@@ -28,7 +28,7 @@ jobs:
             "docs/FAILURE_RECOVERY.md" "docs/HANDOFF_PROTOCOL.md" "docs/OPERATIONS.md"
             "docs/RELAY_RRULE_SELF_UPDATE.md" "docs/SECURITY.md" "docs/STATE_MODEL.md" "docs/UTILIZATION.md"
             "experiments/rrule-self-relay/README.md" "experiments/rrule-self-relay/REPRO_CHECKLIST.md"
-            "schemas/current-state.schema.json" "schemas/handoff.schema.json" "schemas/relay-event.schema.json" "schemas/run-observation.schema.json"
+            "schemas/current-state.schema.json" "schemas/handoff.schema.json" "schemas/relay-event.schema.json" "schemas/run-observation.schema.json" "schemas/relay-validation.schema.json"
             "control/schemas/checkpoint.schema.json" "control/schemas/lease.schema.json" "control/schemas/effect-record.schema.json"
           )
           for path in "${required[@]}"; do
@@ -43,6 +43,7 @@ jobs:
           fetch state/EVENTS.jsonl /tmp/events.jsonl
           fetch state/RUNS.jsonl /tmp/runs.jsonl
           fetch control/relay-policy.v1.json /tmp/relay-policy.json
+          fetch schemas/relay-validation.schema.json /tmp/relay-validation-schema.json
           fetch control/schemas/checkpoint.schema.json /tmp/checkpoint-schema.json
           fetch control/schemas/lease.schema.json /tmp/lease-schema.json
           fetch control/schemas/effect-record.schema.json /tmp/effect-schema.json
@@ -50,6 +51,7 @@ jobs:
           python -m json.tool /tmp/current.json >/dev/null
           python -m json.tool /tmp/handoff.json >/dev/null
           python -m json.tool /tmp/relay-validation.json >/dev/null
+          python -m json.tool /tmp/relay-validation-schema.json >/dev/null
           python -m json.tool /tmp/relay-policy.json >/dev/null
           python -m json.tool /tmp/checkpoint-schema.json >/dev/null
           python -m json.tool /tmp/lease-schema.json >/dev/null
@@ -81,6 +83,9 @@ jobs:
           acceptance=validation.get('acceptance',{})
           mandatory=['canonical_id_preserved','recurring_rrule_preserved','two_or_more_phase_transitions','scheduled_cold_continuation_from_github','additional_cycle_without_continuation_loss','github_state_coherent','runtime_timeout_does_not_break_cycle','overlap_or_serialization_semantics_classified','utilization_handoff_measurement']
           if any(k not in acceptance for k in mandatory): raise SystemExit('relay validation acceptance field missing')
+          allowed_accept={'PASS','PASS_WITH_SCOPE','PENDING','FAIL'}
+          for k in mandatory:
+              if acceptance[k].get('status') not in allowed_accept: raise SystemExit(f'invalid acceptance status: {k}')
           event_ids=set()
           allowed_events={'WAKE_ARMED','WAKE_UPDATE_VERIFIED','WORK_STARTED','CHECKPOINT','SUCCESSOR_OBSERVED','HANDOFF','DEGRADED_CONTINUATION','COMPLETE','BLOCKED_EXTERNAL'}
           for n,line in enumerate(open('/tmp/events.jsonl'),1):
