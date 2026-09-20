@@ -2,6 +2,7 @@
 """Deterministically validate RRuleR forward-only useful-work evidence."""
 from __future__ import annotations
 import json, sys
+from collections import Counter
 from datetime import datetime, timedelta
 from pathlib import Path
 WINDOW_SECONDS=900; TARGET_USEFUL_SECONDS=840; MAX_GAP_SECONDS=120; ACCEPTED="SUBSTANTIVE_ACCEPTED"
@@ -11,7 +12,7 @@ def ts(value:str)->datetime:
     return dt
 def validate_record(record:dict)->list[str]:
     errors=[]
-    for key in ("start_at","end_at","kind","artifact","qualification","basis"):
+    for key in ("record_id","start_at","end_at","kind","artifact","qualification","basis"):
         if not record.get(key): errors.append(f"MISSING_{key.upper()}")
     if errors: return errors
     if record["qualification"]!=ACCEPTED: errors.append("NOT_SUBSTANTIVE_ACCEPTED")
@@ -24,14 +25,17 @@ def validate_record(record:dict)->list[str]:
     except (TypeError,ValueError): errors.append("INVALID_TIMESTAMP")
     return errors
 def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->dict:
+    records=data.get("records",[]); ids=Counter(r.get("record_id") for r in records if r.get("record_id")); duplicate_ids=sorted(k for k,v in ids.items() if v>1)
     record_results=[]; intervals=[]
-    for i,record in enumerate(data.get("records",[])):
-        errors=validate_record(record); record_results.append({"index":i,"errors":errors})
+    for i,record in enumerate(records):
+        errors=validate_record(record)
+        if record.get("record_id") in duplicate_ids: errors.append("DUPLICATE_RECORD_ID")
+        record_results.append({"index":i,"errors":errors})
         if not errors: intervals.append((ts(record["start_at"]),ts(record["end_at"]),i))
     intervals.sort(); overlap_errors=[]
     for left,right in zip(intervals,intervals[1:]):
         if right[0]<left[1]: overlap_errors.append({"left":left[2],"right":right[2],"reason":"OVERLAPPING_INTERVALS"})
-    result={"record_results":record_results,"overlap_errors":overlap_errors,"window":None,"promotion":"INCOMPLETE"}
+    result={"record_results":record_results,"duplicate_record_ids":duplicate_ids,"overlap_errors":overlap_errors,"window":None,"promotion":"INCOMPLETE"}
     if window_start is None: return result
     start=ts(window_start); end=start+timedelta(seconds=WINDOW_SECONDS)
     horizon=ts(observed_through) if observed_through else max((b for _,b,_ in intervals),default=None)
