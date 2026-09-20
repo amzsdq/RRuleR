@@ -27,15 +27,23 @@ jobs:
           set -euo pipefail
           fetch() { curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/$1?ref=$SHA" -o "$2"; }
           mkdir -p /tmp/rruler/tools /tmp/rruler/tests /tmp/rruler/state /tmp/rruler/control
-          for p in state/CURRENT.json state/ACTIVITY.json state/HANDOFF.json state/TURN_PLAN.json state/UTILIZATION.json state/PROGRAM_GOALS.json state/WORK_EVIDENCE.json control/relay-policy.v1.json control/scheduler-fence.v1.json control/rolling-rrule-lifecycle.v1.json control/handoff-recovery.v1.json control/run-continuation-gate.v1.json control/rolling-window-promotion.v1.json; do fetch "$p" "/tmp/rruler/$p"; done
+          for p in state/CURRENT.json state/ACTIVITY.json state/HANDOFF.json state/TURN_PLAN.json state/UTILIZATION.json state/PROGRAM_GOALS.json state/WORK_EVIDENCE.json state/OBSERVATION_HORIZON.json control/relay-policy.v1.json control/scheduler-fence.v1.json control/rolling-rrule-lifecycle.v1.json control/handoff-recovery.v1.json control/run-continuation-gate.v1.json control/rolling-window-promotion.v1.json control/observation-horizon.v1.json; do fetch "$p" "/tmp/rruler/$p"; done
           fetch tools/validate_work_evidence.py /tmp/rruler/tools/validate_work_evidence.py
           fetch tests/test_work_evidence_validator.py /tmp/rruler/tests/test_work_evidence_validator.py
           cd /tmp/rruler
           python - <<'PY'
-          import json
+          import json, os, urllib.request
+          from datetime import datetime
           from pathlib import Path
           def load(path): return json.loads(Path(path).read_text())
-          current=load('state/CURRENT.json'); activity=load('state/ACTIVITY.json'); turn=load('state/TURN_PLAN.json'); util=load('state/UTILIZATION.json'); goals=load('state/PROGRAM_GOALS.json'); policy=load('control/relay-policy.v1.json'); fence=load('control/scheduler-fence.v1.json'); lifecycle=load('control/rolling-rrule-lifecycle.v1.json'); recovery=load('control/handoff-recovery.v1.json'); gate=load('control/run-continuation-gate.v1.json'); promotion=load('control/rolling-window-promotion.v1.json'); evidence=load('state/WORK_EVIDENCE.json')
+          def api(path):
+              req=urllib.request.Request(f"https://api.github.com/repos/{os.environ['REPO']}/{path}",headers={"Authorization":f"Bearer {os.environ['GH_TOKEN']}","Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"})
+              with urllib.request.urlopen(req) as response: return json.load(response)
+          def instant(value):
+              dt=datetime.fromisoformat(value.replace('Z','+00:00'))
+              if dt.tzinfo is None: raise SystemExit('observation horizon timestamp lacks timezone')
+              return dt.timestamp()
+          current=load('state/CURRENT.json'); activity=load('state/ACTIVITY.json'); turn=load('state/TURN_PLAN.json'); util=load('state/UTILIZATION.json'); goals=load('state/PROGRAM_GOALS.json'); policy=load('control/relay-policy.v1.json'); fence=load('control/scheduler-fence.v1.json'); lifecycle=load('control/rolling-rrule-lifecycle.v1.json'); recovery=load('control/handoff-recovery.v1.json'); gate=load('control/run-continuation-gate.v1.json'); promotion=load('control/rolling-window-promotion.v1.json'); evidence=load('state/WORK_EVIDENCE.json'); horizon=load('state/OBSERVATION_HORIZON.json'); horizon_policy=load('control/observation-horizon.v1.json')
           nonterminal={'CONTINUE','DEGRADED_CONTINUATION'}; terminal={'PROGRAM_COMPLETE','BLOCKED_EXTERNAL'}
           if current['program_status'] not in nonterminal|terminal: raise SystemExit('invalid program_status')
           if activity.get('authority_epoch') != current.get('authority_epoch'): raise SystemExit('activity authority_epoch mismatch')
@@ -55,7 +63,20 @@ jobs:
           if (promotion.get('window_seconds'),promotion.get('required_useful_seconds'),promotion.get('max_unexplained_internal_gap_seconds'),promotion.get('minimum_valid_windows_for_pass')) != (900,840,120,3): raise SystemExit('promotion threshold drift')
           if util.get('goal_reached') and len(util.get('valid_completed_turns_rolling',[])) < 3: raise SystemExit('false utilization PASS')
           if evidence.get('rules',{}).get('forward_only') is not True or evidence.get('collection',{}).get('historical_backfill') is not False: raise SystemExit('work evidence invariant broken')
-          print(f"control-plane validation passed owner={current.get('current_owner')} epoch={current.get('authority_epoch')}")
+          if horizon_policy.get('status')!='ACTIVE' or horizon.get('counts_as_useful_work') is not False or horizon.get('monotonic_forward_only') is not True: raise SystemExit('observation horizon invariant broken')
+          kind=horizon.get('provenance_kind'); ref=str(horizon.get('provenance_ref','')); trusted=horizon.get('trusted_observed_through')
+          if kind not in horizon_policy.get('accepted_provenance_kinds',[]): raise SystemExit('unsupported observation horizon provenance kind')
+          if not ref or not trusted: raise SystemExit('observation horizon provenance incomplete')
+          if kind=='GITHUB_ACTIONS_OBSERVED_TIMESTAMP':
+              if not ref.isdigit(): raise SystemExit('GitHub Actions provenance ref must be a run id')
+              source=api(f"actions/runs/{ref}")
+              if source.get('status')!='completed' or source.get('conclusion')!='success': raise SystemExit('observation horizon Actions provenance is not successful/completed')
+              authoritative=source.get('updated_at')
+          elif kind=='GITHUB_COMMIT_COMMITTER_TIMESTAMP':
+              source=api(f"commits/{ref}"); authoritative=source.get('commit',{}).get('committer',{}).get('date')
+          else: raise SystemExit('accepted provenance kind has no verifier')
+          if not authoritative or instant(trusted)!=instant(authoritative): raise SystemExit('trusted_observed_through does not match authoritative provenance timestamp')
+          print(f"control-plane validation passed owner={current.get('current_owner')} epoch={current.get('authority_epoch')} horizon={trusted} provenance={kind}:{ref}")
           PY
           python -m unittest discover -s tests -p 'test_*.py' -v
           python tools/validate_work_evidence.py state/WORK_EVIDENCE.json
