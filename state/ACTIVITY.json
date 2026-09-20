@@ -6,9 +6,9 @@
   "status": "WORKING",
   "active_run_id": "RUN-20260920-2040",
   "authority_epoch": 7,
-  "last_progress_at": "2026-09-20T21:01:16+09:00",
-  "last_progress_kind": "VALIDATOR_HARDENED",
-  "current_unit": "Validate liveness/authority coherence, inspect CI result, then continue to next utilization invariant gap",
+  "last_progress_at": "2026-09-20T21:06:00+09:00",
+  "last_progress_kind": "NO_SELF_TERMINATION_HARDENED",
+  "current_unit": "Validate no-self-termination policy and add measurable early-termination detection",
   "next_wake_due_at": "2026-09-20T21:10:00+09:00",
   "successor_observed": false,
   "operator_ui_note": "UI is advisory; fresh fenced durable activity is authoritative corroboration."
