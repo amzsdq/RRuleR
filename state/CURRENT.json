@@ -6,12 +6,12 @@
   "root_job_id": "RRULER-UTILIZATION-002",
   "root_goal": "Enforce continuous useful-work utilization across root boundaries and make liveness observable without depending on chat UI alone.",
   "status": "CONTINUE",
-  "current_owner": "RUN-20260920-2040",
-  "authority_epoch": 7,
+  "current_owner": "RUN-20260920-2110",
+  "authority_epoch": 8,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-002",
+    "id": "CP-UTILIZATION-003",
     "state": "CONTINUE",
     "completed": [
       "Bootstrap root completed previously",
@@ -19,22 +19,18 @@
       "No-voluntary-idle rule extended across root boundaries",
       "Durable activity heartbeat introduced",
       "Continuation corrected to hourly RRULE phase rotation",
-      "Current successor claimed authority after securing next continuation",
       "Machine-readable liveness policy added",
-      "Bootstrap relay validation scoped as historical root evidence rather than program terminal state",
-      "Control-plane validator now requires control/liveness-policy.v1.json and validates liveness freshness semantics",
-      "Validator now enforces ACTIVITY authority_epoch == CURRENT authority_epoch and WORKING active_run_id == CURRENT current_owner",
-      "Hard no-self-termination invariant persisted in AGENTS.md, POLICY.md, relay-policy, and validator"
+      "Control-plane validator requires liveness policy and authority coherence",
+      "Hard no-self-termination invariant persisted and validated",
+      "21:10 successor secured same-canonical next wake at 21:25 and claimed authority epoch 8"
     ],
     "evidence": [
-      "state/ACTIVITY.json is WORKING for the current run",
-      "control/liveness-policy.v1.json defines freshness and utilization-gap semantics",
-      "state/RELAY_VALIDATION.json now distinguishes ROOT_PASS from program CONTINUE",
-      "commit aae023fc6ebf95ec23e348ad5f21b96910ae7ab6 extends deterministic liveness/authority validation",
-      "commits 8a27b4e, 22413bb, cc6e2a2, faf2e09 enforce and validate nonterminal turn-end prohibition"
+      "state/ACTIVITY.json now identifies RUN-20260920-2110 at authority_epoch 8",
+      "GitHub Actions runs 120 and 121 completed successfully for prior hardening",
+      "same canonical automation remains enabled with next wake 2026-09-20T21:25:00+09:00"
     ],
-    "observation": "Nonterminal voluntary end is now explicitly forbidden and machine-validated. Continue within the same turn by inspecting CI and unresolved utilization gaps.",
-    "next_action": "Inspect latest validation run, then harden measurement so each 15-minute wake records actual run end/reason and exposes voluntary early termination as a validation failure."
+    "observation": "The prior durable owner remained stale after its turn ended. This successor has fenced it by advancing authority and will now make early voluntary termination measurable rather than relying on prose policy alone.",
+    "next_action": "Extend run-observation schema and validator so a nonterminal run that records an end must carry an allowed end reason; classify voluntary early termination as invalid."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_PHASE_ROTATION_15M",
@@ -42,8 +38,8 @@
     "rrule_frequency": "HOURLY",
     "phase_step_minutes": 15,
     "next_wake_first": true,
-    "next_due_at": "2026-09-20T20:55:00+09:00",
-    "current_phase_minute": 55,
+    "next_due_at": "2026-09-20T21:25:00+09:00",
+    "current_phase_minute": 25,
     "handoff_trigger": "SUCCESSOR_ACTUALLY_OBSERVED",
     "voluntary_idle_before_successor_forbidden": true,
     "root_completion_is_stop_condition": false,
