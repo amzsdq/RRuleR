@@ -28,9 +28,10 @@ jobs:
           fetch state/RUNS.jsonl /tmp/runs.jsonl
           fetch control/relay-policy.v1.json /tmp/policy.json
           fetch control/liveness-policy.v1.json /tmp/live.json
+          fetch control/handoff-recovery.v1.json /tmp/recovery.json
           python - <<'PY'
           import json
-          current=json.load(open('/tmp/current.json')); policy=json.load(open('/tmp/policy.json')); live=json.load(open('/tmp/live.json')); activity=json.load(open('/tmp/activity.json')); handoff=json.load(open('/tmp/handoff.json'))
+          current=json.load(open('/tmp/current.json')); policy=json.load(open('/tmp/policy.json')); live=json.load(open('/tmp/live.json')); activity=json.load(open('/tmp/activity.json')); handoff=json.load(open('/tmp/handoff.json')); recovery=json.load(open('/tmp/recovery.json'))
           if current['program_status'] not in {'CONTINUE','PROGRAM_COMPLETE','BLOCKED_EXTERNAL','DEGRADED_CONTINUATION'}: raise SystemExit('invalid program_status')
           if activity.get('authority_epoch') != current.get('authority_epoch'): raise SystemExit('activity authority_epoch mismatch')
           if activity.get('status')=='WORKING' and activity.get('active_run_id') != current.get('current_owner'): raise SystemExit('WORKING owner mismatch')
@@ -38,7 +39,14 @@ jobs:
           expected={'PROGRAM_COMPLETE','BLOCKED_EXTERNAL','COMMITTED_SUCCESSOR_HANDOFF','EXPLICIT_OPERATOR_STOP','PLATFORM_ENFORCED_TERMINATION'}
           if set(policy.get('terminal',{}).get('voluntary_turn_end_allowed_only_for',[])) != expected: raise SystemExit('turn-end allowlist mismatch')
           if live.get('status')!='ACTIVE': raise SystemExit('liveness policy inactive')
+          if recovery.get('status')!='ACTIVE': raise SystemExit('handoff recovery policy inactive')
+          required_recovery=['RE_READ_CURRENT_ACTIVITY_HANDOFF','VERIFY_PREDECESSOR_STILL_OVERDUE_AND_UNCHANGED','ADVANCE_AUTHORITY_EPOCH_TO_SUCCESSOR','MARK_SUCCESSOR_WORKING','MARK_HANDOFF_RECOVERED_TAKEOVER','DO_NOT_REPLAY_PREDECESSOR_ACTIVE_UNIT_BLINDLY','PLAN_15_MIN_WORK_PACKET_FROM_EXACT_DURABLE_NEXT_ACTION','CONTINUE_WORK']
+          if recovery.get('recovery_sequence') != required_recovery: raise SystemExit('handoff recovery sequence mismatch')
+          if recovery.get('successor_may_not_take_over_while_predecessor_is_fresh') is not True: raise SystemExit('fresh predecessor takeover must be forbidden')
           if handoff.get('program_id') != current.get('program_id') or handoff.get('root_job_id') != current.get('root_job_id'): raise SystemExit('handoff identity mismatch')
+          if handoff.get('handoff_state')=='RECOVERED_TAKEOVER':
+              if handoff.get('successor_run_id') != current.get('current_owner'): raise SystemExit('recovered successor must own CURRENT')
+              if not handoff.get('recovery_taken_at') or handoff.get('recovery_reason')!='PREDECESSOR_ACTIVITY_OVERDUE': raise SystemExit('recovered takeover lacks evidence')
           seq=policy.get('handoff',{}).get('successor_start_sequence',[])
           required_seq=['REARM_SAME_CANONICAL_FOR_NEXT_15M','VERIFY_REARM','IF_PREDECESSOR_ACTIVE_PERSIST_HANDOFF_REQUEST','WAIT_FOR_DURABLE_HANDOFF_COMMIT','CLAIM_NEXT_AUTHORITY_EPOCH','PLAN_15_MIN_WORK_PACKET','EXECUTE_WORK_PACKET']
           if seq != required_seq: raise SystemExit('successor sequence mismatch: rearm must precede handoff request')
