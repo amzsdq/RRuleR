@@ -36,6 +36,7 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 │  └─ run-observation.schema.json
 ├─ docs/
 │  ├─ ARCHITECTURE.md
+│  ├─ DESIGN_DECISIONS.md
 │  ├─ FAILURE_RECOVERY.md
 │  ├─ HANDOFF_PROTOCOL.md
 │  ├─ OPERATIONS.md
