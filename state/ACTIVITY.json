@@ -7,11 +7,11 @@
   "active_run_id":"RUN-UTIL-20260921-033304",
   "authority_epoch":23,
   "substantive_work_started_at":"2026-09-21T03:33:20+09:00",
-  "last_progress_at":"2026-09-21T03:33:20+09:00",
-  "last_progress_kind":"ROLLING_WAKE_OBSERVED_AND_PROVISIONAL_REARM_VERIFIED",
-  "current_unit":"UTIL-EXP-011: prove first automatic completion-relative rolling reentry and normalize production measurement state.",
+  "last_progress_at":"2026-09-21T03:36:30+09:00",
+  "last_progress_kind":"ROLLING_MEASUREMENT_AND_SCORECARD_NORMALIZED",
+  "current_unit":"Audit active rolling controls and measurement semantics for residual contradictions before final sample checkpoint.",
   "next_wake_due_at":"2026-09-21T03:46:00+09:00",
   "successor_observed":true,
   "handoff_ready":false,
-  "measurement_note":"Expected durable due was 03:32:00 KST; this invocation was observed at approximately 03:33:04 KST. Same canonical was provisionally rearmed to 03:46 before substantive mutation. Record scheduler delay conservatively from externally supplied wake time; do not infer finer precision."
+  "measurement_note":"Meaningful progress includes production reentry evidence, WAKE_ARCHITECTURE normalization, UTILIZATION normalization, TURN_PLAN refresh, and P0 scorecard advancement. Timestamps are conservative checkpoints rather than inferred continuous work proof."
 }
