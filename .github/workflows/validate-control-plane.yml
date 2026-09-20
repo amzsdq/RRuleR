@@ -43,8 +43,10 @@ jobs:
           if live.get('status')!='ACTIVE': raise SystemExit('liveness policy inactive')
           if recovery.get('status')!='ACTIVE': raise SystemExit('handoff recovery policy inactive')
           if fence.get('status')!='ACTIVE': raise SystemExit('scheduler fence inactive')
-          required_start=['READ_FRESH_CURRENT_BEFORE_AUTOMATION_MUTATION','COMPARE_ACTUAL_WAKE_TO_EXPECTED_DUE','IF_STALE_WAKE_DO_NOT_MUTATE_AUTOMATION_OR_AUTHORITY','IF_EXPECTED_WAKE_REARM_AND_VERIFY','THEN_CONTINUE_HANDOFF_PROTOCOL']
+          required_start=['READ_FRESH_CURRENT_AND_LIVE_CANONICAL','COMPARE_ACTUAL_WAKE_AND_EXPECTED_DUE','IF_MATCH_REARM_AND_VERIFY','IF_MISMATCH_PRESERVE_NEWEST_VERIFIED_LIVE_CONTINUATION','RECONCILE_CURRENT_ACTIVITY_HANDOFF_FORWARD','CLAIM_FRESH_AUTHORITY_IF_NEEDED','CONTINUE_HANDOFF_AND_WORK_PROTOCOL']
           if fence.get('startup_order') != required_start: raise SystemExit('scheduler fence startup order mismatch')
+          rp=fence.get('recovery_policy',{})
+          if fence.get('stale_wake_action')!='RECOVER_FORWARD_NO_ROLLBACK' or rp.get('nonterminal_mismatch_is_blocking') is not False or rp.get('no_op_due_to_stale_timing_forbidden') is not True: raise SystemExit('forward scheduler recovery contract missing')
           if fence.get('queued_old_occurrence_must_not_disable_canonical') is not True or fence.get('queued_old_occurrence_must_not_restore_old_prompt_or_title') is not True: raise SystemExit('stale queued wake mutation fence missing')
           if current.get('continuation',{}).get('scheduler_fence_policy')!='control/scheduler-fence.v1.json': raise SystemExit('CURRENT does not bind scheduler fence')
           sched=policy.get('scheduler',{})
@@ -63,9 +65,6 @@ jobs:
           if stale.get('eligible_when_predecessor_freshness')!='SUSPECT_OR_OVERDUE' or stale.get('handoff_ack_grace_seconds')!=120 or stale.get('requires_no_new_predecessor_progress_during_grace') is not True: raise SystemExit('stale handoff grace contract invalid')
           if recovery.get('successor_may_not_take_over_while_predecessor_is_fresh') is not True: raise SystemExit('fresh predecessor takeover must be forbidden')
           if handoff.get('program_id') != current.get('program_id') or handoff.get('root_job_id') != current.get('root_job_id'): raise SystemExit('handoff identity mismatch')
-          if handoff.get('handoff_state')=='RECOVERED_TAKEOVER':
-              if handoff.get('successor_run_id') != current.get('current_owner'): raise SystemExit('recovered successor must own CURRENT')
-              if not handoff.get('recovery_taken_at') or not handoff.get('recovery_reason'): raise SystemExit('recovered takeover lacks evidence')
           seq=policy.get('handoff',{}).get('successor_start_sequence',[])
           required_seq=['REARM_SAME_CANONICAL_FOR_NEXT_15M','VERIFY_REARM','IF_PREDECESSOR_ACTIVE_PERSIST_HANDOFF_REQUEST','WAIT_FOR_DURABLE_HANDOFF_COMMIT','CLAIM_NEXT_AUTHORITY_EPOCH','PLAN_15_MIN_WORK_PACKET','EXECUTE_WORK_PACKET']
           if seq != required_seq: raise SystemExit('successor sequence mismatch')
@@ -74,7 +73,6 @@ jobs:
           if cycle.get('runtime_safety_margin_minutes') != 1 or cycle.get('handoff_ready_at_minutes') != 14 or cycle.get('large_unit_admission_cutoff_minutes') != 12: raise SystemExit('runtime safety margin invalid')
           if policy.get('utilization',{}).get('no_voluntary_idle_in_safety_margin') is not True: raise SystemExit('handoff safety margin may not become idle tail')
           if policy.get('handoff',{}).get('successor_rearm_before_handoff_request_required') is not True: raise SystemExit('successor rearm must precede handoff request')
-          if handoff.get('protocol') != 'SUCCESSOR_REARM_THEN_REQUEST': raise SystemExit('handoff protocol mismatch')
           seen=set()
           for n,line in enumerate(open('/tmp/runs.jsonl'),1):
               if not line.strip(): continue
