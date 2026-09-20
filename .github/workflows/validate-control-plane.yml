@@ -143,7 +143,7 @@ jobs:
 
           assert util['target']['turn_window_seconds']==900
           assert util['target']['observed_useful_span_seconds']==840
-          assert util['measurement']['maximum_unexplained_gap_seconds_for_acceptance']==120
+          assert util['target']['maximum_internal_progress_gap_seconds_for_acceptance']==120
 
           if activity.get('status')=='WORKING':
               assert activity.get('authority_epoch')==current.get('authority_epoch')
