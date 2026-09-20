@@ -20,29 +20,36 @@
       "Validator requires successor evidence for handoff endings and matching terminal program status for COMPLETE/BLOCKED endings",
       "A transient validator workflow regression was detected, diagnosed as checkout/setup failure, and replaced with dependency-free GitHub-contents validation",
       "Replacement validator commit b8fe1176 passed GitHub Actions run 126",
-      "Utilization handoff measurement is now a blocking acceptance item for the active utilization root"
+      "Utilization handoff measurement is now a blocking acceptance item for the active utilization root",
+      "Recovered missed 21:25 occurrence by rearming same canonical for 21:28 KST",
+      "Scheduler policy changed to derive next due from actual wake +15m instead of stale prior phase +15"
     ],
     "evidence": [
       "commit 9fae757 added unauthorized early-end rejection",
       "workflow run 124 failed before validation steps, exposing a validator transport/setup regression",
       "commit b8fe117 restored dependency-free validation and workflow run 126 succeeded",
-      "state/RELAY_VALIDATION.json now makes utilization_handoff_measurement blocking"
+      "state/RELAY_VALIDATION.json now makes utilization_handoff_measurement blocking",
+      "Automation metadata showed last run 21:24:36 KST, schedule update 21:24:58 KST for 21:25, causing the 21:25 occurrence to be effectively missed and fallback to 22:25"
     ],
-    "observation": "Policy-only prohibition has been converted into a durable measurable invariant. Historical RUNS entries still lack exact end boundaries, so the next successor cycle must capture end reason/timing rather than infer it.",
-    "next_action": "Keep RUN-20260920-2110 active. At actual successor observation, persist this run's end boundary with COMMITTED_SUCCESSOR_HANDOFF; otherwise continue useful utilization work until platform termination. Next successor must measure the resulting gap/overlap and update RUNS.jsonl."
+    "observation": "Direct utilization gap root cause identified: stale-phase self-shift can arm only seconds ahead after scheduler delay. Same canonical recovered to 21:28 and policy is being hardened against recurrence.",
+    "next_action": "On the 21:28 wake, compute next due from actual wake/start +15 minutes, verify same-canonical update, then continue substantive utilization work without voluntary termination."
   },
   "continuation": {
-    "mechanism": "RRULE_HOURLY_PHASE_ROTATION_15M",
+    "mechanism": "RRULE_HOURLY_SELF_SHIFT_FROM_ACTUAL_WAKE",
     "cadence_minutes_effective": 15,
     "rrule_frequency": "HOURLY",
     "phase_step_minutes": 15,
     "next_wake_first": true,
-    "next_due_at": "2026-09-20T21:25:00+09:00",
-    "current_phase_minute": 25,
+    "next_due_at": "2026-09-20T21:28:00+09:00",
+    "current_phase_minute": 28,
     "handoff_trigger": "SUCCESSOR_ACTUALLY_OBSERVED",
     "voluntary_idle_before_successor_forbidden": true,
     "root_completion_is_stop_condition": false,
     "program_terminal_disabled_required": true
   },
-  "safety": {"public_repo":true,"secrets_allowed":false,"reference_repo_amzsdq_R":"READ_ONLY"}
+  "safety": {
+    "public_repo": true,
+    "secrets_allowed": false,
+    "reference_repo_amzsdq_R": "READ_ONLY"
+  }
 }
