@@ -6,33 +6,27 @@
   "root_job_id": "RRULER-UTILIZATION-002",
   "root_goal": "Enforce continuous useful-work utilization across root boundaries and make liveness observable without depending on chat UI alone.",
   "status": "CONTINUE",
-  "current_owner": "RUN-20260920-2110",
-  "authority_epoch": 8,
+  "current_owner": "RUN-20260920-2128",
+  "authority_epoch": 9,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-004",
+    "id": "CP-UTILIZATION-005",
     "state": "CONTINUE",
     "completed": [
       "Hard no-self-termination invariant persisted and validated",
-      "21:10 successor secured same-canonical next wake at 21:25 and claimed authority epoch 8",
-      "Validator now rejects any recorded run end lacking an allowed end reason",
-      "Validator requires successor evidence for handoff endings and matching terminal program status for COMPLETE/BLOCKED endings",
-      "A transient validator workflow regression was detected, diagnosed as checkout/setup failure, and replaced with dependency-free GitHub-contents validation",
-      "Replacement validator commit b8fe1176 passed GitHub Actions run 126",
-      "Utilization handoff measurement is now a blocking acceptance item for the active utilization root",
-      "Recovered missed 21:25 occurrence by rearming same canonical for 21:28 KST",
-      "Scheduler policy changed to derive next due from actual wake +15m instead of stale prior phase +15"
+      "Scheduler rearm now derives next due from actual wake plus at least 15 minutes",
+      "21:28 run secured same-canonical next wake at 21:43 before substantive work",
+      "Created state/RUN_OBSERVATIONS.jsonl so utilization is measured per run instead of inferred only from commit bursts",
+      "Claimed authority epoch 9 for RUN-20260920-2128"
     ],
     "evidence": [
-      "commit 9fae757 added unauthorized early-end rejection",
-      "workflow run 124 failed before validation steps, exposing a validator transport/setup regression",
-      "commit b8fe117 restored dependency-free validation and workflow run 126 succeeded",
-      "state/RELAY_VALIDATION.json now makes utilization_handoff_measurement blocking",
-      "Automation metadata showed last run 21:24:36 KST, schedule update 21:24:58 KST for 21:25, causing the 21:25 occurrence to be effectively missed and fallback to 22:25"
+      "commit 41bf6aa3d09864643ea7f9e44a43df0727ed5133 created first live run observation",
+      "commit 8faa7676265026817269ff402359d38b04b525e8 refreshed fenced activity for the 21:28 run",
+      "same canonical automation was verified enabled with next recurrence at 21:43 KST"
     ],
-    "observation": "Direct utilization gap root cause identified: stale-phase self-shift can arm only seconds ahead after scheduler delay. Same canonical recovered to 21:28 and policy is being hardened against recurrence.",
-    "next_action": "On the 21:28 wake, compute next due from actual wake/start +15 minutes, verify same-canonical update, then continue substantive utilization work without voluntary termination."
+    "observation": "The active root now has direct per-run measurement. The current run remains non-terminal and must continue useful work until a permitted end condition occurs.",
+    "next_action": "Harden the validator and operating docs so every run must create/close a run observation and voluntary early termination becomes measurable; then continue to the next unresolved utilization gap in the same turn."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_SELF_SHIFT_FROM_ACTUAL_WAKE",
@@ -40,8 +34,8 @@
     "rrule_frequency": "HOURLY",
     "phase_step_minutes": 15,
     "next_wake_first": true,
-    "next_due_at": "2026-09-20T21:28:00+09:00",
-    "current_phase_minute": 28,
+    "next_due_at": "2026-09-20T21:43:00+09:00",
+    "current_phase_minute": 43,
     "handoff_trigger": "SUCCESSOR_ACTUALLY_OBSERVED",
     "voluntary_idle_before_successor_forbidden": true,
     "root_completion_is_stop_condition": false,
