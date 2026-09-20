@@ -1,16 +1,3 @@
 {
-  "schema_version": "1.0",
-  "program_id": "RRULER-PROGRAM-001",
-  "root_job_id": "RRULER-UTILIZATION-003",
-  "handoff_state": "HANDOFF_REQUESTED",
-  "predecessor_run_id": "RUN-UTIL-20260921-004608",
-  "successor_run_id": "RUN-UTIL-20260921-010000",
-  "successor_expected_at": "2026-09-21T01:00:00+09:00",
-  "successor_observed_at": "2026-09-21T00:59:19+09:00",
-  "request_persisted_at": "2026-09-21T01:00:00+09:00",
-  "predecessor_last_progress_at": "2026-09-21T00:58:39+09:00",
-  "recovery_basis": null,
-  "active_unit": "UTIL-EXP-006 evidence-driven runtime continuity architecture",
-  "checkpoint_id": "CP-UTILIZATION-022",
-  "next_action": "Predecessor epoch 17 should close its smallest safe unit and commit handoff. Successor has already rearmed canonical to 01:15; if epoch 17 becomes stale under recovery policy, successor may recover authority and continue P0 runtime-continuity work."
+  "schema_version":"1.0","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","handoff_state":"RECOVERED_TAKEOVER","predecessor_run_id":"RUN-UTIL-20260921-004608","successor_run_id":"RUN-UTIL-20260921-010000","successor_expected_at":"2026-09-21T01:00:00+09:00","successor_observed_at":"2026-09-21T00:59:19+09:00","request_persisted_at":"2026-09-21T01:00:00+09:00","predecessor_last_progress_at":"2026-09-21T00:58:39+09:00","recovery_basis":"Predecessor had no new durable progress beyond the configured 120-second freshness threshold after successor observation; reread remained unchanged.","active_unit":"UTIL-EXP-007 hard continuation gate and runtime continuity","checkpoint_id":"CP-UTILIZATION-023","next_action":"Epoch 18 owns authority. Enforce the machine-readable continuation gate, validate it, and continue P0 utilization/runtime-continuity work until an actual successor handoff boundary."
 }
