@@ -17,7 +17,10 @@ def validate_record(record:dict)->list[str]:
     if record["qualification"]!=ACCEPTED: errors.append("NOT_SUBSTANTIVE_ACCEPTED")
     if record.get("start_boundary")!="OBSERVED" or record.get("end_boundary")!="OBSERVED": errors.append("BOUNDARY_NOT_OBSERVED")
     try:
-        if ts(record["end_at"])<=ts(record["start_at"]): errors.append("NON_POSITIVE_INTERVAL")
+        start,end=ts(record["start_at"]),ts(record["end_at"]); duration=(end-start).total_seconds()
+        if duration<=0: errors.append("NON_POSITIVE_INTERVAL")
+        declared=record.get("observed_seconds")
+        if declared is not None and (not isinstance(declared,(int,float)) or isinstance(declared,bool) or abs(float(declared)-duration)>1e-9): errors.append("OBSERVED_SECONDS_MISMATCH")
     except (TypeError,ValueError): errors.append("INVALID_TIMESTAMP")
     return errors
 def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->dict:
@@ -37,7 +40,7 @@ def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->
         return result
     clipped=[]
     for a,b,idx in intervals:
-        x,y=max(a,start),min(b,end)
+        x,y=max(a,start),min(b,end,horizon)
         if y>x: clipped.append((x,y,idx))
     useful=sum((b-a).total_seconds() for a,b,_ in clipped); gaps=[]; cursor=start
     for a,b,idx in clipped:
