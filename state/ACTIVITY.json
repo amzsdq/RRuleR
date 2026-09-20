@@ -7,9 +7,9 @@
   "active_run_id": "RUN-UTIL-20260920-231559",
   "authority_epoch": 12,
   "substantive_work_started_at": "2026-09-20T23:16:15+09:00",
-  "last_progress_at": "2026-09-20T23:16:15+09:00",
-  "last_progress_kind": "AUTHORITY_CLAIMED_AFTER_REARM",
-  "current_unit": "UTIL-EXP-002: execute checkpointable utilization work; harden live run observation and measurement evidence while preserving the :30 successor wake.",
+  "last_progress_at": "2026-09-20T23:18:00+09:00",
+  "last_progress_kind": "VALIDATOR_REPAIRED_AND_GREEN",
+  "current_unit": "Continue UTIL-EXP-002: harden exact run-boundary measurement and keep durable progress fresh until actual :30 successor observation.",
   "next_wake_due_at": "2026-09-20T23:30:00+09:00",
   "successor_observed": false,
   "handoff_ready": false
