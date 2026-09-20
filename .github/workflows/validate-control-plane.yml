@@ -38,6 +38,7 @@ jobs:
             "docs/STATE_MODEL.md"
             "docs/UTILIZATION.md"
             "experiments/rrule-self-relay/README.md"
+            "experiments/rrule-self-relay/REPRO_CHECKLIST.md"
             "schemas/current-state.schema.json"
             "schemas/handoff.schema.json"
             "schemas/relay-event.schema.json"
