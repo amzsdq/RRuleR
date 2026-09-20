@@ -2,22 +2,31 @@
   "schema_version": "1.0",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "authority_epoch": 15,
-  "run_id": "RUN-UTIL-20260921-001349",
-  "status": "TEMPLATE_PENDING_NEXT_AUTHORITY",
-  "objective_id": "NEXT-WAKE-MUST-ASSIGN",
-  "objective": "Next authority owner must replace this template before substantive work with one coherent objective sized for 10-14 minutes.",
+  "authority_epoch": 16,
+  "run_id": "RUN-UTIL-20260921-003046",
+  "status": "ACTIVE",
+  "objective_id": "UTIL-EXP-005",
+  "objective": "Close the plan-enforcement gap exposed by epoch 15: make a real 10-14 minute primary objective machine-enforced and measurable rather than policy-only, and leave the next successor an exact live-retest continuation.",
   "expected_useful_seconds": 840,
   "acceptance_criteria": [
-    "A fresh authority owner replaces this template before substantive execution."
+    "The validator rejects TEMPLATE_PENDING_NEXT_AUTHORITY or placeholder objective for an authority owner that is already WORKING.",
+    "TURN_PLAN records durable per-substep progress timestamps/evidence and a clear terminal/handoff disposition.",
+    "Utilization state can distinguish plan-created, plan-executed, premature-return, and handoff-finalized outcomes without invented timestamps.",
+    "Fresh CI passes for the strengthened control-plane contract and the next live turn is instructed to retest the mechanism rather than merely restate policy."
   ],
   "checkpointable_substeps": [
-    "Rearm and verify next wake",
-    "Claim/reconcile authority",
-    "Replace this template with the actual 10-14 minute objective plan"
+    "Audit current validator and utilization schema for plan-enforcement blind spots.",
+    "Strengthen machine-readable TURN_PLAN/validator invariants and progress evidence fields.",
+    "Update utilization experiment state with explicit plan-first outcome classification.",
+    "Run/inspect validation and persist exact live-retest continuation for successor."
   ],
   "current_substep": 0,
-  "handoff_boundary": "Any completed listed substep with durable state saved.",
-  "early_finish_fallback": "Select a materially related continuation objective; do not add unrelated filler.",
-  "created_for_next_wake": true
+  "handoff_boundary": "After any substep has its exact changed files/evidence durably committed; successor resumes from current_substep and must not redo accepted prior substeps.",
+  "early_finish_fallback": "Audit the next highest-risk utilization loophole that could permit a WORKING owner to stop without a plan outcome, and add a deterministic guard if evidence supports it.",
+  "created_for_next_wake": false,
+  "started_at": "2026-09-21T00:31:00+09:00",
+  "last_progress_at": "2026-09-21T00:31:00+09:00",
+  "progress_evidence": [
+    "Epoch 15 was still WORKING but TURN_PLAN remained TEMPLATE_PENDING_NEXT_AUTHORITY through the next wake, proving policy text alone did not enforce plan creation."
+  ]
 }
