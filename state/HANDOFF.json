@@ -3,11 +3,14 @@
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
   "handoff_state": "RECOVERED_TAKEOVER",
-  "predecessor_run_id": "RUN-UTIL-20260921-001349",
-  "successor_run_id": "RUN-UTIL-20260921-003046",
-  "successor_expected_at": "2026-09-21T00:30:00+09:00",
-  "successor_observed_at": "2026-09-21T00:30:46+09:00",
-  "active_unit": "UTIL-EXP-005 machine-enforced primary-turn plan and outcome instrumentation",
-  "checkpoint_id": "CP-UTILIZATION-020",
-  "next_action": "Epoch 16 owns authority. Execute the persisted UTIL-EXP-005 plan; successor at :45 should request handoff after rearming :00 and either receive a normal commit or recover only if epoch 16 is stale."
+  "predecessor_run_id": "RUN-UTIL-20260921-003046",
+  "successor_run_id": "RUN-UTIL-20260921-004608",
+  "successor_expected_at": "2026-09-21T00:45:00+09:00",
+  "successor_observed_at": "2026-09-21T00:46:08+09:00",
+  "request_persisted_at": "2026-09-21T00:46:23+09:00",
+  "predecessor_last_progress_at": "2026-09-21T00:33:25+09:00",
+  "recovery_basis": "ALREADY_STALE_FAST_PATH: predecessor had no durable progress for >120 seconds before successor request; immediate reread showed unchanged durable predecessor state.",
+  "active_unit": "UTIL-EXP-006 evidence-driven runtime continuity architecture",
+  "checkpoint_id": "CP-UTILIZATION-021",
+  "next_action": "Epoch 17 owns authority. Execute UTIL-EXP-006; successor at :00 should request handoff after rearming :15 and either receive a normal commit or recover only if epoch 17 is stale."
 }
