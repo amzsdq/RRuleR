@@ -4,7 +4,8 @@
 
 - `control/POLICY.md` — human-readable architectural policy.
 - `control/relay-policy.v1.json` — machine-readable relay policy for scheduler/utilization/handoff behavior.
-- `state/CURRENT.json` — current root/job projection and exact continuation state.
+- `state/CURRENT.json` — current program/root projection and exact continuation state.
+- `state/ACTIVITY.json` — current observable run/activity heartbeat.
 
 If prose and machine-readable relay fields disagree, fail closed and reconcile them before relying on the disputed behavior.
 
@@ -22,6 +23,8 @@ If prose and machine-readable relay fields disagree, fail closed and reconcile t
 10. **Completion requires evidence, not worker prose.**
 11. **Useful-work utilization is a first-class operating objective.**
 12. **Scheduled time is not a voluntary stop signal.**
+13. **Root completion is not automatically program completion.**
+14. **An active program must not voluntarily create an idle gap when useful admissible work exists.**
 
 ## Authority
 
@@ -33,11 +36,14 @@ A stale run may read state but must not perform authoritative substantive writes
 
 After the next wake is verified:
 
+- mark durable activity WORKING;
 - begin substantive work immediately;
-- keep selecting useful admissible bounded work units while the root is non-terminal;
-- do not stop at document, checkpoint, milestone, phase, or quarter boundaries;
+- keep selecting useful admissible bounded work units while the program is non-terminal;
+- do not stop at document, checkpoint, milestone, phase, root, or schedule boundaries;
 - checkpoint frequently enough for recovery without treating checkpoint creation as a yield;
-- only successor observation, terminal completion, or a proven external blocker authorizes normal relinquishment.
+- on root completion, persist root terminal evidence, select the next materially useful root if one exists, persist it, and continue;
+- never generate busywork solely to satisfy utilization;
+- only successor observation, verified program completion, explicit operator stop, a proven external blocker with internal alternatives exhausted, or platform-enforced termination authorizes normal relinquishment.
 
 ## Handoff
 
@@ -54,32 +60,41 @@ predecessor stops starting new units
         ↓
 finish current smallest safe work unit
         ↓
-persist checkpoint + duration + evidence + exact next action
+persist checkpoint + activity + duration + evidence + exact next action
         ↓
 handoff status / predecessor end
         ↓
 successor reconstructs from GitHub and resumes
 ```
 
-Scheduled quarter arrival without successor evidence is not a handoff trigger.
+Scheduled recurrence arrival without successor evidence is not a handoff trigger.
 
 If same-canonical overlap is unsupported, correctness falls back to durable reconstruction, but the predecessor must not voluntarily introduce an idle period before platform-enforced termination.
 
 ## Scheduler policy
 
-Scheduler mechanism is replaceable. The currently reproduced mechanism is `docs/RELAY_RRULE_SELF_UPDATE.md`.
+Scheduler mechanism is replaceable. The active relay uses the same canonical automation on a recurring 15-minute RRULE. It must not be converted to one-shot and must not be replaced merely to continue normal work.
 
 Architectural invariant:
 
-> A live non-terminal job that requires continuation must have a valid recoverable continuation path.
+> A live non-terminal program that requires continuation must have a valid recoverable continuation path.
+
+## Activity evidence and UI
+
+The ChatGPT composer/stop-button state is not authoritative durable state, but it is a useful operator-facing liveness signal.
+
+- Stop button: usually means the foreground turn is still generating.
+- Send button / idle composer: means that foreground turn ended, but does not rule out a separate scheduled run.
+- To align behavior with the operator's practical observation, an active predecessor does not voluntarily send its normal final response while it still owns work and no successor has been observed.
+- `state/ACTIVITY.json` is the durable corroborating signal. Idle UI plus stale activity and no successor evidence is a utilization incident.
 
 ## Failure semantics
 
-- Fast self-update failure while the prior recurring RRULE remains verified alive is `DEGRADED_CONTINUATION`, not immediate death.
-- The surviving hourly recurrence may provide a low-frequency self-rescue opportunity.
+- Recurrence repair failure while a prior valid RRULE remains alive is `DEGRADED_CONTINUATION`, not immediate death.
+- A surviving recurrence may provide a recovery opportunity.
 - Disabled/deleted/missing automation is not rescued by that fallback.
 - Repeated blind retry without a new hypothesis or reconciliation evidence is forbidden.
 
 ## Public-safe persistence
 
-RRuleR must remain safe to expose publicly. Never persist credentials, cookies, private files, private message content, or private-repository material.
+RRuleR must remain safe to expose publicly. Never persist credentials, cookies, private files, private message content, private-repository material, or personal data.
