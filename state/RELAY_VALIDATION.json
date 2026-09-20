@@ -14,9 +14,9 @@
     "github_state_coherent": {"status":"PASS","blocking":true},
     "runtime_timeout_does_not_break_cycle": {"status":"PASS_WITH_SCOPE","blocking":true},
     "overlap_or_serialization_semantics_classified": {"status":"PENDING","blocking":false},
-    "utilization_handoff_measurement": {"status":"PENDING","blocking":true,"detail":"Active root now requires durable run-end reason and timing evidence sufficient to distinguish platform termination, successor handoff, and unauthorized voluntary early end."}
+    "utilization_handoff_measurement": {"status":"IN_PROGRESS","blocking":true,"detail":"RUN-UTIL-20260920-231559 is the first post-recovery live 14+1 measurement attempt. It has a durable substantive start boundary and an open RUNS observation; it must not count until an actual successor/end boundary is recorded. Current utilization PASS still requires three valid completed turns with rolling mean observed useful span >= 840 seconds."}
   },
   "pass_rule": "PASS applies to the historical bootstrap relay reproduction root, not the overall RRuleR program or current utilization root.",
   "decision": {"root":"ROOT_PASS","program":"CONTINUE"},
-  "next_action": "Current utilization root remains CONTINUE until run termination reason/timing is durably measurable and at least one successor cycle demonstrates the rule."
+  "next_action": "Keep RUN-UTIL-20260920-231559 productive through the :30 successor boundary. Successor rearms to :45 first, records actual observation/request, predecessor drains and commits exact final progress/end evidence, then finalize the turn without inferred timestamps."
 }
