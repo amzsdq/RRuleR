@@ -1,64 +1,19 @@
 {
-  "schema_version": "1.2",
-  "program_id": "RRULER-PROGRAM-001",
-  "goal": "Sustained wall-clock useful-work coverage >=93.33% with substantive durable-evidence gaps <=120s.",
-  "status": "NEAR_PASS_ZERO_ACCEPTED_WINDOWS",
-  "current_epoch": 18,
-  "metrics": {
-    "evaluation_window_seconds": 900,
-    "target_useful_seconds": 840,
-    "target_fraction": 0.9333333333,
-    "required_consecutive_audited_windows": 3,
-    "passing_consecutive_windows": 0,
-    "latest_closed_window_id": "COV-20260921-0100",
-    "latest_endpoint_coverage_candidate_seconds": 852,
-    "latest_endpoint_fraction_candidate": 0.9466666667,
-    "latest_substantive_commit_points": 40,
-    "latest_max_substantive_gap_seconds": 125,
-    "gap_limit_seconds": 120,
-    "latest_strict_audit_run_id": 35522427744,
-    "latest_strict_audit": "FAIL_BY_5_SECONDS",
-    "epoch18_long_run_still_active": true
-  },
-  "active_interventions": [
-    {
-      "id": "HARD_CONTINUATION_GATE",
-      "state": "IMPLEMENTED_VALIDATED_LONG_RUN_SUCCESS",
-      "expected_effect": "Prevent voluntary early return after objective/checkpoint completion."
-    },
-    {
-      "id": "LONG_RUN_SLIDING_COLD_RESCUE",
-      "state": "ACTIVE",
-      "expected_effect": "Exploit long healthy invocations while preserving a future same-canonical recovery wake."
-    },
-    {
-      "id": "EVENT_WAKE_CHAIN",
-      "state": "AWAITING_TRIGGER_PROVISIONING",
-      "expected_effect": "Provide independent fast replacement after abrupt platform boundary."
-    },
-    {
-      "id": "ACTIONS_5M_RESCUE",
-      "state": "PRODUCER_SELF_TEST_PASS_CONSUMER_INACTIVE",
-      "expected_effect": "Bound stale-owner rescue emission once event consumer exists."
-    },
-    {
-      "id": "HEARTBEAT_EXCLUDING_WINDOW_AUDIT",
-      "state": "ACTIVE_CAUGHT_FALSE_PASS",
-      "expected_effect": "Prevent heartbeat-only writes from laundering idle time into useful-work coverage."
-    },
-    {
-      "id": "PREFINAL_AUTHORIZATION_GATE_V2",
-      "state": "IMPLEMENTED",
-      "expected_effect": "Treat user-visible final as a run-ending side effect and deny it while CONTINUE/DEGRADED_CONTINUATION remains owned without committed handoff/operator stop/platform boundary."
-    }
+  "schema_version":"1.3",
+  "program_id":"RRULER-PROGRAM-001",
+  "goal":"Sustained wall-clock useful-work coverage >=93.33% with substantive durable-evidence gaps <=120s.",
+  "status":"ZERO_ACCEPTED_WINDOWS_RECOVERY_BOTTLENECK_CONFIRMED",
+  "current_epoch":19,
+  "metrics":{"evaluation_window_seconds":900,"target_useful_seconds":840,"target_fraction":0.9333333333,"required_consecutive_audited_windows":3,"passing_consecutive_windows":0,"latest_closed_window_id":"COV-20260921-0115","latest_closed_window_result":"FAIL_RUNTIME_BOUNDARY_GAP","epoch18_last_meaningful_progress_at":"2026-09-21T01:25:08+09:00","epoch19_first_meaningful_progress_at":"2026-09-21T01:33:11+09:00","observed_recovery_gap_seconds":483,"recovery_target_seconds_lte":120,"epoch19_scheduler_prework_loss_seconds":191},
+  "active_interventions":[
+    {"id":"HARD_CONTINUATION_GATE","state":"IMPLEMENTED_BEHAVIORALLY_USEFUL_NOT_PHYSICAL_LIVENESS","expected_effect":"Suppress voluntary objective-complete return; cannot physically prevent invocation disappearance."},
+    {"id":"PREFINAL_AUTHORIZATION_GATE_V2","state":"IMPLEMENTED_CI_VALIDATED","expected_effect":"Deny normal final while nonterminal authority remains; future cold wake is not end authority."},
+    {"id":"LONG_RUN_SLIDING_COLD_RESCUE","state":"ACTIVE_RECOVERY_CORRECT_BUT_483S_TOO_SLOW","expected_effect":"Preserve eventual recovery after abrupt loss."},
+    {"id":"EVENT_WAKE_CHAIN","state":"AWAITING_TRIGGER_PROVISIONING_HIGHEST_VALUE","expected_effect":"Provide independent replacement capable in principle of <=120s recovery."},
+    {"id":"ACTIONS_5M_RESCUE","state":"PRODUCER_SELF_TEST_PASS_CONSUMER_INACTIVE_NO_SCHEDULE_RUN_OBSERVED","expected_effect":"Best-effort liveness rescue only; not a <=120s path."},
+    {"id":"SHORTER_SLIDING_RESCUE_HORIZON","state":"CANDIDATE_ADR002_NOT_ACTIVE","expected_effect":"Reduce cold-rescue gap if deadline-maintenance risk is empirically acceptable."}
   ],
-  "live_interpretation": "The 01:00-01:15 window had enough endpoint coverage for 94.67%, but the stronger audit found one 125-second gap between substantive durable commits after excluding ACTIVITY-only heartbeats. Because the acceptance limit is 120 seconds, the earlier PASS is revoked. This is a near-pass by 5 seconds, not a target achievement.",
-  "dominant_risks": [
-    "Substantive evidence cadence must stay <=120 seconds without manufacturing busywork.",
-    "Independent fast replacement after platform-forced disappearance remains unavailable.",
-    "Same-canonical overlap was not observed.",
-    "Work event trigger is not provisioned and Codex Cloud is not connected.",
-    "Model/runtime may still terminate outside repository control; such disappearance must be recovered by an independent wake path rather than mistaken for an authorized final."
-  ],
-  "next_decision": "On every live owner, require a fresh pre-final gate immediately before any final. If denied, continue useful work; an armed quarter wake is cold rescue only and never permission to idle."
+  "live_interpretation":"The user-observed idle period is now quantified rather than treated as a vague scheduler problem. Epoch 18 remained useful for a long time, then disappeared without committed handoff. The current cold fallback resumed meaningful work 483 seconds after the last meaningful predecessor commit. Therefore the primary bottleneck has shifted from voluntary early yield to replacement latency after physical invocation loss.",
+  "dominant_risks":["No independent <=120s wake path is provisioned.","Shortening same-canonical rescue horizon may create a missed-due-to-hourly-gap hazard if the live owner fails to roll it in time.","GitHub Actions scheduled rescue has not yet produced a schedule-event observation and cannot meet <=120s by design.","Fixed-window utilization cannot pass while multi-minute replacement gaps remain."],
+  "next_decision":"Keep epoch 19 doing useful work and keep 01:45 as cold rescue only. Do not add more no-yield prose. Highest-value work is independent event wake provisioning/validation; ADR-002 is the fallback experiment if that remains unavailable."
 }
