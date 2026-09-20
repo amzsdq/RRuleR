@@ -23,16 +23,18 @@
       "Machine-readable liveness policy added",
       "Bootstrap relay validation scoped as historical root evidence rather than program terminal state",
       "Control-plane validator now requires control/liveness-policy.v1.json and validates liveness freshness semantics",
-      "Validator now enforces ACTIVITY authority_epoch == CURRENT authority_epoch and WORKING active_run_id == CURRENT current_owner"
+      "Validator now enforces ACTIVITY authority_epoch == CURRENT authority_epoch and WORKING active_run_id == CURRENT current_owner",
+      "Hard no-self-termination invariant persisted in AGENTS.md, POLICY.md, relay-policy, and validator"
     ],
     "evidence": [
       "state/ACTIVITY.json is WORKING for the current run",
       "control/liveness-policy.v1.json defines freshness and utilization-gap semantics",
       "state/RELAY_VALIDATION.json now distinguishes ROOT_PASS from program CONTINUE",
-      "commit aae023fc6ebf95ec23e348ad5f21b96910ae7ab6 extends deterministic liveness/authority validation"
+      "commit aae023fc6ebf95ec23e348ad5f21b96910ae7ab6 extends deterministic liveness/authority validation",
+      "commits 8a27b4e, 22413bb, cc6e2a2, faf2e09 enforce and validate nonterminal turn-end prohibition"
     ],
-    "observation": "First utilization-hardening unit implemented. GitHub Actions run 35509429661 started for the validator change; continue useful work rather than yielding at this checkpoint.",
-    "next_action": "Inspect workflow run 35509429661 to completion; if green, identify and implement the next invariant gap that can reduce voluntary idle or stale-owner ambiguity."
+    "observation": "Nonterminal voluntary end is now explicitly forbidden and machine-validated. Continue within the same turn by inspecting CI and unresolved utilization gaps.",
+    "next_action": "Inspect latest validation run, then harden measurement so each 15-minute wake records actual run end/reason and exposes voluntary early termination as a validation failure."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_PHASE_ROTATION_15M",
