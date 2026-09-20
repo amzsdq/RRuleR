@@ -4,13 +4,13 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "status": "WORKING",
-  "active_run_id": "RUN-UTIL-20260920-231559",
-  "authority_epoch": 12,
-  "substantive_work_started_at": "2026-09-20T23:16:15+09:00",
-  "last_progress_at": "2026-09-20T23:30:15+09:00",
-  "last_progress_kind": "TARGET_SPAN_REACHED_AWAITING_ACTUAL_SUCCESSOR",
-  "current_unit": "HANDOFF_READY: 840-second observed span boundary is now durably covered; continue tiny safe work until positive successor evidence, then drain and finalize without inferring end time.",
-  "next_wake_due_at": "2026-09-20T23:30:00+09:00",
+  "active_run_id": "RUN-UTIL-20260920-235858",
+  "authority_epoch": 14,
+  "substantive_work_started_at": "2026-09-20T23:59:54+09:00",
+  "last_progress_at": "2026-09-21T00:00:00+09:00",
+  "last_progress_kind": "AUTHORITY_RECOVERY_AND_HANDOFF_LATENCY_FIX",
+  "current_unit": "UTIL-EXP-003: eliminate baton recovery latency while maintaining checkpointable useful work and exact observed-boundary measurement.",
+  "next_wake_due_at": "2026-09-21T00:15:00+09:00",
   "successor_observed": false,
-  "handoff_ready": true
+  "handoff_ready": false
 }
