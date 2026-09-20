@@ -1,18 +1,20 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
-  "policy_revision": 2,
+  "policy_revision": 3,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
-    "mechanism": "RRULE_ROLLING_15M",
+    "mechanism": "RRULE_HOURLY_PHASE_ROTATION_15M",
     "canonical_reuse_required": true,
     "one_shot_conversion_forbidden": true,
-    "recurring_frequency": "MINUTELY",
-    "recurring_interval_minutes": 15,
+    "replacement_automation_forbidden": true,
+    "rrule_frequency": "HOURLY",
+    "phase_step_minutes": 15,
+    "phase_formula": "(current_phase_minute + 15) mod 60",
     "timing_mode": "exact_schedule",
     "next_wake_first": true,
-    "replacement_automation_forbidden": true
+    "note": "The platform does not support minute-frequency recurring schedules. Effective 15-minute cadence is produced by self-updating the same hourly RRULE to the next +15 minute phase before substantive work."
   },
   "utilization": {
     "first_class_objective": true,
