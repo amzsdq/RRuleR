@@ -108,3 +108,31 @@ A non-terminal owner MUST NOT voluntarily end its turn.
 - After every bounded unit, re-read durable state, select the next useful admissible unit, and execute it in the SAME turn.
 - If no next unit is obvious, the next unit is to inspect durable state/evidence for the highest-value unresolved invariant or validation gap; this is not a reason to idle.
 - Only `PROGRAM_COMPLETE`, proven `BLOCKED_EXTERNAL`, committed successor handoff, explicit operator stop, or platform-enforced termination may end an active turn.
+
+
+## Fifteen-minute rolling worker protocol
+
+The active relay is a rolling predecessor/successor pipeline.
+
+- Each wake first re-arms the same canonical hourly RRULE for actual-wake + at least 15 minutes and verifies it.
+- Each worker then plans a substantive packet sized for approximately one 15-minute window.
+- A newly awakened successor MUST secure its own following wake before requesting handoff from the predecessor.
+- Handoff is request-driven, not clock-driven.
+- After a durable handoff request, the predecessor stops admitting new substantive units, closes its current smallest safe unit, saves exact continuation state/evidence, and relinquishes authority promptly.
+- The successor may not perform conflicting substantive work until the predecessor's durable handoff is committed; read-only reconstruction/preparation is allowed.
+- After handoff, the successor claims the next authority epoch, plans its own 15-minute packet, and works.
+- Finishing the planned packet early is not a reason to idle: pull another useful bounded unit if one exists.
+- Missing/delayed successor means the predecessor continues useful work; the nominal 15-minute boundary does not terminate the predecessor.
+
+Canonical order:
+
+```text
+WAKE
+  -> REARM SAME RRULE FOR +15m AND VERIFY
+  -> if predecessor active: HANDOFF_REQUEST
+  -> predecessor: finish smallest safe unit + SAVE + RELEASE
+  -> successor: CLAIM NEXT EPOCH
+  -> PLAN ~15m USEFUL WORK PACKET
+  -> WORK
+  -> next successor wake repeats the cycle
+```

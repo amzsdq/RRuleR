@@ -84,3 +84,20 @@ A non-terminal owner MUST NOT voluntarily end its turn.
 - After every bounded unit, re-read durable state, select the next useful admissible unit, and execute it in the SAME turn.
 - If no next unit is obvious, the next unit is to inspect durable state/evidence for the highest-value unresolved invariant or validation gap; this is not a reason to idle.
 - Only `PROGRAM_COMPLETE`, proven `BLOCKED_EXTERNAL`, committed successor handoff, explicit operator stop, or platform-enforced termination may end an active turn.
+
+
+## Fifteen-minute worker cycle
+
+Each scheduled wake is a worker generation in a rolling handoff pipeline. The 15-minute interval is the work-packet design horizon, not a voluntary stop timer.
+
+1. Reconstruct fresh durable state.
+2. BEFORE substantive work or handoff arbitration, update THIS SAME canonical hourly RRULE so its next due is the next whole minute at least 15 minutes after the actual wake/start, and verify the update.
+3. If a predecessor is still ACTIVE, persist a durable HANDOFF_REQUEST only after the successor's own next wake is secured. Do not claim substantive authority yet.
+4. The predecessor, after observing the HANDOFF_REQUEST, stops starting new substantive units, finishes the current smallest safe unit as quickly as correctness permits, persists checkpoint/evidence/exact-next-action, marks the handoff ready/committed, and relinquishes authority.
+5. The successor waits for durable handoff completion, then claims the next authority epoch.
+6. The successor selects and persists a useful work packet sized to occupy roughly the next 15-minute window, then executes it.
+7. If that packet finishes early and useful work remains, immediately pull the next useful bounded unit rather than idle. Do not invent busywork.
+8. If the successor wake is delayed, the predecessor keeps working. Scheduled time alone never causes relinquishment.
+9. If a handoff request arrives while a larger unit is in progress, do not insist on finishing the whole 15-minute packet. Close the smallest safe checkpointable unit and hand off promptly.
+
+Successor ordering is strict: REARM+VERIFY -> HANDOFF_REQUEST -> WAIT_FOR_HANDOFF -> CLAIM_AUTHORITY -> PLAN_15M_PACKET -> WORK.

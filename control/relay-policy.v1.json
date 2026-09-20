@@ -1,7 +1,7 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
-  "policy_revision": 5,
+  "policy_revision": 6,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
@@ -58,7 +58,7 @@
     "operator_idle_ui_plus_no_fresh_durable_activity_is_utilization_gap": true
   },
   "handoff": {
-    "trigger": "SUCCESSOR_ACTUALLY_OBSERVED",
+    "trigger": "DURABLE_HANDOFF_REQUEST_FROM_ACTUALLY_AWAKENED_SUCCESSOR",
     "scheduled_time_alone_is_trigger": false,
     "on_trigger": [
       "STOP_STARTING_NEW_SUBSTANTIVE_UNITS",
@@ -70,7 +70,26 @@
     ],
     "successor_must_avoid_duplicate_active_unit": true,
     "same_canonical_overlap_required_for_correctness": false,
-    "same_canonical_overlap_preferred_for_utilization": true
+    "same_canonical_overlap_preferred_for_utilization": true,
+    "successor_start_sequence": [
+      "REARM_SAME_CANONICAL_FOR_NEXT_15M",
+      "VERIFY_REARM",
+      "IF_PREDECESSOR_ACTIVE_PERSIST_HANDOFF_REQUEST",
+      "WAIT_FOR_DURABLE_HANDOFF_COMMIT",
+      "CLAIM_NEXT_AUTHORITY_EPOCH",
+      "PLAN_15_MIN_WORK_PACKET",
+      "EXECUTE_WORK_PACKET"
+    ],
+    "predecessor_on_request": [
+      "STOP_ADMITTING_NEW_SUBSTANTIVE_UNITS",
+      "FINISH_CURRENT_SMALLEST_SAFE_UNIT",
+      "PERSIST_CHECKPOINT_EVIDENCE_EXACT_NEXT_ACTION",
+      "COMMIT_HANDOFF_AND_RELEASE_AUTHORITY",
+      "PREDECESSOR_END"
+    ],
+    "successor_rearm_before_handoff_request_required": true,
+    "successor_conflicting_substantive_work_before_commit_forbidden": true,
+    "read_only_preparation_before_commit_allowed": true
   },
   "fallback": {
     "self_update_failure_with_old_rrule_intact": "DEGRADED_CONTINUATION",
@@ -101,5 +120,14 @@
       "EXPLICIT_OPERATOR_STOP",
       "PLATFORM_ENFORCED_TERMINATION"
     ]
+  },
+  "worker_cycle": {
+    "mode": "ROLLING_15_MINUTE_WORK_PACKET",
+    "planned_work_horizon_minutes": 15,
+    "work_packet_is_stop_timer": false,
+    "plan_before_substantive_work": true,
+    "on_early_packet_finish": "PULL_NEXT_USEFUL_BOUNDED_UNIT",
+    "busywork_for_window_fill_forbidden": true,
+    "predecessor_continues_if_successor_delayed": true
   }
 }

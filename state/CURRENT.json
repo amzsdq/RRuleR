@@ -20,7 +20,9 @@
       "Claimed authority epoch 9 for RUN-20260920-2128",
       "Current live run added to canonical state/RUNS.jsonl ledger",
       "Run-observation schema aligned with measurable end contract and CI run 141 passed",
-      "Accidental duplicate state/RUN_OBSERVATIONS.jsonl ledger removed after reconciliation"
+      "Accidental duplicate state/RUN_OBSERVATIONS.jsonl ledger removed after reconciliation",
+      "Operator-defined rolling 15-minute worker protocol adopted: successor REARM+VERIFY precedes HANDOFF_REQUEST; predecessor closes smallest safe unit and saves before release.",
+      "Each successor must plan a useful work packet sized for approximately the next 15-minute window; early completion pulls another useful bounded unit instead of idling."
     ],
     "evidence": [
       "commit 1e55bc6c15f37c27b4011ae127f494d7a3462a6c records the current live run in state/RUNS.jsonl",
@@ -28,8 +30,8 @@
       "GitHub Actions run 35510756499 completed success",
       "commit 8d5134f188dd1cf861c69c8597d9306144221d78 removes the duplicate ledger"
     ],
-    "observation": "Per-run utilization measurement now uses one canonical ledger and a schema matching the validator's measurable-end contract. The active run remains non-terminal; successor-cycle evidence is still required.",
-    "next_action": "Continue useful work during RUN-20260920-2128 and, when the 21:43 successor is actually observed, durably classify this predecessor end/handoff and compute the measurable gap without inference."
+    "observation": "Relay semantics changed from open-ended same-turn work selection to an explicit rolling 15-minute work-packet pipeline with successor-first rearm and request-driven handoff.",
+    "next_action": "At the next actual successor wake, verify sequence: REARM+VERIFY -> HANDOFF_REQUEST -> predecessor safe-unit close/save/release -> successor epoch claim -> ~15m work packet execution."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_SELF_SHIFT_FROM_ACTUAL_WAKE",
@@ -39,10 +41,12 @@
     "next_wake_first": true,
     "next_due_at": "2026-09-20T21:43:00+09:00",
     "current_phase_minute": 43,
-    "handoff_trigger": "SUCCESSOR_ACTUALLY_OBSERVED",
+    "handoff_trigger": "SUCCESSOR_REARM_VERIFIED_THEN_DURABLE_HANDOFF_REQUEST",
     "voluntary_idle_before_successor_forbidden": true,
     "root_completion_is_stop_condition": false,
-    "program_terminal_disabled_required": true
+    "program_terminal_disabled_required": true,
+    "work_packet_horizon_minutes": 15,
+    "work_packet_boundary_is_stop_condition": false
   },
   "safety": {
     "public_repo": true,
