@@ -6,30 +6,28 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "root_goal": "P0: achieve and sustain >=840 seconds of evidenced useful work per 900-second relay turn; use failures to drive autonomous diagnosis, external-reference research, redesign, implementation, and retest while preserving the broader commercial-SaaS-competitive program goal.",
   "status": "CONTINUE",
-  "current_owner": "RUN-UTIL-20260921-001349",
-  "authority_epoch": 15,
+  "current_owner": "RUN-UTIL-20260921-003046",
+  "authority_epoch": 16,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-PROGRAM-GOALS-001",
+    "id": "CP-UTILIZATION-020",
     "state": "CONTINUE",
     "completed": [
-      "Rearmed the same canonical hourly RRULE from :15 to :30 and verified SUCCESS before successor work.",
-      "Persisted a durable HANDOFF_REQUEST for epoch-14 predecessor after rearm verification.",
-      "Observed predecessor activity last progressed at 00:03:23 KST; at successor observation 00:13:49 KST it was already stale well beyond the 120-second recovery threshold.",
-      "Re-read durable activity after handoff request and found predecessor progress unchanged; applied handoff-recovery v2 already-stale fast path and advanced authority to epoch 15.",
-      "Adopted plan-first utilization experiment: each authority owner must persist one coherent primary turn objective expected to consume 10-14 minutes before substantive execution.",
-      "Operator elevated two durable goals: commercial-agent-SaaS competitiveness as the program goal, with useful-work utilization as P0.",
-      "Broad autonomous RRuleR repo authority adopted for reversible research/design/implementation/testing changes; external or non-RRuleR consequential actions remain outside this scope."
+      "Rearmed and verified the same canonical RRULE from :30 to :45 before substantive work.",
+      "Observed epoch 15 last meaningful progress remained 00:15:05 KST at the 00:30:46 successor wake, far beyond the 120-second stale threshold.",
+      "Persisted successor HANDOFF_REQUEST and recovered stale epoch 15 under the already-stale fast path; authority advanced to epoch 16.",
+      "Confirmed a new failure mode: epoch 15 remained WORKING while state/TURN_PLAN.json was still TEMPLATE_PENDING_NEXT_AUTHORITY, so the newly adopted plan-first rule existed in policy but was not runtime-enforced.",
+      "Persisted an actual epoch-16 primary objective UTIL-EXP-005 before substantive implementation."
     ],
     "evidence": [
-      "Canonical automation update to :30 returned SUCCESS.",
-      "HANDOFF_REQUEST commit 8ec5a734ea45109e97ee841de0e64278d6261453 was published with branch-head CAS.",
-      "Fresh ACTIVITY still showed epoch 14 last_progress_at=2026-09-21T00:03:23+09:00 after the request.",
-      "control/handoff-recovery.v1.json v2 permits zero additional post-request grace when predecessor was already stale >=120s and unchanged on immediate re-read."
+      "Canonical automation update to :45 returned SUCCESS.",
+      "Fresh epoch-15 ACTIVITY last_progress_at=2026-09-21T00:15:05+09:00.",
+      "Fresh TURN_PLAN before takeover was still objective_id=NEXT-WAKE-MUST-ASSIGN and status=TEMPLATE_PENDING_NEXT_AUTHORITY.",
+      "Epoch-16 TURN_PLAN now binds UTIL-EXP-005 with 840-second budget, acceptance criteria, four checkpointable substeps, and progress evidence."
     ],
-    "observation": "Utilization remains the dominant bottleneck: commercial systems emphasize persistent/background execution, orchestration and observability, but those features are low value if the active reasoning worker collapses after only a few minutes.",
-    "next_action": "Next wake: rearm, claim authority, replace TURN_PLAN with one coherent 10-14 minute objective chosen by highest expected effect on P0 utilization; if a utilization intervention fails, investigate root cause and external prior art before choosing a materially different intervention."
+    "observation": "The plan-first idea is valid but policy-only adoption was insufficient: a worker can still claim WORKING authority while leaving the turn plan as a template. UTIL-EXP-005 therefore converts the idea into a machine-enforced state invariant and measurable outcome classification.",
+    "next_action": "Execute UTIL-EXP-005: strengthen validator/TURN_PLAN/utilization state so WORKING authority requires a real active plan, record plan progress/outcome evidence, validate, and leave the next successor an exact live-retest continuation."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_QUARTER_SELF_SHIFT",
@@ -37,8 +35,8 @@
     "rrule_frequency": "HOURLY",
     "phase_step_minutes": 15,
     "next_wake_first": true,
-    "next_due_at": "2026-09-21T00:30:00+09:00",
-    "current_phase_minute": 30,
+    "next_due_at": "2026-09-21T00:45:00+09:00",
+    "current_phase_minute": 45,
     "handoff_trigger": "SUCCESSOR_REARM_VERIFIED_THEN_DURABLE_HANDOFF_REQUEST",
     "voluntary_idle_before_successor_forbidden": true,
     "root_completion_is_stop_condition": false,
@@ -46,13 +44,8 @@
     "work_packet_horizon_minutes": 14,
     "work_packet_boundary_is_stop_condition": false,
     "scheduler_fence_policy": "control/scheduler-fence.v1.json",
-    "next_phase_minute": 45,
-    "quarter_cycle": [
-      0,
-      15,
-      30,
-      45
-    ],
+    "next_phase_minute": 0,
+    "quarter_cycle": [0,15,30,45],
     "utilization_target_seconds": 840,
     "utilization_goal_min_valid_turns": 3,
     "utilization_state_path": "state/UTILIZATION.json",
