@@ -1,0 +1,10 @@
+{
+  "schema_version":"1.0","program_id":"RRULER-PROGRAM-001","purpose":"Track time lost before substantive work so scheduler jitter, cold-start reconstruction, handoff recovery and worker longevity are optimized independently.",
+  "target":{"delivery_plus_startup_seconds_lte":60,"reason":"A non-overlapping 900-second window needs at least 840 seconds left after prework overhead."},
+  "observations":[
+    {"authority_epoch":17,"expected_due_at":"2026-09-21T00:45:00+09:00","worker_observed_at":"2026-09-21T00:46:08+09:00","substantive_work_started_at":"2026-09-21T00:46:24+09:00","scheduler_delivery_seconds":68,"post_observation_startup_seconds":16,"total_prework_loss_seconds":84,"target_feasible":false},
+    {"authority_epoch":18,"expected_due_at":"2026-09-21T01:00:00+09:00","worker_observed_at":"2026-09-21T00:59:19+09:00","substantive_work_started_at":"2026-09-21T01:00:48+09:00","scheduler_delivery_seconds":-41,"post_observation_to_work_seconds":89,"total_loss_from_intended_boundary_seconds":48,"target_feasible":true}
+  ],
+  "optimization_order":["Do not add extra mandatory startup reads without evidence they protect a higher-value invariant.","Use control/ACTIVE_CONTROLS.json to make required reads explicit and prevent exploratory startup drift.","Keep rearm/verify first because losing continuation is worse than startup overhead.","Measure actual successor observation separately from expected due.","Prefer event/overlap continuation for product-level utilization because scheduler jitter can consume the entire 60-second margin even when reconstruction is fast."],
+  "next_action":"Collect >=10 wake samples before tuning scheduled fallback phase from jitter statistics. Do not optimize a two-sample distribution prematurely."
+}
