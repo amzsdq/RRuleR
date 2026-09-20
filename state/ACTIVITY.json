@@ -1,15 +1,14 @@
 {
-  "schema_version": "1.0",
-  "program_id": "RRULER-PROGRAM-001",
-  "root_job_id": "RRULER-UTILIZATION-002",
-  "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "status": "WORKING",
-  "active_run_id": "RUN-20260920-2128",
-  "authority_epoch": 9,
-  "last_progress_at": "2026-09-20T21:30:00+09:00",
-  "last_progress_kind": "RUN_OBSERVATION_SCHEMA_VALIDATED",
-  "current_unit": "Continue live utilization run; classify successor behavior and close measurable handoff gap when evidence appears",
-  "next_wake_due_at": "2026-09-20T21:43:00+09:00",
-  "successor_observed": false,
-  "operator_ui_note": "UI is advisory; fresh fenced durable activity is authoritative corroboration."
+  "schema_version":"1.0",
+  "program_id":"RRULER-PROGRAM-001",
+  "root_job_id":"RRULER-UTILIZATION-002",
+  "canonical_automation_id":"6aaf8a993eb08191b8d0ab1d9662e4b2",
+  "status":"WORKING",
+  "active_run_id":"RUN-20260920-2145",
+  "authority_epoch":10,
+  "last_progress_at":"2026-09-20T21:50:00+09:00",
+  "last_progress_kind":"CONTINUATION_RECOVERED",
+  "current_unit":"Implement and validate relay continuation recovery",
+  "next_wake_due_at":"2026-09-20T22:01:00+09:00",
+  "successor_observed":true
 }
