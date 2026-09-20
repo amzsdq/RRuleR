@@ -10,7 +10,7 @@ A ChatGPT session is disposable. Durable GitHub state is authoritative.
 2. On a relay run, read `control/relay-policy.v1.json` as the machine-readable relay contract.
 3. Read `state/CURRENT.json` and `state/ACTIVITY.json`.
 4. Resolve root goal, program status, owner/authority epoch, latest checkpoint, exact next action, and current activity evidence.
-5. On a relay wake, establish/verify the next recurring wake before substantive work.
+5. On a relay wake, establish/verify the next recurring wake before substantive work. Compute it from the ACTUAL wake/start time, not from the previous scheduled phase: target_due = next whole minute at least 15 minutes after actual wake/start. Never arm a due time that is already near/past because a delayed wake can otherwise skip to the next hourly RRULE occurrence.
 6. Persist `state/ACTIVITY.json` as WORKING before or with the first substantive durable change.
 7. Read only the task-specific files needed for the current work unit.
 8. Continue from durable state; never restart completed work merely because local chat context is missing.
