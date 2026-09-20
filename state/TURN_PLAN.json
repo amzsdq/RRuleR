@@ -20,16 +20,17 @@
     "Update utilization experiment state with explicit plan-first outcome classification.",
     "Run/inspect validation and persist exact live-retest continuation for successor."
   ],
-  "current_substep": 3,
-  "handoff_boundary": "After any substep has its exact changed files/evidence durably committed; successor resumes from current_substep and must not redo accepted prior substeps.",
-  "early_finish_fallback": "Audit the next highest-risk utilization loophole that could permit a WORKING owner to stop without a plan outcome, and add a deterministic guard if evidence supports it.",
+  "current_substep": 4,
+  "handoff_boundary": "All four planned substeps are durably accepted. Keep this plan ACTIVE until actual successor handoff so the live retest measures whether the owner continues useful related work instead of voluntarily returning early.",
+  "early_finish_fallback": "Audit and harden the next utilization loophole: progress evidence currently proves durable checkpoints but does not itself force the reasoning runtime to remain alive; continue related measurement/guard work until successor request.",
   "created_for_next_wake": false,
   "started_at": "2026-09-21T00:31:00+09:00",
-  "last_progress_at": "2026-09-21T00:32:40+09:00",
+  "last_progress_at": "2026-09-21T00:33:25+09:00",
   "progress_evidence": [
     "Epoch 15 was still WORKING but TURN_PLAN remained TEMPLATE_PENDING_NEXT_AUTHORITY through the next wake, proving policy text alone did not enforce plan creation.",
     "Updated control-plane validator now requires WORKING => TURN_PLAN.status ACTIVE, exact run_id/authority_epoch match, non-placeholder objective, progress evidence, and plan timestamps.",
     "Updated UTILIZATION measurement contract now marks template_plan_while_working_invalid=true and requires explicit plan outcome classification.",
-    "Validation run 35519886021 started against exact commit be79dd0af7656dcf603b70de7d437282bf2a9082; result still pending at this checkpoint."
+    "Validation run 35519886021 for exact commit be79dd0af7656dcf603b70de7d437282bf2a9082 completed SUCCESS.",
+    "Planned implementation substeps are complete, but policy forbids early turn termination; live retest continues with related utilization guard analysis until actual successor request."
   ]
 }
