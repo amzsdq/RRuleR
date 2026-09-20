@@ -1,0 +1,19 @@
+{
+  "schema_version":"1.0",
+  "program_id":"RRULER-PROGRAM-001",
+  "status":"ACTIVE",
+  "scoring":"0=absent, 1=concept, 2=prototype, 3=validated baseline, 4=production-oriented, 5=competitive evidence",
+  "dimensions":[
+    {"id":"UTILIZATION","priority":"P0","score":1,"evidence":"Durable measurement/recovery exists, but epoch 16 produced only 145 seconds of evidenced invocation span before a 779-second continuation gap.","next_gate":"Demonstrate >=840 seconds evidenced useful coverage in 3 valid 900-second windows or prove a substrate ceiling and promote a lower-latency wake/longer-lived worker adapter."},
+    {"id":"PERSISTENCE","priority":"P1","score":3,"evidence":"Fresh sessions reconstruct program, owner, checkpoint, plan, handoff and scheduler state from GitHub durable artifacts.","next_gate":"Automated cold-start conformance test across representative interrupted tasks."},
+    {"id":"RECOVERY","priority":"P1","score":3,"evidence":"Stale predecessor recovery, authority epochs, scheduler fence and already-stale fast path are implemented and repeatedly exercised.","next_gate":"Fault-injection matrix with duplicate, delayed, reordered and ambiguous side-effect cases."},
+    {"id":"ORCHESTRATION","priority":"P2","score":1,"evidence":"Architecture goal exists; current RRuleR utilization program is single-owner rolling relay.","next_gate":"Introduce delegation only after utilization baseline is stable; prove benefit over coordination cost."},
+    {"id":"TOOL_REACH","priority":"P2","score":2,"evidence":"GitHub and web research are exercised; adapter model is implicit.","next_gate":"Formal tool capability registry and side-effect classes."},
+    {"id":"OBSERVABILITY","priority":"P1","score":3,"evidence":"CURRENT, ACTIVITY, HANDOFF, TURN_PLAN, UTILIZATION and CI expose machine-readable state.","next_gate":"One synthesized operator status view with SLO/error-budget style utilization and failure-cause history."},
+    {"id":"VERIFICATION","priority":"P1","score":3,"evidence":"CI validates control-plane invariants and durable evidence is preferred over chat claims.","next_gate":"Independent completion verifier contract for arbitrary work outputs and external receipts."},
+    {"id":"GOVERNANCE","priority":"P1","score":3,"evidence":"Public-repo secret prohibition, authority epochs, fences and irreversible-side-effect replay rules exist.","next_gate":"Threat model plus automated public-safety scan and explicit capability/approval matrix."},
+    {"id":"USABILITY","priority":"P2","score":2,"evidence":"AGENTS bootstrap supports disposable sessions, but operation remains state-file heavy and expert-oriented.","next_gate":"Single bootstrap/diagnostic command or generated operator dashboard and reproducible setup test."}
+  ],
+  "selection_rule":"Until UTILIZATION reaches its acceptance gate, choose work by highest expected improvement to utilization unless a correctness/security defect blocks safe experimentation.",
+  "updated_at":"2026-09-21T00:51:00+09:00"
+}
