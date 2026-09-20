@@ -1,7 +1,68 @@
 {
-  "policy_id":"RRULER_RUNTIME_CONTINUITY","version":2,"status":"ACTIVE","principle":"DURABLE_WORKFLOW_DISPOSABLE_REASONING_WORKER","components":{"wake_source":{"responsibility":"Start a fresh reasoning invocation at the next supported opportunity.","current_adapter":"RRULE_HOURLY_QUARTER_SELF_SHIFT","must_not_be_treated_as":"proof that predecessor stayed alive"},"reasoning_worker":{"responsibility":"Perform useful checkpointable work while invocation exists.","mortality":"EXPECTED","must_not_be_treated_as":"durable process"},"durable_continuation":{"responsibility":"Persist exact resumable state and side-effect evidence after meaningful units.","current_adapter":"GITHUB_DURABLE_STATE"},"supervisor_measurement":{"responsibility":"Detect stale workers, recover ownership, and measure useful coverage/dead gaps without inference.","current_adapter":"SUCCESSOR_OBSERVATION_PLUS_DURABLE_STATE"}},
-  "required_metrics":["invocation_useful_span_seconds","continuation_gap_seconds","window_useful_coverage_seconds","scheduler_delivery_delay_seconds","handoff_overhead_seconds"],
-  "scheduler_budget":{"intended_window_seconds":900,"target_useful_seconds":840,"maximum_prework_loss_for_single_nonoverlapping_worker_seconds":60,"prework_loss_definition":"worker_substantive_start - intended_window_start","classification_when_exceeded":"SCHEDULER_BUDGET_CONSTRAINED","rule":"Do not judge a worker as failing the 840-second target when scheduler delivery plus startup overhead leaves fewer than 840 seconds before the intended next boundary. Preserve the measurement and optimize wake overlap/delivery separately."},
-  "early_runtime_end":{"classification":"RUNTIME_INVOCATION_ENDED_EARLY","conditions":["plan was ACTIVE and valid","useful admissible work remained or fallback continuation was required","no terminal or committed handoff evidence exists","later successor observes predecessor stale"],"response":["do not infer useful work across the gap","recover at next available wake","preserve exact checkpoint","compare invocation span across experiments","if repeated, target wake/runtime adapter rather than adding policy prose"]},
-  "progress_evidence":{"timestamp_only_heartbeat_counts_as_useful_work":false,"meaningful_unit_or_material_advancement_required":true,"maximum_unexplained_gap_seconds_for_acceptance":120},"design_reference":"docs/RUNTIME_CONTINUITY_ARCHITECTURE.md"
+  "policy_id": "RRULER_RUNTIME_CONTINUITY",
+  "version": 3,
+  "status": "ACTIVE",
+  "principle": "DURABLE_WORKFLOW_DISPOSABLE_REASONING_WORKER",
+  "components": {
+    "wake_source": {
+      "responsibility": "Start a fresh reasoning invocation at the next supported opportunity.",
+      "current_adapter": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE",
+      "must_not_be_treated_as": "proof that predecessor stayed alive"
+    },
+    "reasoning_worker": {
+      "responsibility": "Perform useful checkpointable work while invocation exists.",
+      "mortality": "EXPECTED",
+      "must_not_be_treated_as": "durable process"
+    },
+    "durable_continuation": {
+      "responsibility": "Persist exact resumable state and side-effect evidence after meaningful units.",
+      "current_adapter": "GITHUB_DURABLE_STATE"
+    },
+    "supervisor_measurement": {
+      "responsibility": "Detect stale workers, recover ownership, and measure useful coverage/dead gaps without inference.",
+      "current_adapter": "DURABLE_PACKET_PLUS_ACTIVITY_PLUS_SCHEDULER_OBSERVATION"
+    }
+  },
+  "required_metrics": [
+    "invocation_useful_span_seconds",
+    "continuation_gap_seconds",
+    "window_useful_coverage_seconds",
+    "scheduler_delivery_delay_seconds",
+    "handoff_overhead_seconds"
+  ],
+  "scheduler_budget": {
+    "intended_window_seconds": 900,
+    "target_useful_seconds": 840,
+    "maximum_prework_loss_for_single_nonoverlapping_worker_seconds": 60,
+    "prework_loss_definition": "worker_substantive_start - intended_window_start",
+    "classification_when_exceeded": "SCHEDULER_BUDGET_CONSTRAINED",
+    "rule": "Use fixed 900-second windows only for measurement. They are not scheduler boundaries. Measure normal continuation gaps and abrupt-loss recovery gaps separately.",
+    "observation_window_seconds": 900
+  },
+  "early_runtime_end": {
+    "classification": "RUNTIME_INVOCATION_ENDED_EARLY",
+    "conditions": [
+      "plan was ACTIVE and valid",
+      "useful admissible work remained or fallback continuation was required",
+      "no terminal or committed handoff evidence exists",
+      "later successor observes predecessor stale"
+    ],
+    "response": [
+      "do not infer useful work across the gap",
+      "recover from the latest durable checkpoint and successor packet",
+      "preserve exact side-effect evidence",
+      "target wake/runtime adapter when repeated"
+    ]
+  },
+  "progress_evidence": {
+    "timestamp_only_heartbeat_counts_as_useful_work": false,
+    "meaningful_unit_or_material_advancement_required": true,
+    "maximum_unexplained_gap_seconds_for_acceptance": 120
+  },
+  "design_reference": "docs/RUNTIME_CONTINUITY_ARCHITECTURE.md",
+  "successor_baton": {
+    "policy": "control/successor-baton.v1.json",
+    "packet_path": "state/NEXT_PACKET.json",
+    "purpose": "shift next-work selection into the warm predecessor while keeping durable state authoritative"
+  }
 }
