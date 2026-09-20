@@ -32,6 +32,10 @@ class WorkEvidenceValidatorTests(unittest.TestCase):
     def test_rejects_overlap_ambiguity(self):
         data={"records":[rec("2026-09-21T05:00:00+09:00","2026-09-21T05:08:00+09:00"),rec("2026-09-21T05:07:00+09:00","2026-09-21T05:15:00+09:00")]}
         out=validator.audit(data,"2026-09-21T05:00:00+09:00","2026-09-21T05:15:00+09:00"); self.assertTrue(out["overlap_errors"]); self.assertEqual(out["promotion"],"REJECTED")
+    def test_overlap_does_not_double_count_reported_useful_seconds(self):
+        data={"records":[rec("2026-09-21T05:00:00+09:00","2026-09-21T05:10:00+09:00"),rec("2026-09-21T05:05:00+09:00","2026-09-21T05:15:00+09:00")]}
+        out=validator.audit(data,"2026-09-21T05:00:00+09:00","2026-09-21T05:15:00+09:00")
+        self.assertEqual(out["window"]["useful_seconds"],900); self.assertEqual(out["window"]["union_interval_count"],1); self.assertIn("OVERLAPPING_INTERVALS",out["window"]["reasons"]); self.assertEqual(out["promotion"],"REJECTED")
     def test_invalid_record_wholly_outside_window_does_not_poison_promotion(self):
         outside=rec("2026-09-21T04:00:00+09:00","2026-09-21T04:01:00+09:00",qualification="CANDIDATE_ONLY")
         data={"records":[outside,rec("2026-09-21T05:00:00+09:00","2026-09-21T05:07:00+09:00"),rec("2026-09-21T05:08:00+09:00","2026-09-21T05:15:00+09:00")]}
