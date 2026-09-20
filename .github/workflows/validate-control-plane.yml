@@ -23,7 +23,7 @@ jobs:
           set -euo pipefail
           required=(
             "README.md" "AGENTS.md" "control/POLICY.md" "control/relay-policy.v1.json"
-            "state/CURRENT.json" "state/HANDOFF.json" "state/EVENTS.jsonl" "state/RUNS.jsonl" "state/README.md"
+            "state/CURRENT.json" "state/HANDOFF.json" "state/RELAY_VALIDATION.json" "state/EVENTS.jsonl" "state/RUNS.jsonl" "state/README.md"
             "docs/ARCHITECTURE.md" "docs/DESIGN_DECISIONS.md" "docs/DURABLE_EXECUTION_MODEL.md"
             "docs/FAILURE_RECOVERY.md" "docs/HANDOFF_PROTOCOL.md" "docs/OPERATIONS.md"
             "docs/RELAY_RRULE_SELF_UPDATE.md" "docs/SECURITY.md" "docs/STATE_MODEL.md" "docs/UTILIZATION.md"
@@ -39,6 +39,7 @@ jobs:
           fetch() { curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/$1?ref=$SHA" -o "$2"; }
           fetch state/CURRENT.json /tmp/current.json
           fetch state/HANDOFF.json /tmp/handoff.json
+          fetch state/RELAY_VALIDATION.json /tmp/relay-validation.json
           fetch state/EVENTS.jsonl /tmp/events.jsonl
           fetch state/RUNS.jsonl /tmp/runs.jsonl
           fetch control/relay-policy.v1.json /tmp/relay-policy.json
@@ -48,6 +49,7 @@ jobs:
 
           python -m json.tool /tmp/current.json >/dev/null
           python -m json.tool /tmp/handoff.json >/dev/null
+          python -m json.tool /tmp/relay-validation.json >/dev/null
           python -m json.tool /tmp/relay-policy.json >/dev/null
           python -m json.tool /tmp/checkpoint-schema.json >/dev/null
           python -m json.tool /tmp/lease-schema.json >/dev/null
@@ -55,7 +57,7 @@ jobs:
 
           python - <<'PY'
           import json
-          p=json.load(open('/tmp/current.json')); policy=json.load(open('/tmp/relay-policy.json')); handoff=json.load(open('/tmp/handoff.json'))
+          p=json.load(open('/tmp/current.json')); policy=json.load(open('/tmp/relay-policy.json')); handoff=json.load(open('/tmp/handoff.json')); validation=json.load(open('/tmp/relay-validation.json'))
           required=['schema_version','repository','root_job_id','root_goal','status','current_owner','authority_epoch','canonical_automation_id','checkpoint','continuation','safety']
           missing=[k for k in required if k not in p]
           if missing: raise SystemExit(f"CURRENT.json missing: {missing}")
@@ -74,6 +76,11 @@ jobs:
           if p['safety'].get('public_repo') is not True or p['safety'].get('secrets_allowed') is not False: raise SystemExit('public safety invariant failed')
           if policy.get('status')!='ACTIVE' or policy.get('scheduler',{}).get('canonical_reuse_required') is not True: raise SystemExit('relay policy inactive')
           if policy.get('utilization',{}).get('voluntary_idle_while_useful_work_exists_forbidden') is not True: raise SystemExit('relay utilization invariant failed')
+          if validation.get('canonical_automation_id') != p.get('canonical_automation_id'): raise SystemExit('validation canonical mismatch')
+          if validation.get('status') not in {'IN_PROGRESS','PASS','FAIL'}: raise SystemExit('invalid validation status')
+          acceptance=validation.get('acceptance',{})
+          mandatory=['canonical_id_preserved','recurring_rrule_preserved','two_or_more_phase_transitions','scheduled_cold_continuation_from_github','additional_cycle_without_continuation_loss','github_state_coherent','runtime_timeout_does_not_break_cycle','overlap_or_serialization_semantics_classified','utilization_handoff_measurement']
+          if any(k not in acceptance for k in mandatory): raise SystemExit('relay validation acceptance field missing')
           event_ids=set()
           allowed_events={'WAKE_ARMED','WAKE_UPDATE_VERIFIED','WORK_STARTED','CHECKPOINT','SUCCESSOR_OBSERVED','HANDOFF','DEGRADED_CONTINUATION','COMPLETE','BLOCKED_EXTERNAL'}
           for n,line in enumerate(open('/tmp/events.jsonl'),1):
@@ -91,5 +98,5 @@ jobs:
                   if k not in o: raise SystemExit(f'run {n} missing {k}')
               if o['classification'] not in {'ACTIVE','HANDOFF','COMPLETE','BLOCKED_EXTERNAL','PLATFORM_ENDED','DEGRADED_CONTINUATION'} or o['observation_id'] in run_ids: raise SystemExit(f'invalid/duplicate run {n}')
               run_ids.add(o['observation_id'])
-          print(f'RRuleR control-plane validation passed; events={len(event_ids)} runs={len(run_ids)}')
+          print(f'RRuleR control-plane validation passed; events={len(event_ids)} runs={len(run_ids)} relay_validation={validation["status"]}')
           PY
