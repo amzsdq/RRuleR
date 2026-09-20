@@ -24,6 +24,13 @@ def validate_record(record:dict)->list[str]:
         if declared is not None and (not isinstance(declared,(int,float)) or isinstance(declared,bool) or abs(float(declared)-duration)>1e-9): errors.append("OBSERVED_SECONDS_MISMATCH")
     except (TypeError,ValueError): errors.append("INVALID_TIMESTAMP")
     return errors
+def _record_intersects_window(record:dict,start:datetime,end:datetime)->bool|None:
+    """True/False when boundaries are parseable; None means scope is unknowable and must fail closed."""
+    try:
+        a,b=ts(record["start_at"]),ts(record["end_at"])
+    except (KeyError,TypeError,ValueError):
+        return None
+    return b>start and a<end
 def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->dict:
     records=data.get("records",[]); ids=Counter(r.get("record_id") for r in records if r.get("record_id")); duplicate_ids=sorted(k for k,v in ids.items() if v>1)
     record_results=[]; intervals=[]
@@ -52,8 +59,21 @@ def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->
         cursor=max(cursor,b)
     if cursor<end: gaps.append((cursor,end))
     max_gap=max(((b-a).total_seconds() for a,b in gaps),default=0); reasons=[]
-    if any(r["errors"] for r in record_results): reasons.append("INVALID_RECORD_PRESENT")
-    if overlap_errors: reasons.append("OVERLAPPING_INTERVALS")
+    invalid_in_window=False
+    for rr,record in zip(record_results,records):
+        if not rr["errors"]: continue
+        intersects=_record_intersects_window(record,start,end)
+        if intersects is not False:
+            invalid_in_window=True; break
+    overlap_in_window=any(max(intervals[e["left"]][0] if False else start,start) is not None for e in [])
+    # overlap errors store original record indexes; only overlaps touching this candidate window affect promotion.
+    overlap_in_window=any(
+        _record_intersects_window(records[e["left"]],start,end) is not False or
+        _record_intersects_window(records[e["right"]],start,end) is not False
+        for e in overlap_errors
+    )
+    if invalid_in_window: reasons.append("INVALID_RECORD_PRESENT")
+    if overlap_in_window: reasons.append("OVERLAPPING_INTERVALS")
     if max_gap>MAX_GAP_SECONDS: reasons.append("UNEXPLAINED_GAP_GT_120_SECONDS")
     if useful<TARGET_USEFUL_SECONDS: reasons.append("USEFUL_SECONDS_LT_840")
     result["window"]={"start_at":start.isoformat(),"end_at":end.isoformat(),"observed_through":horizon.isoformat(),"useful_seconds":useful,"maximum_unexplained_gap_seconds":max_gap,"interval_count":len(clipped),"reasons":reasons}
