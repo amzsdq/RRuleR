@@ -24,9 +24,8 @@ jobs:
           python - <<'PY'
           import json, os, urllib.parse, urllib.request
           from datetime import datetime, timezone
-          data=json.load(open('/tmp/intervals.json'))
-          max_gap=data['maximum_unexplained_gap_seconds_for_passing_window']
-          token=os.environ['GH_TOKEN']; repo=os.environ['REPO']
+          data=json.load(open('/tmp/intervals.json')); limit=data['maximum_unexplained_gap_seconds_for_passing_window']
+          token=os.environ['GH_TOKEN']; repo=os.environ['REPO']; failures=[]
           def dt(s): return datetime.fromisoformat(s).astimezone(timezone.utc)
           for obs in data['observations']:
               if obs.get('state') not in {'CLOSED_PARTIAL','CLOSED_EVIDENCED'}: continue
@@ -35,11 +34,10 @@ jobs:
               q=urllib.parse.urlencode({'since':dt(start).isoformat().replace('+00:00','Z'),'until':dt(end).isoformat().replace('+00:00','Z'),'per_page':100})
               req=urllib.request.Request(f'https://api.github.com/repos/{repo}/commits?{q}',headers={'Authorization':f'Bearer {token}','Accept':'application/vnd.github+json'})
               with urllib.request.urlopen(req) as r: commits=json.load(r)
-              points=[dt(start),dt(end)]
-              points += [datetime.fromisoformat(c['commit']['committer']['date'].replace('Z','+00:00')) for c in commits]
-              points=sorted(set(points))
-              gaps=[(b-a).total_seconds() for a,b in zip(points,points[1:])]
-              worst=max(gaps,default=0)
-              result={'run_id':obs['run_id'],'evidence_points':len(points),'max_gap_seconds':worst,'threshold_seconds':max_gap,'gap_contract_pass':worst<=max_gap}
+              points=sorted(set([dt(start),dt(end)]+[datetime.fromisoformat(c['commit']['committer']['date'].replace('Z','+00:00')) for c in commits]))
+              worst=max([(b-a).total_seconds() for a,b in zip(points,points[1:])],default=0)
+              result={'run_id':obs['run_id'],'evidence_points':len(points),'max_gap_seconds':worst,'threshold_seconds':limit,'gap_contract_pass':worst<=limit}
               print(json.dumps(result,separators=(',',':')))
+              if worst>limit: failures.append(result)
+          if failures: raise SystemExit('utilization evidence gap contract failed: '+json.dumps(failures,separators=(',',':')))
           PY
