@@ -5,9 +5,9 @@
   "handoff_state": "ARMED_NO_ACTIVE_OWNER",
   "predecessor_run_id": null,
   "successor_run_id": null,
-  "successor_expected_at": "2026-09-20T20:33:00+09:00",
+  "successor_expected_at": "2026-09-20T20:36:00+09:00",
   "successor_observed_at": null,
   "active_unit": null,
   "checkpoint_id": "CP-UTILIZATION-001",
-  "next_action": "Immediate same-canonical wake should claim authority, mark ACTIVITY WORKING, and continue substantive utilization-hardening work."
+  "next_action": "Immediate same-canonical wake should claim authority, mark ACTIVITY WORKING, shift the hourly RRULE to the next +15 minute phase, and continue substantive utilization-hardening work."
 }
