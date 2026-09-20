@@ -26,11 +26,14 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 │  └─ relay-policy.v1.json
 ├─ state/
 │  ├─ CURRENT.json
+│  ├─ HANDOFF.json
 │  ├─ EVENTS.jsonl
 │  └─ README.md
 ├─ schemas/
 │  ├─ current-state.schema.json
-│  └─ relay-event.schema.json
+│  ├─ handoff.schema.json
+│  ├─ relay-event.schema.json
+│  └─ run-observation.schema.json
 ├─ docs/
 │  ├─ ARCHITECTURE.md
 │  ├─ HANDOFF_PROTOCOL.md
