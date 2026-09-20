@@ -98,3 +98,13 @@ The ChatGPT composer/stop-button state is not authoritative durable state, but i
 ## Public-safe persistence
 
 RRuleR must remain safe to expose publicly. Never persist credentials, cookies, private files, private message content, private-repository material, or personal data.
+
+## Hard no-self-termination invariant
+
+A non-terminal owner MUST NOT voluntarily end its turn.
+
+- If program state is not `PROGRAM_COMPLETE` or `BLOCKED_EXTERNAL`, emitting a normal final response is forbidden unless a successor has actually been observed and the durable handoff has been committed.
+- `CONTINUE`, `WORKING`, `DEGRADED_CONTINUATION`, checkpoint completion, CI pending/success, document completion, root completion, or "nothing immediately obvious" are NOT permission to end.
+- After every bounded unit, re-read durable state, select the next useful admissible unit, and execute it in the SAME turn.
+- If no next unit is obvious, the next unit is to inspect durable state/evidence for the highest-value unresolved invariant or validation gap; this is not a reason to idle.
+- Only `PROGRAM_COMPLETE`, proven `BLOCKED_EXTERNAL`, committed successor handoff, explicit operator stop, or platform-enforced termination may end an active turn.
