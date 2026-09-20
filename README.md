@@ -25,9 +25,14 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 │  └─ POLICY.md
 ├─ state/
 │  ├─ CURRENT.json
+│  ├─ EVENTS.jsonl
 │  └─ README.md
+├─ schemas/
+│  ├─ current-state.schema.json
+│  └─ relay-event.schema.json
 ├─ docs/
 │  ├─ ARCHITECTURE.md
+│  ├─ OPERATIONS.md
 │  └─ RELAY_RRULE_SELF_UPDATE.md
 ├─ experiments/
 │  └─ rrule-self-relay/
@@ -46,7 +51,17 @@ A fresh session reads:
 4. the referenced checkpoint/task/spec
 5. `docs/RELAY_RRULE_SELF_UPDATE.md` when operating the relay
 
-Then it reconstructs state, validates authority, establishes the next wake, and only then performs substantive work.
+Then it reconstructs state, validates authority, establishes the next wake, and immediately performs substantive work.
+
+## Utilization rule
+
+After the next wake is secured, useful-work utilization is a first-class objective.
+
+- Do not voluntarily idle while useful admissible work remains.
+- Do not stop because a document, milestone, checkpoint, phase, or quarter-hour boundary was reached.
+- Handoff starts only after successor execution is actually observed.
+- Once successor is observed, finish the current smallest safe work unit, checkpoint, hand off, and end.
+- Correctness invariants still outrank raw activity: no duplicate substantive execution, stale-authority writes, or blind replay of ambiguous effects.
 
 ## Public-safety rule
 
