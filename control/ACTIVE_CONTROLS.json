@@ -1,11 +1,12 @@
 {
-  "schema_version": "1.4",
-  "program_id": "RRULER-PROGRAM-001",
-  "status": "ACTIVE",
-  "purpose": "Single machine-readable registry of control artifacts that every fresh worker must load before substantive work.",
-  "mandatory_on_wake": [
+  "schema_version":"1.5",
+  "program_id":"RRULER-PROGRAM-001",
+  "status":"ACTIVE",
+  "purpose":"Single machine-readable registry of control artifacts that every fresh worker must load before substantive work.",
+  "mandatory_on_wake":[
     "control/relay-policy.v1.json",
     "control/scheduler-fence.v1.json",
+    "control/rolling-rrule-lifecycle.v1.json",
     "control/handoff-recovery.v1.json",
     "control/runtime-continuity.v1.json",
     "control/runtime-mode.v1.json",
@@ -17,28 +18,17 @@
     "state/TURN_PLAN.json",
     "state/UTILIZATION.json"
   ],
-  "mandatory_before_corrective_experiment_selection": [
-    "control/evidence-policy.v1.json",
-    "control/recovery-slo.v1.json",
-    "state/EXPERIMENTS.jsonl",
-    "state/P0_SCORECARD.json",
-    "state/WAKE_ARCHITECTURE.json"
-  ],
-  "hard_invariants": [
+  "mandatory_before_corrective_experiment_selection":["control/evidence-policy.v1.json","control/recovery-slo.v1.json","state/EXPERIMENTS.jsonl","state/P0_SCORECARD.json","state/WAKE_ARCHITECTURE.json"],
+  "hard_invariants":[
     "DURABLE_STATE_IS_AUTHORITATIVE",
     "AUTHORITY_EPOCH_MONOTONIC",
-    "REARM_AND_VERIFY_NEXT_WAKE_BEFORE_SUBSTANTIVE_WORK",
-    "NONTERMINAL_OWNER_MUST_CONTINUE_USEFUL_WORK_UNTIL_AUTHORITY_TRANSFER_OR_PLATFORM_BOUNDARY",
-    "SAME_CANONICAL_OVERLAP_MUST_NOT_BE_ASSUMED_WITHOUT_POSITIVE_EVIDENCE",
-    "MISSED_SAME_CANONICAL_PHASE_MUST_BE_ROLLED_FORWARD_BEFORE_IT_DEGRADES_TO_AN_HOURLY_GAP",
-    "PRIMARY_OBJECTIVE_OR_CHECKPOINT_COMPLETION_DOES_NOT_AUTHORIZE_YIELD",
+    "MINIMUM_FENCE_THEN_PROVISIONAL_REARM_AND_VERIFY_BEFORE_FULL_RESTORE_OR_SUBSTANTIVE_WORK",
+    "FINAL_CHECKPOINT_THEN_COMPLETION_RELATIVE_REARM_AND_VERIFY_BEFORE_NORMAL_RETURN",
+    "STALE_WAKE_MUST_NOT_ROLL_DSTART_OR_AUTHORITY_BACKWARD",
+    "NONTERMINAL_PROGRAM_MUST_RETAIN_VERIFIED_CONTINUATION",
     "DUPLICATE_SUBSTANTIVE_SIDE_EFFECTS_FORBIDDEN",
     "CANONICAL_DISABLE_ONLY_ON_PROGRAM_TERMINAL_OR_EXPLICIT_OPERATOR_STOP",
-    "FAILED_INTERVENTION_MUST_NOT_BE_REPEATED_WITHOUT_NEW_EVIDENCE",
-    "HEALTHY_RUN_UTILIZATION_PASS_DOES_NOT_IMPLY_RECOVERY_SLO_PASS",
-    "HEARTBEAT_ONLY_PROGRESS_MUST_NOT_SATISFY_UTILIZATION_EVIDENCE_GAPS",
-    "USER_VISIBLE_FINAL_IS_RUN_END_SIDE_EFFECT_REQUIRING_FRESH_PREFINAL_AUTHORIZATION",
-    "FUTURE_COLD_RESCUE_WAKE_DOES_NOT_AUTHORIZE_HEALTHY_OWNER_TO_STOP"
+    "FAILED_INTERVENTION_MUST_NOT_BE_REPEATED_WITHOUT_NEW_EVIDENCE"
   ],
-  "conflict_rule": "If a mandatory artifact conflicts with another mandatory artifact, fail closed only for the disputed side effect, reconcile the control conflict durably, and continue safe useful work rather than treating the conflict as program completion."
+  "conflict_rule":"If a mandatory artifact conflicts with another mandatory artifact, fail closed only for the disputed side effect, reconcile the control conflict durably, and continue safe useful work rather than treating the conflict as program completion."
 }
