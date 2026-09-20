@@ -1,8 +1,8 @@
 {
   "policy_id":"RRULER_ROLLING_WINDOW_PROMOTION",
-  "version":2,
+  "version":3,
   "status":"ACTIVE",
-  "purpose":"Prevent incomplete, caller-shifted, or weakly evidenced utilization samples from being promoted to P0 acceptance evidence. The historical filename is retained for compatibility; active P0 candidates are fixed 900-second wall-clock windows.",
+  "purpose":"Prevent incomplete, caller-shifted, weakly evidenced, or ambiguously selected utilization samples from being promoted to P0 acceptance evidence. The historical filename is retained for compatibility; active P0 candidates are fixed 900-second wall-clock windows.",
   "window_seconds":900,
   "window_mode":"FIXED_EPOCH_ANCHORED",
   "window_anchor":"UNIX_EPOCH_MULTIPLES_OF_900_SECONDS",
@@ -10,6 +10,7 @@
   "required_useful_seconds":840,
   "max_unexplained_internal_gap_seconds":120,
   "minimum_valid_windows_for_pass":3,
+  "selection_policy":"Among completed canonical windows, identify consecutive VALID_ACCEPTED streaks. Prefer the longest streak; equal-length ties prefer the freshest fully observed streak. When the selected streak contains more than the minimum required windows, compute the acceptance rolling mean over its freshest minimum-required windows.",
   "required_boundaries":["window_start_at","window_end_at","substantive_start_at","last_substantive_progress_at"],
   "required_point_fields":["at","kind","artifact","qualification","basis"],
   "point_qualification_required":"SUBSTANTIVE_ACCEPTED",
@@ -36,7 +37,7 @@
     "USEFUL_SECONDS_LT_840"
   ],
   "window_result_states":["INCOMPLETE","REJECTED","VALID_BELOW_TARGET","VALID_ACCEPTED"],
-  "pass_rule":"P0 PASS requires at least 3 consecutive VALID_ACCEPTED fixed completed windows and rolling mean observed useful seconds >=840; one accepted window never completes P0.",
+  "pass_rule":"P0 PASS requires at least 3 consecutive VALID_ACCEPTED fixed completed windows and rolling mean observed useful seconds >=840 over the deterministically selected freshest required subset; one accepted window never completes P0.",
   "anti_inference_rule":"Absence of evidence is unknown time, not useful time. Never bridge unknown intervals merely because endpoint commits are substantive.",
   "anti_gaming_rule":"Do not manufacture commits or split trivial changes to satisfy cadence; materially new work is required by control/evidence-policy.v1.json."
 }
