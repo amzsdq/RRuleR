@@ -7,9 +7,9 @@
   "active_run_id": "RUN-UTIL-20260920-235858",
   "authority_epoch": 14,
   "substantive_work_started_at": "2026-09-20T23:59:54+09:00",
-  "last_progress_at": "2026-09-21T00:00:00+09:00",
-  "last_progress_kind": "AUTHORITY_RECOVERY_AND_HANDOFF_LATENCY_FIX",
-  "current_unit": "UTIL-EXP-003: eliminate baton recovery latency while maintaining checkpointable useful work and exact observed-boundary measurement.",
+  "last_progress_at": "2026-09-21T00:01:14+09:00",
+  "last_progress_kind": "PLATFORM_BOUNDARY_AND_MEASUREMENT_HARDENING",
+  "current_unit": "UTIL-EXP-003: already-stale fast recovery is CI-bound; official hourly scheduling boundary and actual-vs-expected successor measurement risk are now documented. Continue useful checkpointable work toward a valid 14-minute observed span.",
   "next_wake_due_at": "2026-09-21T00:15:00+09:00",
   "successor_observed": false,
   "handoff_ready": false
