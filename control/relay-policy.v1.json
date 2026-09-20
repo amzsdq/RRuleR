@@ -1,16 +1,18 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
+  "policy_revision": 2,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
-    "mechanism": "RRULE_PHASE_ROTATION",
+    "mechanism": "RRULE_ROLLING_15M",
     "canonical_reuse_required": true,
     "one_shot_conversion_forbidden": true,
-    "recurring_frequency": "HOURLY",
-    "quarter_sequence": [0, 15, 30, 45],
+    "recurring_frequency": "MINUTELY",
+    "recurring_interval_minutes": 15,
     "timing_mode": "exact_schedule",
-    "next_wake_first": true
+    "next_wake_first": true,
+    "replacement_automation_forbidden": true
   },
   "utilization": {
     "first_class_objective": true,
@@ -19,7 +21,33 @@
     "checkpoint_is_yield_condition": false,
     "milestone_is_yield_condition": false,
     "document_boundary_is_yield_condition": false,
-    "scheduled_time_is_yield_condition": false
+    "root_completion_is_yield_condition": false,
+    "scheduled_time_is_yield_condition": false,
+    "normal_final_response_while_active_predecessor_forbidden": true
+  },
+  "program_continuity": {
+    "enabled": true,
+    "root_completion_does_not_imply_program_completion": true,
+    "on_root_complete": [
+      "PERSIST_ROOT_TERMINAL_EVIDENCE",
+      "EVALUATE_MATERIALLY_USEFUL_NEXT_ROOT",
+      "IF_USEFUL_PERSIST_NEXT_ROOT_BEFORE_RELINQUISHING",
+      "CONTINUE_WITHOUT_VOLUNTARY_IDLE"
+    ],
+    "busywork_for_continuity_forbidden": true,
+    "program_stop_requires_one_of": [
+      "EXPLICIT_OPERATOR_STOP",
+      "VERIFIED_PROGRAM_COMPLETE",
+      "BLOCKED_EXTERNAL_WITH_INTERNAL_ALTERNATIVES_EXHAUSTED"
+    ]
+  },
+  "activity_evidence": {
+    "path": "state/ACTIVITY.json",
+    "mark_working_at_run_start": true,
+    "refresh_after_meaningful_work_unit": true,
+    "maximum_heartbeat_gap_minutes_when_practical": 5,
+    "foreground_ui_is_advisory_not_authoritative": true,
+    "operator_idle_ui_plus_no_fresh_durable_activity_is_utilization_gap": true
   },
   "handoff": {
     "trigger": "SUCCESSOR_ACTUALLY_OBSERVED",
@@ -28,15 +56,17 @@
       "STOP_STARTING_NEW_SUBSTANTIVE_UNITS",
       "FINISH_CURRENT_SMALLEST_SAFE_UNIT",
       "PERSIST_HANDOFF_CHECKPOINT",
+      "PERSIST_ACTIVITY_HANDOFF",
       "EMIT_CONCISE_STATUS",
       "PREDECESSOR_END"
     ],
     "successor_must_avoid_duplicate_active_unit": true,
-    "same_canonical_overlap_required_for_correctness": false
+    "same_canonical_overlap_required_for_correctness": false,
+    "same_canonical_overlap_preferred_for_utilization": true
   },
   "fallback": {
     "self_update_failure_with_old_rrule_intact": "DEGRADED_CONTINUATION",
-    "old_hourly_rrule_may_act_as_low_frequency_recovery_opportunity": true,
+    "old_rrule_may_act_as_recovery_opportunity": true,
     "disabled_deleted_missing_automation_self_rescued": false
   },
   "authority": {
@@ -52,8 +82,9 @@
     "duplicate_substantive_execution_forbidden": true
   },
   "terminal": {
-    "complete_requires_evidence": true,
-    "complete_disables_same_canonical_automation": true,
-    "complete_schedules_successor": false
+    "root_complete_requires_evidence": true,
+    "program_complete_requires_evidence": true,
+    "disable_same_canonical_only_on_program_terminal": true,
+    "program_terminal_schedules_successor": false
   }
 }
