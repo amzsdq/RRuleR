@@ -1,0 +1,27 @@
+{
+  "policy_id": "RRULER_HANDOFF_RECOVERY",
+  "version": 1,
+  "status": "ACTIVE",
+  "purpose": "Prevent a dead or platform-ended predecessor from deadlocking a successor after a durable handoff request.",
+  "preconditions": [
+    "SUCCESSOR_REARM_VERIFIED",
+    "HANDOFF_REQUEST_DURABLY_PERSISTED",
+    "PREDECESSOR_ACTIVITY_UNCHANGED",
+    "PREDECESSOR_LAST_PROGRESS_OVERDUE_BY_LIVENESS_POLICY",
+    "PROGRAM_NON_TERMINAL"
+  ],
+  "recovery_sequence": [
+    "RE_READ_CURRENT_ACTIVITY_HANDOFF",
+    "VERIFY_PREDECESSOR_STILL_OVERDUE_AND_UNCHANGED",
+    "ADVANCE_AUTHORITY_EPOCH_TO_SUCCESSOR",
+    "MARK_SUCCESSOR_WORKING",
+    "MARK_HANDOFF_RECOVERED_TAKEOVER",
+    "DO_NOT_REPLAY_PREDECESSOR_ACTIVE_UNIT_BLINDLY",
+    "PLAN_15_MIN_WORK_PACKET_FROM_EXACT_DURABLE_NEXT_ACTION",
+    "CONTINUE_WORK"
+  ],
+  "normal_handoff_preferred": true,
+  "timeout_is_recovery_not_normal_handoff": true,
+  "successor_may_not_take_over_while_predecessor_is_fresh": true,
+  "exact_predecessor_end_time_must_not_be_invented": true
+}
