@@ -87,9 +87,12 @@ def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->
     result["window"]={"start_at":start.isoformat(),"end_at":end.isoformat(),"observed_through":horizon.isoformat(),"useful_seconds":useful,"maximum_unexplained_gap_seconds":max_gap,"interval_count":len(clipped),"union_interval_count":len(union),"reasons":reasons}
     result["promotion"]="VALID_ACCEPTED" if not reasons else "REJECTED"; return result
 def evaluate_consecutive_windows(data:dict,first_observed:str,last_observed:str,required:int=3)->dict:
-    """Evaluate fixed windows; ties select the freshest longest accepted streak, then its freshest required windows."""
+    """Evaluate fixed windows; malformed observation boundaries fail closed without partial selection."""
     if required<=0: raise ValueError("required must be positive")
-    starts=enumerate_completed_fixed_windows(first_observed,last_observed)
+    try:
+        starts=enumerate_completed_fixed_windows(first_observed,last_observed)
+    except (TypeError,ValueError) as exc:
+        return {"required_consecutive_windows":required,"completed_window_count":0,"windows":[],"longest_consecutive_accepted":0,"selection_policy":"FRESHEST_LONGEST_STREAK_THEN_FRESHEST_REQUIRED_WINDOWS","selected_windows":[],"rolling_mean_useful_seconds":None,"p0_acceptance":"NOT_YET","observation_boundary_error":str(exc)}
     windows=[]
     for start in starts:
         result=audit(data,start,last_observed)
@@ -99,13 +102,12 @@ def evaluate_consecutive_windows(data:dict,first_observed:str,last_observed:str,
     for window in windows:
         if window["promotion"]=="VALID_ACCEPTED":
             streak.append(window)
-            # Equal-length ties deliberately prefer the later/fresher fully observed streak.
             if len(streak)>=len(best): best=list(streak)
         else: streak=[]
     selected=best[-required:] if len(best)>=required else []
     mean=(sum(float(w["useful_seconds"]) for w in selected)/required) if selected else None
     accepted=bool(selected) and mean>=TARGET_USEFUL_SECONDS
-    return {"required_consecutive_windows":required,"completed_window_count":len(windows),"windows":windows,"longest_consecutive_accepted":len(best),"selection_policy":"FRESHEST_LONGEST_STREAK_THEN_FRESHEST_REQUIRED_WINDOWS","selected_windows":[w["start_at"] for w in selected],"rolling_mean_useful_seconds":mean,"p0_acceptance":"PASS" if accepted else "NOT_YET"}
+    return {"required_consecutive_windows":required,"completed_window_count":len(windows),"windows":windows,"longest_consecutive_accepted":len(best),"selection_policy":"FRESHEST_LONGEST_STREAK_THEN_FRESHEST_REQUIRED_WINDOWS","selected_windows":[w["start_at"] for w in selected],"rolling_mean_useful_seconds":mean,"p0_acceptance":"PASS" if accepted else "NOT_YET","observation_boundary_error":None}
 def main()->int:
     if len(sys.argv) not in (2,3,4): print("usage: validate_work_evidence.py STATE_JSON [WINDOW_START_ISO] [OBSERVED_THROUGH_ISO]",file=sys.stderr); return 2
     data=json.loads(Path(sys.argv[1]).read_text(encoding="utf-8")); result=audit(data,sys.argv[2] if len(sys.argv)>=3 else None,sys.argv[3] if len(sys.argv)==4 else None)
