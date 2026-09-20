@@ -1,24 +1,25 @@
 {
   "schema_version": "1.0",
   "validation_id": "RRULER-RRULE-SELF-RELAY-001",
+  "validation_scope": "RRULER-BOOTSTRAP-001",
+  "program_terminal": false,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "status": "PASS",
   "acceptance": {
-    "canonical_id_preserved": {"status": "PASS", "blocking": true, "evidence": ["phase :30 -> :45", "phase :45 -> :00", "phase :00 -> :15", "phase :30 -> :45 on terminal validation run"]},
-    "recurring_rrule_preserved": {"status": "PASS", "blocking": true, "expected_base": "FREQ=HOURLY;BYSECOND=0", "effective_phase_sequence": [0, 15, 30, 45]},
-    "two_or_more_phase_transitions": {"status": "PASS", "blocking": true, "observed_transitions": [":30->:45", ":45->:00", ":00->:15"]},
-    "scheduled_cold_continuation_from_github": {"status": "PASS", "blocking": true, "evidence": "Scheduled successor reconstructed durable checkpoint state from GitHub and continued substantive work without predecessor chat memory."},
-    "additional_cycle_without_continuation_loss": {"status": "PASS", "blocking": true, "evidence": "Later scheduled executions reconstructed durable authority and continued the same canonical relay."},
-    "github_state_coherent": {"status": "PASS", "blocking": true, "evidence": "Control-plane validator repeatedly completed successfully after machine validation integration; run 35506916073 succeeded on commit ee83a1ae1839a5325541eb6f25dbd8df01303608 before terminal promotion."},
-    "runtime_timeout_does_not_break_cycle": {"status": "PASS_WITH_SCOPE", "blocking": true, "scope": "Observed continuation across multiple scheduled executions; no claim about unbounded platform runtime behavior."},
-    "overlap_or_serialization_semantics_classified": {"status": "PENDING", "blocking": false, "required_evidence": "Durable timestamps/run ownership or direct platform evidence sufficient to distinguish safe overlap from serialization without inference from chat prose.", "rationale": "Reproduction correctness works under either overlap or serialization; classification is performance characterization, not a correctness prerequisite."},
-    "utilization_handoff_measurement": {"status": "PENDING", "blocking": false, "required_evidence": "At least one observable predecessor productive-end and successor productive-start pair using a common durable clock basis.", "rationale": "Precise utilization measurement remains an optimization objective; unknown timing is not fabricated."}
+    "canonical_id_preserved": {"status": "PASS", "blocking": true},
+    "recurring_rrule_preserved": {"status": "PASS", "blocking": true},
+    "two_or_more_phase_transitions": {"status": "PASS", "blocking": true},
+    "scheduled_cold_continuation_from_github": {"status": "PASS", "blocking": true},
+    "additional_cycle_without_continuation_loss": {"status": "PASS", "blocking": true},
+    "github_state_coherent": {"status": "PASS", "blocking": true},
+    "runtime_timeout_does_not_break_cycle": {"status": "PASS_WITH_SCOPE", "blocking": true},
+    "overlap_or_serialization_semantics_classified": {"status": "PENDING", "blocking": false},
+    "utilization_handoff_measurement": {"status": "PENDING", "blocking": false}
   },
-  "pass_rule": "Overall PASS is permitted when every acceptance item with blocking=true is PASS or PASS_WITH_SCOPE, no blocking item is FAIL/PENDING, public-safe durable state remains coherent, and pending non-blocking observations are explicitly documented rather than inferred.",
-  "terminal_decision": {
-    "decision": "PASS",
-    "reason": "Every blocking reproduction criterion is satisfied with durable evidence. Remaining pending items are explicitly non-blocking performance characterization and are not inferred.",
-    "follow_up": "Future work may characterize overlap and utilization with stronger durable timing evidence, but relay reproduction does not depend on those measurements."
+  "pass_rule": "PASS applies to the bootstrap relay reproduction root, not the overall RRuleR program.",
+  "decision": {
+    "root": "ROOT_PASS",
+    "program": "CONTINUE"
   },
-  "next_action": "Bootstrap relay validation is complete. Disable the canonical bootstrap automation after terminal CURRENT state is persisted."
+  "next_action": "Treat this as historical root acceptance evidence. Read state/CURRENT.json for live program status."
 }
