@@ -7,9 +7,9 @@
   "active_run_id": "RUN-UTIL-20260920-231559",
   "authority_epoch": 12,
   "substantive_work_started_at": "2026-09-20T23:16:15+09:00",
-  "last_progress_at": "2026-09-20T23:18:00+09:00",
-  "last_progress_kind": "VALIDATOR_REPAIRED_AND_GREEN",
-  "current_unit": "Continue UTIL-EXP-002: harden exact run-boundary measurement and keep durable progress fresh until actual :30 successor observation.",
+  "last_progress_at": "2026-09-20T23:20:00+09:00",
+  "last_progress_kind": "LIVE_RUN_OBSERVATION_OPENED",
+  "current_unit": "UTIL-EXP-002 active measurement: keep producing bounded durable progress; next checkpoint should test consistency of CURRENT/ACTIVITY/HANDOFF/RUNS and preserve exact successor boundary.",
   "next_wake_due_at": "2026-09-20T23:30:00+09:00",
   "successor_observed": false,
   "handoff_ready": false
