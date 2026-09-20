@@ -1,0 +1,20 @@
+{
+  "schema_version":"1.0",
+  "program_id":"RRULER-PROGRAM-001",
+  "status":"AWAITING_EVENT_TRIGGER_PROVISIONING",
+  "probe_id":"EVENT-WORKER-WRITE-PROBE-001",
+  "purpose":"Determine whether a GitHub-PR-event-triggered Work invocation receives the same RRuleR write-capable GitHub action surface as the current connected GitHub plugin.",
+  "trigger_lane":"draft PR #1 event-wake-lab commit update",
+  "event_worker_required_sequence":[
+    "READ_FRESH_AGENTS_CURRENT_AND_EVENT_WAKE_LEDGER",
+    "READ_THIS_PROBE",
+    "VERIFY_EVENT_IS_FROM_PR_1_COMMIT_UPDATE",
+    "ATTEMPT_ONE_LOW_RISK_WRITE_TO_THIS_PROBE_RESULT_ONLY",
+    "READ_BACK_THE_WRITE",
+    "DO_NOT_EMIT_A_NEXT_EVENT_DURING_CAPABILITY_PROBE"
+  ],
+  "success_result":{"status":"PASS_WRITE_SURFACE","required_evidence":["event_observed_at","worker_run_identity","write_commit_sha","readback_verified_at"]},
+  "failure_result":{"status":"FAIL_WRITE_SURFACE","required_evidence":["event_observed_at","failure_class","available_action_surface"]},
+  "safety":{"max_probe_writes":1,"recursive_event_emission_forbidden":true,"main_control_state_mutation_during_probe_forbidden":true,"secrets_forbidden":true},
+  "provisioning_note":"Creating or editing the ChatGPT Work event trigger is not exposed by the current automation/plugin tool surface in this run. Official OpenAI documentation states that event-triggered Work tasks inherit existing connected-app permissions and approval requirements; therefore the live capability probe remains necessary but has stronger prior evidence than before."
+}
