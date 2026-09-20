@@ -1,0 +1,20 @@
+{
+  "schema_version":"1.0",
+  "program_id":"RRULER-PROGRAM-001",
+  "root_job_id":"RRULER-UTILIZATION-003",
+  "packet_id":"NEXT-BOOTSTRAP-ROLLING-BATON-001",
+  "status":"NEEDS_REFRESH",
+  "planned_by_authority_epoch":21,
+  "checkpoint_ref":"state/CURRENT.json#/checkpoint",
+  "objective":"Refresh this bootstrap packet from fresh durable state before substantive work.",
+  "target_work_seconds":600,
+  "safety_margin_seconds":180,
+  "provisional_arm_offset_seconds":780,
+  "final_rearm_offset_seconds":60,
+  "acceptance_criteria":[
+    "Fresh authority and checkpoint lineage are validated.",
+    "The next normal packet is persisted before normal close."
+  ],
+  "first_action":"REFRESH_FROM_FRESH_CURRENT",
+  "fallback_action":"Preserve the newest verified continuation and refresh from durable state."
+}
