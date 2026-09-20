@@ -1,0 +1,14 @@
+{
+  "schema_version":"1.0",
+  "program_id":"RRULER-PROGRAM-001",
+  "purpose":"Durable interval evidence for continuous-time useful-work coverage SLO. Never infer full coverage between sparse points without an evidence rule that justifies it.",
+  "target_coverage_fraction":0.9333333333,
+  "maximum_unexplained_gap_seconds_for_passing_window":120,
+  "interval_states":["OPEN","CLOSED_EVIDENCED","CLOSED_PARTIAL","INVALID_UNEXPLAINED_GAP","DUPLICATE_EXCLUDED"],
+  "coverage_rules":{"overlap_counts_once":true,"heartbeat_only_counts":false,"duplicate_work_counts":false,"scheduler_wait_counts":false,"blocked_wait_counts":false,"sparse_endpoint_span_auto_counts":false},
+  "observations":[
+    {"run_id":"RUN-UTIL-20260921-003046","authority_epoch":16,"state":"INVALID_UNEXPLAINED_GAP","first_substantive_at":"2026-09-21T00:31:00+09:00","last_meaningful_progress_at":"2026-09-21T00:33:25+09:00","successor_observed_at":"2026-09-21T00:46:08+09:00","endpoint_span_seconds":145,"uncovered_tail_seconds":779,"counted_useful_seconds":null,"reason":"No interval-level evidence supports continuous coverage across the predecessor-to-successor gap."},
+    {"run_id":"RUN-UTIL-20260921-004608","authority_epoch":17,"state":"OPEN","intended_window_started_at":"2026-09-21T00:45:00+09:00","worker_observed_at":"2026-09-21T00:46:08+09:00","first_substantive_at":"2026-09-21T00:46:24+09:00","latest_evidence_point_at":"2026-09-21T00:57:41+09:00","counted_useful_seconds":null,"evidence_summary":"Multiple substantive repository changes, research, model tests and durable checkpoints exist throughout the invocation; final interval coverage must be closed/reconstructed at successor observation rather than inferred from endpoints."}
+  ],
+  "next_measurement_step":"At successor observation, close epoch 17 using actual last evidence and reconstruct conservative useful sub-intervals from substantive commits/tool-backed checkpoints. Then compute rolling 15-minute union coverage; do not double-count overlaps."
+}
