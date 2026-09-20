@@ -4,49 +4,68 @@
 
 1. Read `AGENTS.md`.
 2. Read `control/POLICY.md`.
-3. Read `state/CURRENT.json`.
-4. Read the document or experiment referenced by `checkpoint.next_action`.
-5. If this is a scheduled relay wake, update and verify the same recurring automation before substantive work.
-6. Start work immediately after wake verification.
+3. Read `control/relay-policy.v1.json`.
+4. Read `state/CURRENT.json` and `state/ACTIVITY.json`.
+5. Read the document or experiment referenced by `checkpoint.next_action`.
+6. If this is a scheduled relay wake, verify the same recurring automation before substantive work.
+7. Mark activity WORKING and start substantive work immediately.
 
 ## Normal loop
 
 ```text
 LOAD durable state
  -> VERIFY authority
- -> ARM/VERIFY next wake
+ -> VERIFY recurring next wake
+ -> ACTIVITY=WORKING
  -> WORK
- -> CHECKPOINT when useful
+ -> CHECKPOINT/ACTIVITY refresh when useful
  -> CONTINUE working
+ -> current root complete?
+      yes -> persist root terminal evidence
+             -> materially useful next root exists?
+                  yes -> persist/chains next root and continue
+                  no  -> evaluate PROGRAM_COMPLETE
  -> successor actually observed?
       no  -> continue work
       yes -> finish smallest safe unit
-             -> HANDOFF checkpoint
+             -> HANDOFF checkpoint + activity
              -> predecessor ends
 ```
 
 ## Stop conditions
 
-A non-terminal run must not stop merely because:
+A non-terminal program must not stop merely because:
 
 - a file was completed;
 - a milestone was reached;
 - a checkpoint was written;
-- the quarter-hour boundary arrived;
+- a root job was completed;
+- a recurrence boundary arrived;
 - the next scheduled time is near.
 
 Normal stop is allowed only for:
 
-- terminal `COMPLETE`;
-- proven `BLOCKED_EXTERNAL`;
+- verified `PROGRAM_COMPLETE`;
+- explicit operator stop;
+- proven `BLOCKED_EXTERNAL` with internal alternatives exhausted;
 - successor-triggered handoff;
 - platform-enforced runtime termination.
 
+## Operator UI interpretation
+
+The composer icon is useful but not authoritative:
+
+- a stop button indicates the foreground turn is generating;
+- a send button/idle composer indicates that foreground turn is over;
+- a separate scheduled run may still be active even when the foreground is idle.
+
+Operationally, however, a predecessor that still owns useful work should not voluntarily return to idle UI before a successor is observed. If idle UI is seen and `state/ACTIVITY.json` is stale with no successor, classify a utilization gap and restore continuation.
+
 ## Recovery
 
-### Self-update failure with old RRULE intact
+### Recurrence damaged but old RRULE intact
 
-Record `DEGRADED_CONTINUATION`. Preserve the old recurring schedule as the slower recovery opportunity. Do not claim the fast 15-minute path succeeded.
+Record `DEGRADED_CONTINUATION`. Preserve the surviving recurrence as a recovery opportunity. Do not claim the preferred cadence succeeded.
 
 ### No valid continuation wake
 
@@ -69,12 +88,15 @@ Never persist:
 
 Use public-safe opaque references where necessary.
 
-## Completion gate
+## Program completion gate
 
-Before `COMPLETE`:
+Before `PROGRAM_COMPLETE`:
 
+- current root is terminal with evidence;
+- no materially useful authorized next root remains;
 - final durable state is internally consistent;
 - required documents validate;
-- relay evidence satisfies the acceptance checklist;
 - the same canonical automation is disabled;
 - no successor is scheduled.
+
+A root-level COMPLETE alone does not satisfy this gate.
