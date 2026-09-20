@@ -15,7 +15,7 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - name: Audit provisional fixed windows
+      - name: Audit fixed windows with substantive durable evidence
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -28,20 +28,28 @@ jobs:
           import json, os, urllib.parse, urllib.request
           from datetime import datetime, timezone, timedelta
           d=json.load(open('/tmp/windows.json')); limit=d['maximum_unexplained_internal_gap_seconds']; token=os.environ['GH_TOKEN']; repo=os.environ['REPO']; failures=[]
+          headers={'Authorization':f'Bearer {token}','Accept':'application/vnd.github+json'}
           def dt(s): return datetime.fromisoformat(s).astimezone(timezone.utc)
+          def get(url):
+              with urllib.request.urlopen(urllib.request.Request(url,headers=headers)) as r: return json.load(r)
           for w in d['windows']:
-              if not w.get('status','').startswith('PROVISIONAL_PASS'): continue
+              if w.get('status') not in {'PROVISIONAL_PASS_AWAITING_GAP_AUDIT','PASS_AUDITED'}: continue
               start=dt(w['evidenced_interval_start']); end=dt(w['end']); query_end=end+timedelta(seconds=limit)
               q=urllib.parse.urlencode({'since':start.isoformat().replace('+00:00','Z'),'until':query_end.isoformat().replace('+00:00','Z'),'per_page':100})
-              req=urllib.request.Request(f'https://api.github.com/repos/{repo}/commits?{q}',headers={'Authorization':f'Bearer {token}','Accept':'application/vnd.github+json'})
-              with urllib.request.urlopen(req) as r: commits=json.load(r)
-              pts=[start]+[datetime.fromisoformat(c['commit']['committer']['date'].replace('Z','+00:00')) for c in commits]
+              commits=get(f'https://api.github.com/repos/{repo}/commits?{q}')
+              pts=[start]; substantive=0
+              for c in commits:
+                  detail=get(f'https://api.github.com/repos/{repo}/commits/{c["sha"]}')
+                  files={f['filename'] for f in detail.get('files',[])}
+                  if files and files != {'state/ACTIVITY.json'}:
+                      pts.append(datetime.fromisoformat(c['commit']['committer']['date'].replace('Z','+00:00'))); substantive+=1
               pts=sorted(set(pts)); before=[p for p in pts if p<=end]; after=[p for p in pts if p>=end]
               continuity_points=sorted(set(before+([min(after)] if after else [])))
               gaps=[(b-a).total_seconds() for a,b in zip(continuity_points,continuity_points[1:])]
               worst=max(gaps,default=0); crosses=bool(after) and (min(after)-end).total_seconds()<=limit
-              ok=worst<=limit and crosses and w.get('provisional_useful_coverage_seconds',0)>=d['target_useful_coverage_seconds']
-              print(json.dumps({'window_id':w['window_id'],'points':len(continuity_points),'max_gap_seconds':worst,'crosses_end_within_limit':crosses,'pass':ok},separators=(',',':')))
+              claimed=w.get('useful_coverage_seconds',w.get('provisional_useful_coverage_seconds',0))
+              ok=worst<=limit and crosses and claimed>=d['target_useful_coverage_seconds']
+              print(json.dumps({'window_id':w['window_id'],'substantive_commit_points':substantive,'max_gap_seconds':worst,'crosses_end_within_limit':crosses,'pass':ok},separators=(',',':')))
               if not ok: failures.append(w['window_id'])
           if failures: raise SystemExit('coverage window audit failed: '+','.join(failures))
           PY
