@@ -28,6 +28,7 @@ jobs:
             "control/relay-policy.v1.json"
             "state/CURRENT.json"
             "state/EVENTS.jsonl"
+            "state/RUNS.jsonl"
             "state/README.md"
             "docs/ARCHITECTURE.md"
             "docs/OPERATIONS.md"
@@ -58,6 +59,7 @@ jobs:
 
           fetch "state/CURRENT.json" /tmp/current.json
           fetch "state/EVENTS.jsonl" /tmp/events.jsonl
+          fetch "state/RUNS.jsonl" /tmp/runs.jsonl
           fetch "control/relay-policy.v1.json" /tmp/relay-policy.json
           fetch "schemas/current-state.schema.json" /tmp/current-schema.json
           fetch "schemas/relay-event.schema.json" /tmp/event-schema.json
@@ -150,5 +152,24 @@ jobs:
                   raise SystemExit(f"duplicate event_id: {e['event_id']}")
               event_ids.add(e['event_id'])
 
-          print(f"RRuleR control-plane validation passed; events={len(event_ids)}")
+          run_ids=set()
+          allowed_run_class={'ACTIVE','HANDOFF','COMPLETE','BLOCKED_EXTERNAL','PLATFORM_ENDED','DEGRADED_CONTINUATION'}
+          for lineno,line in enumerate(open('/tmp/runs.jsonl'),1):
+              line=line.strip()
+              if not line:
+                  continue
+              try:
+                  o=json.loads(line)
+              except Exception as ex:
+                  raise SystemExit(f"RUNS.jsonl line {lineno} invalid JSON: {ex}")
+              for key in ['observation_id','root_job_id','canonical_automation_id','run_started_at','classification']:
+                  if key not in o:
+                      raise SystemExit(f"RUNS.jsonl line {lineno} missing {key}")
+              if o['classification'] not in allowed_run_class:
+                  raise SystemExit(f"RUNS.jsonl line {lineno} invalid classification")
+              if o['observation_id'] in run_ids:
+                  raise SystemExit(f"duplicate observation_id: {o['observation_id']}")
+              run_ids.add(o['observation_id'])
+
+          print(f"RRuleR control-plane validation passed; events={len(event_ids)} runs={len(run_ids)}")
           PY
