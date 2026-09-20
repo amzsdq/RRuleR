@@ -1,0 +1,31 @@
+{
+  "policy_id": "RRULER_ROLLING_POLICY_ERRATA",
+  "version": 1,
+  "status": "ACTIVE",
+  "purpose": "Durably resolve residual human-readable fixed-quarter scheduler prose that conflicts with the active rolling completion-relative machine policy.",
+  "effective_scheduler": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE",
+  "authoritative_machine_controls": [
+    "control/relay-policy.v1.json",
+    "control/scheduler-fence.v1.json",
+    "control/rolling-rrule-lifecycle.v1.json"
+  ],
+  "retired_policy_md_semantics": [
+    "fixed quarter-hour BYMINUTE rotation",
+    "next fixed quarter-hour rearm",
+    "+15m successor handoff as active scheduler mechanism",
+    "next-quarter wake as continuity priority"
+  ],
+  "replacement_semantics": {
+    "startup": "Fence fresh durable/live continuation, then provisional-arm the same canonical approximately +13m and verify before substantive work.",
+    "normal_close": "Persist latest checkpoint, then final-rearm the same canonical to actual close +60s and verify.",
+    "handoff": "Rolling cold successor reconstructs from GitHub; fixed-quarter predecessor/successor request choreography is historical, not active.",
+    "utilization": "600s is a provisional-rescue planning horizon; P0 acceptance remains >=840s evidenced useful coverage per 900s window with <=120s unexplained evidence gaps."
+  },
+  "conflict_resolution": "For the listed retired semantics only, this errata plus the authoritative machine controls supersede stale control/POLICY.md wording until POLICY.md is textually normalized. All unrelated POLICY.md safety, authority, evidence, and no-self-termination rules remain active.",
+  "safety": {
+    "same_canonical_required": true,
+    "replacement_automation_forbidden": true,
+    "one_shot_conversion_forbidden": true,
+    "rollback_to_older_schedule_generation_forbidden": true
+  }
+}
