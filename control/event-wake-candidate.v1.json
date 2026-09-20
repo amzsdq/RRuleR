@@ -1,0 +1,16 @@
+{
+  "policy_id":"RRULER_EVENT_WAKE_CANDIDATE",
+  "version":1,
+  "status":"CANDIDATE_NOT_ACTIVE",
+  "purpose":"Define a safe GitHub-PR-event wake adapter that can be tested without changing durable workflow semantics.",
+  "trigger_source":"SUPPORTED_CHATGPT_WORK_GITHUB_PR_EVENT",
+  "activation_gate":"EXPLICIT_BOUNDED_PROVISIONING_TEST_AND_MEASURED_PASS",
+  "event_envelope":{"required_fields":["event_id","correlation_id","program_id","root_job_id","emitted_at","reason"],"forbidden_fields":["secret","credential","session_state","private_source_material"]},
+  "consumer_sequence":["READ_FRESH_CURRENT_AND_EVENT_LEDGER","REJECT_DUPLICATE_EVENT_ID","APPLY_AUTHORITY_AND_SCHEDULER_FENCES","RECORD_EVENT_OBSERVED","IF_ACTIVE_OWNER_FRESH_DO_NOT_DUPLICATE_WORK","IF_OWNER_STALE_OR_HANDOFF_ELIGIBLE_RECOVER_OR_REQUEST_HANDOFF","PERSIST_FIRST_SUBSTANTIVE_PROGRESS_LATENCY","CONTINUE_NORMAL_DURABLE_WORKFLOW"],
+  "dedupe":{"ledger_path":"state/EVENT_WAKE_LEDGER.json","key":"event_id","duplicate_action":"NO_SUBSTANTIVE_REPLAY","authority_epoch_monotonic":true},
+  "anti_recursion":{"acknowledgement_must_not_emit_trigger_event":true,"worker_progress_commit_must_not_share_trigger_lane":true,"dedicated_test_pr_or_event_lane_required":true,"max_chain_depth":1,"storm_action":"DISABLE_CANDIDATE_PATH_KEEP_QUARTER_BASELINE"},
+  "measurements":["source_event_at","worker_observed_at","first_substantive_progress_at","event_to_observation_seconds","event_to_first_work_seconds","duplicate_delivery_count","grouped_event_count"],
+  "promotion_gate":{"minimum_successful_cycles":3,"median_event_to_first_work_must_beat_quarter_baseline":true,"recursive_trigger_count_max":0,"duplicate_substantive_execution_count_max":0,"authority_rollback_count_max":0},
+  "fallback":"SCHEDULED_QUARTER_SHIFT",
+  "reference":"docs/ADR-001-WAKE-SOURCE-STRATEGY.md"
+}
