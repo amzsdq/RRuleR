@@ -1,20 +1,23 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
-  "policy_revision": 4,
+  "policy_revision": 5,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
-    "mechanism": "RRULE_HOURLY_PHASE_ROTATION_15M",
+    "mechanism": "RRULE_HOURLY_SELF_SHIFT_FROM_ACTUAL_WAKE",
     "canonical_reuse_required": true,
     "one_shot_conversion_forbidden": true,
     "replacement_automation_forbidden": true,
     "rrule_frequency": "HOURLY",
     "phase_step_minutes": 15,
-    "phase_formula": "(current_phase_minute + 15) mod 60",
+    "phase_formula": "target_due = ceil_to_minute(actual_wake_time + 15 minutes)",
     "timing_mode": "exact_schedule",
     "next_wake_first": true,
-    "note": "The platform does not support minute-frequency recurring schedules. Effective 15-minute cadence is produced by self-updating the same hourly RRULE to the next +15 minute phase before substantive work."
+    "note": "Each wake sets the same hourly RRULE's BYMINUTE from actual wake/start +15m (rounded up to whole minute). This prevents near-immediate rearm after delayed wakes and the resulting ~1h missed-slot gap.",
+    "minimum_lead_minutes": 15,
+    "compute_from_actual_wake_time": true,
+    "stale_phase_reuse_forbidden": true
   },
   "utilization": {
     "first_class_objective": true,
