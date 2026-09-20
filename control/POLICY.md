@@ -73,7 +73,7 @@ If same-canonical overlap is unsupported, correctness falls back to durable reco
 
 ## Scheduler policy
 
-Scheduler mechanism is replaceable. The active mechanism is same-canonical hourly RRULE phase rotation. Because minute-frequency recurring schedules are not supported by the scheduler, each wake first moves the same recurring hourly RRULE by +15 minutes modulo 60. This produces an effective 15-minute cadence without converting to one-shot or creating a replacement automation.
+Scheduler mechanism is replaceable. The active mechanism is a same-canonical hourly RRULE whose BYMINUTE is self-shifted on every wake. The shift MUST be computed from the actual wake/start time, not from the stale prior phase. Set target_due to the next whole-minute boundary at least 15 minutes after actual wake/start, then set DTSTART=target_due and RRULE:FREQ=HOURLY;BYMINUTE=target_due.minute;BYSECOND=0. This avoids the failure mode where a delayed wake re-arms only seconds before the nominal next phase, misses that occurrence, and then sleeps for nearly an hour.
 
 Architectural invariant:
 
