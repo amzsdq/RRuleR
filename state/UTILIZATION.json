@@ -7,15 +7,19 @@
     "turn_window_seconds": 900,
     "observed_useful_span_seconds": 840,
     "minimum_valid_completed_turns": 3,
-    "pass_rule": "ROLLING_MEAN_LAST_3_VALID_COMPLETED_TURNS_GTE_840",
-    "runtime_safety_margin_seconds": 60
+    "pass_rule": "LAST_3_VALID_TURNS_MEAN_SPAN_GTE_840_AND_EACH_HAS_CONTINUOUS_PROGRESS_EVIDENCE",
+    "runtime_safety_margin_seconds": 60,
+    "maximum_internal_progress_gap_seconds_for_acceptance": 120
   },
   "measurement": {
     "observed_useful_span_definition": "last_meaningful_progress_at - substantive_work_started_at",
+    "metric_semantics": "A span is only an acceptance proxy for sustained useful work when continuous-progress evidence is also present; two sparse timestamps separated by idle time must never count as 14 minutes of work.",
+    "continuous_progress_evidence_required": true,
+    "continuous_progress_rule": "For a valid acceptance turn, ordered meaningful durable progress evidence must cover the run from substantive start through final progress with no unexplained internal gap greater than 120 seconds. Known waiting/idle intervals are excluded or invalidate the continuous-work claim.",
     "dead_tail_definition": "successor_or_handoff_boundary_at - last_meaningful_progress_at when both are known",
     "missing_boundary_policy": "MARK_MEASUREMENT_INVALID_DO_NOT_INFER",
     "durable_progress_refresh_max_gap_seconds_when_practical": 120,
-    "target_operating_model": "~840s useful work + ~60s runtime-safe handoff margin inside each intended 900s interval",
+    "target_operating_model": "~840s evidenced sustained useful work + ~60s runtime-safe handoff margin inside each intended 900s interval",
     "large_unit_admission_cutoff_seconds": 720,
     "handoff_ready_target_elapsed_seconds": 840,
     "no_voluntary_idle_during_handoff_margin": true,
@@ -30,12 +34,12 @@
   "latest_diagnosis": {
     "cause_class": "HANDOFF_DELAY",
     "evidence": "The prior epoch reached an observed 840-second progress boundary but did not commit its handoff; the following successor recovered only after the predecessor was already stale.",
-    "secondary_risk": "The current successor was invoked at 23:58:58 for an expected 00:00 boundary, so nominal quarter slots cannot be used as exact run boundaries."
+    "secondary_risk": "Span-only measurement could falsely credit idle time between sparse timestamps; acceptance now requires continuous progress evidence with no unexplained gap >120s."
   },
   "next_corrective_experiment": {
     "experiment_id": "UTIL-EXP-003",
-    "hypothesis": "Removing redundant recovery grace for predecessors already stale by >=120s, while measuring against actual successor observation rather than nominal due, will reduce baton latency without weakening fresh-predecessor fencing.",
-    "change": "Use handoff-recovery v2 already-stale fast path; keep frequent durable progress; record expected due and actual successor observation separately; finalize immediately on positive successor request.",
-    "success_signal": "At least 3 valid completed turns with rolling mean observed_useful_span_seconds >= 840, no voluntary dead tail, and no fresh-predecessor takeover."
+    "hypothesis": "Removing redundant recovery grace for already-stale predecessors and requiring dense progress evidence will reduce baton latency while making the 14-minute target resistant to sparse-span false positives.",
+    "change": "Use handoff-recovery v2 fast path; emit meaningful durable progress at <=120s gaps while working; record expected due and actual successor observation separately; finalize immediately on positive successor request.",
+    "success_signal": "At least 3 valid completed turns with rolling mean observed_useful_span_seconds >= 840, each with continuous progress evidence, no voluntary dead tail, and no fresh-predecessor takeover."
   }
 }
