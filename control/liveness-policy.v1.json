@@ -1,0 +1,37 @@
+{
+  "policy_id": "RRULER_LIVENESS_POLICY",
+  "version": 1,
+  "status": "ACTIVE",
+  "activity_path": "state/ACTIVITY.json",
+  "states": ["ARMED", "WORKING", "HANDOFF", "DEGRADED_CONTINUATION", "PROGRAM_COMPLETE", "BLOCKED_EXTERNAL"],
+  "freshness": {
+    "target_refresh_minutes": 5,
+    "suspect_after_minutes": 10,
+    "overdue_after_minutes": 20,
+    "clock_field": "last_progress_at",
+    "rule": "A WORKING claim without fresh durable progress becomes SUSPECT, then OVERDUE. UI state alone cannot refresh liveness."
+  },
+  "healthy_active_requires": [
+    "program_status_is_non_terminal",
+    "activity_status_is_WORKING",
+    "active_run_id_is_present",
+    "activity_authority_epoch_matches_current_authority_epoch",
+    "last_progress_at_is_fresh",
+    "next_wake_due_at_is_present"
+  ],
+  "utilization_gap_requires": [
+    "program_is_non_terminal",
+    "no_fresh_WORKING_activity",
+    "no_durable_successor_observation"
+  ],
+  "recovery": {
+    "on_suspect": "RECONCILE_CURRENT_OWNER_AND_RECURRENCE",
+    "on_overdue": "PERSIST_UTILIZATION_GAP_AND_RESTORE_VALID_CONTINUATION",
+    "blind_duplicate_substantive_execution_forbidden": true
+  },
+  "operator_ui": {
+    "foreground_ui_authoritative": false,
+    "idle_ui_plus_stale_durable_activity": "UTILIZATION_GAP_SIGNAL",
+    "stop_button": "FOREGROUND_GENERATION_HINT_ONLY"
+  }
+}
