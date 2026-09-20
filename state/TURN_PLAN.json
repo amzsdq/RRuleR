@@ -2,20 +2,35 @@
   "schema_version":"1.1",
   "program_id":"RRULER-PROGRAM-001",
   "root_job_id":"RRULER-UTILIZATION-003",
-  "authority_epoch":20,
-  "run_id":"RUN-UTIL-20260921-025900",
+  "authority_epoch":21,
+  "run_id":"RUN-UTIL-20260921-031727",
   "status":"ACTIVE",
   "phase":"OBJECTIVE_ACCEPTED_CONTINUING_UNTIL_PLATFORM_BOUNDARY_OR_INDEPENDENT_HANDOFF",
-  "objective_id":"UTIL-EXP-009",
-  "objective":"Validate whether a same-canonical hourly RRULE can persist a completion-relative +2 minute DTSTART shift and then actually fire from that shifted anchor; if proven, determine whether this can replace fixed-quarter cold-rescue anchoring without weakening recovery safety.",
-  "expected_useful_seconds":840,
-  "acceptance_criteria":["Stage A mutation persistence is recorded from automation state without confusing it with scheduled-fire proof.","Stage B is classified as scheduled proof versus manual-revival mutation-only proof.","The production canonical remains independently armed during the canary.","No production scheduler policy changes are made until scheduled firing is positively proven.","If scheduled proof passes, next work is a bounded policy design for completion-relative RRULE renewal plus a rollback/failure fence."],
-  "checkpointable_substeps":["Recover stale durable owner state and secure production cold rescue.","Record Stage A same-canonical RRULE mutation evidence.","Observe and classify Stage B firing evidence.","If PASS, design production-safe completion-relative RRULE renewal semantics; if FAIL, preserve negative result and retain quarter fallback."],
-  "current_substep":2,
-  "handoff_boundary":"Do not yield merely for the canary due time. Continue safe work; Stage B evidence is independent. Transfer only on genuine authority loss or committed successor handoff.",
-  "early_finish_fallback":"Audit scheduler-fence changes required for completion-relative DTSTART anchoring and define stale-wake rollback protection without activating them.",
+  "objective_id":"UTIL-EXP-010",
+  "objective":"Replace the fixed-quarter scheduler policy with a production-safe rolling same-canonical RRULE lifecycle now that the independent two-wake test proved wake -> self-shift +2m -> automatic wake on the same canonical. Define provisional rescue arming before work and completion-relative final rearm after checkpoint.",
+  "expected_useful_seconds":600,
+  "acceptance_criteria":[
+    "Durable state corrects CP-UTILIZATION-030: the prior early-reentry interpretation is superseded by the later controlled two-wake proof.",
+    "Scheduler lifecycle is explicit: FENCE -> PROVISIONAL ARM -> RESTORE/WORK -> CHECKPOINT -> FINAL REARM -> VERIFY.",
+    "Provisional due is target useful-work horizon plus safety margin; initial target 10m + 3m margin.",
+    "Normal final rearm is completion +1m on the same hourly RRULE canonical.",
+    "Mutation failure retains a verified slower continuation and fails closed rather than falsely claiming a handoff.",
+    "Stale-wake protection forbids an older occurrence from rolling DTSTART or authority backward."
+  ],
+  "checkpointable_substeps":[
+    "Correct durable canary evidence and scheduler hypothesis.",
+    "Implement rolling scheduler policy/control artifact.",
+    "Update CURRENT/AGENTS/POLICY projections consistently.",
+    "Validate JSON/control consistency and leave same canonical continuation armed."
+  ],
+  "current_substep":1,
+  "handoff_boundary":"Checkpoint after each control/state update; do not disable the canonical while program_status remains CONTINUE.",
+  "early_finish_fallback":"Audit all quarter-cycle references and classify each as migrate-now versus compatibility-history.",
   "created_for_next_wake":false,
-  "started_at":"2026-09-21T02:59:06+09:00",
-  "last_progress_at":"2026-09-21T02:59:06+09:00",
-  "progress_evidence":["Production canonical rearmed to 03:15 before substantive work.","Independent canary currently shows Stage B prompt with preserved Stage-A completion=02:58:02 and NEW_DUE=03:00:02 while retaining RRULE:FREQ=HOURLY."]
+  "started_at":"2026-09-21T03:17:27+09:00",
+  "last_progress_at":"2026-09-21T03:18:00+09:00",
+  "progress_evidence":[
+    "Independent canary 6ab01dcefd64819190a756988c732f62 completed controlled Stage1 -> same-canonical +2m self-shift -> Stage2 wake -> disable sequence.",
+    "Production canonical was verified rearmed to 03:30 before scheduler-policy migration work."
+  ]
 }
