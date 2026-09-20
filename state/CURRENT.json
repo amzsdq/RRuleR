@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "repository": "amzsdq/RRuleR",
+  "root_job_id": "RRULER-BOOTSTRAP-001",
+  "root_goal": "Bootstrap RRuleR as a public-safe durable control plane and document/reproduce the RRULE self-update relay.",
+  "status": "ACTIVE",
+  "current_owner": "CHATGPT_RELAY",
+  "authority_epoch": 1,
+  "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
+  "checkpoint": {
+    "id": "CP-BOOTSTRAP-001",
+    "state": "ACTIVE",
+    "completed": [
+      "Repository philosophy established",
+      "Bootstrap/control/architecture/relay documents created"
+    ],
+    "next_action": "Validate repository structure and record scheduled successor wake/resume evidence."
+  },
+  "continuation": {
+    "mechanism": "RRULE_PHASE_ROTATION",
+    "cadence_minutes_effective": 15,
+    "recurring_base": "FREQ=HOURLY",
+    "next_wake_first": true,
+    "fallback_semantics": "Existing hourly RRULE may provide degraded self-rescue if a phase update fails and the old schedule remains alive."
+  },
+  "safety": {
+    "public_repo": true,
+    "secrets_allowed": false,
+    "reference_repo_amzsdq_R": "READ_ONLY"
+  }
+}
