@@ -1,0 +1,9 @@
+{
+  "policy_id":"RRULER_SAAS_PARITY_GATES",
+  "version":1,
+  "status":"ACTIVE",
+  "canonical_spec":"docs/SAAS_PARITY_ARCHITECTURE.md",
+  "scorecard_path":"state/SAAS_PARITY.json",
+  "structural_parity_excludes_model_quality":true,
+  "evidence_required_for_pass":true
+}
