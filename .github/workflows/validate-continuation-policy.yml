@@ -1,0 +1,36 @@
+name: Validate continuation policy
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check continuation authority
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          gate=json.loads(Path('control/run-continuation-gate.v1.json').read_text())
+          policy=json.loads(Path('control/relay-policy.v1.json').read_text())
+          current=json.loads(Path('state/CURRENT.json').read_text())
+          assert gate['status']=='ACTIVE'
+          assert set(gate['program_nonterminal_states'])=={'CONTINUE','DEGRADED_CONTINUATION'}
+          assert gate['default_for_nonterminal_owner']=='MUST_CONTINUE_USEFUL_WORK'
+          assert gate['nonterminal_no_handoff_rule']['required_action']=='SELECT_AND_EXECUTE_NEXT_USEFUL_ADMISSIBLE_UNIT'
+          assert set(gate['run_end_allowed_only_for'])=={'COMMITTED_SUCCESSOR_HANDOFF','EXPLICIT_OPERATOR_STOP','PLATFORM_ENFORCED_RUN_END'}
+          required={'PRIMARY_OBJECTIVE_COMPLETE','CI_PASS','ROOT_COMPLETE','WAITING_FOR_NEXT_WAKE','SCHEDULE_BOUNDARY'}
+          assert required <= set(gate['never_end_because'])
+          assert policy['utilization']['nonterminal_voluntary_turn_end_forbidden'] is True
+          assert current['continuation']['run_continuation_gate_policy']=='control/run-continuation-gate.v1.json'
+          if current['program_status'] in gate['program_nonterminal_states']:
+              assert current['continuation']['program_terminal_disabled_required'] is True
+          print('continuation authority validation passed')
