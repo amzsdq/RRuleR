@@ -2,35 +2,35 @@
   "schema_version":"1.1",
   "program_id":"RRULER-PROGRAM-001",
   "root_job_id":"RRULER-UTILIZATION-003",
-  "authority_epoch":21,
-  "run_id":"RUN-UTIL-20260921-031727",
+  "authority_epoch":22,
+  "run_id":"RUN-UTIL-20260921-032900",
   "status":"ACTIVE",
-  "phase":"OBJECTIVE_ACCEPTED_CONTINUING_UNTIL_PLATFORM_BOUNDARY_OR_INDEPENDENT_HANDOFF",
-  "objective_id":"UTIL-EXP-010",
-  "objective":"Replace the fixed-quarter scheduler policy with a production-safe rolling same-canonical RRULE lifecycle now that the independent two-wake test proved wake -> self-shift +2m -> automatic wake on the same canonical. Define provisional rescue arming before work and completion-relative final rearm after checkpoint.",
+  "phase":"FIRST_PRODUCTION_ROLLING_LIFECYCLE_OBSERVATION",
+  "objective_id":"UTIL-EXP-011",
+  "objective":"Validate the first production rolling same-canonical RRULE wake end-to-end while removing stale active fixed-quarter assumptions that would corrupt measurement or continuation decisions.",
   "expected_useful_seconds":600,
   "acceptance_criteria":[
-    "Durable state corrects CP-UTILIZATION-030: the prior early-reentry interpretation is superseded by the later controlled two-wake proof.",
-    "Scheduler lifecycle is explicit: FENCE -> PROVISIONAL ARM -> RESTORE/WORK -> CHECKPOINT -> FINAL REARM -> VERIFY.",
-    "Provisional due is target useful-work horizon plus safety margin; initial target 10m + 3m margin.",
-    "Normal final rearm is completion +1m on the same hourly RRULE canonical.",
-    "Mutation failure retains a verified slower continuation and fails closed rather than falsely claiming a handoff.",
-    "Stale-wake protection forbids an older occurrence from rolling DTSTART or authority backward."
+    "Same canonical is provisionally armed and verified before substantive work.",
+    "Active control projections no longer instruct fixed-quarter rotation or quarter-boundary termination.",
+    "Historical quarter-cycle evidence remains preserved as history rather than silently rewritten.",
+    "Utilization state distinguishes pre-migration fixed-quarter measurements from the new rolling-lifecycle production observation.",
+    "Latest checkpoint is sufficient for a cold successor to resume without chat context.",
+    "Normal close final-rearms the same canonical to actual close +1m and persists the verified due."
   ],
   "checkpointable_substeps":[
-    "Correct durable canary evidence and scheduler hypothesis.",
-    "Implement rolling scheduler policy/control artifact.",
-    "Update CURRENT/AGENTS/POLICY projections consistently.",
-    "Validate JSON/control consistency and leave same canonical continuation armed."
+    "Audit mandatory active controls and state for stale quarter-cycle semantics.",
+    "Migrate active prose/machine projections that conflict with rolling lifecycle.",
+    "Update utilization/experiment state for a clean rolling production measurement.",
+    "Checkpoint findings and final-rearm same canonical to close+1m."
   ],
   "current_substep":1,
-  "handoff_boundary":"Checkpoint after each control/state update; do not disable the canonical while program_status remains CONTINUE.",
-  "early_finish_fallback":"Audit all quarter-cycle references and classify each as migrate-now versus compatibility-history.",
-  "created_for_next_wake":false,
-  "started_at":"2026-09-21T03:17:27+09:00",
-  "last_progress_at":"2026-09-21T03:18:00+09:00",
+  "handoff_boundary":"After each control/state update; preserve same-canonical future wake before any normal return.",
+  "early_finish_fallback":"Inspect wake architecture and run-continuation gate for scheduler assumptions that can misclassify rolling reentry.",
+  "created_for_next_wake":true,
+  "started_at":"2026-09-21T03:29:00+09:00",
+  "last_progress_at":"2026-09-21T03:29:00+09:00",
   "progress_evidence":[
-    "Independent canary 6ab01dcefd64819190a756988c732f62 completed controlled Stage1 -> same-canonical +2m self-shift -> Stage2 wake -> disable sequence.",
-    "Production canonical was verified rearmed to 03:30 before scheduler-policy migration work."
+    "Expected durable due was 03:29 KST and actual scheduled automation was the same canonical.",
+    "Same canonical hourly RRULE was provisionally rearmed to 03:42 KST before substantive work."
   ]
 }
