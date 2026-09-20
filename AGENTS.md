@@ -94,7 +94,7 @@ A non-terminal owner MUST NOT voluntarily end its turn.
 
 ## Utilization optimization loop
 
-Current optimization target: average observed useful-work span >= 600 seconds per 15-minute turn.
+Current optimization target: average observed useful-work span >= 840 seconds per 15-minute turn.
 
 At every valid wake:
 1. Record wake/start and rearm verification timestamps.
@@ -104,7 +104,20 @@ At every valid wake:
 5. Refresh durable activity at least after every meaningful unit and, when practical, do not allow more than 120 seconds without durable progress evidence while actively working.
 6. On successor handoff, close the smallest safe unit, persist the exact continuation, then finalize the run measurement.
 7. Compute at minimum: observed_useful_span_seconds, dead_tail_seconds, scheduler_or_handoff_overhead_seconds, and end_reason. Never infer missing timestamps.
-8. If the completed turn is under 600 seconds, classify the dominant cause and persist exactly one concrete corrective experiment for the next turn. Valid cause classes include PACKET_TOO_SMALL, EARLY_VOLUNTARY_END, WAITING_ON_TOOL_OR_CI, SCHEDULER_GAP, HANDOFF_DELAY, AUTHORITY_RECOVERY, and UNKNOWN_EVIDENCE_GAP.
+8. If the completed turn is under 840 seconds, classify the dominant cause and persist exactly one concrete corrective experiment for the next turn. Valid cause classes include PACKET_TOO_SMALL, EARLY_VOLUNTARY_END, WAITING_ON_TOOL_OR_CI, SCHEDULER_GAP, HANDOFF_DELAY, AUTHORITY_RECOVERY, and UNKNOWN_EVIDENCE_GAP.
 9. The next worker MUST read and apply the latest corrective experiment before selecting its work packet.
-10. Do not declare the utilization goal reached from one good turn. Goal PASS requires at least 3 valid completed turns with a rolling mean observed useful-work span >= 600 seconds.
+10. Do not declare the utilization goal reached from one good turn. Goal PASS requires at least 3 valid completed turns with a rolling mean observed useful-work span >= 840 seconds/.
 11. Until PASS, utilization optimization remains the active root and each turn must measure -> diagnose -> change -> retest. Do not repeat the same failed intervention without new evidence.
+
+
+## Runtime-safe baton timing
+
+The intended rhythm is ~14 minutes of useful work inside each 15-minute wake interval, followed by a fast successor-triggered baton pass.
+
+- Treat 840 seconds as the useful-work target and ~60 seconds as handoff/runtime safety margin.
+- Do not spend that final margin idling. Continue useful bounded work, but after ~12 minutes avoid starting a unit that cannot be checkpointed quickly.
+- Around ~14 minutes, enter HANDOFF_READY mode: keep durable state current, prefer tiny checkpointable/read-only units, and be able to stop within the smallest safe boundary when the successor request appears.
+- The successor wakes on the quarter-hour, rearms its own next quarter first, then requests handoff.
+- The predecessor immediately stops admitting new substantive units, closes the smallest safe unit, saves exact continuation/evidence, commits handoff, and ends.
+- If the successor is late, the predecessor keeps doing useful small units; there is no voluntary idle tail.
+- This cadence is specifically intended to avoid long single-turn runtime exposure while maintaining near-continuous utilization.

@@ -120,7 +120,7 @@ A non-terminal owner MUST NOT voluntarily end its turn.
 
 The active relay is a rolling predecessor/successor pipeline.
 
-- Each wake first re-arms the same canonical hourly RRULE for actual-wake + at least 15 minutes and verifies it.
+- Each wake first re-arms the same canonical hourly RRULE to the next fixed quarter-hour slot and verifies it.
 - Each worker then plans a substantive packet sized for approximately one 15-minute window.
 - A newly awakened successor MUST secure its own following wake before requesting handoff from the predecessor.
 - Handoff is request-driven, not clock-driven.
@@ -146,7 +146,7 @@ WAKE
 
 ## Utilization measurement and improvement
 
-The active optimization target is an average observed useful-work span of at least 10 minutes per 15-minute turn.
+The active optimization target is an average observed useful-work span of at least 14 minutes per 15-minute turn.
 
 A completed run must persist enough timestamps to distinguish work from dead time. The minimum derived fields are:
 - observed_useful_span_seconds: last meaningful durable progress minus substantive_work_started_at;
@@ -156,10 +156,22 @@ A completed run must persist enough timestamps to distinguish work from dead tim
 
 Every completed valid turn is an experiment:
 1. measure;
-2. compare against 600 seconds;
+2. compare against 840 seconds;
 3. classify the dominant under-utilization cause;
 4. choose one concrete policy/process correction;
 5. persist it for the next worker;
 6. next worker applies it and retests.
 
-The optimization target is reached only after at least 3 valid completed turns whose rolling mean observed_useful_span_seconds is >= 600. Until then the program remains CONTINUE unless a true BLOCKED_EXTERNAL condition is proven. A single good turn does not complete the experiment.
+The optimization target is reached only after at least 3 valid completed turns whose rolling mean observed_useful_span_seconds is >= 840. Until then the program remains CONTINUE unless a true BLOCKED_EXTERNAL condition is proven. A single good turn does not complete the experiment.
+
+
+### Runtime-safe 14+1 cadence
+
+The operational target is not to terminate at minute 14. It is to keep each worker productive for about 14 of the 15 minutes, reserving roughly the last minute as a runtime/handoff safety margin.
+
+- 0-12m: normal substantive bounded units.
+- 12-14m: do not begin units that are expensive to checkpoint; prefer short bounded units.
+- ~14m onward: HANDOFF_READY. Keep working on tiny safe units and keep checkpoint state current.
+- At successor handoff request: stop admitting work, close the smallest safe unit, persist exact next action/evidence, release authority immediately.
+- If no successor request arrives, continue useful small units rather than idling.
+- A worker must not intentionally run a monolithic 15-minute operation that cannot checkpoint; this is the runtime-timeout avoidance mechanism.

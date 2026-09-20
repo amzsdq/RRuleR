@@ -5,15 +5,20 @@
   "status": "OPTIMIZING",
   "target": {
     "turn_window_seconds": 900,
-    "observed_useful_span_seconds": 600,
+    "observed_useful_span_seconds": 840,
     "minimum_valid_completed_turns": 3,
-    "pass_rule": "ROLLING_MEAN_LAST_3_VALID_COMPLETED_TURNS_GTE_600"
+    "pass_rule": "ROLLING_MEAN_LAST_3_VALID_COMPLETED_TURNS_GTE_840",
+    "runtime_safety_margin_seconds": 60
   },
   "measurement": {
     "observed_useful_span_definition": "last_meaningful_progress_at - substantive_work_started_at",
     "dead_tail_definition": "successor_or_handoff_boundary_at - last_meaningful_progress_at when both are known",
     "missing_boundary_policy": "MARK_MEASUREMENT_INVALID_DO_NOT_INFER",
-    "durable_progress_refresh_max_gap_seconds_when_practical": 120
+    "durable_progress_refresh_max_gap_seconds_when_practical": 120,
+    "target_operating_model": "~840s useful work + ~60s runtime-safe handoff margin inside each 900s interval",
+    "large_unit_admission_cutoff_seconds": 720,
+    "handoff_ready_target_elapsed_seconds": 840,
+    "no_voluntary_idle_during_handoff_margin": true
   },
   "latest_completed_turn": null,
   "valid_completed_turns": [],
@@ -21,9 +26,9 @@
   "goal_reached": false,
   "latest_diagnosis": null,
   "next_corrective_experiment": {
-    "experiment_id": "UTIL-EXP-001",
-    "hypothesis": "Short turns are primarily caused by work packets that are too small and voluntary termination after the first bounded unit.",
-    "change": "At wake, select multiple useful checkpointable units sufficient for the full quarter-hour; after each unit immediately pull the next until successor handoff or terminal state.",
-    "success_signal": "Completed valid turn observed_useful_span_seconds >= 600."
+    "experiment_id": "UTIL-EXP-002",
+    "hypothesis": "A 14+1 cadence will improve utilization while reducing runtime-timeout risk: substantial work for ~14m, then handoff-ready tiny units until successor request.",
+    "change": "Plan a 14-minute useful packet composed of checkpointable units; after 12m stop admitting large units; near 14m keep only tiny safe units and hand off immediately when successor requests.",
+    "success_signal": "At least 3 valid completed turns with rolling mean observed_useful_span_seconds >= 840 and no voluntary dead tail before successor."
   }
 }

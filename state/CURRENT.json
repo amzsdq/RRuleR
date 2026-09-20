@@ -4,24 +4,25 @@
   "program_id": "RRULER-PROGRAM-001",
   "program_status": "CONTINUE",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "root_goal": "Raise and verify average observed useful-work span to at least 600 seconds per 15-minute turn through per-turn measurement, diagnosis, policy correction, and retest.",
+  "root_goal": "Raise and verify average observed useful-work span to at least 840 seconds per 15-minute turn while preserving a ~60-second runtime-safe baton-pass margin.",
   "status": "CONTINUE",
   "current_owner": "RUN-20260920-2145",
   "authority_epoch": 10,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-009",
+    "id": "CP-UTILIZATION-010",
     "state": "CONTINUE",
     "completed": [
       "Canonical schedule restored to a single hourly RRULE at minute :15 for the next live test.",
       "Scheduler policy changed to fixed quarter rotation 00->15->30->45->00 instead of actual-wake+15.",
       "Per-turn utilization optimization target set to rolling mean >=600 seconds with at least 3 valid completed turns.",
-      "Measure -> diagnose -> corrective experiment -> retest loop made durable policy."
+      "Measure -> diagnose -> corrective experiment -> retest loop made durable policy.",
+      "Operator corrected target to 14 minutes useful work per 15-minute turn with roughly 1 minute reserved for runtime-safe baton handoff."
     ],
     "evidence": [],
-    "observation": "Prior runs lacked enough end-boundary telemetry and often stopped after short bursts. The active root now treats every 15-minute turn as a utilization experiment and forbids declaring success from one burst.",
-    "next_action": "At the next expected :15 wake, rearm this same hourly RRULE to :30 first; then record utilization telemetry, plan a full 15-minute useful work packet, work continuously, and persist the completed-turn measurement/corrective experiment."
+    "observation": "The optimization objective is near-continuous 14+1 cadence, not 10 minutes and not a hard stop at minute 14. Workers enter handoff-ready mode near minute 14 and continue only tiny safe units until successor request.",
+    "next_action": "At next expected wake: rearm to next quarter first, apply 14+1 cadence, measure useful-work span, and diagnose any turn below 840 seconds."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_QUARTER_SELF_SHIFT",
@@ -35,7 +36,7 @@
     "voluntary_idle_before_successor_forbidden": true,
     "root_completion_is_stop_condition": false,
     "program_terminal_disabled_required": true,
-    "work_packet_horizon_minutes": 15,
+    "work_packet_horizon_minutes": 14,
     "work_packet_boundary_is_stop_condition": false,
     "scheduler_fence_policy": "control/scheduler-fence.v1.json",
     "next_phase_minute": 30,
@@ -45,9 +46,12 @@
       30,
       45
     ],
-    "utilization_target_seconds": 600,
+    "utilization_target_seconds": 840,
     "utilization_goal_min_valid_turns": 3,
-    "utilization_state_path": "state/UTILIZATION.json"
+    "utilization_state_path": "state/UTILIZATION.json",
+    "runtime_safety_margin_seconds": 60,
+    "large_unit_admission_cutoff_seconds": 720,
+    "handoff_ready_target_seconds": 840
   },
   "safety": {
     "public_repo": true,

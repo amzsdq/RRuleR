@@ -1,7 +1,7 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
-  "policy_revision": 7,
+  "policy_revision": 8,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
@@ -44,12 +44,12 @@
     "after_each_work_unit": "SELECT_AND_EXECUTE_NEXT_USEFUL_UNIT_IN_SAME_TURN",
     "no_obvious_unit_action": "INSPECT_DURABLE_STATE_FOR_HIGHEST_VALUE_UNRESOLVED_INVARIANT",
     "optimization_active": true,
-    "target_observed_useful_span_seconds": 600,
+    "target_observed_useful_span_seconds": 840,
     "turn_window_seconds": 900,
-    "target_ratio": 0.6666666666666666,
+    "target_ratio": 0.9333333333333333,
     "goal_min_valid_completed_turns": 3,
     "goal_metric": "ROLLING_MEAN_OBSERVED_USEFUL_SPAN_SECONDS",
-    "goal_threshold_seconds": 600,
+    "goal_threshold_seconds": 840,
     "activity_progress_evidence_max_gap_seconds_when_practical": 120,
     "each_turn_loop": [
       "MEASURE_PREVIOUS_TURN",
@@ -69,7 +69,11 @@
       "AUTHORITY_RECOVERY",
       "UNKNOWN_EVIDENCE_GAP"
     ],
-    "repeat_failed_intervention_without_new_evidence_forbidden": true
+    "repeat_failed_intervention_without_new_evidence_forbidden": true,
+    "handoff_safety_margin_seconds": 60,
+    "handoff_ready_target_elapsed_seconds": 840,
+    "large_unit_admission_cutoff_elapsed_seconds": 720,
+    "no_voluntary_idle_in_safety_margin": true
   },
   "program_continuity": {
     "enabled": true,
@@ -160,12 +164,17 @@
     ]
   },
   "worker_cycle": {
-    "mode": "ROLLING_15_MINUTE_WORK_PACKET",
-    "planned_work_horizon_minutes": 15,
+    "mode": "ROLLING_14M_WORK_PLUS_1M_HANDOFF_MARGIN",
+    "planned_work_horizon_minutes": 14,
     "work_packet_is_stop_timer": false,
     "plan_before_substantive_work": true,
     "on_early_packet_finish": "PULL_NEXT_USEFUL_BOUNDED_UNIT",
     "busywork_for_window_fill_forbidden": true,
-    "predecessor_continues_if_successor_delayed": true
+    "predecessor_continues_if_successor_delayed": true,
+    "total_wake_interval_minutes": 15,
+    "runtime_safety_margin_minutes": 1,
+    "large_unit_admission_cutoff_minutes": 12,
+    "handoff_ready_at_minutes": 14,
+    "handoff_ready_behavior": "KEEP_WORKING_ONLY_TINY_SAFE_CHECKPOINTABLE_UNITS_UNTIL_SUCCESSOR_REQUEST"
   }
 }
