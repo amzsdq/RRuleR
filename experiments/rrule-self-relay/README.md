@@ -22,20 +22,25 @@ Observed sequence:
 4. Same canonical was updated `:30 -> :45` while preserving recurring RRULE semantics.
 5. Next due was verified as `2026-09-20T19:45:00+09:00`.
 6. A premature clean-stop policy was identified as inconsistent with the utilization objective.
-7. Policy was corrected: predecessor now continues useful work until successor execution is **actually observed**; scheduled-time arrival, checkpoint creation, document completion, and milestone completion are not yield conditions.
+7. Policy was corrected: predecessor continues useful work until successor execution is actually observed; scheduled-time arrival, checkpoint creation, document completion, and milestone completion are not yield conditions.
 8. Work continued after the correction: AGENTS/POLICY/ARCHITECTURE/relay guide hardened; schemas, operator runbook, event ledger, utilization metric, and expanded CI checks added.
 
-### Current expected successor behavior
+### Scheduled successor observation — 2026-09-20 19:44:39 KST
 
-At the actual scheduled successor wake:
+Directly observed:
 
-1. successor performs NEXT WAKE FIRST and rotates `:45 -> :00`;
-2. successor reads `state/CURRENT.json`;
-3. successor detects whether a predecessor handoff is already durable;
-4. if predecessor is still active and overlap is possible, successor must not duplicate the active unit;
-5. predecessor, once successor is actually observed, finishes its smallest safe current unit and persists handoff;
-6. successor resumes from that handoff;
-7. if same-canonical overlap is serialized by the platform, record the actual gap and resume from latest durable state rather than assuming overlap.
+1. The scheduled automation execution actually began under the same canonical automation ID.
+2. NEXT WAKE FIRST succeeded: the same recurring automation rotated `:45 -> :00` with next due `20:00 KST`.
+3. The successor then read `AGENTS.md`, `control/POLICY.md`, `state/CURRENT.json`, machine relay policy, handoff state, and reproduction guide from GitHub.
+4. It reconstructed `CP-BOOTSTRAP-004` without relying on predecessor chat memory.
+5. It immediately continued substantive non-duplicative work by adding the durable execution model plus fenced-lease/checkpoint/effect-receipt schemas and expanding CI requirements.
+6. Durable state advanced to `CP-BOOTSTRAP-005`, authority epoch 2, with the next scheduled phase at `:00`.
+
+This is direct evidence for **scheduled successor -> GitHub reconstruction -> substantive continuation**.
+
+### Important overlap finding
+
+This observation proves successor execution and cold durable continuation. It does not by itself prove that two executions of the same canonical automation can safely overlap. Correctness therefore remains independent of overlap; durable state plus fencing is the fallback.
 
 ## Checklist
 
@@ -46,17 +51,17 @@ At the actual scheduled successor wake:
 - [x] Continuous-work/no-voluntary-idle policy made authoritative.
 - [x] Machine-readable current-state and relay-event schemas exist.
 - [x] CI validates required control-plane files and durable-state invariants.
-- [ ] Second RRuleR-era phase transition recorded by scheduled successor (`:45 -> :00`).
-- [ ] Scheduled successor reads `state/CURRENT.json` and continues substantive work.
-- [ ] Successor/predecessor overlap-or-serialization semantics observed and recorded.
-- [ ] At least one handoff continuation cycle completes without runtime-timeout loss.
+- [x] Second RRuleR-era phase transition recorded by scheduled successor (`:45 -> :00`).
+- [x] Scheduled successor reads `state/CURRENT.json` and continues substantive work.
+- [ ] Successor/predecessor overlap-or-serialization semantics observed sufficiently to classify platform behavior.
+- [ ] At least one additional continuation cycle confirms no runtime-timeout loss.
 - [ ] Handoff idle gap / successor wait is measured where observable.
 
 ## Correctness boundary
 
 Queued or concurrent predecessor/successor execution is not required for correctness.
 
-The relay must remain correct under serialized execution because durable GitHub state is authoritative. However, **serialized execution is not a reason to voluntarily stop early**. The predecessor keeps working until successor observation, a terminal condition, a proven external blocker, or platform-enforced termination.
+The relay must remain correct under serialized execution because durable GitHub state is authoritative. However, serialized execution is not a reason to voluntarily stop early. The predecessor keeps working until successor observation, a terminal condition, a proven external blocker, or platform-enforced termination.
 
 ## Failure classification
 
