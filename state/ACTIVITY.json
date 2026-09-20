@@ -7,9 +7,9 @@
   "active_run_id": "RUN-UTIL-20260921-003046",
   "authority_epoch": 16,
   "substantive_work_started_at": "2026-09-21T00:31:00+09:00",
-  "last_progress_at": "2026-09-21T00:31:00+09:00",
-  "last_progress_kind": "RECOVERED_TAKEOVER_AND_PLAN_FIRST_START",
-  "current_unit": "UTIL-EXP-005: eliminate policy-vs-runtime plan enforcement gap and instrument the plan-first 14-minute objective so the next turn cannot remain a template or silently terminate after micro-work.",
+  "last_progress_at": "2026-09-21T00:32:40+09:00",
+  "last_progress_kind": "EXP005_VALIDATOR_AND_MEASUREMENT_GUARDS_IMPLEMENTED",
+  "current_unit": "UTIL-EXP-005 substep 4: inspect exact validation result, then persist live-retest continuation and continue useful related work until successor request.",
   "next_wake_due_at": "2026-09-21T00:45:00+09:00",
   "successor_observed": false,
   "handoff_ready": false
