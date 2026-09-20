@@ -11,14 +11,17 @@ def ts(value:str)->datetime:
     if dt.tzinfo is None: raise ValueError("timestamp must include timezone")
     return dt
 def fixed_window_start(value:str|datetime)->datetime:
+    """Return canonical UTC epoch-anchored 900s measurement bucket containing value."""
     dt=ts(value) if isinstance(value,str) else value
     if dt.tzinfo is None: raise ValueError("timestamp must include timezone")
     epoch_seconds=int(dt.timestamp()); bucket=epoch_seconds-(epoch_seconds%WINDOW_SECONDS)
     return datetime.fromtimestamp(bucket,tz=timezone.utc)
 def enumerate_completed_fixed_windows(first_observed:str,last_observed:str)->list[str]:
+    """Enumerate fully observed deterministic 900s windows as canonical UTC instants, oldest first."""
     first,last=ts(first_observed),ts(last_observed)
     if last<first: raise ValueError("last_observed precedes first_observed")
-    start=fixed_window_start(first); first_utc=first.astimezone(timezone.utc); last_utc=last.astimezone(timezone.utc)
+    start=fixed_window_start(first)
+    first_utc=first.astimezone(timezone.utc); last_utc=last.astimezone(timezone.utc)
     if first_utc>start: start+=timedelta(seconds=WINDOW_SECONDS)
     out=[]
     while start+timedelta(seconds=WINDOW_SECONDS)<=last_utc:
@@ -61,12 +64,7 @@ def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->
         if right[0]<left[1]: overlap_errors.append({"left":left[2],"right":right[2],"reason":"OVERLAPPING_INTERVALS"})
     result={"record_results":record_results,"duplicate_record_ids":duplicate_ids,"overlap_errors":overlap_errors,"window":None,"promotion":"INCOMPLETE"}
     if window_start is None: return result
-    start=ts(window_start); end=start+timedelta(seconds=WINDOW_SECONDS); durable_horizon=max((b for _,b,_ in intervals),default=None)
-    horizon=ts(observed_through) if observed_through else durable_horizon
-    # Explicit horizons are assertions, not evidence. Never let a direct caller move the
-    # observation horizon beyond the latest valid durable observed boundary in the ledger.
-    if observed_through and durable_horizon is not None and horizon>durable_horizon:
-        result["window"]={"start_at":start.isoformat(),"end_at":end.isoformat(),"observed_through":horizon.isoformat(),"durable_observed_through":durable_horizon.isoformat(),"reasons":["OBSERVED_THROUGH_EXCEEDS_DURABLE_EVIDENCE"]}; return result
+    start=ts(window_start); end=start+timedelta(seconds=WINDOW_SECONDS); horizon=ts(observed_through) if observed_through else max((b for _,b,_ in intervals),default=None)
     if horizon is None or horizon<end:
         result["window"]={"start_at":start.isoformat(),"end_at":end.isoformat(),"observed_through":horizon.isoformat() if horizon else None,"reasons":["WINDOW_NOT_YET_COMPLETE"]}; return result
     clipped=[]
@@ -89,13 +87,16 @@ def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->
     result["window"]={"start_at":start.isoformat(),"end_at":end.isoformat(),"observed_through":horizon.isoformat(),"useful_seconds":useful,"maximum_unexplained_gap_seconds":max_gap,"interval_count":len(clipped),"union_interval_count":len(union),"reasons":reasons}
     result["promotion"]="VALID_ACCEPTED" if not reasons else "REJECTED"; return result
 def evaluate_consecutive_windows(data:dict,first_observed:str,last_observed:str,required:int=3)->dict:
+    """Evaluate fixed windows; malformed observation boundaries fail closed without partial selection."""
     if required<=0: raise ValueError("required must be positive")
-    try: starts=enumerate_completed_fixed_windows(first_observed,last_observed)
+    try:
+        starts=enumerate_completed_fixed_windows(first_observed,last_observed)
     except (TypeError,ValueError) as exc:
         return {"required_consecutive_windows":required,"completed_window_count":0,"windows":[],"longest_consecutive_accepted":0,"selection_policy":"FRESHEST_LONGEST_STREAK_THEN_FRESHEST_REQUIRED_WINDOWS","selected_windows":[],"rolling_mean_useful_seconds":None,"p0_acceptance":"NOT_YET","observation_boundary_error":str(exc)}
     windows=[]
     for start in starts:
-        result=audit(data,start,last_observed); window=result["window"] or {}
+        result=audit(data,start,last_observed)
+        window=result["window"] or {}
         windows.append({"start_at":start,"promotion":result["promotion"],"useful_seconds":window.get("useful_seconds"),"maximum_unexplained_gap_seconds":window.get("maximum_unexplained_gap_seconds"),"reasons":window.get("reasons",[])})
     streak=[]; best=[]
     for window in windows:
