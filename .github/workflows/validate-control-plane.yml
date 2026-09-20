@@ -27,6 +27,7 @@ jobs:
             "control/POLICY.md"
             "control/relay-policy.v1.json"
             "state/CURRENT.json"
+            "state/HANDOFF.json"
             "state/EVENTS.jsonl"
             "state/RUNS.jsonl"
             "state/README.md"
@@ -38,6 +39,7 @@ jobs:
             "docs/UTILIZATION.md"
             "experiments/rrule-self-relay/README.md"
             "schemas/current-state.schema.json"
+            "schemas/handoff.schema.json"
             "schemas/relay-event.schema.json"
             "schemas/run-observation.schema.json"
           )
@@ -60,16 +62,20 @@ jobs:
           }
 
           fetch "state/CURRENT.json" /tmp/current.json
+          fetch "state/HANDOFF.json" /tmp/handoff.json
           fetch "state/EVENTS.jsonl" /tmp/events.jsonl
           fetch "state/RUNS.jsonl" /tmp/runs.jsonl
           fetch "control/relay-policy.v1.json" /tmp/relay-policy.json
           fetch "schemas/current-state.schema.json" /tmp/current-schema.json
+          fetch "schemas/handoff.schema.json" /tmp/handoff-schema.json
           fetch "schemas/relay-event.schema.json" /tmp/event-schema.json
           fetch "schemas/run-observation.schema.json" /tmp/run-schema.json
 
           python -m json.tool /tmp/current.json >/dev/null
+          python -m json.tool /tmp/handoff.json >/dev/null
           python -m json.tool /tmp/relay-policy.json >/dev/null
           python -m json.tool /tmp/current-schema.json >/dev/null
+          python -m json.tool /tmp/handoff-schema.json >/dev/null
           python -m json.tool /tmp/event-schema.json >/dev/null
           python -m json.tool /tmp/run-schema.json >/dev/null
 
@@ -78,6 +84,7 @@ jobs:
 
           p=json.load(open('/tmp/current.json'))
           policy=json.load(open('/tmp/relay-policy.json'))
+          handoff=json.load(open('/tmp/handoff.json'))
 
           required=[
               'schema_version','repository','root_job_id','root_goal','status',
@@ -111,6 +118,14 @@ jobs:
               raise SystemExit('continuous-work invariant missing')
           if cont.get('handoff_trigger') != 'SUCCESSOR_ACTUALLY_OBSERVED':
               raise SystemExit('handoff must be successor-triggered')
+
+          allowed_handoff={'PREDECESSOR_ACTIVE','SUCCESSOR_DUE','SUCCESSOR_OBSERVED','HANDOFF_DRAIN','HANDOFF_COMMITTED','SUCCESSOR_ACTIVE','TERMINAL'}
+          if handoff.get('handoff_state') not in allowed_handoff:
+              raise SystemExit('invalid handoff_state')
+          if handoff.get('root_job_id') != p.get('root_job_id'):
+              raise SystemExit('handoff root_job_id must match CURRENT')
+          if handoff.get('handoff_state') == 'PREDECESSOR_ACTIVE' and not handoff.get('active_unit'):
+              raise SystemExit('active predecessor must name active_unit')
 
           safety=p['safety']
           if safety.get('public_repo') is not True:
