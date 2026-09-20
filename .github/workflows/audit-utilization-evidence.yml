@@ -3,6 +3,9 @@ name: Audit utilization evidence gaps
 on:
   push:
     branches: ["main"]
+    paths:
+      - 'state/WORK_INTERVALS.json'
+      - '.github/workflows/audit-utilization-evidence.yml'
   workflow_dispatch:
 
 permissions:
