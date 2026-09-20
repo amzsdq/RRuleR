@@ -1,16 +1,11 @@
 {
-  "policy_id":"RRULER_EVENT_WAKE_CANDIDATE",
-  "version":1,
-  "status":"CANDIDATE_NOT_ACTIVE",
-  "purpose":"Define a safe GitHub-PR-event wake adapter that can be tested without changing durable workflow semantics.",
-  "trigger_source":"SUPPORTED_CHATGPT_WORK_GITHUB_PR_EVENT",
-  "activation_gate":"EXPLICIT_BOUNDED_PROVISIONING_TEST_AND_MEASURED_PASS",
-  "event_envelope":{"required_fields":["event_id","correlation_id","program_id","root_job_id","emitted_at","reason"],"forbidden_fields":["secret","credential","session_state","private_source_material"]},
-  "consumer_sequence":["READ_FRESH_CURRENT_AND_EVENT_LEDGER","REJECT_DUPLICATE_EVENT_ID","APPLY_AUTHORITY_AND_SCHEDULER_FENCES","RECORD_EVENT_OBSERVED","IF_ACTIVE_OWNER_FRESH_DO_NOT_DUPLICATE_WORK","IF_OWNER_STALE_OR_HANDOFF_ELIGIBLE_RECOVER_OR_REQUEST_HANDOFF","PERSIST_FIRST_SUBSTANTIVE_PROGRESS_LATENCY","CONTINUE_NORMAL_DURABLE_WORKFLOW"],
-  "dedupe":{"ledger_path":"state/EVENT_WAKE_LEDGER.json","key":"event_id","duplicate_action":"NO_SUBSTANTIVE_REPLAY","authority_epoch_monotonic":true},
-  "anti_recursion":{"acknowledgement_must_not_emit_trigger_event":true,"worker_progress_commit_must_not_share_trigger_lane":true,"dedicated_test_pr_or_event_lane_required":true,"max_chain_depth":1,"storm_action":"DISABLE_CANDIDATE_PATH_KEEP_QUARTER_BASELINE"},
-  "measurements":["source_event_at","worker_observed_at","first_substantive_progress_at","event_to_observation_seconds","event_to_first_work_seconds","duplicate_delivery_count","grouped_event_count"],
-  "promotion_gate":{"minimum_successful_cycles":3,"median_event_to_first_work_must_beat_quarter_baseline":true,"recursive_trigger_count_max":0,"duplicate_substantive_execution_count_max":0,"authority_rollback_count_max":0},
-  "fallback":"SCHEDULED_QUARTER_SHIFT",
-  "reference":"docs/ADR-001-WAKE-SOURCE-STRATEGY.md"
+  "policy_id":"RRULER_EVENT_WAKE_CANDIDATE","version":2,"status":"CANDIDATE_NOT_ACTIVE","purpose":"Test a safe low-latency continuation chain using supported ChatGPT Work GitHub pull-request events while retaining GitHub durable state and authority fencing.","trigger_source":"SUPPORTED_CHATGPT_WORK_GITHUB_PR_EVENT","supported_event_evidence":"Official GitHub connector documentation says triggers may include PR opened/ready/closed and, depending on trigger, reviews, comments, commit updates, or completed merges.","activation_gate":"BOUNDED_PROVISIONING_TEST_AND_MEASURED_PASS",
+  "relay_lane":{"design":"DEDICATED_LONG_LIVED_TEST_PR","trigger_candidate":"PR_COMMIT_UPDATE","main_control_state_branch":"main","event_lane_must_not_contain_secrets":true,"rationale":"A dedicated PR branch can emit a supported commit-update event without coupling every main control-state commit to a wake."},
+  "event_envelope":{"required_fields":["event_id","correlation_id","generation","expected_authority_epoch","program_id","root_job_id","emitted_at","reason"],"forbidden_fields":["secret","credential","session_state","private_source_material"]},
+  "consumer_sequence":["READ_FRESH_CURRENT_AND_EVENT_LEDGER","REJECT_DUPLICATE_EVENT_ID","VERIFY_EVENT_GENERATION_AND_EXPECTED_EPOCH","APPLY_AUTHORITY_FENCE","RECORD_EVENT_OBSERVED","IF_PREDECESSOR_FRESH_REQUEST_HANDOFF_OR_PREPARE_NONCONFLICTING_WORK","IF_PREDECESSOR_STALE_RECOVER","PERSIST_FIRST_SUBSTANTIVE_PROGRESS_LATENCY","CONTINUE_SAME_DURABLE_OBJECTIVE"],
+  "dedupe":{"ledger_path":"state/EVENT_WAKE_LEDGER.json","key":"event_id","duplicate_action":"NO_SUBSTANTIVE_REPLAY","authority_epoch_monotonic":true,"one_outstanding_continuation_token":true},
+  "controlled_chain":{"enabled_in_candidate_test":true,"goal":"Use one intentionally emitted PR commit-update as the next-generation wake after a meaningful checkpoint, turning a 10-14 minute objective into resumable micro-generations if individual invocations are short.","minimum_useful_work_before_emit_seconds":60,"target_emit_before_observed_early_runtime_boundary_seconds":110,"max_unacknowledged_generation_ahead":1,"emit_only_after_meaningful_checkpoint":true,"ack_event_must_not_itself_emit_next_event":true,"next_event_may_be_emitted_only_by_current_authority_owner":true,"same_event_id_reuse_forbidden":true,"storm_action":"STOP_EVENT_EMISSION_KEEP_QUARTER_BASELINE_ACTIVE"},
+  "measurements":["source_event_at","worker_observed_at","first_substantive_progress_at","event_to_observation_seconds","event_to_first_work_seconds","generation_useful_span_seconds","duplicate_delivery_count","grouped_event_count","overlap_seconds"],
+  "promotion_gate":{"minimum_successful_cycles":3,"median_event_to_first_work_must_beat_quarter_baseline":true,"duplicate_substantive_execution_count_max":0,"authority_rollback_count_max":0,"unbounded_event_storm_count_max":0,"max_generation_ahead":1},
+  "fallback":"SCHEDULED_QUARTER_SHIFT","reference":"docs/ADR-001-WAKE-SOURCE-STRATEGY.md"
 }
