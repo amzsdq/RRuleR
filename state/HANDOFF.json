@@ -2,12 +2,12 @@
   "schema_version": "1.0",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "handoff_state": "HANDOFF_REQUESTED",
+  "handoff_state": "RECOVERED_TAKEOVER",
   "predecessor_run_id": "RUN-UTIL-20260920-234225",
   "successor_run_id": "RUN-UTIL-20260920-235858",
   "successor_expected_at": "2026-09-21T00:00:00+09:00",
   "successor_observed_at": "2026-09-20T23:58:58+09:00",
-  "active_unit": "UTIL-EXP-002 14+1 cadence validation",
-  "checkpoint_id": "CP-UTILIZATION-016",
-  "next_action": "Canonical is verified rearmed to :15. Predecessor epoch 13 has no durable progress after 23:43:08 KST; stop new work and commit baton if still alive. Successor waits through the bounded recovery grace, then advances authority only if predecessor remains unchanged."
+  "active_unit": "UTIL-EXP-003 baton latency reduction and valid-turn measurement",
+  "checkpoint_id": "CP-UTILIZATION-017",
+  "next_action": "Epoch 14 owns authority. Continue checkpointable useful work; at :15 successor observation, close the smallest safe unit and commit exact measurement/handoff immediately."
 }
