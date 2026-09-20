@@ -6,9 +6,9 @@
   "status":"WORKING",
   "active_run_id":"RUN-20260920-2145",
   "authority_epoch":10,
-  "last_progress_at":"2026-09-20T21:54:00+09:00",
-  "last_progress_kind":"LOW_GAP_HANDOFF_RECOVERY_VALIDATED",
-  "current_unit":"Rolling handoff recovery is CI-validated; continue hardening measurable handoff behavior until successor request arrives",
-  "next_wake_due_at":"2026-09-20T22:01:00+09:00",
+  "last_progress_at":"2026-09-20T22:02:00+09:00",
+  "last_progress_kind":"SCHEDULER_RACE_RECOVERED",
+  "current_unit":"Validate durable expected-due scheduler fence and same-canonical handoff behavior through the 22:17 successor attempt",
+  "next_wake_due_at":"2026-09-20T22:17:00+09:00",
   "successor_observed":true
 }
