@@ -1,18 +1,26 @@
 {
-  "policy_id":"RRULER_HANDOFF_RECOVERY",
-  "version":1,
-  "status":"ACTIVE",
-  "purpose":"Prevent an inactive predecessor from deadlocking a successor after a durable handoff request while avoiding takeover from a fresh predecessor.",
-  "normal_path":"Wait for predecessor durable handoff commit while predecessor activity remains fresh.",
-  "stale_path":{
-    "eligible_when_predecessor_freshness":"SUSPECT_OR_OVERDUE",
-    "handoff_ack_grace_seconds":120,
-    "requires_no_new_predecessor_progress_during_grace":true,
-    "requires_handoff_request_still_pending":true,
-    "requires_successor_rearm_verified":true,
-    "requires_program_non_terminal":true
+  "policy_id": "RRULER_HANDOFF_RECOVERY",
+  "version": 2,
+  "status": "ACTIVE",
+  "purpose": "Prevent an inactive predecessor from deadlocking a successor after a durable handoff request while avoiding takeover from a fresh predecessor.",
+  "normal_path": "Wait for predecessor durable handoff commit while predecessor activity remains fresh.",
+  "stale_path": {
+    "eligible_when_predecessor_freshness": "SUSPECT_OR_OVERDUE",
+    "handoff_ack_grace_seconds": 120,
+    "requires_no_new_predecessor_progress_during_grace": true,
+    "requires_handoff_request_still_pending": true,
+    "requires_successor_rearm_verified": true,
+    "requires_program_non_terminal": true,
+    "already_stale_fast_path": {
+      "enabled": true,
+      "eligible_when_last_predecessor_progress_age_seconds_gte": 120,
+      "additional_post_request_grace_seconds": 0,
+      "requires_immediate_re_read_after_request": true,
+      "requires_predecessor_progress_unchanged_on_re_read": true,
+      "rationale": "Do not add a second 120-second idle tax when the predecessor was already stale for at least the full recovery grace before the successor request. Freshness protection is based on observed predecessor progress age, not request age alone."
+    }
   },
-  "recovery_sequence":[
+  "recovery_sequence": [
     "RE_READ_CURRENT_ACTIVITY_HANDOFF",
     "VERIFY_PREDECESSOR_STILL_SUSPECT_OR_OVERDUE_AND_UNCHANGED",
     "ADVANCE_AUTHORITY_EPOCH_TO_SUCCESSOR",
@@ -22,9 +30,9 @@
     "PLAN_15_MIN_WORK_PACKET_FROM_EXACT_DURABLE_NEXT_ACTION",
     "CONTINUE_WORK"
   ],
-  "normal_handoff_preferred":true,
-  "timeout_is_recovery_not_normal_handoff":true,
-  "successor_may_not_take_over_while_predecessor_is_fresh":true,
-  "predecessor_should_check_pending_handoff_after_each_bounded_unit":true,
-  "exact_predecessor_end_time_must_not_be_invented":true
+  "normal_handoff_preferred": true,
+  "timeout_is_recovery_not_normal_handoff": true,
+  "successor_may_not_take_over_while_predecessor_is_fresh": true,
+  "predecessor_should_check_pending_handoff_after_each_bounded_unit": true,
+  "exact_predecessor_end_time_must_not_be_invented": true
 }
