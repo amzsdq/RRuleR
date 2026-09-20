@@ -1,0 +1,59 @@
+name: Event wake rescue pulse
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rruler-event-wake-rescue
+  cancel-in-progress: false
+
+jobs:
+  rescue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Evaluate durable rescue gate
+        id: gate
+        shell: python
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          import json, os, urllib.request
+          from datetime import datetime, timezone
+          def get(path):
+              req=urllib.request.Request(f'https://api.github.com/repos/{os.environ["REPO"]}/contents/{path}?ref=main',headers={'Authorization':f'Bearer {os.environ["GH_TOKEN"]}','Accept':'application/vnd.github.raw+json'})
+              with urllib.request.urlopen(req) as r: return json.load(r)
+          current=get('state/CURRENT.json')
+          activity=get('state/ACTIVITY.json')
+          ledger=get('state/EVENT_WAKE_LEDGER.json')
+          enabled=ledger.get('status')=='ACTIVE' and current.get('program_status') in {'CONTINUE','DEGRADED_CONTINUATION'}
+          stale=False
+          if enabled and activity.get('last_progress_at'):
+              t=datetime.fromisoformat(activity['last_progress_at'])
+              stale=(datetime.now(timezone.utc)-t.astimezone(timezone.utc)).total_seconds() >= 180
+          outstanding=ledger.get('outstanding_generation')
+          emit=enabled and stale and outstanding in (None,0)
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f: f.write(f'emit={str(emit).lower()}\n')
+          print(json.dumps({'enabled':enabled,'stale':stale,'outstanding_generation':outstanding,'emit':emit}))
+      - name: Emit one bounded PR-lane event
+        if: steps.gate.outputs.emit == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch event-wake-lab "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" repo
+          cd repo
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          mkdir -p .rruler-event-lane
+          printf '{"producer":"ACTIONS_RESCUE_PULSE","emitted_at":"%s","reason":"STALE_ACTIVE_OWNER"}\n' "$(date -u +%FT%TZ)" > .rruler-event-lane/rescue-pulse.json
+          git add .rruler-event-lane/rescue-pulse.json
+          git commit -m 'event-wake: guarded stale-owner rescue pulse'
+          git push origin HEAD:event-wake-lab
