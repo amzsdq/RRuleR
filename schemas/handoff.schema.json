@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/amzsdq/RRuleR/schemas/handoff.schema.json",
+  "title": "RRuleR Handoff State",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "root_job_id",
+    "handoff_state",
+    "predecessor_run_id",
+    "successor_expected_at",
+    "successor_observed_at",
+    "active_unit",
+    "next_action"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "root_job_id": {"type": "string", "minLength": 1},
+    "handoff_state": {
+      "enum": [
+        "PREDECESSOR_ACTIVE",
+        "SUCCESSOR_DUE",
+        "SUCCESSOR_OBSERVED",
+        "HANDOFF_DRAIN",
+        "HANDOFF_COMMITTED",
+        "SUCCESSOR_ACTIVE",
+        "TERMINAL"
+      ]
+    },
+    "predecessor_run_id": {"type": "string", "minLength": 1},
+    "successor_run_id": {"type": ["string", "null"]},
+    "successor_expected_at": {"type": "string", "minLength": 1},
+    "successor_observed_at": {"type": ["string", "null"]},
+    "active_unit": {"type": "string", "minLength": 1},
+    "checkpoint_id": {"type": ["string", "null"]},
+    "next_action": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}
