@@ -2,8 +2,9 @@
 
 ## Files
 
-- `CURRENT.json` — compact machine-readable projection of the current root job.
+- `CURRENT.json` — compact machine-readable projection of the current program/root job.
 - `HANDOFF.json` — explicit predecessor/successor coordination state for the current handoff.
+- `ACTIVITY.json` — durable operator-facing liveness heartbeat: armed/working/handoff/terminal state, active run identity, last progress, current unit, and next wake.
 - `RELAY_VALIDATION.json` — machine-readable acceptance ledger for the reproduced RRULE self-relay.
 - `EVENTS.jsonl` — append-oriented public-safe relay event ledger.
 - `RUNS.jsonl` — run/handoff/utilization observation ledger.
@@ -16,14 +17,31 @@ It must remain:
 
 - public-safe;
 - sufficient for cold-start reconstruction;
+- explicit about program status separately from root status;
 - explicit about owner/authority epoch;
 - explicit about latest checkpoint;
 - explicit about exact next action;
 - explicit about continuation mode;
+- explicit that root completion is not automatically program completion;
 - explicit that voluntary idle before successor observation is forbidden for this relay;
 - free of secrets and private source material.
 
 Chat output may summarize this state but cannot override it.
+
+## ACTIVITY.json
+
+This is the durable corroborating signal for whether the program is merely armed or an execution is actually doing work.
+
+Rules:
+
+- `WORKING` requires an `active_run_id`;
+- refresh after meaningful work units when practical;
+- `ARMED` means continuation exists but no active executor is claimed;
+- the ChatGPT composer UI is advisory only;
+- idle UI plus stale `ACTIVITY.json` and no successor evidence is a utilization gap, not healthy activity;
+- never claim hidden/background work from schedule existence alone.
+
+Schema: `schemas/activity.schema.json`.
 
 ## RELAY_VALIDATION.json
 
