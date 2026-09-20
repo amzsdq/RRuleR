@@ -9,6 +9,13 @@ on:
 permissions:
   contents: read
 
+# Durable activity/checkpoint updates can arrive in short bursts. Only the newest
+# main-branch snapshot matters for this projection validator, so do not build a
+# queue of obsolete validations that competes with the live relay.
+concurrency:
+  group: rruler-control-plane-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
