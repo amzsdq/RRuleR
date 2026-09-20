@@ -15,20 +15,27 @@
     "dead_tail_definition": "successor_or_handoff_boundary_at - last_meaningful_progress_at when both are known",
     "missing_boundary_policy": "MARK_MEASUREMENT_INVALID_DO_NOT_INFER",
     "durable_progress_refresh_max_gap_seconds_when_practical": 120,
-    "target_operating_model": "~840s useful work + ~60s runtime-safe handoff margin inside each 900s interval",
+    "target_operating_model": "~840s useful work + ~60s runtime-safe handoff margin inside each intended 900s interval",
     "large_unit_admission_cutoff_seconds": 720,
     "handoff_ready_target_elapsed_seconds": 840,
-    "no_voluntary_idle_during_handoff_margin": true
+    "no_voluntary_idle_during_handoff_margin": true,
+    "expected_schedule_is_not_actual_boundary": true,
+    "record_successor_delivery_offset_seconds_when_observable": true,
+    "platform_boundary_note": "Official Scheduled Tasks documentation describes paid recurring schedules up to once per hour. The quarter-hour fast path is experimental same-task hourly-BYMINUTE mutation, so actual successor observation rather than nominal due time controls measurement validity."
   },
   "latest_completed_turn": null,
   "valid_completed_turns": [],
   "rolling_mean_observed_useful_span_seconds": null,
   "goal_reached": false,
-  "latest_diagnosis": null,
+  "latest_diagnosis": {
+    "cause_class": "HANDOFF_DELAY",
+    "evidence": "The prior epoch reached an observed 840-second progress boundary but did not commit its handoff; the following successor recovered only after the predecessor was already stale.",
+    "secondary_risk": "The current successor was invoked at 23:58:58 for an expected 00:00 boundary, so nominal quarter slots cannot be used as exact run boundaries."
+  },
   "next_corrective_experiment": {
-    "experiment_id": "UTIL-EXP-002",
-    "hypothesis": "A 14+1 cadence will improve utilization while reducing runtime-timeout risk: substantial work for ~14m, then handoff-ready tiny units until successor request.",
-    "change": "Plan a 14-minute useful packet composed of checkpointable units; after 12m stop admitting large units; near 14m keep only tiny safe units and hand off immediately when successor requests.",
-    "success_signal": "At least 3 valid completed turns with rolling mean observed_useful_span_seconds >= 840 and no voluntary dead tail before successor."
+    "experiment_id": "UTIL-EXP-003",
+    "hypothesis": "Removing redundant recovery grace for predecessors already stale by >=120s, while measuring against actual successor observation rather than nominal due, will reduce baton latency without weakening fresh-predecessor fencing.",
+    "change": "Use handoff-recovery v2 already-stale fast path; keep frequent durable progress; record expected due and actual successor observation separately; finalize immediately on positive successor request.",
+    "success_signal": "At least 3 valid completed turns with rolling mean observed_useful_span_seconds >= 840, no voluntary dead tail, and no fresh-predecessor takeover."
   }
 }
