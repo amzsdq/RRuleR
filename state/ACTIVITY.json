@@ -3,14 +3,15 @@
   "program_id":"RRULER-PROGRAM-001",
   "root_job_id":"RRULER-UTILIZATION-003",
   "canonical_automation_id":"6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "status":"WORKING",
+  "status":"CHECKPOINTED_WAITING_ROLLING_WAKE",
   "active_run_id":"RUN-UTIL-20260921-032900",
   "authority_epoch":22,
   "substantive_work_started_at":"2026-09-21T03:29:00+09:00",
-  "last_progress_at":"2026-09-21T03:29:00+09:00",
-  "last_progress_kind":"ROLLING_RRULE_PROVISIONAL_ARM_VERIFIED",
-  "current_unit":"First production rolling lifecycle wake: same canonical provisionally armed to 03:42 KST; audit and repair stale fixed-quarter control projections before checkpoint/final rearm.",
-  "next_wake_due_at":"2026-09-21T03:42:00+09:00",
+  "last_progress_at":"2026-09-21T03:30:21+09:00",
+  "last_progress_kind":"ROLLING_RRULE_ACTIVE_CONTROL_MIGRATION_AND_FINAL_REARM_VERIFIED",
+  "current_unit":"First production rolling lifecycle startup/migration checkpoint complete; next wake must verify automatic completion-relative fast reentry and continue normalized measurement.",
+  "next_wake_due_at":"2026-09-21T03:32:00+09:00",
   "successor_observed":false,
-  "handoff_ready":false
+  "handoff_ready":true,
+  "measurement_note":"This short migration wake is lifecycle evidence, not a 840-second utilization acceptance sample. Do not infer scheduler latency until the 03:32 wake is actually observed."
 }
