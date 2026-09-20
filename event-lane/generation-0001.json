@@ -1,0 +1,13 @@
+{
+  "schema_version":"1.0",
+  "event_id":"LAB-EVENT-0001",
+  "correlation_id":"UTIL-EXP-007-LAB",
+  "generation":1,
+  "expected_authority_epoch":17,
+  "program_id":"RRULER-PROGRAM-001",
+  "root_job_id":"RRULER-UTILIZATION-003",
+  "emitted_at":"2026-09-21T00:53:00+09:00",
+  "reason":"PRODUCER_SIDE_PR_COMMIT_UPDATE_PROOF_ONLY",
+  "substantive_trigger_active":false,
+  "note":"This commit proves the dedicated PR lane can receive generation commits. No ChatGPT Work event trigger is assumed provisioned, so this must not advance main authority or be counted as a continuation cycle."
+}
