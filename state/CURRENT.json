@@ -5,11 +5,11 @@
   "root_goal": "Bootstrap RRuleR as a public-safe durable control plane and document/reproduce the RRULE self-update relay.",
   "status": "CONTINUE",
   "current_owner": "CHATGPT_RELAY",
-  "authority_epoch": 2,
+  "authority_epoch": 3,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "SUCCESSOR_ACTIVE_CONTINUOUS_WORK",
+  "run_state": "ACTIVE_CONTINUOUS_WORK",
   "checkpoint": {
-    "id": "CP-BOOTSTRAP-005",
+    "id": "CP-BOOTSTRAP-006",
     "state": "ACTIVE",
     "completed": [
       "Bootstrap contract, control policy, architecture, operations and RRULE relay guide established",
@@ -21,29 +21,34 @@
       "Second RRuleR-era phase transition :45 -> :00 succeeded on same canonical automation",
       "Durable execution model added for root/work-unit state, fenced lease, checkpoint, effect receipt, completion verification and liveness recovery",
       "Checkpoint, lease and effect-record machine schemas added",
-      "CI expanded to require durable execution contracts"
+      "CI expanded to require durable execution contracts",
+      "Third RRuleR-era phase transition :00 -> :15 succeeded on same canonical automation",
+      "Latest expanded control-plane CI success verified and recorded",
+      "Experiment ledger updated with third-cycle continuation evidence"
     ],
     "evidence": [
       "automation_id:6aaf8a993eb08191b8d0ab1d9662e4b2",
       "phase_transition::45->:00 verified at 2026-09-20T19:44:41+09:00",
-      "next_due_kst:2026-09-20T20:00:00+09:00",
+      "phase_transition::00->:15 verified at 2026-09-20T20:02:34+09:00",
+      "next_due_kst:2026-09-20T20:15:00+09:00",
       "durable_execution_model_commit:ff200683039379d69ad193de73fafd2177a6796f",
       "checkpoint_schema_commit:40fc8f8be09da7cfbcfd9912267d0f695118634b",
       "lease_schema_commit:fab800316ab5dd5c876452d2ba79e9f30268aa8c",
       "effect_schema_commit:9bda33c4e6f8602a6bf961a62354a6e607e640ce",
       "ci_contract_commit:58f170497600e546518213acf053a5756ab60b42",
-      "successor_event_commit:feac8dd106113af4e6483b83fe279376c0dae062"
+      "ci_success_run:35506033120 head=85315fb98b4d2b06b8ed15e8e138d7230b9c39c0",
+      "third_cycle_ledger_commit:9f3db627dc99ee28ceb77945f6e67eef600d8dbd"
     ],
-    "observation": "A scheduled successor run actually fired, rotated the same recurring automation to :00, read durable state, and continued substantive work. This supplies the first direct cold-continuation evidence for the RRuleR-era relay.",
-    "next_action": "Continue substantive bootstrap hardening without voluntary idle: verify expanded CI, update experiment ledger with observed successor continuation, and close remaining relay acceptance evidence across the next scheduled continuation."
+    "observation": "A later scheduled run preserved the canonical automation, rotated :00 to :15, reconstructed durable authority, and verified the expanded CI success. Multi-cycle continuation is now directly evidenced; remaining acceptance work is precise handoff/concurrency classification and observable utilization measurement.",
+    "next_action": "Continue substantive bootstrap hardening without voluntary idle: formalize concurrency-safe authority/handoff observation rules and add a machine-readable relay validation record so a fresh session can decide PASS without relying on prose interpretation."
   },
   "continuation": {
     "mechanism": "RRULE_PHASE_ROTATION",
     "cadence_minutes_effective": 15,
     "recurring_base": "FREQ=HOURLY",
     "next_wake_first": true,
-    "next_due_at": "2026-09-20T20:00:00+09:00",
-    "current_phase_minute": 0,
+    "next_due_at": "2026-09-20T20:15:00+09:00",
+    "current_phase_minute": 15,
     "handoff_trigger": "SUCCESSOR_ACTUALLY_OBSERVED",
     "voluntary_idle_before_successor_forbidden": true,
     "fallback_semantics": "If a phase update fails and the previous hourly RRULE remains verified intact, classify DEGRADED_CONTINUATION and use the surviving hourly recurrence as a recovery opportunity."
