@@ -1,0 +1,47 @@
+name: Audit coverage windows
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'state/COVERAGE_WINDOWS.json'
+      - '.github/workflows/audit-coverage-windows.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Audit provisional fixed windows
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/state/COVERAGE_WINDOWS.json?ref=$SHA" -o /tmp/windows.json
+          python - <<'PY'
+          import json, os, urllib.parse, urllib.request
+          from datetime import datetime, timezone, timedelta
+          d=json.load(open('/tmp/windows.json')); limit=d['maximum_unexplained_internal_gap_seconds']; token=os.environ['GH_TOKEN']; repo=os.environ['REPO']; failures=[]
+          def dt(s): return datetime.fromisoformat(s).astimezone(timezone.utc)
+          for w in d['windows']:
+              if not w.get('status','').startswith('PROVISIONAL_PASS'): continue
+              start=dt(w['evidenced_interval_start']); end=dt(w['end']); query_end=end+timedelta(seconds=limit)
+              q=urllib.parse.urlencode({'since':start.isoformat().replace('+00:00','Z'),'until':query_end.isoformat().replace('+00:00','Z'),'per_page':100})
+              req=urllib.request.Request(f'https://api.github.com/repos/{repo}/commits?{q}',headers={'Authorization':f'Bearer {token}','Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req) as r: commits=json.load(r)
+              pts=[start]+[datetime.fromisoformat(c['commit']['committer']['date'].replace('Z','+00:00')) for c in commits]
+              pts=sorted(set(pts)); before=[p for p in pts if p<=end]; after=[p for p in pts if p>=end]
+              continuity_points=sorted(set(before+([min(after)] if after else [])))
+              gaps=[(b-a).total_seconds() for a,b in zip(continuity_points,continuity_points[1:])]
+              worst=max(gaps,default=0); crosses=bool(after) and (min(after)-end).total_seconds()<=limit
+              ok=worst<=limit and crosses and w.get('provisional_useful_coverage_seconds',0)>=d['target_useful_coverage_seconds']
+              print(json.dumps({'window_id':w['window_id'],'points':len(continuity_points),'max_gap_seconds':worst,'crosses_end_within_limit':crosses,'pass':ok},separators=(',',':')))
+              if not ok: failures.append(w['window_id'])
+          if failures: raise SystemExit('coverage window audit failed: '+','.join(failures))
+          PY
