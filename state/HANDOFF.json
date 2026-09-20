@@ -6,7 +6,7 @@
   "successor_run_id": null,
   "successor_expected_at": "2026-09-20T19:45:00+09:00",
   "successor_observed_at": null,
-  "active_unit": "Bootstrap control-plane hardening and relay reproducibility validation",
-  "checkpoint_id": "CP-BOOTSTRAP-003",
-  "next_action": "Predecessor continues useful bounded work. At/after expected time, do not hand off until positive successor evidence is observed. Once observed, enter HANDOFF_DRAIN and persist final predecessor checkpoint."
+  "active_unit": "Bootstrap control-plane hardening and live RRULE successor observation",
+  "checkpoint_id": "CP-BOOTSTRAP-004",
+  "next_action": "Continue useful bounded work. At/after 19:45 KST require positive successor evidence before entering HANDOFF_DRAIN; clock arrival alone is insufficient."
 }
