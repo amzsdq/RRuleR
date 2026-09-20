@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/amzsdq/RRuleR/schemas/activity.schema.json",
+  "title": "RRuleR Durable Activity Heartbeat",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "program_id",
+    "root_job_id",
+    "canonical_automation_id",
+    "status",
+    "active_run_id",
+    "last_progress_at",
+    "last_progress_kind",
+    "current_unit",
+    "next_wake_due_at",
+    "successor_observed",
+    "operator_ui_note"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "program_id": {"type": "string", "minLength": 1},
+    "root_job_id": {"type": "string", "minLength": 1},
+    "canonical_automation_id": {"type": "string", "minLength": 1},
+    "status": {"enum": ["ARMED", "WORKING", "HANDOFF", "PROGRAM_COMPLETE", "BLOCKED_EXTERNAL", "DEGRADED_CONTINUATION"]},
+    "active_run_id": {"type": ["string", "null"]},
+    "last_progress_at": {"type": "string", "format": "date-time"},
+    "last_progress_kind": {"type": "string", "minLength": 1},
+    "current_unit": {"type": ["string", "null"]},
+    "next_wake_due_at": {"type": ["string", "null"], "format": "date-time"},
+    "successor_observed": {"type": "boolean"},
+    "operator_ui_note": {"type": "string", "minLength": 1}
+  }
+}
