@@ -1,14 +1,68 @@
 {
   "policy_id": "RRULER_RUN_CONTINUATION_GATE",
-  "version": 1,
+  "version": 2,
   "status": "ACTIVE",
   "purpose": "Require an active worker to keep performing useful work while the program remains non-terminal unless authority has been safely transferred.",
-  "program_nonterminal_states": ["CONTINUE", "DEGRADED_CONTINUATION"],
+  "program_nonterminal_states": [
+    "CONTINUE",
+    "DEGRADED_CONTINUATION"
+  ],
   "default_for_nonterminal_owner": "MUST_CONTINUE_USEFUL_WORK",
-  "run_end_allowed_only_for": ["COMMITTED_SUCCESSOR_HANDOFF", "EXPLICIT_OPERATOR_STOP", "PLATFORM_ENFORCED_TERMINATION"],
-  "program_end_allowed_only_for": ["PROGRAM_COMPLETE", "BLOCKED_EXTERNAL", "EXPLICIT_OPERATOR_STOP"],
-  "never_end_because": ["WORK_PACKET_COMPLETE", "PRIMARY_OBJECTIVE_COMPLETE", "CHECKPOINT_COMPLETE", "DOCUMENT_COMPLETE", "CI_PASS", "MILESTONE_COMPLETE", "ROOT_COMPLETE", "PLAN_COMPLETE", "NO_OBVIOUS_NEXT_TASK", "WAITING_FOR_NEXT_WAKE", "SCHEDULE_BOUNDARY"],
-  "nonterminal_no_handoff_rule": {"final_response":"FORBIDDEN","run_end":"FORBIDDEN","required_action":"SELECT_AND_EXECUTE_NEXT_USEFUL_ADMISSIBLE_UNIT"},
-  "nonterminal_committed_handoff_rule": {"final_response":"ALLOWED_FOR_PREDECESSOR_ONLY","run_end":"ALLOWED_FOR_PREDECESSOR_ONLY","required_action":"RELINQUISH_OLD_AUTHORITY"},
-  "enforcement": {"durable_end_record_requires_end_reason":true,"nonterminal_end_without_allowlisted_reason_is_incident":"EARLY_VOLUNTARY_RUN_END","normal_completion_prose_is_not_authority_to_end":true,"platform_forced_run_end_recovers_on_next_wake":true,"canonical_disable_requires_program_terminal_or_explicit_operator_stop":true}
+  "run_end_allowed_only_for": [
+    "COMMITTED_SUCCESSOR_HANDOFF",
+    "EXPLICIT_OPERATOR_STOP",
+    "PLATFORM_ENFORCED_TERMINATION"
+  ],
+  "program_end_allowed_only_for": [
+    "PROGRAM_COMPLETE",
+    "BLOCKED_EXTERNAL",
+    "EXPLICIT_OPERATOR_STOP"
+  ],
+  "never_end_because": [
+    "WORK_PACKET_COMPLETE",
+    "PRIMARY_OBJECTIVE_COMPLETE",
+    "CHECKPOINT_COMPLETE",
+    "DOCUMENT_COMPLETE",
+    "CI_PASS",
+    "MILESTONE_COMPLETE",
+    "ROOT_COMPLETE",
+    "PLAN_COMPLETE",
+    "NO_OBVIOUS_NEXT_TASK",
+    "WAITING_FOR_NEXT_WAKE",
+    "SCHEDULE_BOUNDARY"
+  ],
+  "nonterminal_no_handoff_rule": {
+    "final_response": "FORBIDDEN",
+    "run_end": "FORBIDDEN",
+    "required_action": "SELECT_AND_EXECUTE_NEXT_USEFUL_ADMISSIBLE_UNIT"
+  },
+  "nonterminal_committed_handoff_rule": {
+    "final_response": "ALLOWED_FOR_PREDECESSOR_ONLY",
+    "run_end": "ALLOWED_FOR_PREDECESSOR_ONLY",
+    "required_action": "RELINQUISH_OLD_AUTHORITY"
+  },
+  "enforcement": {
+    "durable_end_record_requires_end_reason": true,
+    "nonterminal_end_without_allowlisted_reason_is_incident": "EARLY_VOLUNTARY_RUN_END",
+    "normal_completion_prose_is_not_authority_to_end": true,
+    "platform_forced_run_end_recovers_on_next_wake": true,
+    "canonical_disable_requires_program_terminal_or_explicit_operator_stop": true,
+    "final_without_fresh_pre_final_authorization_is_incident": "EARLY_VOLUNTARY_FINAL_RESPONSE",
+    "waiting_for_cold_rescue_is_not_valid_end_reason": true,
+    "future_wake_exists_does_not_authorize_current_owner_to_end": true
+  },
+  "final_response_is_authoritative_side_effect": true,
+  "pre_final_authorization": {
+    "required": true,
+    "source_of_truth": [
+      "state/CURRENT.json",
+      "state/HANDOFF.json",
+      "control/run-continuation-gate.v1.json"
+    ],
+    "check_immediately_before_user_visible_final": true,
+    "authorization_rule": "ALLOW_ONLY_IF_RUN_END_ALLOWED",
+    "if_denied": "DO_NOT_EMIT_FINAL_CONTINUE_USEFUL_WORK",
+    "stale_prior_check_forbidden": true,
+    "normal_status_report_does_not_authorize_final": true
+  }
 }

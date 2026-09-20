@@ -155,3 +155,20 @@ For the active RRULER-UTILIZATION program, continuity and measured useful-work u
 - If the canonical automation is enabled and a future quarter wake can be verified, reconcile durable state to that continuation and keep the program moving.
 - Never intentionally no-op a non-terminal expected/recoverable wake merely because durable timing metadata is stale.
 - Do not bypass actual platform/security controls, irreversible-side-effect reconciliation, or public-repository secret protections.
+
+
+## Pre-final authorization gate
+
+A user-visible final response is an authoritative run-ending side effect for an active owner.
+
+Immediately before emitting ANY normal final response, the current owner MUST perform a fresh pre-final authorization check against:
+- `state/CURRENT.json`;
+- `state/HANDOFF.json`;
+- `control/run-continuation-gate.v1.json`.
+
+Rules:
+- If program status is `CONTINUE` or `DEGRADED_CONTINUATION`, and no committed successor handoff, explicit operator stop, or actual platform-enforced termination exists, FINAL IS FORBIDDEN.
+- A future cold-rescue wake being armed does NOT authorize the current healthy owner to stop.
+- Reporting that work remains, that a checkpoint succeeded, or that the next wake is scheduled does NOT authorize final.
+- If the pre-final gate denies final, do not emit a terminal/status reply. Immediately select and execute the next useful admissible unit in the same invocation.
+- The check must be fresh and immediately precede any final. A stale earlier check cannot authorize final after more work/state changes.
