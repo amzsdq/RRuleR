@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/amzsdq/RRuleR/schemas/run-observation.schema.json",
+  "title": "RRuleR Run Observation",
+  "type": "object",
+  "required": [
+    "observation_id",
+    "root_job_id",
+    "canonical_automation_id",
+    "run_started_at",
+    "classification"
+  ],
+  "properties": {
+    "observation_id": {"type": "string", "minLength": 1},
+    "root_job_id": {"type": "string", "minLength": 1},
+    "canonical_automation_id": {"type": "string", "minLength": 1},
+    "run_started_at": {"type": "string", "minLength": 1},
+    "run_ended_at": {"type": ["string", "null"]},
+    "successor_observed_at": {"type": ["string", "null"]},
+    "productive_substantive_seconds": {"type": ["integer", "null"], "minimum": 0},
+    "checkpoint_seconds": {"type": ["integer", "null"], "minimum": 0},
+    "handoff_seconds": {"type": ["integer", "null"], "minimum": 0},
+    "relay_idle_gap_seconds": {"type": ["integer", "null"], "minimum": 0},
+    "successor_wait_seconds": {"type": ["integer", "null"], "minimum": 0},
+    "classification": {
+      "enum": ["ACTIVE", "HANDOFF", "COMPLETE", "BLOCKED_EXTERNAL", "PLATFORM_ENDED", "DEGRADED_CONTINUATION"]
+    },
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": false
+}
