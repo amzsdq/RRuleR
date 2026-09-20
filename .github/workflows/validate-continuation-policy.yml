@@ -45,7 +45,11 @@ jobs:
           assert set(gate['run_end_allowed_only_for'])=={'COMMITTED_SUCCESSOR_HANDOFF','EXPLICIT_OPERATOR_STOP','PLATFORM_ENFORCED_TERMINATION'}
           required={'PRIMARY_OBJECTIVE_COMPLETE','CI_PASS','ROOT_COMPLETE','WAITING_FOR_NEXT_WAKE','SCHEDULE_BOUNDARY'}
           assert required <= set(gate['never_end_because'])
-          assert policy['utilization']['nonterminal_voluntary_turn_end_forbidden'] is True
+          util=policy['utilization']
+          assert util['voluntary_idle_while_useful_work_exists_forbidden'] is True
+          assert util['checkpoint_is_yield_condition'] is False
+          assert util['root_completion_is_yield_condition'] is False
+          assert util['after_each_work_unit']=='SELECT_NEXT_SAFE_USEFUL_UNIT_UNTIL_NATURAL_CLOSE_OR_SAFETY_BOUNDARY'
           assert current['continuation']['run_continuation_gate_policy']=='control/run-continuation-gate.v1.json'
           if current['program_status'] in gate['program_nonterminal_states']:
               assert current['continuation']['program_terminal_disabled_required'] is True
