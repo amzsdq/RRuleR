@@ -7,9 +7,9 @@
   "active_run_id":"RUN-UTIL-20260921-013250",
   "authority_epoch":19,
   "substantive_work_started_at":"2026-09-21T01:33:11+09:00",
-  "last_progress_at":"2026-09-21T01:36:40+09:00",
-  "last_progress_kind":"RECOVERY_GAP_BASELINE_AND_RESCUE_PATH_AUDIT",
-  "current_unit":"Epoch18-to-19 recovery gap is now measured at 483s. The quarter fallback is proven correct but too slow for <=120s; Actions rescue has no schedule-event observation yet and remains non-fast-path; continue independent-wake/recovery work.",
+  "last_progress_at":"2026-09-21T01:38:20+09:00",
+  "last_progress_kind":"SLIDING_COLD_RESCUE_HORIZON_CANDIDATE_DESIGNED",
+  "current_unit":"ADR-002 now defines a staged 10m/5m/3m sliding cold-rescue experiment and explicitly captures the missed-due hazard. It is not activated prematurely; independent event wake remains the only current <=120s-class candidate.",
   "next_wake_due_at":"2026-09-21T01:45:00+09:00",
   "successor_observed":false,
   "handoff_ready":false
