@@ -1,0 +1,27 @@
+{
+  "policy_id": "RRULER_OBSERVATION_HORIZON",
+  "version": 1,
+  "status": "ACTIVE",
+  "purpose": "Separate trusted observation horizon provenance from useful-work evidence endpoints so valid trailing gaps remain measurable without allowing caller-invented future horizons.",
+  "authoritative_state": "state/OBSERVATION_HORIZON.json",
+  "rules": {
+    "horizon_is_not_useful_work": true,
+    "horizon_must_not_be_inferred_from_latest_useful_evidence_endpoint": true,
+    "promotion_caller_must_not_advance_horizon": true,
+    "requested_observed_through_must_be_lte_trusted_observed_through": true,
+    "trusted_boundary_requires_durable_external_observation": true,
+    "timezone_required": true,
+    "monotonic_forward_only": true,
+    "trailing_unexplained_gap_remains_subject_to_evidence_policy": true
+  },
+  "accepted_provenance_kinds": [
+    "GITHUB_COMMIT_COMMITTER_TIMESTAMP",
+    "GITHUB_ACTIONS_OBSERVED_TIMESTAMP"
+  ],
+  "rejected_provenance_kinds": [
+    "CALLER_SUPPLIED_ONLY",
+    "INFERRED_FROM_USEFUL_EVIDENCE",
+    "LOCAL_UNPERSISTED_CLOCK"
+  ],
+  "fail_closed": "If a promotion request supplies observed_through later than the trusted durable horizon, reject that promotion request as UNTRUSTED_OBSERVATION_HORIZON. Do not shorten a valid trusted horizon to the latest useful-evidence endpoint."
+}
