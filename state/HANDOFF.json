@@ -1,12 +1,12 @@
 {
   "schema_version": "1.0",
   "root_job_id": "RRULER-BOOTSTRAP-001",
-  "handoff_state": "PREDECESSOR_ACTIVE",
+  "handoff_state": "SUCCESSOR_ACTIVE",
   "predecessor_run_id": "RUNOBS-20260920-193228",
-  "successor_run_id": null,
+  "successor_run_id": "AUTOMATION-TURN-1-20260920-194439",
   "successor_expected_at": "2026-09-20T19:45:00+09:00",
-  "successor_observed_at": null,
-  "active_unit": "Bootstrap control-plane hardening and live RRULE successor observation",
-  "checkpoint_id": "CP-BOOTSTRAP-004",
-  "next_action": "Continue useful bounded work. At/after 19:45 KST require positive successor evidence before entering HANDOFF_DRAIN; clock arrival alone is insufficient."
+  "successor_observed_at": "2026-09-20T19:44:39+09:00",
+  "active_unit": "Durable execution semantics: lease, checkpoint, effect receipts, completion verification, liveness recovery",
+  "checkpoint_id": "CP-BOOTSTRAP-005",
+  "next_action": "Continue hardening durable execution model and relay evidence; verify expanded CI; before the next scheduled successor, persist current checkpoint without voluntarily idling."
 }
