@@ -3,7 +3,17 @@ name: Validate continuation policy
 on:
   push:
     branches: ["main"]
+    paths:
+      - 'control/run-continuation-gate.v1.json'
+      - 'control/relay-policy.v1.json'
+      - 'state/CURRENT.json'
+      - '.github/workflows/validate-continuation-policy.yml'
   pull_request:
+    paths:
+      - 'control/run-continuation-gate.v1.json'
+      - 'control/relay-policy.v1.json'
+      - 'state/CURRENT.json'
+      - '.github/workflows/validate-continuation-policy.yml'
   workflow_dispatch:
 
 permissions:
