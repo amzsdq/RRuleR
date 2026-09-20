@@ -1,0 +1,9 @@
+{
+  "policy_id":"RRULER_SUBSTANTIVE_EVIDENCE","version":1,"status":"ACTIVE","purpose":"Define what may bridge utilization evidence gaps so the system cannot inflate useful-work coverage with heartbeats or no-op bookkeeping.",
+  "counts_as_substantive_when_materially_new":["implementation_or_refactor","control_policy_change_that_changes_behavior","test_or_validator_added_or_hardened","failure_root_cause_analysis_with_new_evidence","external_prior_art_research_that_changes_a_design_decision","measurement_method_improvement_that_can_change_pass_fail_classification","new_experiment_or_result_with_reproducible_evidence","operator_observability_artifact_derived_from_new_evidence"],
+  "never_counts_by_itself":["ACTIVITY_HEARTBEAT_ONLY","timestamp_refresh_only","reformat_only","duplicate_checkpoint_text","CI_POLL_WITH_NO_NEW_RESULT","waiting","scheduler_wait","tool_wait","repeated_statement_of_existing_policy"],
+  "git_audit_minimum_rule":"A commit that changes only state/ACTIVITY.json is heartbeat-only and cannot be a substantive evidence point.",
+  "semantic_rule":"Changing another file is necessary for the simple Git audit but not sufficient in principle; future auditors should reject no-op/busywork changes even outside ACTIVITY.",
+  "anti_gaming":["Do not split one trivial change into many commits solely to satisfy the 120-second gap threshold.","Do not create unrelated filler work to manufacture evidence points.","Prefer naturally checkpointable meaningful units; if useful work genuinely requires >120 seconds without a durable intermediate result, mark the interval measurement uncertain rather than fake progress."],
+  "acceptance_gap_seconds":120
+}
