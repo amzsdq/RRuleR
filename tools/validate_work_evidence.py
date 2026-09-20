@@ -11,19 +11,20 @@ def ts(value:str)->datetime:
     if dt.tzinfo is None: raise ValueError("timestamp must include timezone")
     return dt
 def fixed_window_start(value:str|datetime)->datetime:
-    """Return deterministic epoch-anchored 900s measurement bucket containing value."""
+    """Return canonical UTC epoch-anchored 900s measurement bucket containing value."""
     dt=ts(value) if isinstance(value,str) else value
     if dt.tzinfo is None: raise ValueError("timestamp must include timezone")
     epoch_seconds=int(dt.timestamp()); bucket=epoch_seconds-(epoch_seconds%WINDOW_SECONDS)
-    return datetime.fromtimestamp(bucket,tz=timezone.utc).astimezone(dt.tzinfo)
+    return datetime.fromtimestamp(bucket,tz=timezone.utc)
 def enumerate_completed_fixed_windows(first_observed:str,last_observed:str)->list[str]:
-    """Enumerate fully observed deterministic 900s windows, oldest first."""
+    """Enumerate fully observed deterministic 900s windows as canonical UTC instants, oldest first."""
     first,last=ts(first_observed),ts(last_observed)
     if last<first: raise ValueError("last_observed precedes first_observed")
     start=fixed_window_start(first)
-    if first>start: start+=timedelta(seconds=WINDOW_SECONDS)
+    first_utc=first.astimezone(timezone.utc); last_utc=last.astimezone(timezone.utc)
+    if first_utc>start: start+=timedelta(seconds=WINDOW_SECONDS)
     out=[]
-    while start+timedelta(seconds=WINDOW_SECONDS)<=last:
+    while start+timedelta(seconds=WINDOW_SECONDS)<=last_utc:
         out.append(start.isoformat()); start+=timedelta(seconds=WINDOW_SECONDS)
     return out
 def validate_record(record:dict)->list[str]:
@@ -76,7 +77,7 @@ def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->
         cursor=max(cursor,b)
     if cursor<end: gaps.append((cursor,end))
     max_gap=max(((b-a).total_seconds() for a,b in gaps),default=0); reasons=[]
-    if start!=fixed_window_start(start): reasons.append("NON_FIXED_WINDOW_BOUNDARY")
+    if start.astimezone(timezone.utc)!=fixed_window_start(start): reasons.append("NON_FIXED_WINDOW_BOUNDARY")
     invalid_in_window=any(rr["errors"] and _record_intersects_window(record,start,end) is not False for rr,record in zip(record_results,records))
     overlap_in_window=any(_record_intersects_window(records[e["left"]],start,end) is not False or _record_intersects_window(records[e["right"]],start,end) is not False for e in overlap_errors)
     if invalid_in_window: reasons.append("INVALID_RECORD_PRESENT")
