@@ -103,6 +103,10 @@ jobs:
           if policy.get('status')!='ACTIVE' or policy.get('scheduler',{}).get('canonical_reuse_required') is not True: raise SystemExit('relay policy inactive')
           if policy.get('scheduler',{}).get('mechanism')!='RRULE_HOURLY_PHASE_ROTATION_15M': raise SystemExit('relay scheduler policy mismatch')
           if policy.get('utilization',{}).get('voluntary_idle_while_useful_work_exists_forbidden') is not True: raise SystemExit('relay utilization invariant failed')
+          if policy.get('utilization',{}).get('nonterminal_voluntary_turn_end_forbidden') is not True: raise SystemExit('nonterminal voluntary turn-end invariant missing')
+          allowed_end=set(policy.get('terminal',{}).get('voluntary_turn_end_allowed_only_for',[]))
+          required_end={'PROGRAM_COMPLETE','BLOCKED_EXTERNAL','COMMITTED_SUCCESSOR_HANDOFF','EXPLICIT_OPERATOR_STOP','PLATFORM_ENFORCED_TERMINATION'}
+          if allowed_end != required_end: raise SystemExit('voluntary turn-end allowlist mismatch')
           if policy.get('program_continuity',{}).get('root_completion_does_not_imply_program_completion') is not True: raise SystemExit('program continuity invariant failed')
           if liveness.get('status')!='ACTIVE' or liveness.get('activity_path')!='state/ACTIVITY.json': raise SystemExit('liveness policy inactive or activity path mismatch')
           if 'activity_authority_epoch_matches_current_authority_epoch' not in liveness.get('healthy_active_requires',[]): raise SystemExit('liveness authority-epoch invariant missing')
