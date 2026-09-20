@@ -10,15 +10,28 @@ permissions:
   contents: read
   actions: read
 
+concurrency:
+  group: rruler-observation-horizon-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Run observation horizon regression tests
-        run: python -m unittest tests.test_observation_horizon_validator -v
-      - name: Verify durable provenance against GitHub
+      - name: Fetch validator inputs and verify durable provenance
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-        run: python tools/validate_observation_horizon.py state/OBSERVATION_HORIZON.json control/observation-horizon.v1.json
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          fetch() { curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/$1?ref=$SHA" -o "$2"; }
+          mkdir -p /tmp/rruler/tools /tmp/rruler/tests /tmp/rruler/state /tmp/rruler/control
+          fetch tools/validate_observation_horizon.py /tmp/rruler/tools/validate_observation_horizon.py
+          fetch tests/test_observation_horizon_validator.py /tmp/rruler/tests/test_observation_horizon_validator.py
+          fetch state/OBSERVATION_HORIZON.json /tmp/rruler/state/OBSERVATION_HORIZON.json
+          fetch control/observation-horizon.v1.json /tmp/rruler/control/observation-horizon.v1.json
+          cd /tmp/rruler
+          python -m unittest tests.test_observation_horizon_validator -v
+          python tools/validate_observation_horizon.py state/OBSERVATION_HORIZON.json control/observation-horizon.v1.json
