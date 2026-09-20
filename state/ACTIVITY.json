@@ -7,9 +7,9 @@
   "active_run_id": "RUN-UTIL-20260920-231559",
   "authority_epoch": 12,
   "substantive_work_started_at": "2026-09-20T23:16:15+09:00",
-  "last_progress_at": "2026-09-20T23:24:00+09:00",
-  "last_progress_kind": "ACCEPTANCE_BOUND_TO_LIVE_MEASUREMENT",
-  "current_unit": "Continue bounded useful validation/hardening; preserve the first clean live measurement attempt until actual :30 successor evidence.",
+  "last_progress_at": "2026-09-20T23:26:00+09:00",
+  "last_progress_kind": "BATON_EVIDENCE_PROTOCOL_HARDENED",
+  "current_unit": "UTIL-EXP-002: final pre-handoff validation units; after ~12m admit only quick-checkpoint work, then mark HANDOFF_READY near the measured 840s boundary.",
   "next_wake_due_at": "2026-09-20T23:30:00+09:00",
   "successor_observed": false,
   "handoff_ready": false
