@@ -1,5 +1,13 @@
 # RRuleR Control Policy
 
+## Authority surfaces
+
+- `control/POLICY.md` — human-readable architectural policy.
+- `control/relay-policy.v1.json` — machine-readable relay policy for scheduler/utilization/handoff behavior.
+- `state/CURRENT.json` — current root/job projection and exact continuation state.
+
+If prose and machine-readable relay fields disagree, fail closed and reconcile them before relying on the disputed behavior.
+
 ## Architectural axioms
 
 1. **Persistence belongs to GitHub.**
