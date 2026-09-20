@@ -3,279 +3,114 @@
 ## Authority surfaces
 
 - `control/POLICY.md` — human-readable architectural policy.
-- `control/relay-policy.v1.json` — machine-readable relay policy for scheduler/utilization/handoff behavior.
+- `control/relay-policy.v1.json` — machine-readable relay policy.
+- `control/scheduler-fence.v1.json` — scheduler generation/fencing policy.
+- `control/rolling-rrule-lifecycle.v1.json` — active rolling same-canonical lifecycle.
 - `state/CURRENT.json` — current program/root projection and exact continuation state.
 - `state/ACTIVITY.json` — current observable run/activity heartbeat.
 
-If prose and machine-readable relay fields disagree, fail closed and reconcile them before relying on the disputed behavior.
+Machine-readable active controls and fresh durable state govern execution. If prose disagrees, fail closed only for the disputed side effect, reconcile forward, and continue safe useful work.
 
 ## Architectural axioms
 
-1. **Persistence belongs to GitHub.**
-2. **Intelligence belongs to disposable ChatGPT sessions.**
-3. **No session is authoritative; durable state is.**
-4. **Automation is a wake mechanism, not a state store.**
-5. **Delivery is not work completion.**
-6. **Checkpoint before authoritative advancement.**
-7. **At-least-once delivery is acceptable; duplicate substantive execution is not.**
-8. **Ambiguous irreversible side effects reconcile before replay.**
-9. **Authority must be explicit and fenced.**
-10. **Completion requires evidence, not worker prose.**
-11. **Useful-work utilization is a first-class operating objective.**
-12. **Scheduled time is not a voluntary stop signal.**
-13. **Root completion is not automatically program completion.**
-14. **An active program must not voluntarily create an idle gap when useful admissible work exists.**
+1. Persistence belongs to GitHub.
+2. Intelligence belongs to disposable ChatGPT sessions.
+3. No session is authoritative; durable state is.
+4. Automation is a wake mechanism, not a state store.
+5. Delivery is not work completion.
+6. Checkpoint before authoritative advancement.
+7. At-least-once delivery is acceptable; duplicate substantive execution is not.
+8. Ambiguous irreversible side effects reconcile before replay.
+9. Authority must be explicit and fenced.
+10. Completion requires evidence, not worker prose.
+11. Useful-work utilization is a first-class operating objective.
+12. Scheduled time is not a voluntary stop signal.
+13. Root completion is not automatically program completion.
+14. A non-terminal program must retain a verified recoverable continuation path.
 
-## Authority
+## Authority and continuous work
 
-`state/CURRENT.json` identifies current owner and monotonic `authority_epoch`.
+`state/CURRENT.json` identifies the current owner and monotonic `authority_epoch`. A stale run may not roll authority or schedule generation backward. Scheduler mismatch is recovery work when a newer valid same-canonical continuation exists.
 
-A stale run may not roll authority backward or replay conflicting side effects. Scheduler-time mismatch alone is not a stop condition: if the live canonical continuation is verifiable, reconcile scheduler/owner/handoff metadata forward to the newest valid continuation and resume under a fresh authority claim.
+After continuation is verified, obtain/confirm authority, persist WORKING activity, and execute useful admissible bounded work continuously. Document, checkpoint, CI, milestone, root, or schedule boundaries do not authorize voluntary termination. Checkpoint frequently enough for cold recovery without manufacturing heartbeat-only evidence.
 
-## Continuous work
+## Active scheduler policy
 
-After the next wake is verified:
+The active mechanism is `RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE` on one same canonical automation.
 
-- mark durable activity WORKING;
-- begin substantive work immediately;
-- keep selecting useful admissible bounded work units while the program is non-terminal;
-- do not stop at document, checkpoint, milestone, phase, root, or schedule boundaries;
-- checkpoint frequently enough for recovery without treating checkpoint creation as a yield;
-- on root completion, persist root terminal evidence, select the next materially useful root if one exists, persist it, and continue;
-- never generate busywork solely to satisfy utilization;
-- only successor observation, verified program completion, explicit operator stop, a proven external blocker with internal alternatives exhausted, or platform-enforced termination authorizes normal relinquishment.
-
-## Handoff
-
-Preferred handoff:
+Startup order:
 
 ```text
-successor wake already armed
-        ↓
-predecessor continues useful work
-        ↓
-successor ACTUALLY observed
-        ↓
-predecessor stops starting new units
-        ↓
-finish current smallest safe work unit
-        ↓
-persist checkpoint + activity + duration + evidence + exact next action
-        ↓
-handoff status / predecessor end
-        ↓
-successor reconstructs from GitHub and resumes
+FRESH DURABLE STATE
+ -> STALE-WAKE / GENERATION FENCE
+ -> PRESERVE NEWEST VERIFIED SAME-CANONICAL CONTINUATION
+ -> PROVISIONAL ARM + VERIFY
+ -> AUTHORITY / ACTIVITY RECONCILIATION
+ -> USEFUL WORK
 ```
 
-Scheduled recurrence arrival without successor evidence is not a handoff trigger.
-
-If same-canonical overlap is unsupported, correctness falls back to durable reconstruction, but the predecessor must not voluntarily introduce an idle period before platform-enforced termination.
-
-## Scheduler policy
-
-Scheduler mechanism is replaceable. The active mechanism is one same-canonical hourly RRULE. Each valid wake rotates only BYMINUTE through the fixed quarter-hour cycle:
+Normal close order:
 
 ```text
-:00 -> :15 -> :30 -> :45 -> :00 of the next hour
+LATEST CHECKPOINT
+ -> FINAL REARM SAME CANONICAL TO COMPLETION-RELATIVE FAST CONTINUATION
+ -> VERIFY ENABLED + FUTURE DUE
+ -> PERSIST VERIFIED DUE
 ```
 
-The successor MUST rearm and verify this same canonical before substantive work or handoff request. Do not create four separate quarter-hour automations and do not convert the canonical to one-shot.
+The provisional rescue horizon and final close offset are tunables declared by active machine controls; they are not utilization acceptance thresholds. Never create a replacement canonical merely to continue this actor and never convert the canonical to one-shot for normal continuation.
 
-Architectural invariant:
+Fixed quarter-hour BYMINUTE rotation and predecessor/successor quarter-cycle choreography are retired scheduler semantics. Historical evidence produced under that mechanism remains history, not an active instruction.
 
-> A live non-terminal program that requires continuation must have a valid recoverable continuation path.
+## Handoff and recovery
 
-## Activity evidence and UI
+The rolling cold successor reconstructs from GitHub. A future wake existing by itself does not authorize a healthy current owner to stop. Normal run end requires an allowlisted condition from `control/run-continuation-gate.v1.json`, including committed successor handoff, explicit operator stop, or platform-enforced termination. Program end additionally requires durable terminal evidence such as `PROGRAM_COMPLETE` or proven `BLOCKED_EXTERNAL`.
 
-The ChatGPT composer/stop-button state is not authoritative durable state, but it is a useful operator-facing liveness signal.
-
-- Stop button: usually means the foreground turn is still generating.
-- Send button / idle composer: means that foreground turn ended, but does not rule out a separate scheduled run.
-- To align behavior with the operator's practical observation, an active predecessor does not voluntarily send its normal final response while it still owns work and no successor has been observed.
-- `state/ACTIVITY.json` is the durable corroborating signal. Idle UI plus stale activity and no successor evidence is a utilization incident.
-
-## Failure semantics
-
-- Recurrence phase-update failure while a prior valid RRULE remains alive is `DEGRADED_CONTINUATION`, not immediate death.
-- A surviving recurrence may provide a slower recovery opportunity.
-- Disabled/deleted/missing automation is not rescued by that fallback.
-- Repeated blind retry without a new hypothesis or reconciliation evidence is forbidden.
-
-## Public-safe persistence
-
-RRuleR must remain safe to expose publicly. Never persist credentials, cookies, private files, private message content, private-repository material, or personal data.
-
-## Hard no-self-termination invariant
-
-A non-terminal owner MUST NOT voluntarily end its turn.
-
-- If program state is not `PROGRAM_COMPLETE` or `BLOCKED_EXTERNAL`, emitting a normal final response is forbidden unless a successor has actually been observed and the durable handoff has been committed.
-- `CONTINUE`, `WORKING`, `DEGRADED_CONTINUATION`, checkpoint completion, CI pending/success, document completion, root completion, or "nothing immediately obvious" are NOT permission to end.
-- After every bounded unit, re-read durable state, select the next useful admissible unit, and execute it in the SAME turn.
-- If no next unit is obvious, the next unit is to inspect durable state/evidence for the highest-value unresolved invariant or validation gap; this is not a reason to idle.
-- Only `PROGRAM_COMPLETE`, proven `BLOCKED_EXTERNAL`, committed successor handoff, explicit operator stop, or platform-enforced termination may end an active turn.
-
-
-## Fifteen-minute rolling worker protocol
-
-The active relay is a rolling predecessor/successor pipeline.
-
-- Each wake first re-arms the same canonical hourly RRULE to the next fixed quarter-hour slot and verifies it.
-- Each worker then plans a substantive packet sized for approximately one 15-minute window.
-- A newly awakened successor MUST secure its own following wake before requesting handoff from the predecessor.
-- Handoff is request-driven, not clock-driven.
-- After a durable handoff request, the predecessor stops admitting new substantive units, closes its current smallest safe unit, saves exact continuation state/evidence, and relinquishes authority promptly.
-- The successor may not perform conflicting substantive work until the predecessor's durable handoff is committed; read-only reconstruction/preparation is allowed.
-- After handoff, the successor claims the next authority epoch, plans its own 15-minute packet, and works.
-- Finishing the planned packet early is not a reason to idle: pull another useful bounded unit if one exists.
-- Missing/delayed successor means the predecessor continues useful work; the nominal 15-minute boundary does not terminate the predecessor.
-
-Canonical order:
-
-```text
-WAKE
-  -> REARM SAME RRULE FOR +15m AND VERIFY
-  -> if predecessor active: HANDOFF_REQUEST
-  -> predecessor: finish smallest safe unit + SAVE + RELEASE
-  -> successor: CLAIM NEXT EPOCH
-  -> PLAN ~15m USEFUL WORK PACKET
-  -> WORK
-  -> next successor wake repeats the cycle
-```
-
-
-## Utilization measurement and improvement
-
-The active optimization target is an average observed useful-work span of at least 14 minutes per 15-minute turn.
-
-A completed run must persist enough timestamps to distinguish work from dead time. The minimum derived fields are:
-- observed_useful_span_seconds: last meaningful durable progress minus substantive_work_started_at;
-- dead_tail_seconds: successor/handoff boundary minus last meaningful durable progress, when both timestamps are known;
-- scheduler_or_handoff_overhead_seconds: known non-substantive startup/handoff overhead;
-- measurement_valid: false when required boundaries are missing rather than inventing values.
-
-Every completed valid turn is an experiment:
-1. measure;
-2. compare against 840 seconds;
-3. classify the dominant under-utilization cause;
-4. choose one concrete policy/process correction;
-5. persist it for the next worker;
-6. next worker applies it and retests.
-
-The optimization target is reached only after at least 3 valid completed turns whose rolling mean observed_useful_span_seconds is >= 840. Until then the program remains CONTINUE unless a true BLOCKED_EXTERNAL condition is proven. A single good turn does not complete the experiment.
-
-
-### Runtime-safe 14+1 cadence
-
-The operational target is not to terminate at minute 14. It is to keep each worker productive for about 14 of the 15 minutes, reserving roughly the last minute as a runtime/handoff safety margin.
-
-- 0-12m: normal substantive bounded units.
-- 12-14m: do not begin units that are expensive to checkpoint; prefer short bounded units.
-- ~14m onward: HANDOFF_READY. Keep working on tiny safe units and keep checkpoint state current.
-- At successor handoff request: stop admitting work, close the smallest safe unit, persist exact next action/evidence, release authority immediately.
-- If no successor request arrives, continue useful small units rather than idling.
-- A worker must not intentionally run a monolithic 15-minute operation that cannot checkpoint; this is the runtime-timeout avoidance mechanism.
-
-
-## Utilization continuity precedence
-
-For RRULER-UTILIZATION, the operator's priority order is:
-
-1. preserve a verified next quarter wake;
-2. keep useful work running toward the 14-minute/15-minute target;
-3. perform fast baton handoff;
-4. repair internal scheduler/handoff bookkeeping without yielding;
-5. only then optimize secondary validation/cleanup.
-
-Internal scheduler-fence mismatches are therefore recoverable control-plane drift, not permission to idle. When the canonical automation remains enabled with a verifiable future quarter wake, repair CURRENT/ACTIVITY/HANDOFF to the newest continuation and proceed. Never restore an older schedule generation or authority epoch.
-
+If a wake is stale relative to the newest verified schedule generation, recover forward. Do not restore an older DTSTART, prompt, title, authority epoch, or checkpoint. Ambiguous irreversible side effects must reconcile before replay.
 
 ## Primary turn objective
 
-The worker must not begin a turn by greedily selecting the first available microtask. After rearming the next wake and obtaining authority, it must first commit one coherent PRIMARY TURN OBJECTIVE sized for the available ~14-minute work budget.
+After rearm verification and authority acquisition, persist one coherent primary objective sized for useful sustained work. Required fields are maintained in `state/TURN_PLAN.json`: objective id, expected useful duration, acceptance criteria, checkpointable substeps, current substep, safe handoff boundary, and early-finish fallback.
 
-Required durable planning fields:
-- objective_id;
-- objective;
-- expected_useful_seconds (normally 600-840, hard planning cap 840);
-- acceptance_criteria;
-- checkpointable_substeps (2-5);
-- current_substep;
-- handoff_boundary;
-- early_finish_fallback.
+Prefer meaningful medium-sized work over unrelated microtasks. If the objective finishes early and useful work remains, execute the declared fallback or form a related continuation objective. Do not pad with filler solely to manufacture duration.
 
-Selection rule:
-- maximize materially useful progress that can be safely checkpointed within the turn;
-- reject trivially small objectives when a coherent larger objective is available;
-- tightly related subtasks may be bundled, unrelated filler may not;
-- completion of an intermediate substep does not authorize turn termination or a new unrelated plan.
+## Utilization evidence and P0 acceptance
 
-Execution rule:
-- follow the committed plan until acceptance, successor request, genuine blocker, or evidence that the plan is invalid;
-- if the objective completes materially before the 14-minute target, immediately execute the predeclared fallback or form one new related continuation objective;
-- after ~12 minutes, admit only work with a fast safe checkpoint boundary;
-- successor handoff preempts finishing the entire objective: close the smallest safe unit, persist exact remaining work, and transfer.
+P0 is sustained evidenced useful-work coverage. The current acceptance target is:
 
+- intended evaluation window: 900 seconds;
+- evidenced useful-work target: at least 840 seconds;
+- no unexplained internal durable-progress gap greater than 120 seconds;
+- at least 3 valid completed windows with rolling mean at least 840 seconds.
+
+The active rolling scheduler may use a shorter provisional rescue planning horizon. That horizon is operational safety, not permission to redefine the 840/900 acceptance gate.
+
+Substantive evidence follows `control/evidence-policy.v1.json`. Heartbeat-only, timestamp-only, waiting, scheduler mutation alone, CI polling without a new result, reformatting, and duplicate checkpoint prose do not independently prove useful work. Missing timestamps or unexplained intervals must remain unknown rather than inferred.
+
+Each valid completed sample follows:
+
+```text
+MEASURE -> CLASSIFY -> CORRECT ONE DOMINANT CAUSE -> RETEST
+```
+
+Do not repeat a failed intervention without new evidence.
+
+## Runtime-safe continuity
+
+Keep work checkpointable. As runtime exposure grows, prefer smaller safe units rather than voluntarily idling. A cold-rescue wake is a safety mechanism, not authority for a healthy owner to terminate. If the future wake becomes too near while useful authorized work remains and active lifecycle policy permits, refresh it before collision.
 
 ## Program goals and autonomous R&D authority
 
-The operator has established two durable goals for RRuleR.
+The program goal is to evolve RRuleR into a production-oriented autonomous agent runtime/control plane competitive with commercial agent SaaS for long-running work, including utilization, durable continuation, disposable-session recovery, delegation, tool reach, observability, completion verification, security/governance, and reproducibility.
 
-### Program goal — commercial-agent-SaaS competitiveness
+Within `amzsdq/RRuleR`, workers may autonomously inspect, create, edit, refactor, and remove reversible relevant repository artifacts; build tests, schemas, policies, experiments, docs, workflows, checkpoints, and measurement infrastructure; research prior art when needed; replace falsified interventions; and select the next bounded objective by expected effect on program goals.
 
-Evolve RRuleR into a production-oriented autonomous agent runtime/control plane that can credibly compete with commercial agent SaaS on the dimensions that matter for long-running autonomous work:
+This authority does not waive platform/security constraints, public-repository secret rules, irreversible-side-effect reconciliation, or approval requirements for consequential actions outside RRuleR.
 
-- sustained useful-work utilization;
-- durable continuation and background operation;
-- recovery from disposable-session failure;
-- delegation / multi-agent orchestration;
-- tool and environment reach;
-- observability, auditability, and operator control;
-- predictable completion verification;
-- security / governance appropriate to a public-safe control plane;
-- low-friction setup and reproducibility.
+## Public-safe persistence
 
-Competitive parity is evidence-based. Marketing claims or architecture presence alone do not count.
+RRuleR is public-safe durable state. Never persist credentials, cookies, private files, private message content, private-repository material, or personal data.
 
-### P0 goal — sustained utilization
+## Pre-final authorization gate
 
-Until the utilization acceptance gate passes, sustained useful work is P0.
-
-Acceptance target:
-- intended turn window: 900 seconds;
-- evidenced useful-work target: >=840 seconds;
-- no unexplained internal durable-progress gap >120 seconds;
-- fast successor-triggered baton handoff;
-- minimum 3 valid completed turns with rolling mean >=840 seconds;
-- after initial PASS, utilization becomes a regression SLO and must remain protected while other capabilities advance.
-
-### Autonomous R&D authority inside RRuleR
-
-Within `amzsdq/RRuleR`, workers may autonomously:
-- inspect, create, edit, refactor, and remove repo files when reversible and relevant;
-- create/update tests, schemas, policies, experiments, docs, workflows, checkpoints, and measurement infrastructure;
-- perform web research and compare external prior art when the current intervention fails or architecture is uncertain;
-- replace a failed intervention with a materially different hypothesis without waiting for operator approval;
-- select the next bounded objective by highest expected effect on the program goals;
-- use negative results as durable evidence and revise architecture rather than protecting prior ideas.
-
-This authority does not waive platform/security constraints, public-repository secret rules, or approval requirements for consequential actions outside RRuleR.
-
-### Failure-driven improvement loop
-
-A failed turn or failed intervention MUST trigger:
-
-```text
-MEASURE FAILURE
- -> LOCALIZE ROOT CAUSE
- -> CHECK WHETHER CURRENT HYPOTHESIS WAS FALSIFIED
- -> SEARCH INTERNAL EVIDENCE
- -> IF NEEDED SEARCH EXTERNAL PRIOR ART / COMPETITOR PRACTICE
- -> GENERATE >=2 PLAUSIBLE CORRECTIONS WHEN UNCERTAIN
- -> SELECT HIGHEST EXPECTED-EFFECT CORRECTION
- -> IMPLEMENT
- -> VALIDATE
- -> RETEST UNDER LIVE RELAY
-```
-
-Repeating the same failed intervention without new evidence is forbidden.
+Immediately before any normal user-visible final response, freshly read `state/CURRENT.json`, `state/HANDOFF.json`, and `control/run-continuation-gate.v1.json`. If the program is non-terminal and no allowlisted run-end condition exists, final response and voluntary run end are forbidden; select and execute the next useful admissible unit instead.
