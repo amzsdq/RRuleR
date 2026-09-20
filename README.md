@@ -28,10 +28,11 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 ├─ state/
 │  ├─ CURRENT.json
 │  ├─ HANDOFF.json
+│  ├─ RELAY_VALIDATION.json   # machine acceptance ledger for the live relay
 │  ├─ EVENTS.jsonl
 │  ├─ RUNS.jsonl
 │  └─ README.md
-├─ schemas/                    # relay/current-state observation schemas
+├─ schemas/                    # relay/current-state observation/validation schemas
 ├─ docs/
 │  ├─ ARCHITECTURE.md
 │  ├─ DESIGN_DECISIONS.md
@@ -60,8 +61,9 @@ A fresh session reads:
 2. `control/POLICY.md`
 3. on relay runs, `control/relay-policy.v1.json`
 4. `state/CURRENT.json`
-5. the referenced checkpoint/task/spec
-6. `docs/RELAY_RRULE_SELF_UPDATE.md` when operating the relay
+5. `state/HANDOFF.json` and `state/RELAY_VALIDATION.json` when continuing/validating a relay
+6. the referenced checkpoint/task/spec
+7. `docs/RELAY_RRULE_SELF_UPDATE.md` when operating the relay
 
 Then it reconstructs state, validates authority, establishes the next wake, and immediately performs substantive work.
 
