@@ -11,26 +11,25 @@
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-003",
+    "id": "CP-UTILIZATION-004",
     "state": "CONTINUE",
     "completed": [
-      "Bootstrap root completed previously",
-      "Root completion separated from program completion",
-      "No-voluntary-idle rule extended across root boundaries",
-      "Durable activity heartbeat introduced",
-      "Continuation corrected to hourly RRULE phase rotation",
-      "Machine-readable liveness policy added",
-      "Control-plane validator requires liveness policy and authority coherence",
       "Hard no-self-termination invariant persisted and validated",
-      "21:10 successor secured same-canonical next wake at 21:25 and claimed authority epoch 8"
+      "21:10 successor secured same-canonical next wake at 21:25 and claimed authority epoch 8",
+      "Validator now rejects any recorded run end lacking an allowed end reason",
+      "Validator requires successor evidence for handoff endings and matching terminal program status for COMPLETE/BLOCKED endings",
+      "A transient validator workflow regression was detected, diagnosed as checkout/setup failure, and replaced with dependency-free GitHub-contents validation",
+      "Replacement validator commit b8fe1176 passed GitHub Actions run 126",
+      "Utilization handoff measurement is now a blocking acceptance item for the active utilization root"
     ],
     "evidence": [
-      "state/ACTIVITY.json now identifies RUN-20260920-2110 at authority_epoch 8",
-      "GitHub Actions runs 120 and 121 completed successfully for prior hardening",
-      "same canonical automation remains enabled with next wake 2026-09-20T21:25:00+09:00"
+      "commit 9fae757 added unauthorized early-end rejection",
+      "workflow run 124 failed before validation steps, exposing a validator transport/setup regression",
+      "commit b8fe117 restored dependency-free validation and workflow run 126 succeeded",
+      "state/RELAY_VALIDATION.json now makes utilization_handoff_measurement blocking"
     ],
-    "observation": "The prior durable owner remained stale after its turn ended. This successor has fenced it by advancing authority and will now make early voluntary termination measurable rather than relying on prose policy alone.",
-    "next_action": "Extend run-observation schema and validator so a nonterminal run that records an end must carry an allowed end reason; classify voluntary early termination as invalid."
+    "observation": "Policy-only prohibition has been converted into a durable measurable invariant. Historical RUNS entries still lack exact end boundaries, so the next successor cycle must capture end reason/timing rather than infer it.",
+    "next_action": "Keep RUN-20260920-2110 active. At actual successor observation, persist this run's end boundary with COMMITTED_SUCCESSOR_HANDOFF; otherwise continue useful utilization work until platform termination. Next successor must measure the resulting gap/overlap and update RUNS.jsonl."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_PHASE_ROTATION_15M",
@@ -45,9 +44,5 @@
     "root_completion_is_stop_condition": false,
     "program_terminal_disabled_required": true
   },
-  "safety": {
-    "public_repo": true,
-    "secrets_allowed": false,
-    "reference_repo_amzsdq_R": "READ_ONLY"
-  }
+  "safety": {"public_repo":true,"secrets_allowed":false,"reference_repo_amzsdq_R":"READ_ONLY"}
 }
