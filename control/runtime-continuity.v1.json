@@ -1,0 +1,16 @@
+{
+  "policy_id":"RRULER_RUNTIME_CONTINUITY",
+  "version":1,
+  "status":"ACTIVE",
+  "principle":"DURABLE_WORKFLOW_DISPOSABLE_REASONING_WORKER",
+  "components":{
+    "wake_source":{"responsibility":"Start a fresh reasoning invocation at the next supported opportunity.","current_adapter":"RRULE_HOURLY_QUARTER_SELF_SHIFT","must_not_be_treated_as":"proof that predecessor stayed alive"},
+    "reasoning_worker":{"responsibility":"Perform useful checkpointable work while invocation exists.","mortality":"EXPECTED","must_not_be_treated_as":"durable process"},
+    "durable_continuation":{"responsibility":"Persist exact resumable state and side-effect evidence after meaningful units.","current_adapter":"GITHUB_DURABLE_STATE"},
+    "supervisor_measurement":{"responsibility":"Detect stale workers, recover ownership, and measure useful coverage/dead gaps without inference.","current_adapter":"SUCCESSOR_OBSERVATION_PLUS_DURABLE_STATE"}
+  },
+  "required_metrics":["invocation_useful_span_seconds","continuation_gap_seconds","window_useful_coverage_seconds","scheduler_delivery_delay_seconds","handoff_overhead_seconds"],
+  "early_runtime_end":{"classification":"RUNTIME_INVOCATION_ENDED_EARLY","conditions":["plan was ACTIVE and valid","useful admissible work remained or fallback continuation was required","no terminal or committed handoff evidence exists","later successor observes predecessor stale"],"response":["do not infer useful work across the gap","recover at next available wake","preserve exact checkpoint","compare invocation span across experiments","if repeated, target wake/runtime adapter rather than adding policy prose"]},
+  "progress_evidence":{"timestamp_only_heartbeat_counts_as_useful_work":false,"meaningful_unit_or_material_advancement_required":true,"maximum_unexplained_gap_seconds_for_acceptance":120},
+  "design_reference":"docs/RUNTIME_CONTINUITY_ARCHITECTURE.md"
+}
