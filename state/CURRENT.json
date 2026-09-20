@@ -21,15 +21,18 @@
       "Continuation corrected to hourly RRULE phase rotation",
       "Current successor claimed authority after securing next continuation",
       "Machine-readable liveness policy added",
-      "Bootstrap relay validation scoped as historical root evidence rather than program terminal state"
+      "Bootstrap relay validation scoped as historical root evidence rather than program terminal state",
+      "Control-plane validator now requires control/liveness-policy.v1.json and validates liveness freshness semantics",
+      "Validator now enforces ACTIVITY authority_epoch == CURRENT authority_epoch and WORKING active_run_id == CURRENT current_owner"
     ],
     "evidence": [
       "state/ACTIVITY.json is WORKING for the current run",
       "control/liveness-policy.v1.json defines freshness and utilization-gap semantics",
-      "state/RELAY_VALIDATION.json now distinguishes ROOT_PASS from program CONTINUE"
+      "state/RELAY_VALIDATION.json now distinguishes ROOT_PASS from program CONTINUE",
+      "commit aae023fc6ebf95ec23e348ad5f21b96910ae7ab6 extends deterministic liveness/authority validation"
     ],
-    "observation": "Continuous-utilization policy is authoritative and stale terminal wording has been reconciled. Remaining useful work is deterministic validation of liveness-policy presence, epoch coherence, and program/root status separation.",
-    "next_action": "Extend the control-plane validator to require liveness-policy and authority-epoch coherence, then inspect workflow results and continue with any discovered invariant gaps."
+    "observation": "First utilization-hardening unit implemented. GitHub Actions run 35509429661 started for the validator change; continue useful work rather than yielding at this checkpoint.",
+    "next_action": "Inspect workflow run 35509429661 to completion; if green, identify and implement the next invariant gap that can reduce voluntary idle or stale-owner ambiguity."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_PHASE_ROTATION_15M",
