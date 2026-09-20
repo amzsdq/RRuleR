@@ -40,6 +40,7 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 │  ├─ HANDOFF_PROTOCOL.md
 │  ├─ OPERATIONS.md
 │  ├─ RELAY_RRULE_SELF_UPDATE.md
+│  ├─ SECURITY.md
 │  ├─ STATE_MODEL.md
 │  └─ UTILIZATION.md
 ├─ experiments/
