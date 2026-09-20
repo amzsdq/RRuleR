@@ -1,51 +1,41 @@
 {
   "schema_version": "1.0",
   "repository": "amzsdq/RRuleR",
-  "root_job_id": "RRULER-BOOTSTRAP-001",
-  "root_goal": "Bootstrap RRuleR as a public-safe durable control plane and document/reproduce the RRULE self-update relay.",
-  "status": "COMPLETE",
+  "program_id": "RRULER-PROGRAM-001",
+  "program_status": "CONTINUE",
+  "root_job_id": "RRULER-UTILIZATION-002",
+  "root_goal": "Enforce continuous useful-work utilization across root boundaries and make liveness observable without depending on chat UI alone.",
+  "status": "CONTINUE",
   "current_owner": null,
-  "authority_epoch": 4,
+  "authority_epoch": 5,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "TERMINAL",
+  "run_state": "ARMED",
   "checkpoint": {
-    "id": "CP-BOOTSTRAP-008",
-    "state": "COMPLETE",
+    "id": "CP-UTILIZATION-001",
+    "state": "CONTINUE",
     "completed": [
-      "Bootstrap/control/architecture/operations/RRULE relay documentation established",
-      "Continuous-work no-voluntary-idle rule made authoritative",
-      "Machine relay policy and durable CURRENT/HANDOFF/EVENT/RUN models established",
-      "Fresh-session reproduction checklist established",
-      "Scheduled cold continuation from GitHub durable state directly observed",
-      "Multiple same-canonical recurring phase transitions evidenced",
-      "Scheduler-independent durable execution model and checkpoint/lease/effect schemas established",
-      "Machine-readable RELAY_VALIDATION acceptance ledger and schema established",
-      "CI validator integrated and repeatedly successful",
-      "Experiment/reproduction docs prohibit inferred timing/concurrency evidence",
-      "Every blocking relay reproduction criterion promoted to PASS or PASS_WITH_SCOPE",
-      "Terminal bootstrap decision persisted before automation disable"
+      "RRULER-BOOTSTRAP-001 completed with durable acceptance evidence",
+      "Root-complete versus program-complete distinction adopted",
+      "No-voluntary-idle rule extended across root boundaries",
+      "Durable activity heartbeat contract introduced"
     ],
     "evidence": [
-      "automation_id:6aaf8a993eb08191b8d0ab1d9662e4b2",
-      "relay_validation_status:PASS",
-      "relay_validation_terminal_commit:d21484fe7b6bfb961c65ebf97cc8db103a3ed97d",
-      "experiment_terminal_commit:61211eed11459b30692ca02af5d4f9d5ca45a88d",
-      "preterminal_validator_success_run:35506916073"
+      "prior_root:RRULER-BOOTSTRAP-001",
+      "prior_root_terminal_commit:d21484fe7b6bfb961c65ebf97cc8db103a3ed97d",
+      "operator_directive:continuous utilization is a first-class requirement"
     ],
-    "observation": "RRuleR bootstrap and RRULE self-update relay reproduction are implementation-ready. All blocking acceptance criteria are satisfied. Exact overlap/serialization and handoff utilization remain explicitly non-blocking future performance characterization and are not inferred.",
-    "next_action": "None for bootstrap. Canonical bootstrap automation must remain disabled. Future work starts as a new durable root job using the established control-plane contracts."
+    "observation": "The prior bootstrap root was validly complete, but treating root completion as relay termination created an avoidable utilization gap. Program continuity now supersedes that stop behavior.",
+    "next_action": "Wake the same canonical immediately, mark ACTIVITY WORKING, verify the recurring continuation, then harden and validate continuous-utilization/root-chaining semantics. Continue into the next useful bounded unit rather than stopping at this root boundary."
   },
   "continuation": {
-    "mechanism": "RRULE_PHASE_ROTATION",
+    "mechanism": "RRULE_ROLLING_15M",
     "cadence_minutes_effective": 15,
-    "recurring_base": "FREQ=HOURLY",
     "next_wake_first": true,
-    "next_due_at": null,
-    "current_phase_minute": null,
+    "next_due_at": "2026-09-20T20:33:00+09:00",
     "handoff_trigger": "SUCCESSOR_ACTUALLY_OBSERVED",
     "voluntary_idle_before_successor_forbidden": true,
-    "terminal_disabled_required": true,
-    "fallback_semantics": "If a non-terminal phase update fails and the previous hourly RRULE remains verified intact, classify DEGRADED_CONTINUATION and use the surviving hourly recurrence as a recovery opportunity."
+    "root_completion_is_stop_condition": false,
+    "program_terminal_disabled_required": true
   },
   "safety": {
     "public_repo": true,
