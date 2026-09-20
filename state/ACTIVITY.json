@@ -7,9 +7,9 @@
   "active_run_id": "RUN-UTIL-20260920-231559",
   "authority_epoch": 12,
   "substantive_work_started_at": "2026-09-20T23:16:15+09:00",
-  "last_progress_at": "2026-09-20T23:29:00+09:00",
-  "last_progress_kind": "HANDOFF_READY_CHECKPOINT",
-  "current_unit": "HANDOFF_READY: continue only tiny safe checks until actual successor request; successor must rearm canonical to :45 before requesting baton.",
+  "last_progress_at": "2026-09-20T23:30:15+09:00",
+  "last_progress_kind": "TARGET_SPAN_REACHED_AWAITING_ACTUAL_SUCCESSOR",
+  "current_unit": "HANDOFF_READY: 840-second observed span boundary is now durably covered; continue tiny safe work until positive successor evidence, then drain and finalize without inferring end time.",
   "next_wake_due_at": "2026-09-20T23:30:00+09:00",
   "successor_observed": false,
   "handoff_ready": true
