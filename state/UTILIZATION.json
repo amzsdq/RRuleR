@@ -25,6 +25,9 @@
     "no_voluntary_idle_during_handoff_margin": true,
     "expected_schedule_is_not_actual_boundary": true,
     "record_successor_delivery_offset_seconds_when_observable": true,
+    "plan_outcome_required": true,
+    "plan_outcome_states": ["ACTIVE","HANDOFF_FINALIZED","PREMATURE_RETURN","BLOCKED_EXTERNAL","PROGRAM_COMPLETE"],
+    "template_plan_while_working_invalid": true,
     "platform_boundary_note": "Official Scheduled Tasks documentation describes paid recurring schedules up to once per hour. The quarter-hour fast path is experimental same-task hourly-BYMINUTE mutation, so actual successor observation rather than nominal due time controls measurement validity."
   },
   "latest_completed_turn": null,
@@ -32,14 +35,14 @@
   "rolling_mean_observed_useful_span_seconds": null,
   "goal_reached": false,
   "latest_diagnosis": {
-    "cause_class": "EARLY_VOLUNTARY_END",
-    "evidence": "Epoch 14 started substantive work at 23:59:54 but its last durable meaningful progress remained 00:03:23 when the successor was observed at 00:13:49. The >10-minute unexplained gap invalidates continuous-work acceptance and indicates the predecessor turn effectively collapsed long before baton time.",
-    "secondary_risk": "Fast stale-predecessor takeover prevents extra recovery delay but cannot create missing work evidence; the predecessor itself must remain active and checkpoint frequently."
+    "cause_class": "PLAN_ENFORCEMENT_GAP",
+    "evidence": "Epoch 15 claimed WORKING authority from 00:15:05 through the next successor wake, but TURN_PLAN remained TEMPLATE_PENDING_NEXT_AUTHORITY with objective NEXT-WAKE-MUST-ASSIGN. The plan-first intervention was therefore adopted in policy but never instantiated by the active owner, and ACTIVITY also had no progress after 00:15:05.",
+    "secondary_risk": "Policy prose cannot guarantee utilization. Runtime-valid state must make an unplanned WORKING owner invalid and preserve explicit plan progress/outcome evidence."
   },
   "next_corrective_experiment": {
-    "experiment_id": "UTIL-EXP-004",
-    "hypothesis": "If each worker treats meaningful <=120-second durable progress refreshes as part of its normal bounded work packet and keeps selecting useful units until successor request, the early-collapse failure will disappear and a valid >=840-second turn can be measured.",
-    "change": "During epoch 15, perform useful checkpointable units continuously and persist meaningful progress at <=120-second gaps; after 12 minutes admit only quickly checkpointable units; on successor request finalize measurement and handoff before optional validation/documentation.",
-    "success_signal": "One valid completed turn with >=840s observed useful span, continuous <=120s progress evidence, and immediate successor-triggered handoff; then repeat until 3 valid turns achieve rolling mean >=840s."
+    "experiment_id": "UTIL-EXP-005",
+    "hypothesis": "If WORKING authority is machine-invalid unless TURN_PLAN is a real ACTIVE plan for the same owner/epoch, and plan progress/outcome is validated durably, the system will prevent silent policy-only plan adoption and expose premature return immediately.",
+    "change": "Strengthen control-plane validation around TURN_PLAN owner/epoch/status/objective, add explicit progress/outcome evidence, and classify premature return rather than leaving a template or stale WORKING state.",
+    "success_signal": "Validator passes only with a real active plan for the owner; next live worker executes that plan with <=120s meaningful progress gaps and finalizes handoff/measurement explicitly."
   }
 }
