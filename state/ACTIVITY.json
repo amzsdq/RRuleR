@@ -6,9 +6,10 @@
   "status": "WORKING",
   "active_run_id": "RUN-20260920-2040",
   "authority_epoch": 7,
-  "last_progress_at": "2026-09-20T20:46:00+09:00",
-  "last_progress_kind": "LIVENESS_POLICY_HARDENED",
-  "current_unit": "Extend deterministic validation for liveness and epoch coherence",
+  "last_progress_at": "2026-09-20T20:49:00+09:00",
+  "last_progress_kind": "ACTIVITY_SCHEMA_FENCED",
+  "current_unit": "Extend deterministic validator for liveness and authority epoch coherence",
   "next_wake_due_at": "2026-09-20T20:55:00+09:00",
-  "successor_observed": false
+  "successor_observed": false,
+  "operator_ui_note": "UI is advisory; fresh fenced durable activity is authoritative corroboration."
 }
