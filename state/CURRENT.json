@@ -28,7 +28,7 @@
       "scheduler_error:minute-and-second-based recurring schedules are not supported"
     ],
     "observation": "The prior bootstrap root was validly complete, but treating root completion as relay termination created an avoidable utilization gap. Program continuity now supersedes that stop behavior. Effective 15-minute recurrence must use hourly RRULE phase rotation, not FREQ=MINUTELY.",
-    "next_action": "Wake the same canonical immediately, mark ACTIVITY WORKING, shift its hourly RRULE phase +15 minutes before substantive work, then harden and validate continuous-utilization/root-chaining semantics. Continue into the next useful bounded unit rather than stopping at this root boundary."
+    "next_action": "At the 20:40 same-canonical wake, claim authority, mark ACTIVITY WORKING, shift the hourly RRULE to +15 minute phase before substantive work, then continue utilization-hardening and root-chaining validation without voluntary idle."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_PHASE_ROTATION_15M",
@@ -36,8 +36,8 @@
     "rrule_frequency": "HOURLY",
     "phase_step_minutes": 15,
     "next_wake_first": true,
-    "next_due_at": "2026-09-20T20:36:00+09:00",
-    "current_phase_minute": 36,
+    "next_due_at": "2026-09-20T20:40:00+09:00",
+    "current_phase_minute": 40,
     "handoff_trigger": "SUCCESSOR_ACTUALLY_OBSERVED",
     "voluntary_idle_before_successor_forbidden": true,
     "root_completion_is_stop_condition": false,
