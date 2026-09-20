@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "root_job_id": "RRULER-BOOTSTRAP-001",
+  "handoff_state": "PREDECESSOR_ACTIVE",
+  "predecessor_run_id": "RUNOBS-20260920-193228",
+  "successor_run_id": null,
+  "successor_expected_at": "2026-09-20T19:45:00+09:00",
+  "successor_observed_at": null,
+  "active_unit": "Bootstrap control-plane hardening and relay reproducibility validation",
+  "checkpoint_id": "CP-BOOTSTRAP-003",
+  "next_action": "Predecessor continues useful bounded work. At/after expected time, do not hand off until positive successor evidence is observed. Once observed, enter HANDOFF_DRAIN and persist final predecessor checkpoint."
+}
