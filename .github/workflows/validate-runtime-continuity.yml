@@ -3,21 +3,10 @@ name: Validate runtime continuity
 on:
   push:
     branches: ["main"]
-    paths:
-      - "control/runtime-continuity.v1.json"
-      - "control/event-wake-candidate.v1.json"
-      - "state/UTILIZATION.json"
-      - "state/WAKE_ADAPTERS.json"
-      - "state/EVENT_WAKE_LEDGER.json"
-      - "state/UTILIZATION_EXPERIMENTS.json"
-      - "state/CURRENT.json"
-      - "tests/test_event_wake_model.py"
-      - ".github/workflows/validate-runtime-continuity.yml"
+    paths: ["control/runtime-continuity.v1.json","control/event-wake-candidate.v1.json","state/UTILIZATION.json","state/WAKE_ADAPTERS.json","state/EVENT_WAKE_LEDGER.json","state/UTILIZATION_EXPERIMENTS.json","state/CURRENT.json","tests/test_event_wake_model.py",".github/workflows/validate-runtime-continuity.yml"]
   workflow_dispatch:
-
 permissions:
   contents: read
-
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -29,30 +18,25 @@ jobs:
           import json
           from pathlib import Path
           def load(p): return json.loads(Path(p).read_text())
-          rc=load('control/runtime-continuity.v1.json'); ew=load('control/event-wake-candidate.v1.json')
-          util=load('state/UTILIZATION.json'); wa=load('state/WAKE_ADAPTERS.json')
-          ledger=load('state/EVENT_WAKE_LEDGER.json'); exps=load('state/UTILIZATION_EXPERIMENTS.json'); current=load('state/CURRENT.json')
+          rc=load('control/runtime-continuity.v1.json'); ew=load('control/event-wake-candidate.v1.json'); util=load('state/UTILIZATION.json'); wa=load('state/WAKE_ADAPTERS.json'); ledger=load('state/EVENT_WAKE_LEDGER.json'); exps=load('state/UTILIZATION_EXPERIMENTS.json'); current=load('state/CURRENT.json')
           assert rc['status']=='ACTIVE' and rc['principle']=='DURABLE_WORKFLOW_DISPOSABLE_REASONING_WORKER'
           required={'invocation_useful_span_seconds','continuation_gap_seconds','window_useful_coverage_seconds','scheduler_delivery_delay_seconds','handoff_overhead_seconds'}
           assert required.issubset(set(rc['required_metrics']))
-          assert rc['progress_evidence']['timestamp_only_heartbeat_counts_as_useful_work'] is False
-          assert rc['progress_evidence']['maximum_unexplained_gap_seconds_for_acceptance']==120
+          assert rc['progress_evidence']['timestamp_only_heartbeat_counts_as_useful_work'] is False and rc['progress_evidence']['maximum_unexplained_gap_seconds_for_acceptance']==120
           assert current['continuation']['runtime_continuity_policy']=='control/runtime-continuity.v1.json'
           assert 'window_useful_coverage_definition' in util['measurement'] and util['measurement']['continuous_progress_evidence_required'] is True
           latest=util.get('latest_completed_turn')
-          if latest and latest.get('classification')=='RUNTIME_INVOCATION_ENDED_EARLY':
-              assert latest['valid_for_840s_acceptance'] is False and latest['continuation_gap_seconds'] >= 0
-          ids={x['id']:x for x in wa['adapters']}
-          assert wa['active_adapter']=='SCHEDULED_QUARTER_SHIFT' and ids['WORK_GITHUB_EVENT_TRIGGER']['status'].startswith('CANDIDATE')
-          assert ew['status']=='CANDIDATE_NOT_ACTIVE' and ew['dedupe']['ledger_path']=='state/EVENT_WAKE_LEDGER.json'
-          assert ew['dedupe']['one_outstanding_continuation_token'] is True
-          chain=ew['controlled_chain']
-          assert chain['enabled_in_candidate_test'] is True and chain['max_unacknowledged_generation_ahead']==1
+          if latest and latest.get('classification')=='RUNTIME_INVOCATION_ENDED_EARLY': assert latest['valid_for_840s_acceptance'] is False and latest['continuation_gap_seconds'] >= 0
+          ids={x['id']:x for x in wa['adapters']}; event_adapter=ids['WORK_GITHUB_EVENT_TRIGGER']
+          assert wa['active_adapter']=='SCHEDULED_QUARTER_SHIFT'
+          assert event_adapter['status'] in {'CANDIDATE_REQUIRES_OPERATOR_LEVEL_PROVISIONING_TEST','LAB_PR_READY_TRIGGER_NOT_PROVISIONED'}
+          if event_adapter['status']=='LAB_PR_READY_TRIGGER_NOT_PROVISIONED':
+              assert event_adapter['lab']['pr_number']==1 and event_adapter['lab']['state']=='DRAFT_OPEN'
+          assert ew['status']=='CANDIDATE_NOT_ACTIVE' and ew['dedupe']['ledger_path']=='state/EVENT_WAKE_LEDGER.json' and ew['dedupe']['one_outstanding_continuation_token'] is True
+          chain=ew['controlled_chain']; assert chain['enabled_in_candidate_test'] is True and chain['max_unacknowledged_generation_ahead']==1
           assert chain['ack_event_must_not_itself_emit_next_event'] is True and chain['next_event_may_be_emitted_only_by_current_authority_owner'] is True
           assert ew['promotion_gate']['unbounded_event_storm_count_max']==0 and ledger['status']=='INACTIVE_CANDIDATE'
-          expmap={x['id']:x for x in exps['experiments']}
-          assert expmap['UTIL-EXP-005']['status']=='FALSIFIED_AS_SUFFICIENT'
-          assert expmap['UTIL-EXP-006']['status']=='ACTIVE' and expmap['UTIL-EXP-007']['status']=='CANDIDATE_REQUIRES_PROVISIONING'
+          expmap={x['id']:x for x in exps['experiments']}; assert expmap['UTIL-EXP-005']['status']=='FALSIFIED_AS_SUFFICIENT'; assert expmap['UTIL-EXP-006']['status']=='ACTIVE' and expmap['UTIL-EXP-007']['status']=='CANDIDATE_REQUIRES_PROVISIONING'
           print('runtime continuity validation passed')
       - name: Test event wake safety model
         run: python tests/test_event_wake_model.py
