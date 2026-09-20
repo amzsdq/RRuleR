@@ -36,7 +36,8 @@
     "theoretical_target_duty_cycle": 0.9090909091,
     "busywork_for_window_fill_forbidden": true,
     "after_each_work_unit": "SELECT_NEXT_SAFE_USEFUL_UNIT_UNTIL_NATURAL_CLOSE_OR_SAFETY_BOUNDARY",
-    "activity_progress_evidence_max_gap_seconds_when_practical": 120
+    "activity_progress_evidence_max_gap_seconds_when_practical": 120,
+    "nonterminal_voluntary_turn_end_forbidden": true
   },
   "program_continuity": {
     "enabled": true,
