@@ -1,9 +1,38 @@
 {
-  "policy_id":"RRULER_RUNTIME_MODE","version":2,"status":"ACTIVE","mode":"LONG_RUN_WITH_ROLLING_COMPLETION_RELATIVE_RESCUE","basis":"Live long-run evidence showed productive invocations can exceed nominal schedule boundaries, and a controlled same-canonical two-wake canary proved an hourly RRULE can self-shift DTSTART and wake again automatically. Production therefore uses rolling provisional rescue plus completion-relative fast reentry instead of fixed quarter rotation.",
-  "owner_behavior":["WORK_CONTINUOUSLY_WHILE_PROGRAM_NONTERMINAL_AND_RUNTIME_ALIVE","DO_NOT_TREAT_SCHEDULE_BOUNDARY_AS_HANDOFF","PROVISIONAL_ARM_SAME_CANONICAL_BEFORE_FULL_RESTORE_OR_SUBSTANTIVE_WORK","KEEP_CHECKPOINT_SAFE_UNITS_AS_PROVISIONAL_DUE_APPROACHES","EXTEND_PROVISIONAL_DUE_BEFORE_COLLISION_WHEN_USEFUL_WORK_REMAINS","PERSIST_FRESH_PROGRESS_AND_EXACT_CONTINUATION","ON_NORMAL_CLOSE_CHECKPOINT_THEN_FINAL_REARM_SAME_CANONICAL_TO_CLOSE_PLUS_OFFSET_AND_VERIFY","NEVER_DISABLE_CANONICAL_WHILE_PROGRAM_NONTERMINAL"],
-  "scheduler_role":"ACTIVE_FAST_CONTINUATION_PLUS_BOUNDED_COLD_RESCUE",
-  "same_canonical_overlap_assumption":"NOT_REQUIRED; NEWEST_VERIFIED_FUTURE_DSTART_WINS AND STALE OCCURRENCES MAY NOT ROLL STATE BACK",
-  "fallback_guarantee_target":"If the active invocation disappears after provisional arming, retain a bounded future wake at the configured work horizon plus safety margin and scheduler jitter. On normal close, target a fast next wake at close plus the configured final offset.",
-  "independent_fast_wake_upgrade":{"required_for_saas_grade_resilience":true,"preferred":"CHATGPT_WORK_GITHUB_EVENT_TRIGGER","producer":"GitHub PR event lane; optional guarded Actions stale-owner producer","activation_gate":"EVENT_WORKER_WRITE_SURFACE_PROBE_PASS","fallback_remains":"SAME_CANONICAL_ROLLING_RRULE"},
-  "measurement":{"live_run_useful_span":"May exceed the normal 600-second planning target; keep measuring continuous evidence rather than forcing artificial closure.","recovery_gap":"Measure from last meaningful predecessor progress to first meaningful replacement-worker progress.","normal_continuation_gap":"Measure actual final-rearm reference to next observed same-canonical wake; do not assume the configured offset equals delivery latency.","product_slo":"Optimize wall-clock useful-work coverage union, not number of nominal turns."}
+  "policy_id": "RRULER_RUNTIME_MODE",
+  "version": 2,
+  "status": "ACTIVE",
+  "mode": "LONG_RUN_WITH_ROLLING_COMPLETION_RELATIVE_RESCUE",
+  "basis": "Live long-run evidence showed productive invocations can exceed nominal schedule boundaries, and a controlled same-canonical two-wake canary proved an hourly RRULE can self-shift DTSTART and wake again automatically. Production therefore uses rolling provisional rescue plus completion-relative fast reentry instead of fixed quarter rotation.",
+  "owner_behavior": [
+    "WORK_CONTINUOUSLY_WHILE_PROGRAM_NONTERMINAL_AND_RUNTIME_ALIVE",
+    "DO_NOT_TREAT_SCHEDULE_BOUNDARY_AS_HANDOFF",
+    "PROVISIONAL_ARM_SAME_CANONICAL_BEFORE_FULL_RESTORE_OR_SUBSTANTIVE_WORK",
+    "KEEP_CHECKPOINT_SAFE_UNITS_AS_PROVISIONAL_DUE_APPROACHES",
+    "EXTEND_PROVISIONAL_DUE_BEFORE_COLLISION_WHEN_USEFUL_WORK_REMAINS",
+    "PERSIST_FRESH_PROGRESS_AND_EXACT_CONTINUATION",
+    "CHECKPOINT_AND_PLAN_SUCCESSOR_PACKET_BEFORE_NORMAL_RETURN",
+    "ON_NORMAL_CLOSE_CHECKPOINT_THEN_FINAL_REARM_SAME_CANONICAL_TO_CLOSE_PLUS_OFFSET_AND_VERIFY",
+    "NEVER_DISABLE_CANONICAL_WHILE_PROGRAM_NONTERMINAL"
+  ],
+  "scheduler_role": "ACTIVE_FAST_CONTINUATION_PLUS_BOUNDED_COLD_RESCUE",
+  "same_canonical_overlap_assumption": "NOT_REQUIRED; NEWEST_VERIFIED_FUTURE_DSTART_WINS AND STALE OCCURRENCES MAY NOT ROLL STATE BACK",
+  "fallback_guarantee_target": "If the active invocation disappears after provisional arming, retain a bounded future wake at the configured work horizon plus safety margin and scheduler jitter. On normal close, target a fast next wake at close plus the configured final offset.",
+  "independent_fast_wake_upgrade": {
+    "required_for_saas_grade_resilience": true,
+    "preferred": "CHATGPT_WORK_GITHUB_EVENT_TRIGGER",
+    "producer": "GitHub PR event lane; optional guarded Actions stale-owner producer",
+    "activation_gate": "EVENT_WORKER_WRITE_SURFACE_PROBE_PASS",
+    "fallback_remains": "SAME_CANONICAL_ROLLING_RRULE"
+  },
+  "measurement": {
+    "live_run_useful_span": "May exceed the normal 600-second planning target; keep measuring continuous evidence rather than forcing artificial closure.",
+    "recovery_gap": "Measure from last meaningful predecessor progress to first meaningful replacement-worker progress.",
+    "normal_continuation_gap": "Measure actual final-rearm reference to next observed same-canonical wake; do not assume the configured offset equals delivery latency.",
+    "product_slo": "Optimize wall-clock useful-work coverage union, not number of nominal turns."
+  },
+  "successor_baton": {
+    "policy": "control/successor-baton.v1.json",
+    "packet_path": "state/NEXT_PACKET.json"
+  }
 }

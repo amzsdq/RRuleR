@@ -17,7 +17,7 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Validate durable state from GitHub contents
+      - name: Validate durable control contracts
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -26,93 +26,161 @@ jobs:
         run: |
           set -euo pipefail
           fetch() { curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/$1?ref=$SHA" -o "$2"; }
+
           fetch state/CURRENT.json /tmp/current.json
-          fetch state/HANDOFF.json /tmp/handoff.json
           fetch state/ACTIVITY.json /tmp/activity.json
-          fetch state/RUNS.jsonl /tmp/runs.jsonl
-          fetch state/UTILIZATION.json /tmp/utilization.json
+          fetch state/HANDOFF.json /tmp/handoff.json
           fetch state/TURN_PLAN.json /tmp/turn-plan.json
-          fetch state/PROGRAM_GOALS.json /tmp/program-goals.json
-          fetch control/relay-policy.v1.json /tmp/policy.json
-          fetch control/liveness-policy.v1.json /tmp/live.json
+          fetch state/UTILIZATION.json /tmp/utilization.json
+          fetch state/PROGRAM_GOALS.json /tmp/goals.json
+          fetch state/NEXT_PACKET.json /tmp/next-packet.json
+          fetch state/SAAS_PARITY.json /tmp/saas-parity.json
+          fetch state/RUNS.jsonl /tmp/runs.jsonl
+
+          fetch control/ACTIVE_CONTROLS.json /tmp/active-controls.json
+          fetch control/relay-policy.v1.json /tmp/relay.json
+          fetch control/scheduler-fence.v1.json /tmp/fence.json
+          fetch control/rolling-rrule-lifecycle.v1.json /tmp/rolling.json
+          fetch control/successor-baton.v1.json /tmp/baton.json
+          fetch control/runtime-continuity.v1.json /tmp/runtime-continuity.json
+          fetch control/runtime-mode.v1.json /tmp/runtime-mode.json
           fetch control/handoff-recovery.v1.json /tmp/recovery.json
-          fetch control/scheduler-fence.v1.json /tmp/scheduler-fence.json
-          fetch control/run-continuation-gate.v1.json /tmp/run-continuation-gate.json
+          fetch control/run-continuation-gate.v1.json /tmp/continuation-gate.json
+          fetch control/saas-parity-gates.v1.json /tmp/saas-gates.json
+
           python - <<'PY'
           import json
-          current=json.load(open('/tmp/current.json')); policy=json.load(open('/tmp/policy.json')); live=json.load(open('/tmp/live.json')); activity=json.load(open('/tmp/activity.json')); handoff=json.load(open('/tmp/handoff.json')); recovery=json.load(open('/tmp/recovery.json')); fence=json.load(open('/tmp/scheduler-fence.json')); util=json.load(open('/tmp/utilization.json')); turnplan=json.load(open('/tmp/turn-plan.json')); goals=json.load(open('/tmp/program-goals.json')); contgate=json.load(open('/tmp/run-continuation-gate.json'))
-          if current['program_status'] not in {'CONTINUE','PROGRAM_COMPLETE','BLOCKED_EXTERNAL','DEGRADED_CONTINUATION'}: raise SystemExit('invalid program_status')
-          goalmap={g.get('goal_id'):g for g in goals.get('goals',[])}
-          if 'GOAL-COMPETE-SAAS' not in goalmap: raise SystemExit('commercial SaaS program goal missing')
-          p0=goalmap.get('GOAL-UTILIZATION-P0')
-          if not p0 or p0.get('priority')!='P0' or p0.get('acceptance',{}).get('rolling_mean_useful_seconds_gte')!=840: raise SystemExit('P0 utilization goal missing or invalid')
-          ar=goals.get('autonomy',{})
-          if ar.get('authorized_scope')!='amzsdq/RRuleR' or ar.get('mode')!='SELF_DIRECTED_R_AND_D': raise SystemExit('autonomous R&D scope invalid')
-          if activity.get('authority_epoch') != current.get('authority_epoch'): raise SystemExit('activity authority_epoch mismatch')
-          if activity.get('status')=='WORKING' and activity.get('active_run_id') != current.get('current_owner'): raise SystemExit('WORKING owner mismatch')
-          if policy.get('utilization',{}).get('nonterminal_voluntary_turn_end_forbidden') is not True: raise SystemExit('no-self-termination invariant missing')
-          if contgate.get('status')!='ACTIVE' or contgate.get('final_response_is_authoritative_side_effect') is not True: raise SystemExit('final-response termination gate inactive')
-          pfa=contgate.get('pre_final_authorization',{})
-          if pfa.get('required') is not True or pfa.get('check_immediately_before_user_visible_final') is not True or pfa.get('if_denied')!='DO_NOT_EMIT_FINAL_CONTINUE_USEFUL_WORK': raise SystemExit('pre-final authorization contract missing')
-          if contgate.get('enforcement',{}).get('future_wake_exists_does_not_authorize_current_owner_to_end') is not True: raise SystemExit('cold-rescue wake incorrectly authorizes owner end')
-          if current.get('continuation',{}).get('run_continuation_gate_policy')!='control/run-continuation-gate.v1.json': raise SystemExit('CURRENT does not bind continuation gate')
-          expected={'PROGRAM_COMPLETE','BLOCKED_EXTERNAL','COMMITTED_SUCCESSOR_HANDOFF','EXPLICIT_OPERATOR_STOP','PLATFORM_ENFORCED_TERMINATION'}
-          if set(policy.get('terminal',{}).get('voluntary_turn_end_allowed_only_for',[])) != expected: raise SystemExit('turn-end allowlist mismatch')
-          if live.get('status')!='ACTIVE' or recovery.get('status')!='ACTIVE' or fence.get('status')!='ACTIVE': raise SystemExit('control policy inactive')
-          required_start=['READ_FRESH_CURRENT_AND_LIVE_CANONICAL','COMPARE_ACTUAL_WAKE_AND_EXPECTED_DUE','IF_MATCH_REARM_AND_VERIFY','IF_MISMATCH_PRESERVE_NEWEST_VERIFIED_LIVE_CONTINUATION','RECONCILE_CURRENT_ACTIVITY_HANDOFF_FORWARD','CLAIM_FRESH_AUTHORITY_IF_NEEDED','CONTINUE_HANDOFF_AND_WORK_PROTOCOL']
-          if fence.get('startup_order') != required_start: raise SystemExit('scheduler fence startup order mismatch')
-          rp=fence.get('recovery_policy',{})
-          if fence.get('stale_wake_action')!='RECOVER_FORWARD_NO_ROLLBACK' or rp.get('nonterminal_mismatch_is_blocking') is not False or rp.get('no_op_due_to_stale_timing_forbidden') is not True: raise SystemExit('forward scheduler recovery contract missing')
-          if fence.get('queued_old_occurrence_must_not_disable_canonical') is not True or fence.get('queued_old_occurrence_must_not_restore_old_prompt_or_title') is not True: raise SystemExit('stale queued wake mutation fence missing')
-          if current.get('continuation',{}).get('scheduler_fence_policy')!='control/scheduler-fence.v1.json': raise SystemExit('CURRENT does not bind scheduler fence')
-          sched=policy.get('scheduler',{})
-          if sched.get('mechanism')!='RRULE_HOURLY_QUARTER_SELF_SHIFT' or sched.get('phase_cycle_minutes') != [0,15,30,45] or sched.get('phase_transition_map') != {'0':15,'15':30,'30':45,'45':0}: raise SystemExit('quarter-hour scheduler contract invalid')
-          if util.get('target',{}).get('observed_useful_span_seconds') != 840 or util.get('target',{}).get('minimum_valid_completed_turns') != 3: raise SystemExit('utilization target invalid')
-          if current.get('continuation',{}).get('utilization_state_path') != 'state/UTILIZATION.json': raise SystemExit('CURRENT does not bind utilization state')
-          vals=util.get('valid_completed_turns',[])
-          if util.get('goal_reached'):
-              if len(vals) < 3: raise SystemExit('utilization goal claimed without 3 valid turns')
-              last3=[x.get('observed_useful_span_seconds') for x in vals[-3:]]
-              if any(not isinstance(x,(int,float)) for x in last3) or sum(last3)/3 < 840: raise SystemExit('false utilization PASS')
-          required_recovery=['RE_READ_CURRENT_ACTIVITY_HANDOFF','VERIFY_PREDECESSOR_STILL_SUSPECT_OR_OVERDUE_AND_UNCHANGED','ADVANCE_AUTHORITY_EPOCH_TO_SUCCESSOR','MARK_SUCCESSOR_WORKING','MARK_HANDOFF_RECOVERED_TAKEOVER','DO_NOT_REPLAY_PREDECESSOR_ACTIVE_UNIT_BLINDLY','PLAN_15_MIN_WORK_PACKET_FROM_EXACT_DURABLE_NEXT_ACTION','CONTINUE_WORK']
-          if recovery.get('recovery_sequence') != required_recovery: raise SystemExit('handoff recovery sequence mismatch')
-          stale=recovery.get('stale_path',{}); fast=stale.get('already_stale_fast_path',{})
-          if stale.get('eligible_when_predecessor_freshness')!='SUSPECT_OR_OVERDUE' or stale.get('handoff_ack_grace_seconds')!=120 or stale.get('requires_no_new_predecessor_progress_during_grace') is not True: raise SystemExit('stale handoff grace contract invalid')
-          if fast.get('enabled') is not True or fast.get('eligible_when_last_predecessor_progress_age_seconds_gte') != stale.get('handoff_ack_grace_seconds') or fast.get('additional_post_request_grace_seconds') != 0 or fast.get('requires_immediate_re_read_after_request') is not True or fast.get('requires_predecessor_progress_unchanged_on_re_read') is not True: raise SystemExit('already-stale fast path safety guards missing')
-          if recovery.get('successor_may_not_take_over_while_predecessor_is_fresh') is not True: raise SystemExit('fresh predecessor takeover must be forbidden')
-          if handoff.get('program_id') != current.get('program_id') or handoff.get('root_job_id') != current.get('root_job_id'): raise SystemExit('handoff identity mismatch')
-          seq=policy.get('handoff',{}).get('successor_start_sequence',[])
-          required_seq=['REARM_SAME_CANONICAL_FOR_NEXT_15M','VERIFY_REARM','IF_PREDECESSOR_ACTIVE_PERSIST_HANDOFF_REQUEST','WAIT_FOR_DURABLE_HANDOFF_COMMIT','CLAIM_NEXT_AUTHORITY_EPOCH','PERSIST_PRIMARY_14M_TURN_OBJECTIVE','EXECUTE_PRIMARY_TURN_OBJECTIVE']
-          if seq != required_seq: raise SystemExit('successor sequence mismatch')
-          cycle=policy.get('worker_cycle',{})
-          if cycle.get('planned_work_horizon_minutes') != 14 or cycle.get('work_packet_is_stop_timer') is not False: raise SystemExit('14+1 work-packet contract invalid')
-          if cycle.get('runtime_safety_margin_minutes') != 1 or cycle.get('handoff_ready_at_minutes') != 14 or cycle.get('large_unit_admission_cutoff_minutes') != 12: raise SystemExit('runtime safety margin invalid')
-          if cycle.get('primary_objective_required') is not True or cycle.get('primary_objective_expected_useful_seconds_max') != 840 or cycle.get('primary_objective_expected_useful_seconds_min') != 600: raise SystemExit('primary objective planning contract invalid')
-          if cycle.get('primary_objective_persist_path') != 'state/TURN_PLAN.json': raise SystemExit('turn-plan path mismatch')
-          required_plan={'objective_id','objective','expected_useful_seconds','acceptance_criteria','checkpointable_substeps','current_substep','handoff_boundary','early_finish_fallback'}
-          if not required_plan.issubset(turnplan): raise SystemExit('turn plan required fields missing')
-          if not isinstance(turnplan.get('expected_useful_seconds'),(int,float)) or not (600 <= turnplan['expected_useful_seconds'] <= 840): raise SystemExit('turn plan duration outside 10-14 minute contract')
-          if not isinstance(turnplan.get('checkpointable_substeps'),list) or not (2 <= len(turnplan['checkpointable_substeps']) <= 5): raise SystemExit('turn plan substep count invalid')
-          # Critical runtime invariant: policy text is not enough. A WORKING owner must have a real plan bound to that exact authority.
+
+          def load(path):
+              with open(path) as f:
+                  return json.load(f)
+
+          current=load('/tmp/current.json')
+          activity=load('/tmp/activity.json')
+          handoff=load('/tmp/handoff.json')
+          plan=load('/tmp/turn-plan.json')
+          util=load('/tmp/utilization.json')
+          goals=load('/tmp/goals.json')
+          packet=load('/tmp/next-packet.json')
+          parity=load('/tmp/saas-parity.json')
+          controls=load('/tmp/active-controls.json')
+          relay=load('/tmp/relay.json')
+          fence=load('/tmp/fence.json')
+          rolling=load('/tmp/rolling.json')
+          baton=load('/tmp/baton.json')
+          runtime=load('/tmp/runtime-continuity.json')
+          mode=load('/tmp/runtime-mode.json')
+          recovery=load('/tmp/recovery.json')
+          gate=load('/tmp/continuation-gate.json')
+          saas=load('/tmp/saas-gates.json')
+
+          allowed_status={'CONTINUE','PROGRAM_COMPLETE','BLOCKED_EXTERNAL','DEGRADED_CONTINUATION'}
+          assert current['program_status'] in allowed_status
+
+          goalmap={g['goal_id']:g for g in goals['goals']}
+          assert 'GOAL-COMPETE-SAAS' in goalmap
+          assert goalmap['GOAL-UTILIZATION-P0']['priority']=='P0'
+
+          assert relay['status']=='ACTIVE'
+          sched=relay['scheduler']
+          assert sched['mechanism']=='RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE'
+          assert sched['fixed_quarter_cycle_active'] is False
+          assert sched['lifecycle_policy']=='control/rolling-rrule-lifecycle.v1.json'
+          assert sched['successor_baton_policy']=='control/successor-baton.v1.json'
+          assert sched['successor_packet_path']=='state/NEXT_PACKET.json'
+          assert sched['reservation_packet_cache_authoritative'] is False
+
+          assert rolling['status']=='ACTIVE'
+          assert rolling['timing']['target_useful_work_seconds']==600
+          assert rolling['timing']['provisional_safety_margin_seconds']==180
+          assert rolling['timing']['final_rearm_offset_seconds']==60
+          assert rolling['timing']['fixed_quarter_cycle_required'] is False
+          assert 'PROVISIONAL_ARM_AND_VERIFY' in rolling['startup_order']
+          assert 'FINAL_REARM_AND_VERIFY' in rolling['startup_order']
+
+          assert baton['status']=='ACTIVE'
+          assert baton['canonical_spec']=='docs/ROLLING_RRULE_BATON_SPEC.md'
+          assert baton['durable_packet_path']=='state/NEXT_PACKET.json'
+          assert baton['reservation_capsule_authoritative'] is False
+          assert baton['default_target_work_seconds']==600
+
+          required_packet={
+              'packet_id','program_id','root_job_id','planned_by_authority_epoch','checkpoint_ref',
+              'objective','target_work_seconds','safety_margin_seconds','provisional_arm_offset_seconds',
+              'final_rearm_offset_seconds','acceptance_criteria','first_action','fallback_action','status'
+          }
+          assert required_packet <= set(packet)
+          assert packet['provisional_arm_offset_seconds']==packet['target_work_seconds']+packet['safety_margin_seconds']
+          assert 420 <= packet['target_work_seconds'] <= 660
+          assert 60 <= packet['safety_margin_seconds'] <= 240
+          assert packet['final_rearm_offset_seconds']==60
+
+          assert controls['status']=='ACTIVE'
+          mandatory=set(controls['mandatory_on_wake'])
+          for p in {
+              'control/rolling-rrule-lifecycle.v1.json',
+              'control/successor-baton.v1.json',
+              'control/saas-parity-gates.v1.json',
+              'state/NEXT_PACKET.json',
+              'state/SAAS_PARITY.json'
+          }:
+              assert p in mandatory
+
+          assert runtime['components']['wake_source']['current_adapter']=='RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE'
+          assert runtime['successor_baton']['packet_path']=='state/NEXT_PACKET.json'
+          assert mode['scheduler_role']=='ACTIVE_FAST_CONTINUATION_PLUS_BOUNDED_COLD_RESCUE'
+          assert 'LOAD_OR_REFRESH_SUCCESSOR_PACKET_FROM_EXACT_DURABLE_NEXT_ACTION' in recovery['recovery_sequence']
+
+          assert gate['status']=='ACTIVE'
+          assert gate['default_for_nonterminal_owner']=='MUST_CONTINUE_USEFUL_WORK'
+          assert gate['pre_final_authorization']['required'] is True
+
+          assert saas['status']=='ACTIVE'
+          assert saas['canonical_spec']=='docs/SAAS_PARITY_ARCHITECTURE.md'
+          assert saas['structural_parity_excludes_model_quality'] is True
+          assert parity['policy']=='control/saas-parity-gates.v1.json'
+          assert parity['model_quality_scored_separately'] is True
+
+          assert util['target']['turn_window_seconds']==900
+          assert util['target']['observed_useful_span_seconds']==840
+          assert util['target']['maximum_internal_progress_gap_seconds_for_acceptance']==120
+
           if activity.get('status')=='WORKING':
-              if turnplan.get('status')!='ACTIVE': raise SystemExit('WORKING authority lacks ACTIVE turn plan')
-              if turnplan.get('run_id')!=activity.get('active_run_id') or turnplan.get('authority_epoch')!=activity.get('authority_epoch'): raise SystemExit('turn plan owner/epoch mismatch')
-              if turnplan.get('objective_id') in {None,'','NEXT-WAKE-MUST-ASSIGN'}: raise SystemExit('WORKING authority still has placeholder objective')
-              if not isinstance(turnplan.get('progress_evidence'),list) or not turnplan.get('progress_evidence'): raise SystemExit('ACTIVE turn plan lacks progress evidence')
-              if not turnplan.get('started_at') or not turnplan.get('last_progress_at'): raise SystemExit('ACTIVE turn plan lacks timestamps')
-          if util.get('measurement',{}).get('template_plan_while_working_invalid') is not True or util.get('measurement',{}).get('plan_outcome_required') is not True: raise SystemExit('plan outcome measurement contract missing')
-          if policy.get('utilization',{}).get('no_voluntary_idle_in_safety_margin') is not True: raise SystemExit('handoff safety margin may not become idle tail')
-          if policy.get('handoff',{}).get('successor_rearm_before_handoff_request_required') is not True: raise SystemExit('successor rearm must precede handoff request')
+              assert activity.get('authority_epoch')==current.get('authority_epoch')
+              assert activity.get('active_run_id')==current.get('current_owner')
+              assert plan.get('status')=='ACTIVE'
+              assert plan.get('run_id')==activity.get('active_run_id')
+              assert plan.get('authority_epoch')==activity.get('authority_epoch')
+
+          allowed_end={'PROGRAM_COMPLETE','BLOCKED_EXTERNAL','COMMITTED_SUCCESSOR_HANDOFF','EXPLICIT_OPERATOR_STOP','PLATFORM_ENFORCED_TERMINATION'}
           seen=set()
-          for n,line in enumerate(open('/tmp/runs.jsonl'),1):
-              if not line.strip(): continue
-              o=json.loads(line); oid=o.get('observation_id')
-              if not oid or oid in seen: raise SystemExit(f'invalid duplicate run observation {n}')
-              seen.add(oid); ended=o.get('run_ended_at') is not None; reason=o.get('end_reason')
-              if ended and reason is None: raise SystemExit(f'ended run {oid} lacks end_reason')
-              if reason is not None and reason not in expected: raise SystemExit(f'unauthorized end_reason {reason} in {oid}')
-              if ended and reason=='COMMITTED_SUCCESSOR_HANDOFF' and not o.get('successor_observed_at'): raise SystemExit(f'handoff end without successor observation in {oid}')
-              if ended and reason=='PROGRAM_COMPLETE' and o.get('program_status_at_end')!='PROGRAM_COMPLETE': raise SystemExit(f'false complete end in {oid}')
-              if ended and reason=='BLOCKED_EXTERNAL' and o.get('program_status_at_end')!='BLOCKED_EXTERNAL': raise SystemExit(f'false blocked end in {oid}')
-          print(f'RRuleR validation passed; runs={len(seen)} owner={current.get("current_owner")} epoch={current.get("authority_epoch")} plan={turnplan.get("objective_id")}')
+          with open('/tmp/runs.jsonl') as f:
+              for n,line in enumerate(f,1):
+                  if not line.strip():
+                      continue
+                  o=json.loads(line)
+                  oid=o.get('observation_id')
+                  assert oid and oid not in seen, f'duplicate/invalid observation at {n}'
+                  seen.add(oid)
+                  if o.get('run_ended_at') is not None:
+                      assert o.get('end_reason') in allowed_end
+
+          print(f"control-plane validation passed: owner={current.get('current_owner')} epoch={current.get('authority_epoch')} packet={packet.get('packet_id')}")
           PY
+
+      - name: Reject active quarter-cycle regressions
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          for p in AGENTS.md control/POLICY.md control/relay-policy.v1.json control/runtime-continuity.v1.json control/runtime-mode.v1.json control/handoff-recovery.v1.json; do
+            curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/$p?ref=$SHA" >> /tmp/active-policy.txt
+            printf "\n" >> /tmp/active-policy.txt
+          done
+          if grep -E 'RRULE_HOURLY_QUARTER_SELF_SHIFT|PLAN_15_MIN_WORK_PACKET_FROM_EXACT_DURABLE_NEXT_ACTION|REARM_SAME_CANONICAL_FOR_NEXT_15M' /tmp/active-policy.txt; then
+            echo "stale quarter-cycle active instruction detected"
+            exit 1
+          fi

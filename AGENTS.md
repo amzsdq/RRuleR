@@ -11,7 +11,7 @@ A ChatGPT session is disposable. Durable GitHub state is authoritative.
 3. Read `state/CURRENT.json`, `state/ACTIVITY.json`, `state/HANDOFF.json`, `control/handoff-recovery.v1.json`, and `control/scheduler-fence.v1.json`.
 4. Resolve root goal, program status, owner/authority epoch, latest checkpoint, exact next action, current activity evidence, and durable expected next due.
 5. BEFORE substantive work, compare this wake against durable expected due under `control/scheduler-fence.v1.json`. Scheduler mismatch is a RECOVERY condition, not a yield condition: preserve the live canonical schedule, reconcile durable expected-due/owner/handoff state to the newest verified continuation, then continue. A stale occurrence must not restore an older prompt/title or roll authority backward.
-6. For an expected wake, establish/verify the next recurring wake before substantive work. Keep the schedule as one hourly RRULE and rotate only the minute slot in the fixed quarter cycle: 00 -> 15 -> 30 -> 45 -> 00(next hour).
+6. For an expected wake, validate the predecessor-planned successor packet and establish/verify the provisional future continuation before full restore or substantive work. The fixed quarter-hour cycle is retired as an active instruction.
 7. If a predecessor is active, persist a durable handoff request only after the successor's own next wake is secured.
 8. Persist `state/ACTIVITY.json` as WORKING before or with the first substantive durable change after authority is obtained.
 9. Read only the task-specific files needed for the current work unit.
@@ -41,44 +41,35 @@ A predecessor keeps working until a successor wake is actually observed.
 6. Commit handoff and relinquish authority promptly.
 7. Successor treats predecessor as active until durable handoff is visible, unless `control/handoff-recovery.v1.json` becomes eligible.
 
-## Fourteen-minute primary objective planning
+## Successor packet planning
 
-After REARM+VERIFY and authority acquisition, DO NOT begin with miscellaneous small work.
+After provisional continuation and authority validation, use the durable successor packet when valid. If it is stale, refresh it from fresh durable state.
 
-Before the first substantive action, persist one PRIMARY TURN OBJECTIVE designed to consume up to about 14 minutes of useful work.
+The packet should normally:
+- target about 10 minutes of useful work, adjusted to the work shape;
+- contain one coherent objective with explicit acceptance criteria;
+- reference the checkpoint it continues from;
+- define checkpointable substeps and a first action;
+- carry a provisional safety margin;
+- remain a planning horizon, never a forced stop timer.
 
-The plan must contain:
-- one concrete primary objective;
-- expected useful-work duration, normally 10-14 minutes and never intentionally above 14 minutes;
-- explicit acceptance criteria that can be checked at handoff;
-- 2-5 checkpointable substeps that advance the same objective;
-- the smallest safe handoff boundary for each substep;
-- a fallback continuation unit only if the primary objective finishes materially early.
+Before a normal return, checkpoint current work and plan/persist the next successor packet so the next cold worker pays minimal startup/planning overhead.
 
-Planning discipline:
-- Prefer one coherent medium-sized objective over many unrelated microtasks.
-- Do not choose an objective expected to finish in only a few minutes when a larger useful objective can safely be formed.
-- Do not pad with busywork merely to reach 14 minutes.
-- If no single useful objective can honestly fill most of the window, bundle tightly related substeps under one outcome-level objective.
-- Persist the plan BEFORE substantive execution so a successor can distinguish planned work from opportunistic drift.
-- Execute the planned objective continuously. Do not re-plan merely because an intermediate substep completed.
-- At ~12 minutes, stop admitting any substep that is expensive to checkpoint.
-- On actual successor handoff request, finish only the current smallest safe boundary, persist achieved acceptance criteria and exact remaining substep, then hand off.
+## Rolling worker lifecycle
 
-## Fifteen-minute worker cycle
+Each valid wake is a disposable worker generation in a rolling baton pipeline.
 
-Each scheduled wake is a worker generation in a rolling handoff pipeline. The 15-minute interval is the work-packet design horizon, not a voluntary stop timer.
+1. Reconstruct the minimum fresh fence/current/packet state.
+2. Validate that the wake and successor packet are current; refresh stale packet state rather than trusting cached reservation text.
+3. Establish and verify a provisional future continuation using the packet work target plus safety margin.
+4. Restore the bound checkpoint and execute the packet continuously.
+5. Persist durable progress after meaningful units.
+6. On normal close, checkpoint, plan/persist the next successor packet, then establish/verify a short completion-relative continuation.
+7. If the invocation dies, the provisional occurrence is the cold-rescue path.
+8. Never convert a packet target or schedule boundary into a voluntary stop condition.
 
-1. Reconstruct fresh durable state and run scheduler reconciliation. A mismatch must be repaired in-place when a valid live continuation exists; it must not cause a non-terminal no-op.
-2. REARM+VERIFY the same canonical hourly RRULE by moving its minute slot exactly one quarter: 00->15, 15->30, 30->45, 45->00(next hour).
-3. If predecessor exists, persist HANDOFF_REQUEST only after rearm verification.
-4. While predecessor is fresh, wait for its durable handoff commit and do only non-conflicting preparation.
-5. If predecessor is SUSPECT or OVERDUE and remains unchanged through the recovery grace, execute `control/handoff-recovery.v1.json`.
-6. After authority is obtained, persist a PRIMARY TURN OBJECTIVE with an expected 10-14 minute useful-work duration, acceptance criteria, and 2-5 checkpointable substeps; then execute that objective continuously.
-7. If the packet finishes early and useful work remains, pull another bounded unit rather than idle.
-8. A predecessor checks for pending handoff after every bounded unit; on request it closes the smallest safe unit and hands off promptly.
+Successor ordering: MINIMUM_FENCE+PACKET -> PROVISIONAL_CONTINUATION -> RESTORE -> WORK -> CHECKPOINT -> NEXT_PACKET -> FAST_CONTINUATION -> RETURN
 
-Successor ordering: FRESH_STATE+SCHEDULER_FENCE -> REARM+VERIFY -> HANDOFF_REQUEST -> WAIT_OR_RECOVER -> CLAIM_AUTHORITY -> PLAN_15M_PACKET -> WORK.
 
 ## Operator-visible activity
 
@@ -118,43 +109,38 @@ A non-terminal owner MUST NOT voluntarily end its turn.
 
 ## Utilization optimization loop
 
-Current optimization target: average observed useful-work span >= 840 seconds per 15-minute turn.
+Current optimization target: sustained evidenced useful-work coverage with short normal continuation gaps and separately measured recovery latency.
 
 At every valid wake:
-1. Record wake/start and rearm verification timestamps.
-2. Read the previous completed-turn utilization result before planning.
-3. Plan enough useful, non-duplicative work to occupy the upcoming quarter-hour window; prefer several checkpointable units over one tiny unit.
-4. Start substantive work immediately after authority is obtained.
-5. Refresh durable activity at least after every meaningful unit and, when practical, do not allow more than 120 seconds without durable progress evidence while actively working.
-6. On successor handoff, close the smallest safe unit, persist the exact continuation, then finalize the run measurement.
-7. Compute at minimum: observed_useful_span_seconds, dead_tail_seconds, scheduler_or_handoff_overhead_seconds, and end_reason. Never infer missing timestamps.
-8. If the completed turn is under 840 seconds, classify the dominant cause and persist exactly one concrete corrective experiment for the next turn. Valid cause classes include PACKET_TOO_SMALL, EARLY_VOLUNTARY_END, WAITING_ON_TOOL_OR_CI, SCHEDULER_GAP, HANDOFF_DELAY, AUTHORITY_RECOVERY, and UNKNOWN_EVIDENCE_GAP.
-9. The next worker MUST read and apply the latest corrective experiment before selecting its work packet.
-10. Do not declare the utilization goal reached from one good turn. Goal PASS requires at least 3 valid completed turns with a rolling mean observed useful-work span >= 840 seconds/.
-11. Until PASS, utilization optimization remains the active root and each turn must measure -> diagnose -> change -> retest. Do not repeat the same failed intervention without new evidence.
+1. record wake/start and continuation verification timestamps;
+2. use or refresh the successor packet;
+3. start substantive work immediately after authority/provisional continuation are secured;
+4. refresh durable evidence after meaningful work, keeping unexplained evidence gaps <=120 seconds when practical;
+5. on normal close, checkpoint and prepare the next packet before scheduling the fast completion-relative continuation;
+6. measure useful coverage, startup overhead, normal continuation gap, and abrupt-loss recovery gap separately;
+7. classify the dominant loss cause and leave one concrete corrective experiment when targets are missed;
+8. do not declare success from one good window.
 
+## Runtime-safe rolling timing
 
-## Runtime-safe baton timing
+The intended rhythm is approximately 10 minutes of useful work, protected by a longer provisional rescue horizon, followed by a short completion-relative continuation.
 
-The intended rhythm is ~14 minutes of useful work inside each 15-minute wake interval, followed by a fast successor-triggered baton pass.
-
-- Treat 840 seconds as the useful-work target and ~60 seconds as handoff/runtime safety margin.
-- Do not spend that final margin idling. Continue useful bounded work, but after ~12 minutes avoid starting a unit that cannot be checkpointed quickly.
-- Around ~14 minutes, enter HANDOFF_READY mode: keep durable state current, prefer tiny checkpointable/read-only units, and be able to stop within the smallest safe boundary when the successor request appears.
-- The successor wakes on the quarter-hour, rearms its own next quarter first, then requests handoff.
-- The predecessor immediately stops admitting new substantive units, closes the smallest safe unit, saves exact continuation/evidence, commits handoff, and ends.
-- If the successor is late, the predecessor keeps doing useful small units; there is no voluntary idle tail.
-- This cadence is specifically intended to avoid long single-turn runtime exposure while maintaining near-continuous utilization.
+- Ten minutes is a target, not a hard cutoff.
+- The default provisional horizon is target work plus a tunable safety margin.
+- Continue useful checkpointable work if the target is reached early or safely overrun.
+- If the provisional deadline approaches while useful work remains, move the future continuation forward before collision and verify it.
+- On normal close, checkpoint and set the next due from actual completion rather than a fixed wall-clock slot.
+- Recovery timing and normal continuation timing are different metrics and must not be conflated.
 
 
 ## Priority override — utilization continuity
 
 For the active RRULER-UTILIZATION program, continuity and measured useful-work utilization are the highest operational priority below platform/security constraints.
 
-- Internal stale-wake, scheduler-fence, handoff-freshness, CI-pending, or bookkeeping inconsistencies are recovery work, not reasons to stop.
-- If the canonical automation is enabled and a future quarter wake can be verified, reconcile durable state to that continuation and keep the program moving.
-- Never intentionally no-op a non-terminal expected/recoverable wake merely because durable timing metadata is stale.
-- Do not bypass actual platform/security controls, irreversible-side-effect reconciliation, or public-repository secret protections.
+- Internal stale-wake, packet-staleness, scheduler-fence, checkpoint, CI-pending, or bookkeeping inconsistencies are recovery work, not reasons to stop.
+- Preserve the newest verified future continuation and reconcile durable state forward.
+- A stale cached reservation capsule may not roll durable packet/checkpoint/authority backward.
+- Do not bypass actual platform/security controls or irreversible-side-effect reconciliation.
 
 
 ## Pre-final authorization gate
