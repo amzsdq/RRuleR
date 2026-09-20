@@ -26,7 +26,7 @@ jobs:
           assert set(gate['program_nonterminal_states'])=={'CONTINUE','DEGRADED_CONTINUATION'}
           assert gate['default_for_nonterminal_owner']=='MUST_CONTINUE_USEFUL_WORK'
           assert gate['nonterminal_no_handoff_rule']['required_action']=='SELECT_AND_EXECUTE_NEXT_USEFUL_ADMISSIBLE_UNIT'
-          assert set(gate['run_end_allowed_only_for'])=={'COMMITTED_SUCCESSOR_HANDOFF','EXPLICIT_OPERATOR_STOP','PLATFORM_ENFORCED_RUN_END'}
+          assert set(gate['run_end_allowed_only_for'])=={'COMMITTED_SUCCESSOR_HANDOFF','EXPLICIT_OPERATOR_STOP','PLATFORM_ENFORCED_TERMINATION'}
           required={'PRIMARY_OBJECTIVE_COMPLETE','CI_PASS','ROOT_COMPLETE','WAITING_FOR_NEXT_WAKE','SCHEDULE_BOUNDARY'}
           assert required <= set(gate['never_end_because'])
           assert policy['utilization']['nonterminal_voluntary_turn_end_forbidden'] is True
