@@ -2,12 +2,12 @@
   "schema_version": "1.0",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "handoff_state": "SUCCESSOR_OBSERVED",
-  "predecessor_run_id": "RUN-UTIL-20260920-231559",
-  "successor_run_id": "RUN-UTIL-20260920-233222",
-  "successor_expected_at": "2026-09-20T23:30:00+09:00",
-  "successor_observed_at": "2026-09-20T23:32:22+09:00",
-  "active_unit": "UTIL-EXP-002 checkpointable utilization work and live measurement hardening",
-  "checkpoint_id": "CP-UTILIZATION-014",
-  "next_action": "Successor has verified canonical rearm to :45 and requested baton. Predecessor must stop admitting new substantive units, close the smallest safe unit, persist exact measurement/checkpoint evidence, and commit handoff. Successor waits or applies bounded stale-predecessor recovery only if eligibility is proven."
+  "handoff_state": "HANDOFF_REQUESTED",
+  "predecessor_run_id": "RUN-UTIL-20260920-234225",
+  "successor_run_id": "RUN-UTIL-20260920-235858",
+  "successor_expected_at": "2026-09-21T00:00:00+09:00",
+  "successor_observed_at": "2026-09-20T23:58:58+09:00",
+  "active_unit": "UTIL-EXP-002 14+1 cadence validation",
+  "checkpoint_id": "CP-UTILIZATION-016",
+  "next_action": "Canonical is verified rearmed to :15. Predecessor epoch 13 has no durable progress after 23:43:08 KST; stop new work and commit baton if still alive. Successor waits through the bounded recovery grace, then advances authority only if predecessor remains unchanged."
 }
