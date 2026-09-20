@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/amzsdq/RRuleR/control/schemas/checkpoint.schema.json",
+  "title": "RRuleR Resumable Checkpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "checkpoint_id", "root_job_id", "work_unit_id", "authority_epoch", "completed", "in_progress", "next_action", "evidence", "side_effects"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "checkpoint_id": {"type": "string", "minLength": 1},
+    "root_job_id": {"type": "string", "minLength": 1},
+    "work_unit_id": {"type": "string", "minLength": 1},
+    "authority_epoch": {"type": "integer", "minimum": 0},
+    "completed": {"type": "array", "items": {"type": "string"}},
+    "in_progress": {"type": ["string", "null"]},
+    "next_action": {"type": "string", "minLength": 1},
+    "evidence": {"type": "array", "items": {"type": "string"}},
+    "side_effects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["effect_id", "status", "receipt"],
+        "properties": {
+          "effect_id": {"type": "string", "minLength": 1},
+          "status": {"enum": ["NOT_STARTED", "CONFIRMED", "AMBIGUOUS"]},
+          "receipt": {"type": ["string", "null"]}
+        }
+      }
+    }
+  }
+}
