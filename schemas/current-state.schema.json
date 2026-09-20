@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/amzsdq/RRuleR/schemas/current-state.schema.json",
+  "title": "RRuleR Current Durable State",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "repository",
+    "root_job_id",
+    "root_goal",
+    "status",
+    "current_owner",
+    "authority_epoch",
+    "canonical_automation_id",
+    "checkpoint",
+    "continuation",
+    "safety"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "repository": {"type": "string", "minLength": 1},
+    "root_job_id": {"type": "string", "minLength": 1},
+    "root_goal": {"type": "string", "minLength": 1},
+    "status": {
+      "enum": ["CONTINUE", "COMPLETE", "BLOCKED_EXTERNAL", "DEGRADED_CONTINUATION"]
+    },
+    "current_owner": {"type": "string", "minLength": 1},
+    "authority_epoch": {"type": "integer", "minimum": 0},
+    "canonical_automation_id": {"type": "string", "minLength": 1},
+    "checkpoint": {
+      "type": "object",
+      "required": ["id", "state", "completed", "evidence", "next_action"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "state": {"enum": ["ACTIVE", "VERIFIED", "HANDOFF_PENDING", "TERMINAL"]},
+        "completed": {"type": "array", "items": {"type": "string"}},
+        "evidence": {"type": "array", "items": {"type": "string"}},
+        "next_action": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    },
+    "continuation": {
+      "type": "object",
+      "required": [
+        "mechanism",
+        "next_wake_first",
+        "next_due_at",
+        "current_phase_minute",
+        "fallback_semantics"
+      ],
+      "properties": {
+        "mechanism": {"const": "RRULE_PHASE_ROTATION"},
+        "next_wake_first": {"const": true},
+        "next_due_at": {"type": "string", "minLength": 1},
+        "current_phase_minute": {"enum": [0, 15, 30, 45]},
+        "fallback_semantics": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    },
+    "safety": {
+      "type": "object",
+      "required": ["public_repo", "secrets_allowed"],
+      "properties": {
+        "public_repo": {"const": true},
+        "secrets_allowed": {"const": false}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
