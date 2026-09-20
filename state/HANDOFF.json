@@ -2,12 +2,12 @@
   "schema_version": "1.0",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "handoff_state": "HANDOFF_REQUESTED",
+  "handoff_state": "RECOVERED_TAKEOVER",
   "predecessor_run_id": "RUN-UTIL-20260921-001349",
   "successor_run_id": "RUN-UTIL-20260921-003046",
   "successor_expected_at": "2026-09-21T00:30:00+09:00",
   "successor_observed_at": "2026-09-21T00:30:46+09:00",
-  "active_unit": "UTIL-EXP-004 / superseded plan-first utilization experiment",
+  "active_unit": "UTIL-EXP-005 machine-enforced primary-turn plan and outcome instrumentation",
   "checkpoint_id": "CP-UTILIZATION-020",
-  "next_action": "Successor has rearmed :45. Epoch 15 predecessor is stale; recover authority under handoff-recovery v2 fast path, persist a real 10-14 minute TURN_PLAN before substantive work, then execute the highest-expected-effect utilization objective."
+  "next_action": "Epoch 16 owns authority. Execute the persisted UTIL-EXP-005 plan; successor at :45 should request handoff after rearming :00 and either receive a normal commit or recover only if epoch 16 is stale."
 }
