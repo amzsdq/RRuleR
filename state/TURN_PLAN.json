@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "program_id": "RRULER-PROGRAM-001",
+  "root_job_id": "RRULER-UTILIZATION-003",
+  "authority_epoch": 15,
+  "run_id": "RUN-UTIL-20260921-001349",
+  "status": "TEMPLATE_PENDING_NEXT_AUTHORITY",
+  "objective_id": "NEXT-WAKE-MUST-ASSIGN",
+  "objective": "Next authority owner must replace this template before substantive work with one coherent objective sized for 10-14 minutes.",
+  "expected_useful_seconds": 840,
+  "acceptance_criteria": [
+    "A fresh authority owner replaces this template before substantive execution."
+  ],
+  "checkpointable_substeps": [
+    "Rearm and verify next wake",
+    "Claim/reconcile authority",
+    "Replace this template with the actual 10-14 minute objective plan"
+  ],
+  "current_substep": 0,
+  "handoff_boundary": "Any completed listed substep with durable state saved.",
+  "early_finish_fallback": "Select a materially related continuation objective; do not add unrelated filler.",
+  "created_for_next_wake": true
+}

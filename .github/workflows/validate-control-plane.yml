@@ -34,13 +34,14 @@ jobs:
           fetch state/ACTIVITY.json /tmp/activity.json
           fetch state/RUNS.jsonl /tmp/runs.jsonl
           fetch state/UTILIZATION.json /tmp/utilization.json
+          fetch state/TURN_PLAN.json /tmp/turn-plan.json
           fetch control/relay-policy.v1.json /tmp/policy.json
           fetch control/liveness-policy.v1.json /tmp/live.json
           fetch control/handoff-recovery.v1.json /tmp/recovery.json
           fetch control/scheduler-fence.v1.json /tmp/scheduler-fence.json
           python - <<'PY'
           import json
-          current=json.load(open('/tmp/current.json')); policy=json.load(open('/tmp/policy.json')); live=json.load(open('/tmp/live.json')); activity=json.load(open('/tmp/activity.json')); handoff=json.load(open('/tmp/handoff.json')); recovery=json.load(open('/tmp/recovery.json')); fence=json.load(open('/tmp/scheduler-fence.json')); util=json.load(open('/tmp/utilization.json'))
+          current=json.load(open('/tmp/current.json')); policy=json.load(open('/tmp/policy.json')); live=json.load(open('/tmp/live.json')); activity=json.load(open('/tmp/activity.json')); handoff=json.load(open('/tmp/handoff.json')); recovery=json.load(open('/tmp/recovery.json')); fence=json.load(open('/tmp/scheduler-fence.json')); util=json.load(open('/tmp/utilization.json')); turnplan=json.load(open('/tmp/turn-plan.json'))
           if current['program_status'] not in {'CONTINUE','PROGRAM_COMPLETE','BLOCKED_EXTERNAL','DEGRADED_CONTINUATION'}: raise SystemExit('invalid program_status')
           if activity.get('authority_epoch') != current.get('authority_epoch'): raise SystemExit('activity authority_epoch mismatch')
           if activity.get('status')=='WORKING' and activity.get('active_run_id') != current.get('current_owner'): raise SystemExit('WORKING owner mismatch')
@@ -76,11 +77,17 @@ jobs:
           if recovery.get('successor_may_not_take_over_while_predecessor_is_fresh') is not True: raise SystemExit('fresh predecessor takeover must be forbidden')
           if handoff.get('program_id') != current.get('program_id') or handoff.get('root_job_id') != current.get('root_job_id'): raise SystemExit('handoff identity mismatch')
           seq=policy.get('handoff',{}).get('successor_start_sequence',[])
-          required_seq=['REARM_SAME_CANONICAL_FOR_NEXT_15M','VERIFY_REARM','IF_PREDECESSOR_ACTIVE_PERSIST_HANDOFF_REQUEST','WAIT_FOR_DURABLE_HANDOFF_COMMIT','CLAIM_NEXT_AUTHORITY_EPOCH','PLAN_15_MIN_WORK_PACKET','EXECUTE_WORK_PACKET']
+          required_seq=['REARM_SAME_CANONICAL_FOR_NEXT_15M','VERIFY_REARM','IF_PREDECESSOR_ACTIVE_PERSIST_HANDOFF_REQUEST','WAIT_FOR_DURABLE_HANDOFF_COMMIT','CLAIM_NEXT_AUTHORITY_EPOCH','PERSIST_PRIMARY_14M_TURN_OBJECTIVE','EXECUTE_PRIMARY_TURN_OBJECTIVE']
           if seq != required_seq: raise SystemExit('successor sequence mismatch')
           cycle=policy.get('worker_cycle',{})
           if cycle.get('planned_work_horizon_minutes') != 14 or cycle.get('work_packet_is_stop_timer') is not False: raise SystemExit('14+1 work-packet contract invalid')
           if cycle.get('runtime_safety_margin_minutes') != 1 or cycle.get('handoff_ready_at_minutes') != 14 or cycle.get('large_unit_admission_cutoff_minutes') != 12: raise SystemExit('runtime safety margin invalid')
+          if cycle.get('primary_objective_required') is not True or cycle.get('primary_objective_expected_useful_seconds_max') != 840 or cycle.get('primary_objective_expected_useful_seconds_min') != 600: raise SystemExit('primary objective planning contract invalid')
+          if cycle.get('primary_objective_persist_path') != 'state/TURN_PLAN.json': raise SystemExit('turn-plan path mismatch')
+          required_plan={'objective_id','objective','expected_useful_seconds','acceptance_criteria','checkpointable_substeps','current_substep','handoff_boundary','early_finish_fallback'}
+          if not required_plan.issubset(turnplan): raise SystemExit('turn plan required fields missing')
+          if not isinstance(turnplan.get('expected_useful_seconds'),(int,float)) or turnplan['expected_useful_seconds'] > 840: raise SystemExit('turn plan exceeds 14-minute cap')
+          if not isinstance(turnplan.get('checkpointable_substeps'),list) or not (2 <= len(turnplan['checkpointable_substeps']) <= 5): raise SystemExit('turn plan substep count invalid')
           if policy.get('utilization',{}).get('no_voluntary_idle_in_safety_margin') is not True: raise SystemExit('handoff safety margin may not become idle tail')
           if policy.get('handoff',{}).get('successor_rearm_before_handoff_request_required') is not True: raise SystemExit('successor rearm must precede handoff request')
           seen=set()

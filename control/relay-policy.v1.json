@@ -1,7 +1,7 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
-  "policy_revision": 9,
+  "policy_revision": 10,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
@@ -11,8 +11,18 @@
     "replacement_automation_forbidden": true,
     "rrule_frequency": "HOURLY",
     "phase_step_minutes": 15,
-    "phase_cycle_minutes": [0,15,30,45],
-    "phase_transition_map": {"0":15,"15":30,"30":45,"45":0},
+    "phase_cycle_minutes": [
+      0,
+      15,
+      30,
+      45
+    ],
+    "phase_transition_map": {
+      "0": 15,
+      "15": 30,
+      "30": 45,
+      "45": 0
+    },
     "forty_five_wraps_to_next_hour": true,
     "timing_mode": "exact_schedule",
     "next_wake_first": true,
@@ -44,8 +54,24 @@
     "maximum_unexplained_internal_progress_gap_seconds": 120,
     "known_waiting_or_idle_may_count_as_productive": false,
     "activity_progress_evidence_max_gap_seconds_when_practical": 120,
-    "each_turn_loop": ["MEASURE_PREVIOUS_TURN","DIAGNOSE_UNDERUTILIZATION","APPLY_LATEST_CORRECTIVE_EXPERIMENT","PLAN_15M_WORK_PACKET","WORK_CONTINUOUSLY","FINALIZE_MEASUREMENT","PERSIST_NEXT_EXPERIMENT_IF_UNDER_TARGET"],
-    "under_target_cause_classes": ["PACKET_TOO_SMALL","EARLY_VOLUNTARY_END","WAITING_ON_TOOL_OR_CI","SCHEDULER_GAP","HANDOFF_DELAY","AUTHORITY_RECOVERY","UNKNOWN_EVIDENCE_GAP"],
+    "each_turn_loop": [
+      "MEASURE_PREVIOUS_TURN",
+      "DIAGNOSE_UNDERUTILIZATION",
+      "APPLY_LATEST_CORRECTIVE_EXPERIMENT",
+      "PLAN_15M_WORK_PACKET",
+      "WORK_CONTINUOUSLY",
+      "FINALIZE_MEASUREMENT",
+      "PERSIST_NEXT_EXPERIMENT_IF_UNDER_TARGET"
+    ],
+    "under_target_cause_classes": [
+      "PACKET_TOO_SMALL",
+      "EARLY_VOLUNTARY_END",
+      "WAITING_ON_TOOL_OR_CI",
+      "SCHEDULER_GAP",
+      "HANDOFF_DELAY",
+      "AUTHORITY_RECOVERY",
+      "UNKNOWN_EVIDENCE_GAP"
+    ],
     "repeat_failed_intervention_without_new_evidence_forbidden": true,
     "handoff_safety_margin_seconds": 60,
     "handoff_ready_target_elapsed_seconds": 840,
@@ -55,9 +81,18 @@
   "program_continuity": {
     "enabled": true,
     "root_completion_does_not_imply_program_completion": true,
-    "on_root_complete": ["PERSIST_ROOT_TERMINAL_EVIDENCE","EVALUATE_MATERIALLY_USEFUL_NEXT_ROOT","IF_USEFUL_PERSIST_NEXT_ROOT_BEFORE_RELINQUISHING","CONTINUE_WITHOUT_VOLUNTARY_IDLE"],
+    "on_root_complete": [
+      "PERSIST_ROOT_TERMINAL_EVIDENCE",
+      "EVALUATE_MATERIALLY_USEFUL_NEXT_ROOT",
+      "IF_USEFUL_PERSIST_NEXT_ROOT_BEFORE_RELINQUISHING",
+      "CONTINUE_WITHOUT_VOLUNTARY_IDLE"
+    ],
     "busywork_for_continuity_forbidden": true,
-    "program_stop_requires_one_of": ["EXPLICIT_OPERATOR_STOP","VERIFIED_PROGRAM_COMPLETE","BLOCKED_EXTERNAL_WITH_INTERNAL_ALTERNATIVES_EXHAUSTED"]
+    "program_stop_requires_one_of": [
+      "EXPLICIT_OPERATOR_STOP",
+      "VERIFIED_PROGRAM_COMPLETE",
+      "BLOCKED_EXTERNAL_WITH_INTERNAL_ALTERNATIVES_EXHAUSTED"
+    ]
   },
   "activity_evidence": {
     "path": "state/ACTIVITY.json",
@@ -70,12 +105,33 @@
   "handoff": {
     "trigger": "DURABLE_HANDOFF_REQUEST_FROM_ACTUALLY_AWAKENED_SUCCESSOR",
     "scheduled_time_alone_is_trigger": false,
-    "on_trigger": ["STOP_STARTING_NEW_SUBSTANTIVE_UNITS","FINISH_CURRENT_SMALLEST_SAFE_UNIT","PERSIST_HANDOFF_CHECKPOINT","PERSIST_ACTIVITY_HANDOFF","EMIT_CONCISE_STATUS","PREDECESSOR_END"],
+    "on_trigger": [
+      "STOP_STARTING_NEW_SUBSTANTIVE_UNITS",
+      "FINISH_CURRENT_SMALLEST_SAFE_UNIT",
+      "PERSIST_HANDOFF_CHECKPOINT",
+      "PERSIST_ACTIVITY_HANDOFF",
+      "EMIT_CONCISE_STATUS",
+      "PREDECESSOR_END"
+    ],
     "successor_must_avoid_duplicate_active_unit": true,
     "same_canonical_overlap_required_for_correctness": false,
     "same_canonical_overlap_preferred_for_utilization": true,
-    "successor_start_sequence": ["REARM_SAME_CANONICAL_FOR_NEXT_15M","VERIFY_REARM","IF_PREDECESSOR_ACTIVE_PERSIST_HANDOFF_REQUEST","WAIT_FOR_DURABLE_HANDOFF_COMMIT","CLAIM_NEXT_AUTHORITY_EPOCH","PLAN_15_MIN_WORK_PACKET","EXECUTE_WORK_PACKET"],
-    "predecessor_on_request": ["STOP_ADMITTING_NEW_SUBSTANTIVE_UNITS","FINISH_CURRENT_SMALLEST_SAFE_UNIT","PERSIST_CHECKPOINT_EVIDENCE_EXACT_NEXT_ACTION","COMMIT_HANDOFF_AND_RELEASE_AUTHORITY","PREDECESSOR_END"],
+    "successor_start_sequence": [
+      "REARM_SAME_CANONICAL_FOR_NEXT_15M",
+      "VERIFY_REARM",
+      "IF_PREDECESSOR_ACTIVE_PERSIST_HANDOFF_REQUEST",
+      "WAIT_FOR_DURABLE_HANDOFF_COMMIT",
+      "CLAIM_NEXT_AUTHORITY_EPOCH",
+      "PERSIST_PRIMARY_14M_TURN_OBJECTIVE",
+      "EXECUTE_PRIMARY_TURN_OBJECTIVE"
+    ],
+    "predecessor_on_request": [
+      "STOP_ADMITTING_NEW_SUBSTANTIVE_UNITS",
+      "FINISH_CURRENT_SMALLEST_SAFE_UNIT",
+      "PERSIST_CHECKPOINT_EVIDENCE_EXACT_NEXT_ACTION",
+      "COMMIT_HANDOFF_AND_RELEASE_AUTHORITY",
+      "PREDECESSOR_END"
+    ],
     "successor_rearm_before_handoff_request_required": true,
     "successor_conflicting_substantive_work_before_commit_forbidden": true,
     "read_only_preparation_before_commit_allowed": true
@@ -102,7 +158,13 @@
     "program_complete_requires_evidence": true,
     "disable_same_canonical_only_on_program_terminal": true,
     "program_terminal_schedules_successor": false,
-    "voluntary_turn_end_allowed_only_for": ["PROGRAM_COMPLETE","BLOCKED_EXTERNAL","COMMITTED_SUCCESSOR_HANDOFF","EXPLICIT_OPERATOR_STOP","PLATFORM_ENFORCED_TERMINATION"]
+    "voluntary_turn_end_allowed_only_for": [
+      "PROGRAM_COMPLETE",
+      "BLOCKED_EXTERNAL",
+      "COMMITTED_SUCCESSOR_HANDOFF",
+      "EXPLICIT_OPERATOR_STOP",
+      "PLATFORM_ENFORCED_TERMINATION"
+    ]
   },
   "worker_cycle": {
     "mode": "ROLLING_14M_WORK_PLUS_1M_HANDOFF_MARGIN",
@@ -116,6 +178,25 @@
     "runtime_safety_margin_minutes": 1,
     "large_unit_admission_cutoff_minutes": 12,
     "handoff_ready_at_minutes": 14,
-    "handoff_ready_behavior": "KEEP_WORKING_ONLY_TINY_SAFE_CHECKPOINTABLE_UNITS_UNTIL_SUCCESSOR_REQUEST"
+    "handoff_ready_behavior": "KEEP_WORKING_ONLY_TINY_SAFE_CHECKPOINTABLE_UNITS_UNTIL_SUCCESSOR_REQUEST",
+    "primary_objective_required": true,
+    "primary_objective_expected_useful_seconds_min": 600,
+    "primary_objective_expected_useful_seconds_target": 840,
+    "primary_objective_expected_useful_seconds_max": 840,
+    "primary_objective_substeps_min": 2,
+    "primary_objective_substeps_max": 5,
+    "primary_objective_unrelated_microtask_greedy_start_forbidden": true,
+    "primary_objective_busywork_padding_forbidden": true,
+    "primary_objective_persist_path": "state/TURN_PLAN.json",
+    "primary_objective_required_fields": [
+      "objective_id",
+      "objective",
+      "expected_useful_seconds",
+      "acceptance_criteria",
+      "checkpointable_substeps",
+      "current_substep",
+      "handoff_boundary",
+      "early_finish_fallback"
+    ]
   }
 }

@@ -41,6 +41,30 @@ A predecessor keeps working until a successor wake is actually observed.
 6. Commit handoff and relinquish authority promptly.
 7. Successor treats predecessor as active until durable handoff is visible, unless `control/handoff-recovery.v1.json` becomes eligible.
 
+## Fourteen-minute primary objective planning
+
+After REARM+VERIFY and authority acquisition, DO NOT begin with miscellaneous small work.
+
+Before the first substantive action, persist one PRIMARY TURN OBJECTIVE designed to consume up to about 14 minutes of useful work.
+
+The plan must contain:
+- one concrete primary objective;
+- expected useful-work duration, normally 10-14 minutes and never intentionally above 14 minutes;
+- explicit acceptance criteria that can be checked at handoff;
+- 2-5 checkpointable substeps that advance the same objective;
+- the smallest safe handoff boundary for each substep;
+- a fallback continuation unit only if the primary objective finishes materially early.
+
+Planning discipline:
+- Prefer one coherent medium-sized objective over many unrelated microtasks.
+- Do not choose an objective expected to finish in only a few minutes when a larger useful objective can safely be formed.
+- Do not pad with busywork merely to reach 14 minutes.
+- If no single useful objective can honestly fill most of the window, bundle tightly related substeps under one outcome-level objective.
+- Persist the plan BEFORE substantive execution so a successor can distinguish planned work from opportunistic drift.
+- Execute the planned objective continuously. Do not re-plan merely because an intermediate substep completed.
+- At ~12 minutes, stop admitting any substep that is expensive to checkpoint.
+- On actual successor handoff request, finish only the current smallest safe boundary, persist achieved acceptance criteria and exact remaining substep, then hand off.
+
 ## Fifteen-minute worker cycle
 
 Each scheduled wake is a worker generation in a rolling handoff pipeline. The 15-minute interval is the work-packet design horizon, not a voluntary stop timer.
@@ -50,7 +74,7 @@ Each scheduled wake is a worker generation in a rolling handoff pipeline. The 15
 3. If predecessor exists, persist HANDOFF_REQUEST only after rearm verification.
 4. While predecessor is fresh, wait for its durable handoff commit and do only non-conflicting preparation.
 5. If predecessor is SUSPECT or OVERDUE and remains unchanged through the recovery grace, execute `control/handoff-recovery.v1.json`.
-6. After authority is obtained, select a useful work packet sized for roughly the next 15-minute window and execute it.
+6. After authority is obtained, persist a PRIMARY TURN OBJECTIVE with an expected 10-14 minute useful-work duration, acceptance criteria, and 2-5 checkpointable substeps; then execute that objective continuously.
 7. If the packet finishes early and useful work remains, pull another bounded unit rather than idle.
 8. A predecessor checks for pending handoff after every bounded unit; on request it closes the smallest safe unit and hands off promptly.
 

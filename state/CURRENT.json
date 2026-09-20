@@ -11,13 +11,14 @@
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-018",
+    "id": "CP-UTILIZATION-019",
     "state": "CONTINUE",
     "completed": [
       "Rearmed the same canonical hourly RRULE from :15 to :30 and verified SUCCESS before successor work.",
       "Persisted a durable HANDOFF_REQUEST for epoch-14 predecessor after rearm verification.",
       "Observed predecessor activity last progressed at 00:03:23 KST; at successor observation 00:13:49 KST it was already stale well beyond the 120-second recovery threshold.",
-      "Re-read durable activity after handoff request and found predecessor progress unchanged; applied handoff-recovery v2 already-stale fast path and advanced authority to epoch 15."
+      "Re-read durable activity after handoff request and found predecessor progress unchanged; applied handoff-recovery v2 already-stale fast path and advanced authority to epoch 15.",
+      "Adopted plan-first utilization experiment: each authority owner must persist one coherent primary turn objective expected to consume 10-14 minutes before substantive execution."
     ],
     "evidence": [
       "Canonical automation update to :30 returned SUCCESS.",
@@ -25,8 +26,8 @@
       "Fresh ACTIVITY still showed epoch 14 last_progress_at=2026-09-21T00:03:23+09:00 after the request.",
       "control/handoff-recovery.v1.json v2 permits zero additional post-request grace when predecessor was already stale >=120s and unchanged on immediate re-read."
     ],
-    "observation": "UTIL-EXP-003 again exposes the real bottleneck: the predecessor stopped refreshing durable progress roughly 10 minutes before the successor, so the turn cannot satisfy continuous <=120s progress evidence. Fast recovery prevents a second 120s idle tax but does not repair the predecessor's early activity collapse.",
-    "next_action": "Under epoch 15, execute UTIL-EXP-004: make durable progress-heartbeat production itself the bounded work packet, refresh meaningful progress at <=120s gaps throughout the turn, stay checkpointable after 12m, and finalize immediately when the next successor handoff request appears."
+    "observation": "The prior heartbeat-centric intervention still allowed a worker to begin with undersized/miscellaneous work. The next experiment changes admission: choose the outcome-level 14-minute objective first, then execute its checkpointable substeps.",
+    "next_action": "At the next expected wake, REARM+VERIFY, obtain authority, persist state/TURN_PLAN.json with one 10-14 minute primary objective and 2-5 checkpointable substeps, then execute it continuously until successor handoff."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_QUARTER_SELF_SHIFT",
@@ -44,13 +45,20 @@
     "work_packet_boundary_is_stop_condition": false,
     "scheduler_fence_policy": "control/scheduler-fence.v1.json",
     "next_phase_minute": 45,
-    "quarter_cycle": [0,15,30,45],
+    "quarter_cycle": [
+      0,
+      15,
+      30,
+      45
+    ],
     "utilization_target_seconds": 840,
     "utilization_goal_min_valid_turns": 3,
     "utilization_state_path": "state/UTILIZATION.json",
     "runtime_safety_margin_seconds": 60,
     "large_unit_admission_cutoff_seconds": 720,
-    "handoff_ready_target_seconds": 840
+    "handoff_ready_target_seconds": 840,
+    "turn_plan_path": "state/TURN_PLAN.json",
+    "turn_plan_required_before_substantive_work": true
   },
   "safety": {
     "public_repo": true,

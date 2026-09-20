@@ -188,3 +188,30 @@ For RRULER-UTILIZATION, the operator's priority order is:
 5. only then optimize secondary validation/cleanup.
 
 Internal scheduler-fence mismatches are therefore recoverable control-plane drift, not permission to idle. When the canonical automation remains enabled with a verifiable future quarter wake, repair CURRENT/ACTIVITY/HANDOFF to the newest continuation and proceed. Never restore an older schedule generation or authority epoch.
+
+
+## Primary turn objective
+
+The worker must not begin a turn by greedily selecting the first available microtask. After rearming the next wake and obtaining authority, it must first commit one coherent PRIMARY TURN OBJECTIVE sized for the available ~14-minute work budget.
+
+Required durable planning fields:
+- objective_id;
+- objective;
+- expected_useful_seconds (normally 600-840, hard planning cap 840);
+- acceptance_criteria;
+- checkpointable_substeps (2-5);
+- current_substep;
+- handoff_boundary;
+- early_finish_fallback.
+
+Selection rule:
+- maximize materially useful progress that can be safely checkpointed within the turn;
+- reject trivially small objectives when a coherent larger objective is available;
+- tightly related subtasks may be bundled, unrelated filler may not;
+- completion of an intermediate substep does not authorize turn termination or a new unrelated plan.
+
+Execution rule:
+- follow the committed plan until acceptance, successor request, genuine blocker, or evidence that the plan is invalid;
+- if the objective completes materially before the 14-minute target, immediately execute the predeclared fallback or form one new related continuation objective;
+- after ~12 minutes, admit only work with a fast safe checkpoint boundary;
+- successor handoff preempts finishing the entire objective: close the smallest safe unit, persist exact remaining work, and transfer.
