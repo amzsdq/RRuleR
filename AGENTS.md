@@ -8,13 +8,14 @@ A ChatGPT session is disposable. Durable GitHub state is authoritative.
 
 1. Read `control/POLICY.md`.
 2. On a relay run, read `control/relay-policy.v1.json` as the machine-readable relay contract.
-3. Read `state/CURRENT.json`, `state/ACTIVITY.json`, `state/HANDOFF.json`, and `control/handoff-recovery.v1.json`.
-4. Resolve root goal, program status, owner/authority epoch, latest checkpoint, exact next action, and current activity evidence.
-5. On a relay wake, establish/verify the next recurring wake before substantive work. Compute it from the ACTUAL wake/start time: target_due = next whole minute at least 15 minutes after actual wake/start.
-6. If a predecessor is active, persist a durable handoff request only after the successor's own next wake is secured.
-7. Persist `state/ACTIVITY.json` as WORKING before or with the first substantive durable change after authority is obtained.
-8. Read only the task-specific files needed for the current work unit.
-9. Continue from durable state; never restart completed work merely because local chat context is missing.
+3. Read `state/CURRENT.json`, `state/ACTIVITY.json`, `state/HANDOFF.json`, `control/handoff-recovery.v1.json`, and `control/scheduler-fence.v1.json`.
+4. Resolve root goal, program status, owner/authority epoch, latest checkpoint, exact next action, current activity evidence, and durable expected next due.
+5. BEFORE any automation mutation, compare this wake against the durable expected due under `control/scheduler-fence.v1.json`. A stale queued occurrence may record an incident but MUST NOT update/disable the canonical, restore an old prompt/title, or claim authority.
+6. For an expected wake, establish/verify the next recurring wake before substantive work. Compute it from actual wake/start: target_due = next whole minute at least 15 minutes after actual wake/start.
+7. If a predecessor is active, persist a durable handoff request only after the successor's own next wake is secured.
+8. Persist `state/ACTIVITY.json` as WORKING before or with the first substantive durable change after authority is obtained.
+9. Read only the task-specific files needed for the current work unit.
+10. Continue from durable state; never restart completed work merely because local chat context is missing.
 
 ## Utilization rule
 
@@ -44,7 +45,7 @@ A predecessor keeps working until a successor wake is actually observed.
 
 Each scheduled wake is a worker generation in a rolling handoff pipeline. The 15-minute interval is the work-packet design horizon, not a voluntary stop timer.
 
-1. Reconstruct fresh durable state.
+1. Reconstruct fresh durable state and pass the scheduler-fence check.
 2. REARM+VERIFY the same canonical RRULE for the next whole minute at least 15 minutes after actual wake.
 3. If predecessor exists, persist HANDOFF_REQUEST only after rearm verification.
 4. While predecessor is fresh, wait for its durable handoff commit and do only non-conflicting preparation.
@@ -53,7 +54,7 @@ Each scheduled wake is a worker generation in a rolling handoff pipeline. The 15
 7. If the packet finishes early and useful work remains, pull another bounded unit rather than idle.
 8. A predecessor checks for pending handoff after every bounded unit; on request it closes the smallest safe unit and hands off promptly.
 
-Successor ordering: REARM+VERIFY -> HANDOFF_REQUEST -> WAIT_OR_RECOVER -> CLAIM_AUTHORITY -> PLAN_15M_PACKET -> WORK.
+Successor ordering: FRESH_STATE+SCHEDULER_FENCE -> REARM+VERIFY -> HANDOFF_REQUEST -> WAIT_OR_RECOVER -> CLAIM_AUTHORITY -> PLAN_15M_PACKET -> WORK.
 
 ## Operator-visible activity
 
