@@ -11,12 +11,12 @@
   "canonical_automation_id":"6aaf8a993eb08191b8d0ab1d9662e4b2",
   "run_state":"WORKING",
   "checkpoint":{
-    "id":"CP-UTILIZATION-007",
+    "id":"CP-UTILIZATION-008",
     "state":"CONTINUE",
-    "completed":["Rolling 15-minute worker protocol adopted","RUN-20260920-2145 rearmed the same canonical RRULE to 22:01 before requesting handoff","Durable handoff request persisted for predecessor RUN-20260920-2128","Predecessor activity remained unchanged beyond the configured 20-minute overdue threshold","Continuation advanced to RUN-20260920-2145 at authority epoch 10"],
-    "evidence":["commit f12f4400e4c115ab392e472335a5fcbe4032e241 records successor rearm verification and HANDOFF_REQUEST","state/ACTIVITY.json last_progress_at remained 2026-09-20T21:30:00+09:00 through the liveness overdue threshold"],
-    "observation":"First rolling handoff exposed the stale-predecessor recovery case: an inactive predecessor cannot acknowledge a handoff request, so the configured overdue recovery path must restore continuation.",
-    "next_action":"Execute a roughly 15-minute packet formalizing stale-predecessor handoff recovery and validator coverage while the 22:01 successor wake remains secured."
+    "completed":["Rolling 15-minute worker protocol adopted","Stale predecessor recovery formalized and CI validated","Recovered successor run recorded in RUNS.jsonl","A queued older 22:00 occurrence overwrote/disabled the same canonical after the newer 22:01 schedule had been committed","Canonical was restored with the fresh wake-pointer prompt and a verified next due at 22:17","Scheduler-fence policy added so stale queued wakes must read durable expected due before any automation mutation"],
+    "evidence":["GitHub Actions run 35511896249 passed low-gap handoff recovery validation","automation inspection at 22:01 showed canonical disabled and reverted to an older 22:00 quarter-hour prompt/schedule despite the previously verified 22:01 rearm","commit 1801730e663b96a525c4927aa3099362f40b7ce9 adds control/scheduler-fence.v1.json","commit a86d25b121b6966288cf8778796886d92f007f0b teaches bootstrap to fence stale queued wakes"],
+    "observation":"The first live rolling-handoff test found a scheduler race more important than the planned work: an already-queued old occurrence can execute after a self-update and mutate the same canonical. Durable expected-due fencing is therefore required before scheduler mutation.",
+    "next_action":"Keep working until the 22:17 successor attempt; verify whether the scheduler fence prevents stale mutation and whether same-canonical overlap produces a durable HANDOFF_REQUEST."
   },
   "continuation":{
     "mechanism":"RRULE_HOURLY_SELF_SHIFT_FROM_ACTUAL_WAKE",
@@ -24,14 +24,15 @@
     "rrule_frequency":"HOURLY",
     "phase_step_minutes":15,
     "next_wake_first":true,
-    "next_due_at":"2026-09-20T22:01:00+09:00",
-    "current_phase_minute":1,
+    "next_due_at":"2026-09-20T22:17:00+09:00",
+    "current_phase_minute":17,
     "handoff_trigger":"SUCCESSOR_REARM_VERIFIED_THEN_DURABLE_HANDOFF_REQUEST",
     "voluntary_idle_before_successor_forbidden":true,
     "root_completion_is_stop_condition":false,
     "program_terminal_disabled_required":true,
     "work_packet_horizon_minutes":15,
-    "work_packet_boundary_is_stop_condition":false
+    "work_packet_boundary_is_stop_condition":false,
+    "scheduler_fence_policy":"control/scheduler-fence.v1.json"
   },
   "safety":{"public_repo":true,"secrets_allowed":false,"reference_repo_amzsdq_R":"READ_ONLY"}
 }
