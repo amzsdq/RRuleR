@@ -9,34 +9,31 @@
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "run_state": "ACTIVE_UNTIL_SUCCESSOR_OBSERVED",
   "checkpoint": {
-    "id": "CP-BOOTSTRAP-003",
+    "id": "CP-BOOTSTRAP-004",
     "state": "ACTIVE",
     "completed": [
-      "Repository philosophy and bootstrap contract established",
-      "Control policy and architecture persisted",
-      "RRULE self-update relay reproduction guide persisted",
-      "Machine-readable durable CURRENT state established",
-      "RRULE validation experiment ledger established",
-      "GitHub Actions control-plane validator created",
-      "Same canonical recurring automation moved from :30 phase to :45 phase without one-shot conversion",
-      "Continuous-work utilization rule corrected and made authoritative",
-      "Current-state and relay-event schemas added",
-      "Operator runbook added",
-      "Append-only public-safe relay event ledger started",
-      "CI validator expanded to cover schemas and durable-state invariants"
+      "Bootstrap contract, control policy, architecture, operations and RRULE relay guide established",
+      "Continuous-work/no-voluntary-idle utilization rule made authoritative",
+      "Machine relay policy v1 added and validated by CI",
+      "CURRENT, EVENT, RUN and HANDOFF durable state models/schemas established",
+      "Successor-triggered handoff state machine documented",
+      "Utilization measurement model documented",
+      "Fresh-session RRULE reproduction checklist created",
+      "CI expanded to validate machine policy, current state, handoff state, events and run observations",
+      "Predecessor continued useful work instead of stopping after checkpoint"
     ],
     "evidence": [
-      "workflow_run:35505295915 conclusion=success",
-      "workflow_run:35505498011 conclusion=success",
-      "workflow_run:35505508102 queued for expanded validator at observation time",
       "automation_id:6aaf8a993eb08191b8d0ab1d9662e4b2",
       "schedule:RRULE:FREQ=HOURLY;BYMINUTE=45;BYSECOND=0",
       "next_due_kst:2026-09-20T19:45:00+09:00",
-      "continuous_work_policy_commit:adbfb29126bc4de3c12b4ff1a0ef814cc54486c6",
-      "relay_guide_commit:37e2e235e376b04017bde7a48307407ec302223b"
+      "workflow_run:35505724107 conclusion=success",
+      "workflow_run:35505752776 conclusion=success",
+      "machine_relay_policy_commit:f3a92fa1352ac4dad98fdbc60c829d688571f4a1",
+      "handoff_protocol_commit:40c26b60a34b3dd213f3e07c85df54a43d80ac3b",
+      "repro_checklist_commit:14306924de9fcec199cc7955ed7465df5501cab0"
     ],
-    "observation": "Previous voluntary early stop was incorrect for the utilization objective. Current policy requires the predecessor to keep doing useful work until successor wake is actually observed, terminal completion occurs, an external blocker is proven, or the platform ends the run.",
-    "next_action": "Continue useful RRuleR bootstrap/validation work now. Do not idle. At or after 19:45 KST, check whether the successor wake actually began. Only after actual successor observation initiate handoff; otherwise keep working."
+    "observation": "Predecessor remains active and productive. Scheduled 19:45 KST boundary is a successor opportunity, not a voluntary stop time.",
+    "next_action": "Continue useful bounded work. At/after 19:45 KST inspect automation metadata/durable state for positive successor execution evidence. If no successor is observed, continue working. If observed, stop starting new units, finish the current smallest safe unit, persist HANDOFF_DRAIN -> HANDOFF_COMMITTED, and let successor resume."
   },
   "continuation": {
     "mechanism": "RRULE_PHASE_ROTATION",
