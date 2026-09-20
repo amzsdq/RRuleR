@@ -32,14 +32,14 @@
   "rolling_mean_observed_useful_span_seconds": null,
   "goal_reached": false,
   "latest_diagnosis": {
-    "cause_class": "HANDOFF_DELAY",
-    "evidence": "The prior epoch reached an observed 840-second progress boundary but did not commit its handoff; the following successor recovered only after the predecessor was already stale.",
-    "secondary_risk": "Span-only measurement could falsely credit idle time between sparse timestamps; acceptance now requires continuous progress evidence with no unexplained gap >120s."
+    "cause_class": "EARLY_VOLUNTARY_END",
+    "evidence": "Epoch 14 started substantive work at 23:59:54 but its last durable meaningful progress remained 00:03:23 when the successor was observed at 00:13:49. The >10-minute unexplained gap invalidates continuous-work acceptance and indicates the predecessor turn effectively collapsed long before baton time.",
+    "secondary_risk": "Fast stale-predecessor takeover prevents extra recovery delay but cannot create missing work evidence; the predecessor itself must remain active and checkpoint frequently."
   },
   "next_corrective_experiment": {
-    "experiment_id": "UTIL-EXP-003",
-    "hypothesis": "Removing redundant recovery grace for already-stale predecessors and requiring dense progress evidence will reduce baton latency while making the 14-minute target resistant to sparse-span false positives.",
-    "change": "Use handoff-recovery v2 fast path; emit meaningful durable progress at <=120s gaps while working; record expected due and actual successor observation separately; finalize immediately on positive successor request.",
-    "success_signal": "At least 3 valid completed turns with rolling mean observed_useful_span_seconds >= 840, each with continuous progress evidence, no voluntary dead tail, and no fresh-predecessor takeover."
+    "experiment_id": "UTIL-EXP-004",
+    "hypothesis": "If each worker treats meaningful <=120-second durable progress refreshes as part of its normal bounded work packet and keeps selecting useful units until successor request, the early-collapse failure will disappear and a valid >=840-second turn can be measured.",
+    "change": "During epoch 15, perform useful checkpointable units continuously and persist meaningful progress at <=120-second gaps; after 12 minutes admit only quickly checkpointable units; on successor request finalize measurement and handoff before optional validation/documentation.",
+    "success_signal": "One valid completed turn with >=840s observed useful span, continuous <=120s progress evidence, and immediate successor-triggered handoff; then repeat until 3 valid turns achieve rolling mean >=840s."
   }
 }

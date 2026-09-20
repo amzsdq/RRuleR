@@ -2,12 +2,12 @@
   "schema_version": "1.0",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "handoff_state": "HANDOFF_REQUESTED",
+  "handoff_state": "RECOVERED_TAKEOVER",
   "predecessor_run_id": "RUN-UTIL-20260920-235858",
   "successor_run_id": "RUN-UTIL-20260921-001349",
   "successor_expected_at": "2026-09-21T00:15:00+09:00",
   "successor_observed_at": "2026-09-21T00:13:49+09:00",
-  "active_unit": "UTIL-EXP-003 baton latency reduction and valid-turn measurement",
-  "checkpoint_id": "CP-UTILIZATION-017",
-  "next_action": "Successor rearm to :30 is verified. Predecessor must stop admitting new substantive units, close the smallest safe unit, persist exact measurement/continuation, and release authority promptly. Successor then claims the next authority epoch and continues the utilization experiment."
+  "active_unit": "UTIL-EXP-004 continuous progress-heartbeat and fast baton finalization",
+  "checkpoint_id": "CP-UTILIZATION-018",
+  "next_action": "Epoch 15 owns authority. Continue useful checkpointable work with meaningful durable progress at <=120-second gaps; on the next successor request, stop admitting new units, persist exact measurement/continuation, and release immediately."
 }
