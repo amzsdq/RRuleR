@@ -9,9 +9,9 @@
   "current_owner": "RUN-UTIL-20260920-231559",
   "authority_epoch": 12,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "WORKING",
+  "run_state": "HANDOFF_DRAIN",
   "checkpoint": {
-    "id": "CP-UTILIZATION-014",
+    "id": "CP-UTILIZATION-015",
     "state": "CONTINUE",
     "completed": [
       "23:15 expected wake rearmed the same canonical hourly RRULE to :30 before substantive work and claimed authority epoch 12.",
@@ -19,16 +19,18 @@
       "Opened a durable live RUNS observation for the 23:15 utilization turn rather than relying on schedule arithmetic.",
       "Expanded docs/UTILIZATION.md with the valid-turn 14+1 measurement protocol and explicit 840-second acceptance gate.",
       "Expanded docs/HANDOFF_PROTOCOL.md with positive successor-evidence ordering and baton-request requirements.",
-      "Bound RELAY_VALIDATION utilization measurement acceptance to the live 23:15 experiment."
+      "Bound RELAY_VALIDATION utilization measurement acceptance to the live 23:15 experiment.",
+      "23:30 successor positively woke at 23:32:22, rearmed the same canonical hourly RRULE to :45, verified rearm success, and persisted durable successor handoff evidence without taking predecessor authority."
     ],
     "evidence": [
-      "canonical automation verified next phase BYMINUTE=30",
+      "canonical automation verified next phase BYMINUTE=45",
       "CI run 35516038296 completed success after validator repair",
       "CI run 35516072374 completed success with the new live RUNS observation",
-      "state/ACTIVITY.json has durable substantive start 23:16:15 and progressive checkpoints through the pre-handoff window"
+      "state/ACTIVITY.json has durable substantive start 23:16:15 and progressive checkpoints through 23:30:15",
+      "state/HANDOFF.json records successor RUN-UTIL-20260920-233222 observed at 23:32:22 after successful :45 rearm"
     ],
-    "observation": "The 23:15 turn is now a real measurement attempt with durable start/progress evidence. It must remain non-terminal and cannot count as valid until an actual successor/end boundary is captured. After 12 minutes, admit only tiny checkpointable units; at ~14 minutes mark handoff-ready without idling.",
-    "next_action": "Continue tiny useful validation/checkpoint units. Near 23:30 mark HANDOFF_READY. When the actual :30 successor appears, require it to rearm to :45 first, then persist successor evidence/request; close the smallest safe unit and finalize exact run/utilization boundaries without inference."
+    "observation": "The 23:15 predecessor has positive successor evidence and is now in handoff drain. Authority remains epoch 12 until predecessor commits handoff or bounded stale-predecessor recovery becomes eligible; the verified future continuation is already advanced to :45.",
+    "next_action": "Predecessor must close the smallest safe unit and commit exact measurement/checkpoint boundaries. If it remains unchanged through the configured recovery grace and is proven SUSPECT/OVERDUE, successor may advance authority under control/handoff-recovery.v1.json."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_QUARTER_SELF_SHIFT",
@@ -36,8 +38,8 @@
     "rrule_frequency": "HOURLY",
     "phase_step_minutes": 15,
     "next_wake_first": true,
-    "next_due_at": "2026-09-20T23:30:00+09:00",
-    "current_phase_minute": 30,
+    "next_due_at": "2026-09-20T23:45:00+09:00",
+    "current_phase_minute": 45,
     "handoff_trigger": "SUCCESSOR_REARM_VERIFIED_THEN_DURABLE_HANDOFF_REQUEST",
     "voluntary_idle_before_successor_forbidden": true,
     "root_completion_is_stop_condition": false,
@@ -45,7 +47,7 @@
     "work_packet_horizon_minutes": 14,
     "work_packet_boundary_is_stop_condition": false,
     "scheduler_fence_policy": "control/scheduler-fence.v1.json",
-    "next_phase_minute": 45,
+    "next_phase_minute": 0,
     "quarter_cycle": [0,15,30,45],
     "utilization_target_seconds": 840,
     "utilization_goal_min_valid_turns": 3,
