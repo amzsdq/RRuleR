@@ -25,6 +25,7 @@ jobs:
             "README.md"
             "AGENTS.md"
             "control/POLICY.md"
+            "control/relay-policy.v1.json"
             "state/CURRENT.json"
             "state/EVENTS.jsonl"
             "state/README.md"
@@ -57,11 +58,13 @@ jobs:
 
           fetch "state/CURRENT.json" /tmp/current.json
           fetch "state/EVENTS.jsonl" /tmp/events.jsonl
+          fetch "control/relay-policy.v1.json" /tmp/relay-policy.json
           fetch "schemas/current-state.schema.json" /tmp/current-schema.json
           fetch "schemas/relay-event.schema.json" /tmp/event-schema.json
           fetch "schemas/run-observation.schema.json" /tmp/run-schema.json
 
           python -m json.tool /tmp/current.json >/dev/null
+          python -m json.tool /tmp/relay-policy.json >/dev/null
           python -m json.tool /tmp/current-schema.json >/dev/null
           python -m json.tool /tmp/event-schema.json >/dev/null
           python -m json.tool /tmp/run-schema.json >/dev/null
@@ -70,6 +73,8 @@ jobs:
           import json
 
           p=json.load(open('/tmp/current.json'))
+          policy=json.load(open('/tmp/relay-policy.json'))
+
           required=[
               'schema_version','repository','root_job_id','root_goal','status',
               'current_owner','authority_epoch','canonical_automation_id',
@@ -108,6 +113,19 @@ jobs:
               raise SystemExit('RRuleR must remain public-safe by policy')
           if safety.get('secrets_allowed') is not False:
               raise SystemExit('public repo must keep secrets_allowed=false')
+
+          if policy.get('status') != 'ACTIVE':
+              raise SystemExit('relay policy must be ACTIVE')
+          if policy.get('scheduler',{}).get('mechanism') != 'RRULE_PHASE_ROTATION':
+              raise SystemExit('relay policy scheduler mechanism mismatch')
+          if policy.get('scheduler',{}).get('canonical_reuse_required') is not True:
+              raise SystemExit('relay policy must require canonical reuse')
+          if policy.get('utilization',{}).get('voluntary_idle_while_useful_work_exists_forbidden') is not True:
+              raise SystemExit('relay policy must forbid voluntary idle')
+          if policy.get('handoff',{}).get('trigger') != 'SUCCESSOR_ACTUALLY_OBSERVED':
+              raise SystemExit('relay policy handoff trigger mismatch')
+          if policy.get('safety',{}).get('secrets_allowed') is not False:
+              raise SystemExit('relay policy must forbid secrets')
 
           event_ids=set()
           allowed_events={
