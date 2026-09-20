@@ -2,35 +2,37 @@
   "schema_version":"1.1",
   "program_id":"RRULER-PROGRAM-001",
   "root_job_id":"RRULER-UTILIZATION-003",
-  "authority_epoch":22,
-  "run_id":"RUN-UTIL-20260921-032900",
+  "authority_epoch":23,
+  "run_id":"RUN-UTIL-20260921-033304",
   "status":"ACTIVE",
-  "phase":"FIRST_PRODUCTION_ROLLING_LIFECYCLE_OBSERVATION",
-  "objective_id":"UTIL-EXP-011",
-  "objective":"Validate the first production rolling same-canonical RRULE wake end-to-end while removing stale active fixed-quarter assumptions that would corrupt measurement or continuation decisions.",
+  "phase":"NORMALIZED_ROLLING_UTILIZATION_SAMPLE",
+  "objective_id":"UTIL-EXP-011-SAMPLE-1",
+  "objective":"Produce the first completed normalized rolling-lifecycle utilization sample with explicit automatic-reentry, useful-work evidence, final close+1m rearm, and cold-resumable checkpoint state.",
   "expected_useful_seconds":600,
   "acceptance_criteria":[
+    "Automatic wake from predecessor final-rearm is durably recorded with scheduler delay.",
     "Same canonical is provisionally armed and verified before substantive work.",
-    "Active control projections no longer instruct fixed-quarter rotation or quarter-boundary termination.",
-    "Historical quarter-cycle evidence remains preserved as history rather than silently rewritten.",
-    "Utilization state distinguishes pre-migration fixed-quarter measurements from the new rolling-lifecycle production observation.",
-    "Latest checkpoint is sufficient for a cold successor to resume without chat context.",
-    "Normal close final-rearms the same canonical to actual close +1m and persists the verified due."
+    "At least several meaningful durable progress points advance measurement/control quality without padding.",
+    "No active control projection contradicts rolling lifecycle semantics.",
+    "Latest checkpoint is sufficient for cold resume.",
+    "Normal close final-rearms same canonical to close+1m and persists verified due."
   ],
   "checkpointable_substeps":[
-    "Audit mandatory active controls and state for stale quarter-cycle semantics.",
-    "Migrate active prose/machine projections that conflict with rolling lifecycle.",
-    "Update utilization/experiment state for a clean rolling production measurement.",
-    "Checkpoint findings and final-rearm same canonical to close+1m."
+    "Record automatic reentry and claim epoch 23.",
+    "Normalize wake architecture and utilization measurement projections.",
+    "Audit active rolling lifecycle controls for residual contradictions or measurement gaps.",
+    "Checkpoint sample state and final-rearm same canonical to close+1m."
   ],
-  "current_substep":1,
-  "handoff_boundary":"After each control/state update; preserve same-canonical future wake before any normal return.",
-  "early_finish_fallback":"Inspect wake architecture and run-continuation gate for scheduler assumptions that can misclassify rolling reentry.",
-  "created_for_next_wake":true,
-  "started_at":"2026-09-21T03:29:00+09:00",
-  "last_progress_at":"2026-09-21T03:29:00+09:00",
+  "current_substep":3,
+  "handoff_boundary":"After each state/control update; preserve verified same-canonical future wake before normal return.",
+  "early_finish_fallback":"Audit recovery/runtime-mode/evidence controls for stale fixed-quarter assumptions or insufficient rolling sample fields.",
+  "created_for_next_wake":false,
+  "started_at":"2026-09-21T03:33:20+09:00",
+  "last_progress_at":"2026-09-21T03:35:00+09:00",
   "progress_evidence":[
-    "Expected durable due was 03:29 KST and actual scheduled automation was the same canonical.",
-    "Same canonical hourly RRULE was provisionally rearmed to 03:42 KST before substantive work."
+    "Automatic same-canonical wake from durable 03:32 due observed near 03:33:04 KST.",
+    "Same canonical provisionally rearmed to 03:46 KST.",
+    "Authority epoch 23 claimed in CURRENT/ACTIVITY/HANDOFF.",
+    "WAKE_ARCHITECTURE and UTILIZATION normalized with production reentry evidence."
   ]
 }
