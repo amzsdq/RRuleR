@@ -1,0 +1,57 @@
+name: Validate RRuleR control plane
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate required files and JSON from GitHub API checkout-free workspace
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          required=(
+            "README.md"
+            "AGENTS.md"
+            "control/POLICY.md"
+            "state/CURRENT.json"
+            "state/README.md"
+            "docs/ARCHITECTURE.md"
+            "docs/RELAY_RRULE_SELF_UPDATE.md"
+            "experiments/rrule-self-relay/README.md"
+          )
+          for path in "${required[@]}"; do
+            code="$(curl -sS -o /tmp/content -w '%{http_code}' \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github.raw+json" \
+              "https://api.github.com/repos/$REPO/contents/$path?ref=$SHA")"
+            test "$code" = "200" || { echo "Missing required file: $path"; exit 1; }
+          done
+          curl -fsSL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github.raw+json" \
+            "https://api.github.com/repos/$REPO/contents/state/CURRENT.json?ref=$SHA" \
+            -o /tmp/current.json
+          python -m json.tool /tmp/current.json >/dev/null
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/current.json'))
+          required=['schema_version','root_job_id','root_goal','status','authority_epoch','checkpoint','continuation','safety']
+          missing=[k for k in required if k not in p]
+          if missing:
+              raise SystemExit(f"CURRENT.json missing: {missing}")
+          if p['safety'].get('secrets_allowed') is not False:
+              raise SystemExit('public repo must keep secrets_allowed=false')
+          print('RRuleR control-plane validation passed')
+          PY
