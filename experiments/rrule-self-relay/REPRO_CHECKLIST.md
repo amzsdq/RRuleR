@@ -13,6 +13,7 @@ Use this checklist to reproduce the mechanism with a fresh ChatGPT session.
   - `control/POLICY.md`
   - `control/relay-policy.v1.json`
   - `state/CURRENT.json`
+  - `state/RELAY_VALIDATION.json`
 
 ## Initial arm
 
@@ -61,7 +62,8 @@ Read in order:
 3. `control/relay-policy.v1.json`
 4. `state/CURRENT.json`
 5. `state/HANDOFF.json`
-6. task-specific referenced material
+6. `state/RELAY_VALIDATION.json`
+7. task-specific referenced material
 
 Do not treat chat memory as authoritative state.
 
@@ -81,7 +83,7 @@ At the next scheduled boundary, distinguish:
 - **clock arrived only** — predecessor keeps working;
 - **successor actually observed** — initiate handoff.
 
-Positive successor evidence is required.
+Positive successor evidence is required. Never infer overlap merely because two run descriptions appear close in time.
 
 ### 5. Handoff
 
@@ -91,9 +93,9 @@ Predecessor:
 
 1. stops starting new substantive units;
 2. finishes current smallest safe unit;
-3. updates `state/HANDOFF.json` to `HANDOFF_DRAIN`;
+3. updates `state/HANDOFF.json` to `HANDOFF_DRAIN` when it still owns the handoff write;
 4. updates `state/CURRENT.json` with final predecessor checkpoint and exact next action;
-5. records event/run evidence;
+5. records event/run evidence with observed timestamps only;
 6. commits handoff as `HANDOFF_COMMITTED`;
 7. ends.
 
@@ -101,8 +103,19 @@ Successor:
 
 1. must not duplicate predecessor active work;
 2. reads durable handoff;
-3. resumes exact next action;
+3. resumes exact next action after authority is valid;
 4. marks itself active where the state model requires.
+
+If the platform serializes executions and explicit predecessor drain cannot run, successor reconstructs from the latest durable checkpoint and records the platform-ended boundary where observable.
+
+## Evidence discipline
+
+For every acceptance claim:
+
+- prefer automation metadata, Git commit SHA, Actions run ID, durable event timestamp, or durable run observation;
+- record unknown timing as `null`, not an estimate;
+- do not use chat prose alone as completion or concurrency evidence;
+- update `state/RELAY_VALIDATION.json` so a fresh session can distinguish proven and pending criteria mechanically.
 
 ## Self-update failure test
 
@@ -121,17 +134,20 @@ If no valid wake remains:
 
 ## PASS gate
 
-Do not claim reproduction PASS until all are evidenced:
+Do not claim reproduction PASS until the machine validation record shows adequate evidence for:
 
 - [ ] same canonical automation ID across runs;
 - [ ] RRULE remains recurring;
 - [ ] at least two phase rotations succeed;
 - [ ] at least one scheduled successor actually runs;
 - [ ] successor reconstructs from GitHub durable state;
-- [ ] no duplicate substantive execution;
-- [ ] predecessor does not voluntarily idle while waiting for successor;
-- [ ] handoff/runtime timeout behavior is recorded;
+- [ ] additional continuation survives beyond the first cold handoff;
+- [ ] no duplicate substantive execution is evidenced;
+- [ ] predecessor no-voluntary-idle rule is durable and followed where observable;
+- [ ] handoff/runtime behavior is recorded without fabricated precision;
 - [ ] final CI/durable state is coherent.
+
+Concurrency classification and precise idle-gap measurement are desirable live evidence. They must not be invented; if unavailable, preserve them as pending or scoped observations and state whether they block reproduction correctness.
 
 ## Terminal behavior
 
@@ -139,6 +155,7 @@ When the root goal itself is complete:
 
 1. persist terminal durable state;
 2. append terminal evidence;
-3. disable the same canonical automation;
-4. schedule no successor;
-5. report COMPLETE.
+3. set `state/RELAY_VALIDATION.json` to the justified terminal validation status;
+4. disable the same canonical automation;
+5. schedule no successor;
+6. report COMPLETE.
