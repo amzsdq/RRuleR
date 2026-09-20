@@ -22,7 +22,8 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 /
 ├─ AGENTS.md
 ├─ control/
-│  └─ POLICY.md
+│  ├─ POLICY.md
+│  └─ relay-policy.v1.json
 ├─ state/
 │  ├─ CURRENT.json
 │  ├─ EVENTS.jsonl
@@ -33,7 +34,8 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 ├─ docs/
 │  ├─ ARCHITECTURE.md
 │  ├─ OPERATIONS.md
-│  └─ RELAY_RRULE_SELF_UPDATE.md
+│  ├─ RELAY_RRULE_SELF_UPDATE.md
+│  └─ UTILIZATION.md
 ├─ experiments/
 │  └─ rrule-self-relay/
 │     └─ README.md
@@ -47,9 +49,10 @@ A fresh session reads:
 
 1. `AGENTS.md`
 2. `control/POLICY.md`
-3. `state/CURRENT.json`
-4. the referenced checkpoint/task/spec
-5. `docs/RELAY_RRULE_SELF_UPDATE.md` when operating the relay
+3. on relay runs, `control/relay-policy.v1.json`
+4. `state/CURRENT.json`
+5. the referenced checkpoint/task/spec
+6. `docs/RELAY_RRULE_SELF_UPDATE.md` when operating the relay
 
 Then it reconstructs state, validates authority, establishes the next wake, and immediately performs substantive work.
 
