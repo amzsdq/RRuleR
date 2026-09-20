@@ -15,8 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check continuation authority
-        shell: python
+        shell: bash
         run: |
+          python - <<'PY'
           import json
           from pathlib import Path
           gate=json.loads(Path('control/run-continuation-gate.v1.json').read_text())
@@ -34,3 +35,4 @@ jobs:
           if current['program_status'] in gate['program_nonterminal_states']:
               assert current['continuation']['program_terminal_disabled_required'] is True
           print('continuation authority validation passed')
+          PY
