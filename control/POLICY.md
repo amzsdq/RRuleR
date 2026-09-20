@@ -73,7 +73,13 @@ If same-canonical overlap is unsupported, correctness falls back to durable reco
 
 ## Scheduler policy
 
-Scheduler mechanism is replaceable. The active mechanism is a same-canonical hourly RRULE whose BYMINUTE is self-shifted on every wake. The shift MUST be computed from the actual wake/start time, not from the stale prior phase. Set target_due to the next whole-minute boundary at least 15 minutes after actual wake/start, then set DTSTART=target_due and RRULE:FREQ=HOURLY;BYMINUTE=target_due.minute;BYSECOND=0. This avoids the failure mode where a delayed wake re-arms only seconds before the nominal next phase, misses that occurrence, and then sleeps for nearly an hour.
+Scheduler mechanism is replaceable. The active mechanism is one same-canonical hourly RRULE. Each valid wake rotates only BYMINUTE through the fixed quarter-hour cycle:
+
+```text
+:00 -> :15 -> :30 -> :45 -> :00 of the next hour
+```
+
+The successor MUST rearm and verify this same canonical before substantive work or handoff request. Do not create four separate quarter-hour automations and do not convert the canonical to one-shot.
 
 Architectural invariant:
 
@@ -136,3 +142,24 @@ WAKE
   -> WORK
   -> next successor wake repeats the cycle
 ```
+
+
+## Utilization measurement and improvement
+
+The active optimization target is an average observed useful-work span of at least 10 minutes per 15-minute turn.
+
+A completed run must persist enough timestamps to distinguish work from dead time. The minimum derived fields are:
+- observed_useful_span_seconds: last meaningful durable progress minus substantive_work_started_at;
+- dead_tail_seconds: successor/handoff boundary minus last meaningful durable progress, when both timestamps are known;
+- scheduler_or_handoff_overhead_seconds: known non-substantive startup/handoff overhead;
+- measurement_valid: false when required boundaries are missing rather than inventing values.
+
+Every completed valid turn is an experiment:
+1. measure;
+2. compare against 600 seconds;
+3. classify the dominant under-utilization cause;
+4. choose one concrete policy/process correction;
+5. persist it for the next worker;
+6. next worker applies it and retests.
+
+The optimization target is reached only after at least 3 valid completed turns whose rolling mean observed_useful_span_seconds is >= 600. Until then the program remains CONTINUE unless a true BLOCKED_EXTERNAL condition is proven. A single good turn does not complete the experiment.

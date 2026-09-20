@@ -1,19 +1,33 @@
 {
-  "policy_id":"RRULER_SCHEDULER_FENCE",
-  "version":1,
-  "status":"ACTIVE",
-  "purpose":"Prevent an already-queued stale wake from overwriting or disabling the canonical automation after a newer schedule has been committed.",
-  "authoritative_expected_due_path":"state/CURRENT.json#/continuation/next_due_at",
-  "startup_order":[
+  "policy_id": "RRULER_SCHEDULER_FENCE",
+  "version": 1,
+  "status": "ACTIVE",
+  "purpose": "Prevent an already-queued stale wake from overwriting or disabling the canonical automation after a newer schedule has been committed.",
+  "authoritative_expected_due_path": "state/CURRENT.json#/continuation/next_due_at",
+  "startup_order": [
     "READ_FRESH_CURRENT_BEFORE_AUTOMATION_MUTATION",
     "COMPARE_ACTUAL_WAKE_TO_EXPECTED_DUE",
     "IF_STALE_WAKE_DO_NOT_MUTATE_AUTOMATION_OR_AUTHORITY",
     "IF_EXPECTED_WAKE_REARM_AND_VERIFY",
     "THEN_CONTINUE_HANDOFF_PROTOCOL"
   ],
-  "stale_wake_definition":"A wake whose scheduled/actual occurrence belongs to an older schedule generation and does not match the current durable expected due window.",
-  "stale_wake_action":"NO_AUTOMATION_MUTATION_NO_AUTHORITY_CLAIM_RECORD_INCIDENT_ONLY",
-  "expected_due_tolerance_seconds":180,
-  "queued_old_occurrence_must_not_disable_canonical":true,
-  "queued_old_occurrence_must_not_restore_old_prompt_or_title":true
+  "stale_wake_definition": "A wake whose scheduled/actual occurrence belongs to an older schedule generation and does not match the current durable expected due window.",
+  "stale_wake_action": "NO_AUTOMATION_MUTATION_NO_AUTHORITY_CLAIM_RECORD_INCIDENT_ONLY",
+  "expected_due_tolerance_seconds": 240,
+  "queued_old_occurrence_must_not_disable_canonical": true,
+  "queued_old_occurrence_must_not_restore_old_prompt_or_title": true,
+  "scheduler_mechanism": "RRULE_HOURLY_QUARTER_SELF_SHIFT",
+  "expected_phase_cycle_minutes": [
+    0,
+    15,
+    30,
+    45
+  ],
+  "expected_transition_map": {
+    "0": 15,
+    "15": 30,
+    "30": 45,
+    "45": 0
+  },
+  "expected_wake_action": "REARM_SAME_CANONICAL_TO_NEXT_QUARTER_SLOT_AND_VERIFY_BEFORE_WORK"
 }

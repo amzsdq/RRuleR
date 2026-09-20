@@ -11,7 +11,7 @@ A ChatGPT session is disposable. Durable GitHub state is authoritative.
 3. Read `state/CURRENT.json`, `state/ACTIVITY.json`, `state/HANDOFF.json`, `control/handoff-recovery.v1.json`, and `control/scheduler-fence.v1.json`.
 4. Resolve root goal, program status, owner/authority epoch, latest checkpoint, exact next action, current activity evidence, and durable expected next due.
 5. BEFORE any automation mutation, compare this wake against the durable expected due under `control/scheduler-fence.v1.json`. A stale queued occurrence may record an incident but MUST NOT update/disable the canonical, restore an old prompt/title, or claim authority.
-6. For an expected wake, establish/verify the next recurring wake before substantive work. Compute it from actual wake/start: target_due = next whole minute at least 15 minutes after actual wake/start.
+6. For an expected wake, establish/verify the next recurring wake before substantive work. Keep the schedule as one hourly RRULE and rotate only the minute slot in the fixed quarter cycle: 00 -> 15 -> 30 -> 45 -> 00(next hour).
 7. If a predecessor is active, persist a durable handoff request only after the successor's own next wake is secured.
 8. Persist `state/ACTIVITY.json` as WORKING before or with the first substantive durable change after authority is obtained.
 9. Read only the task-specific files needed for the current work unit.
@@ -46,7 +46,7 @@ A predecessor keeps working until a successor wake is actually observed.
 Each scheduled wake is a worker generation in a rolling handoff pipeline. The 15-minute interval is the work-packet design horizon, not a voluntary stop timer.
 
 1. Reconstruct fresh durable state and pass the scheduler-fence check.
-2. REARM+VERIFY the same canonical RRULE for the next whole minute at least 15 minutes after actual wake.
+2. REARM+VERIFY the same canonical hourly RRULE by moving its minute slot exactly one quarter: 00->15, 15->30, 30->45, 45->00(next hour).
 3. If predecessor exists, persist HANDOFF_REQUEST only after rearm verification.
 4. While predecessor is fresh, wait for its durable handoff commit and do only non-conflicting preparation.
 5. If predecessor is SUSPECT or OVERDUE and remains unchanged through the recovery grace, execute `control/handoff-recovery.v1.json`.
@@ -90,3 +90,21 @@ A non-terminal owner MUST NOT voluntarily end its turn.
 - After every bounded unit, re-read durable state, check for pending handoff, then execute the next useful unit if ownership remains.
 - If no next unit is obvious, inspect durable state/evidence for the highest-value unresolved invariant or validation gap.
 - Only `PROGRAM_COMPLETE`, proven `BLOCKED_EXTERNAL`, committed successor handoff, explicit operator stop, platform-enforced termination, or validated loss of authority under stale-predecessor recovery may end an active turn.
+
+
+## Utilization optimization loop
+
+Current optimization target: average observed useful-work span >= 600 seconds per 15-minute turn.
+
+At every valid wake:
+1. Record wake/start and rearm verification timestamps.
+2. Read the previous completed-turn utilization result before planning.
+3. Plan enough useful, non-duplicative work to occupy the upcoming quarter-hour window; prefer several checkpointable units over one tiny unit.
+4. Start substantive work immediately after authority is obtained.
+5. Refresh durable activity at least after every meaningful unit and, when practical, do not allow more than 120 seconds without durable progress evidence while actively working.
+6. On successor handoff, close the smallest safe unit, persist the exact continuation, then finalize the run measurement.
+7. Compute at minimum: observed_useful_span_seconds, dead_tail_seconds, scheduler_or_handoff_overhead_seconds, and end_reason. Never infer missing timestamps.
+8. If the completed turn is under 600 seconds, classify the dominant cause and persist exactly one concrete corrective experiment for the next turn. Valid cause classes include PACKET_TOO_SMALL, EARLY_VOLUNTARY_END, WAITING_ON_TOOL_OR_CI, SCHEDULER_GAP, HANDOFF_DELAY, AUTHORITY_RECOVERY, and UNKNOWN_EVIDENCE_GAP.
+9. The next worker MUST read and apply the latest corrective experiment before selecting its work packet.
+10. Do not declare the utilization goal reached from one good turn. Goal PASS requires at least 3 valid completed turns with a rolling mean observed useful-work span >= 600 seconds.
+11. Until PASS, utilization optimization remains the active root and each turn must measure -> diagnose -> change -> retest. Do not repeat the same failed intervention without new evidence.

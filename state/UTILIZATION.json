@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "program_id": "RRULER-PROGRAM-001",
+  "root_job_id": "RRULER-UTILIZATION-003",
+  "status": "OPTIMIZING",
+  "target": {
+    "turn_window_seconds": 900,
+    "observed_useful_span_seconds": 600,
+    "minimum_valid_completed_turns": 3,
+    "pass_rule": "ROLLING_MEAN_LAST_3_VALID_COMPLETED_TURNS_GTE_600"
+  },
+  "measurement": {
+    "observed_useful_span_definition": "last_meaningful_progress_at - substantive_work_started_at",
+    "dead_tail_definition": "successor_or_handoff_boundary_at - last_meaningful_progress_at when both are known",
+    "missing_boundary_policy": "MARK_MEASUREMENT_INVALID_DO_NOT_INFER",
+    "durable_progress_refresh_max_gap_seconds_when_practical": 120
+  },
+  "latest_completed_turn": null,
+  "valid_completed_turns": [],
+  "rolling_mean_observed_useful_span_seconds": null,
+  "goal_reached": false,
+  "latest_diagnosis": null,
+  "next_corrective_experiment": {
+    "experiment_id": "UTIL-EXP-001",
+    "hypothesis": "Short turns are primarily caused by work packets that are too small and voluntary termination after the first bounded unit.",
+    "change": "At wake, select multiple useful checkpointable units sufficient for the full quarter-hour; after each unit immediately pull the next until successor handoff or terminal state.",
+    "success_signal": "Completed valid turn observed_useful_span_seconds >= 600."
+  }
+}
