@@ -9,9 +9,6 @@ on:
 permissions:
   contents: read
 
-# Durable activity/checkpoint updates can arrive in short bursts. Only the newest
-# main-branch snapshot matters for this projection validator, so do not build a
-# queue of obsolete validations that competes with the live relay.
 concurrency:
   group: rruler-control-plane-${{ github.ref }}
   cancel-in-progress: true
@@ -55,9 +52,7 @@ jobs:
           if policy.get('utilization',{}).get('nonterminal_voluntary_turn_end_forbidden') is not True: raise SystemExit('no-self-termination invariant missing')
           expected={'PROGRAM_COMPLETE','BLOCKED_EXTERNAL','COMMITTED_SUCCESSOR_HANDOFF','EXPLICIT_OPERATOR_STOP','PLATFORM_ENFORCED_TERMINATION'}
           if set(policy.get('terminal',{}).get('voluntary_turn_end_allowed_only_for',[])) != expected: raise SystemExit('turn-end allowlist mismatch')
-          if live.get('status')!='ACTIVE': raise SystemExit('liveness policy inactive')
-          if recovery.get('status')!='ACTIVE': raise SystemExit('handoff recovery policy inactive')
-          if fence.get('status')!='ACTIVE': raise SystemExit('scheduler fence inactive')
+          if live.get('status')!='ACTIVE' or recovery.get('status')!='ACTIVE' or fence.get('status')!='ACTIVE': raise SystemExit('control policy inactive')
           required_start=['READ_FRESH_CURRENT_AND_LIVE_CANONICAL','COMPARE_ACTUAL_WAKE_AND_EXPECTED_DUE','IF_MATCH_REARM_AND_VERIFY','IF_MISMATCH_PRESERVE_NEWEST_VERIFIED_LIVE_CONTINUATION','RECONCILE_CURRENT_ACTIVITY_HANDOFF_FORWARD','CLAIM_FRESH_AUTHORITY_IF_NEEDED','CONTINUE_HANDOFF_AND_WORK_PROTOCOL']
           if fence.get('startup_order') != required_start: raise SystemExit('scheduler fence startup order mismatch')
           rp=fence.get('recovery_policy',{})
@@ -65,8 +60,7 @@ jobs:
           if fence.get('queued_old_occurrence_must_not_disable_canonical') is not True or fence.get('queued_old_occurrence_must_not_restore_old_prompt_or_title') is not True: raise SystemExit('stale queued wake mutation fence missing')
           if current.get('continuation',{}).get('scheduler_fence_policy')!='control/scheduler-fence.v1.json': raise SystemExit('CURRENT does not bind scheduler fence')
           sched=policy.get('scheduler',{})
-          if sched.get('mechanism')!='RRULE_HOURLY_QUARTER_SELF_SHIFT' or sched.get('phase_cycle_minutes') != [0,15,30,45]: raise SystemExit('quarter-hour scheduler contract invalid')
-          if sched.get('phase_transition_map') != {'0':15,'15':30,'30':45,'45':0}: raise SystemExit('quarter transition map invalid')
+          if sched.get('mechanism')!='RRULE_HOURLY_QUARTER_SELF_SHIFT' or sched.get('phase_cycle_minutes') != [0,15,30,45] or sched.get('phase_transition_map') != {'0':15,'15':30,'30':45,'45':0}: raise SystemExit('quarter-hour scheduler contract invalid')
           if util.get('target',{}).get('observed_useful_span_seconds') != 840 or util.get('target',{}).get('minimum_valid_completed_turns') != 3: raise SystemExit('utilization target invalid')
           if current.get('continuation',{}).get('utilization_state_path') != 'state/UTILIZATION.json': raise SystemExit('CURRENT does not bind utilization state')
           vals=util.get('valid_completed_turns',[])
@@ -76,11 +70,9 @@ jobs:
               if any(not isinstance(x,(int,float)) for x in last3) or sum(last3)/3 < 840: raise SystemExit('false utilization PASS')
           required_recovery=['RE_READ_CURRENT_ACTIVITY_HANDOFF','VERIFY_PREDECESSOR_STILL_SUSPECT_OR_OVERDUE_AND_UNCHANGED','ADVANCE_AUTHORITY_EPOCH_TO_SUCCESSOR','MARK_SUCCESSOR_WORKING','MARK_HANDOFF_RECOVERED_TAKEOVER','DO_NOT_REPLAY_PREDECESSOR_ACTIVE_UNIT_BLINDLY','PLAN_15_MIN_WORK_PACKET_FROM_EXACT_DURABLE_NEXT_ACTION','CONTINUE_WORK']
           if recovery.get('recovery_sequence') != required_recovery: raise SystemExit('handoff recovery sequence mismatch')
-          stale=recovery.get('stale_path',{})
+          stale=recovery.get('stale_path',{}); fast=stale.get('already_stale_fast_path',{})
           if stale.get('eligible_when_predecessor_freshness')!='SUSPECT_OR_OVERDUE' or stale.get('handoff_ack_grace_seconds')!=120 or stale.get('requires_no_new_predecessor_progress_during_grace') is not True: raise SystemExit('stale handoff grace contract invalid')
-          fast=stale.get('already_stale_fast_path',{})
-          if fast.get('enabled') is not True or fast.get('eligible_when_last_predecessor_progress_age_seconds_gte') != stale.get('handoff_ack_grace_seconds'): raise SystemExit('already-stale fast path threshold mismatch')
-          if fast.get('additional_post_request_grace_seconds') != 0 or fast.get('requires_immediate_re_read_after_request') is not True or fast.get('requires_predecessor_progress_unchanged_on_re_read') is not True: raise SystemExit('already-stale fast path safety guards missing')
+          if fast.get('enabled') is not True or fast.get('eligible_when_last_predecessor_progress_age_seconds_gte') != stale.get('handoff_ack_grace_seconds') or fast.get('additional_post_request_grace_seconds') != 0 or fast.get('requires_immediate_re_read_after_request') is not True or fast.get('requires_predecessor_progress_unchanged_on_re_read') is not True: raise SystemExit('already-stale fast path safety guards missing')
           if recovery.get('successor_may_not_take_over_while_predecessor_is_fresh') is not True: raise SystemExit('fresh predecessor takeover must be forbidden')
           if handoff.get('program_id') != current.get('program_id') or handoff.get('root_job_id') != current.get('root_job_id'): raise SystemExit('handoff identity mismatch')
           seq=policy.get('handoff',{}).get('successor_start_sequence',[])
@@ -93,8 +85,16 @@ jobs:
           if cycle.get('primary_objective_persist_path') != 'state/TURN_PLAN.json': raise SystemExit('turn-plan path mismatch')
           required_plan={'objective_id','objective','expected_useful_seconds','acceptance_criteria','checkpointable_substeps','current_substep','handoff_boundary','early_finish_fallback'}
           if not required_plan.issubset(turnplan): raise SystemExit('turn plan required fields missing')
-          if not isinstance(turnplan.get('expected_useful_seconds'),(int,float)) or turnplan['expected_useful_seconds'] > 840: raise SystemExit('turn plan exceeds 14-minute cap')
+          if not isinstance(turnplan.get('expected_useful_seconds'),(int,float)) or not (600 <= turnplan['expected_useful_seconds'] <= 840): raise SystemExit('turn plan duration outside 10-14 minute contract')
           if not isinstance(turnplan.get('checkpointable_substeps'),list) or not (2 <= len(turnplan['checkpointable_substeps']) <= 5): raise SystemExit('turn plan substep count invalid')
+          # Critical runtime invariant: policy text is not enough. A WORKING owner must have a real plan bound to that exact authority.
+          if activity.get('status')=='WORKING':
+              if turnplan.get('status')!='ACTIVE': raise SystemExit('WORKING authority lacks ACTIVE turn plan')
+              if turnplan.get('run_id')!=activity.get('active_run_id') or turnplan.get('authority_epoch')!=activity.get('authority_epoch'): raise SystemExit('turn plan owner/epoch mismatch')
+              if turnplan.get('objective_id') in {None,'','NEXT-WAKE-MUST-ASSIGN'}: raise SystemExit('WORKING authority still has placeholder objective')
+              if not isinstance(turnplan.get('progress_evidence'),list) or not turnplan.get('progress_evidence'): raise SystemExit('ACTIVE turn plan lacks progress evidence')
+              if not turnplan.get('started_at') or not turnplan.get('last_progress_at'): raise SystemExit('ACTIVE turn plan lacks timestamps')
+          if util.get('measurement',{}).get('template_plan_while_working_invalid') is not True or util.get('measurement',{}).get('plan_outcome_required') is not True: raise SystemExit('plan outcome measurement contract missing')
           if policy.get('utilization',{}).get('no_voluntary_idle_in_safety_margin') is not True: raise SystemExit('handoff safety margin may not become idle tail')
           if policy.get('handoff',{}).get('successor_rearm_before_handoff_request_required') is not True: raise SystemExit('successor rearm must precede handoff request')
           seen=set()
@@ -108,5 +108,5 @@ jobs:
               if ended and reason=='COMMITTED_SUCCESSOR_HANDOFF' and not o.get('successor_observed_at'): raise SystemExit(f'handoff end without successor observation in {oid}')
               if ended and reason=='PROGRAM_COMPLETE' and o.get('program_status_at_end')!='PROGRAM_COMPLETE': raise SystemExit(f'false complete end in {oid}')
               if ended and reason=='BLOCKED_EXTERNAL' and o.get('program_status_at_end')!='BLOCKED_EXTERNAL': raise SystemExit(f'false blocked end in {oid}')
-          print(f'RRuleR validation passed; runs={len(seen)} owner={current.get("current_owner")} epoch={current.get("authority_epoch")}')
+          print(f'RRuleR validation passed; runs={len(seen)} owner={current.get("current_owner")} epoch={current.get("authority_epoch")} plan={turnplan.get("objective_id")}')
           PY
