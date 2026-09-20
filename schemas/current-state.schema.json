@@ -6,12 +6,15 @@
   "required": [
     "schema_version",
     "repository",
+    "program_id",
+    "program_status",
     "root_job_id",
     "root_goal",
     "status",
     "current_owner",
     "authority_epoch",
     "canonical_automation_id",
+    "run_state",
     "checkpoint",
     "continuation",
     "safety"
@@ -19,20 +22,21 @@
   "properties": {
     "schema_version": {"const": "1.0"},
     "repository": {"type": "string", "minLength": 1},
+    "program_id": {"type": "string", "minLength": 1},
+    "program_status": {"enum": ["CONTINUE", "PROGRAM_COMPLETE", "BLOCKED_EXTERNAL", "DEGRADED_CONTINUATION"]},
     "root_job_id": {"type": "string", "minLength": 1},
     "root_goal": {"type": "string", "minLength": 1},
-    "status": {
-      "enum": ["CONTINUE", "COMPLETE", "BLOCKED_EXTERNAL", "DEGRADED_CONTINUATION"]
-    },
-    "current_owner": {"type": "string", "minLength": 1},
+    "status": {"enum": ["CONTINUE", "COMPLETE", "BLOCKED_EXTERNAL", "DEGRADED_CONTINUATION"]},
+    "current_owner": {"type": ["string", "null"]},
     "authority_epoch": {"type": "integer", "minimum": 0},
     "canonical_automation_id": {"type": "string", "minLength": 1},
+    "run_state": {"enum": ["ARMED", "WORKING", "HANDOFF", "TERMINAL", "BLOCKED_EXTERNAL", "DEGRADED_CONTINUATION"]},
     "checkpoint": {
       "type": "object",
       "required": ["id", "state", "completed", "evidence", "next_action"],
       "properties": {
         "id": {"type": "string", "minLength": 1},
-        "state": {"enum": ["ACTIVE", "VERIFIED", "HANDOFF_PENDING", "TERMINAL"]},
+        "state": {"enum": ["ACTIVE", "CONTINUE", "VERIFIED", "HANDOFF_PENDING", "TERMINAL"]},
         "completed": {"type": "array", "items": {"type": "string"}},
         "evidence": {"type": "array", "items": {"type": "string"}},
         "next_action": {"type": "string", "minLength": 1}
@@ -43,17 +47,29 @@
       "type": "object",
       "required": [
         "mechanism",
+        "cadence_minutes_effective",
+        "rrule_frequency",
+        "phase_step_minutes",
         "next_wake_first",
         "next_due_at",
         "current_phase_minute",
-        "fallback_semantics"
+        "handoff_trigger",
+        "voluntary_idle_before_successor_forbidden",
+        "root_completion_is_stop_condition",
+        "program_terminal_disabled_required"
       ],
       "properties": {
-        "mechanism": {"const": "RRULE_PHASE_ROTATION"},
+        "mechanism": {"const": "RRULE_HOURLY_PHASE_ROTATION_15M"},
+        "cadence_minutes_effective": {"const": 15},
+        "rrule_frequency": {"const": "HOURLY"},
+        "phase_step_minutes": {"const": 15},
         "next_wake_first": {"const": true},
-        "next_due_at": {"type": "string", "minLength": 1},
-        "current_phase_minute": {"enum": [0, 15, 30, 45]},
-        "fallback_semantics": {"type": "string", "minLength": 1}
+        "next_due_at": {"type": "string", "format": "date-time"},
+        "current_phase_minute": {"type": "integer", "minimum": 0, "maximum": 59},
+        "handoff_trigger": {"const": "SUCCESSOR_ACTUALLY_OBSERVED"},
+        "voluntary_idle_before_successor_forbidden": {"const": true},
+        "root_completion_is_stop_condition": {"const": false},
+        "program_terminal_disabled_required": {"const": true}
       },
       "additionalProperties": true
     },
