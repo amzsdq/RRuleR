@@ -38,9 +38,19 @@ Directly observed:
 
 This is direct evidence for **scheduled successor -> GitHub reconstruction -> substantive continuation**.
 
-### Important overlap finding
+### Third phase continuation — 2026-09-20 20:02 KST
 
-This observation proves successor execution and cold durable continuation. It does not by itself prove that two executions of the same canonical automation can safely overlap. Correctness therefore remains independent of overlap; durable state plus fencing is the fallback.
+Directly observed:
+
+1. A subsequent scheduled execution began and NEXT WAKE FIRST rotated the same canonical recurring automation `:00 -> :15`.
+2. Canonical automation ID remained `6aaf8a993eb08191b8d0ab1d9662e4b2`; the automation remained enabled, recurring, and `exact_schedule`.
+3. The run reconstructed authority from `AGENTS.md`, `control/POLICY.md`, `control/relay-policy.v1.json`, and `state/CURRENT.json` before substantive writes.
+4. The latest GitHub Actions validation run for the control plane, run `35506033120`, completed `success` against commit `85315fb98b4d2b06b8ed15e8e138d7230b9c39c0`.
+5. This supplies an additional live continuation cycle after the first scheduled cold continuation, reducing the risk that the observed relay was a one-cycle artifact.
+
+### Overlap / serialization finding
+
+Scheduled successor execution and durable cold continuation are proven. Exact predecessor/successor concurrency semantics must be classified only from durable or directly observable evidence; correctness does not depend on concurrency. If executions serialize, GitHub reconstruction remains the correctness path. If overlap is observed, authority fencing and active-unit ownership still prevent duplicate substantive work.
 
 ## Checklist
 
@@ -52,9 +62,10 @@ This observation proves successor execution and cold durable continuation. It do
 - [x] Machine-readable current-state and relay-event schemas exist.
 - [x] CI validates required control-plane files and durable-state invariants.
 - [x] Second RRuleR-era phase transition recorded by scheduled successor (`:45 -> :00`).
-- [x] Scheduled successor reads `state/CURRENT.json` and continues substantive work.
+- [x] Scheduled successor reads durable GitHub state and continues substantive work.
+- [x] Third phase transition recorded by later scheduled continuation (`:00 -> :15`).
+- [x] At least one additional continuation cycle confirms continuation survives beyond the first cold handoff.
 - [ ] Successor/predecessor overlap-or-serialization semantics observed sufficiently to classify platform behavior.
-- [ ] At least one additional continuation cycle confirms no runtime-timeout loss.
 - [ ] Handoff idle gap / successor wait is measured where observable.
 
 ## Correctness boundary
