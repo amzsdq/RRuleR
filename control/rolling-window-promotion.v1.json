@@ -1,0 +1,36 @@
+{
+  "policy_id":"RRULER_ROLLING_WINDOW_PROMOTION",
+  "version":1,
+  "status":"ACTIVE",
+  "purpose":"Prevent incomplete or weakly evidenced rolling utilization samples from being promoted to P0 acceptance evidence.",
+  "window_seconds":900,
+  "required_useful_seconds":840,
+  "max_unexplained_internal_gap_seconds":120,
+  "minimum_valid_windows_for_pass":3,
+  "required_boundaries":["window_start_at","window_end_at","substantive_start_at","last_substantive_progress_at"],
+  "required_point_fields":["at","kind","artifact","qualification","basis"],
+  "point_qualification_required":"SUBSTANTIVE_ACCEPTED",
+  "promotion_preconditions":[
+    "ALL_REQUIRED_BOUNDARIES_OBSERVED_NOT_INFERRED",
+    "WINDOW_DURATION_EXACTLY_OR_EXPLICITLY_CLASSIFIED_AGAINST_900_SECONDS",
+    "EVERY_INTERNAL_INTERVAL_CLASSIFIED",
+    "NO_UNEXPLAINED_INTERNAL_INTERVAL_GT_120_SECONDS",
+    "SUBSTANTIVE_EVIDENCE_CONFORMS_TO_CONTROL_EVIDENCE_POLICY",
+    "SCHEDULER_REARM_OR_HEARTBEAT_ALONE_NOT_COUNTED_AS_USEFUL_WORK",
+    "USEFUL_SECONDS_COMPUTED_FROM_OBSERVED_CLASSIFIED_INTERVALS_NOT_FIRST_TO_LAST_POINT_SPAN",
+    "USEFUL_SECONDS_GTE_840"
+  ],
+  "reject_if":[
+    "BOUNDARY_MISSING",
+    "BOUNDARY_INFERRED",
+    "CANDIDATE_ONLY_POINT_USED_AS_ACCEPTED_EVIDENCE",
+    "UNCLASSIFIED_INTERVAL",
+    "UNEXPLAINED_GAP_GT_120_SECONDS",
+    "HEARTBEAT_OR_SCHEDULER_ONLY_INTERVAL_COUNTED_AS_USEFUL",
+    "USEFUL_SECONDS_LT_840"
+  ],
+  "window_result_states":["INCOMPLETE","REJECTED","VALID_BELOW_TARGET","VALID_ACCEPTED"],
+  "pass_rule":"P0 PASS requires at least 3 VALID_ACCEPTED completed windows and rolling mean observed useful seconds >=840; one accepted window never completes P0.",
+  "anti_inference_rule":"Absence of evidence is unknown time, not useful time. Never bridge unknown intervals merely because endpoint commits are substantive.",
+  "anti_gaming_rule":"Do not manufacture commits or split trivial changes to satisfy cadence; materially new work is required by control/evidence-policy.v1.json."
+}
