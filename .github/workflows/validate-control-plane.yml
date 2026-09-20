@@ -13,7 +13,7 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Validate required files and JSON from GitHub API checkout-free workspace
+      - name: Validate required files and durable state
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -26,13 +26,16 @@ jobs:
             "AGENTS.md"
             "control/POLICY.md"
             "state/CURRENT.json"
+            "state/EVENTS.jsonl"
             "state/README.md"
             "docs/ARCHITECTURE.md"
             "docs/OPERATIONS.md"
             "docs/RELAY_RRULE_SELF_UPDATE.md"
+            "docs/UTILIZATION.md"
             "experiments/rrule-self-relay/README.md"
             "schemas/current-state.schema.json"
             "schemas/relay-event.schema.json"
+            "schemas/run-observation.schema.json"
           )
           for path in "${required[@]}"; do
             code="$(curl -sS -o /tmp/content -w '%{http_code}' \
@@ -53,12 +56,15 @@ jobs:
           }
 
           fetch "state/CURRENT.json" /tmp/current.json
+          fetch "state/EVENTS.jsonl" /tmp/events.jsonl
           fetch "schemas/current-state.schema.json" /tmp/current-schema.json
           fetch "schemas/relay-event.schema.json" /tmp/event-schema.json
+          fetch "schemas/run-observation.schema.json" /tmp/run-schema.json
 
           python -m json.tool /tmp/current.json >/dev/null
           python -m json.tool /tmp/current-schema.json >/dev/null
           python -m json.tool /tmp/event-schema.json >/dev/null
+          python -m json.tool /tmp/run-schema.json >/dev/null
 
           python - <<'PY'
           import json
@@ -92,6 +98,10 @@ jobs:
               raise SystemExit('next_wake_first must be true')
           if cont.get('current_phase_minute') not in {0,15,30,45}:
               raise SystemExit('current_phase_minute must be a quarter marker')
+          if cont.get('voluntary_idle_before_successor_forbidden') is not True:
+              raise SystemExit('continuous-work invariant missing')
+          if cont.get('handoff_trigger') != 'SUCCESSOR_ACTUALLY_OBSERVED':
+              raise SystemExit('handoff must be successor-triggered')
 
           safety=p['safety']
           if safety.get('public_repo') is not True:
@@ -99,5 +109,28 @@ jobs:
           if safety.get('secrets_allowed') is not False:
               raise SystemExit('public repo must keep secrets_allowed=false')
 
-          print('RRuleR control-plane validation passed')
+          event_ids=set()
+          allowed_events={
+              'WAKE_ARMED','WAKE_UPDATE_VERIFIED','WORK_STARTED','CHECKPOINT',
+              'SUCCESSOR_OBSERVED','HANDOFF','DEGRADED_CONTINUATION',
+              'COMPLETE','BLOCKED_EXTERNAL'
+          }
+          for lineno,line in enumerate(open('/tmp/events.jsonl'),1):
+              line=line.strip()
+              if not line:
+                  continue
+              try:
+                  e=json.loads(line)
+              except Exception as ex:
+                  raise SystemExit(f"EVENTS.jsonl line {lineno} invalid JSON: {ex}")
+              for key in ['event_id','event_type','occurred_at','root_job_id','authority_epoch','canonical_automation_id']:
+                  if key not in e:
+                      raise SystemExit(f"EVENTS.jsonl line {lineno} missing {key}")
+              if e['event_type'] not in allowed_events:
+                  raise SystemExit(f"EVENTS.jsonl line {lineno} invalid event_type")
+              if e['event_id'] in event_ids:
+                  raise SystemExit(f"duplicate event_id: {e['event_id']}")
+              event_ids.add(e['event_id'])
+
+          print(f"RRuleR control-plane validation passed; events={len(event_ids)}")
           PY
