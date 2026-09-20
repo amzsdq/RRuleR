@@ -13,16 +13,21 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Check continuation authority
+      - name: Check continuation authority from GitHub contents
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
         run: |
+          set -euo pipefail
+          fetch() { curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/$1?ref=$SHA" -o "$2"; }
+          fetch control/run-continuation-gate.v1.json /tmp/gate.json
+          fetch control/relay-policy.v1.json /tmp/policy.json
+          fetch state/CURRENT.json /tmp/current.json
           python - <<'PY'
           import json
-          from pathlib import Path
-          gate=json.loads(Path('control/run-continuation-gate.v1.json').read_text())
-          policy=json.loads(Path('control/relay-policy.v1.json').read_text())
-          current=json.loads(Path('state/CURRENT.json').read_text())
+          gate=json.load(open('/tmp/gate.json')); policy=json.load(open('/tmp/policy.json')); current=json.load(open('/tmp/current.json'))
           assert gate['status']=='ACTIVE'
           assert set(gate['program_nonterminal_states'])=={'CONTINUE','DEGRADED_CONTINUATION'}
           assert gate['default_for_nonterminal_owner']=='MUST_CONTINUE_USEFUL_WORK'
