@@ -6,26 +6,27 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "root_goal": "Raise and verify average observed useful-work span to at least 840 seconds per 15-minute turn while preserving a ~60-second runtime-safe baton-pass margin.",
   "status": "CONTINUE",
-  "current_owner": "RUN-UTIL-20260920-234225",
-  "authority_epoch": 13,
+  "current_owner": "RUN-UTIL-20260920-235858",
+  "authority_epoch": 14,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-016",
+    "id": "CP-UTILIZATION-017",
     "state": "CONTINUE",
     "completed": [
-      "Recovered the stale epoch-12 predecessor after positive successor evidence and more than the configured recovery grace with no newer predecessor progress.",
-      "Verified and rearmed the same canonical hourly RRULE forward from :45 to :00 before substantive work.",
-      "Advanced authority to epoch 13 without replaying the predecessor active unit blindly."
+      "Rearmed the same canonical hourly RRULE from :00 to :15 before substantive successor work.",
+      "Observed epoch-13 predecessor with no durable progress after 23:43:08 KST, already stale for more than the 120-second recovery threshold before this handoff request.",
+      "Hardened handoff recovery so an already-stale predecessor does not impose a redundant second 120-second post-request idle tax.",
+      "Re-read durable handoff and commit history after the request and found no newer predecessor progress; advanced authority to epoch 14."
     ],
     "evidence": [
-      "Prior predecessor last durable progress was 23:30:15 KST.",
-      "Durable successor evidence was recorded at 23:32:22 KST.",
-      "At recovery time the stale interval exceeded the 120-second handoff recovery grace.",
-      "Canonical automation update to the next :00 quarter slot returned SUCCESS."
+      "Canonical automation update to :15 returned SUCCESS.",
+      "Latest predecessor authority commit before this successor was f8c1323 at 23:43:08 KST.",
+      "Handoff request commit e4ca4db recorded this successor after rearm.",
+      "Recovery policy v2 commit 1671379 adds the already-stale fast path with forward-only authority semantics."
     ],
-    "observation": "The prior turn reached the 840-second observed progress boundary but failed to commit its own handoff. Recovery therefore advances authority rather than allowing the baton pipeline to deadlock.",
-    "next_action": "Execute UTIL-EXP-002 under epoch 13: keep useful work checkpointable, refresh durable progress frequently, and prepare for successor-triggered handoff near the next quarter boundary."
+    "observation": "The dominant utilization loss is no longer lack of a 14-minute packet; it is baton completion/recovery latency. Removing duplicate grace preserves freshness safety while avoiding a deterministic 120-second idle penalty when staleness is already proven.",
+    "next_action": "Run UTIL-EXP-003 under epoch 14: maintain frequent durable progress, keep work checkpointable, and at the next successor request finalize the baton immediately; measure a valid completed turn only from observed boundaries."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_QUARTER_SELF_SHIFT",
@@ -33,8 +34,8 @@
     "rrule_frequency": "HOURLY",
     "phase_step_minutes": 15,
     "next_wake_first": true,
-    "next_due_at": "2026-09-21T00:00:00+09:00",
-    "current_phase_minute": 0,
+    "next_due_at": "2026-09-21T00:15:00+09:00",
+    "current_phase_minute": 15,
     "handoff_trigger": "SUCCESSOR_REARM_VERIFIED_THEN_DURABLE_HANDOFF_REQUEST",
     "voluntary_idle_before_successor_forbidden": true,
     "root_completion_is_stop_condition": false,
@@ -42,7 +43,7 @@
     "work_packet_horizon_minutes": 14,
     "work_packet_boundary_is_stop_condition": false,
     "scheduler_fence_policy": "control/scheduler-fence.v1.json",
-    "next_phase_minute": 15,
+    "next_phase_minute": 30,
     "quarter_cycle": [0,15,30,45],
     "utilization_target_seconds": 840,
     "utilization_goal_min_valid_turns": 3,
