@@ -1,12 +1,16 @@
 {
-  "schema_version":"1.0","program_id":"RRULER-PROGRAM-001","status":"NOT_YET_PASSING","slo_policy":"control/recovery-slo.v1.json",
+  "schema_version":"1.1",
+  "program_id":"RRULER-PROGRAM-001",
+  "status":"FAIL_OBSERVED_COLD_RESCUE_GAP",
+  "slo_policy":"control/recovery-slo.v1.json",
   "target":{"p50_recovery_gap_seconds_lte":60,"p95_recovery_gap_seconds_lte":120,"no_duplicate_substantive_execution":true},
+  "observations":[{"id":"REC-20260921-E18-E19","predecessor_run_id":"RUN-UTIL-20260921-010000","successor_run_id":"RUN-UTIL-20260921-013250","last_meaningful_predecessor_progress_at":"2026-09-21T01:25:08+09:00","cold_rescue_observed_at":"2026-09-21T01:32:50+09:00","first_meaningful_replacement_progress_at":"2026-09-21T01:33:11+09:00","observed_recovery_gap_seconds":483,"scheduler_observation_delay_seconds":170,"post_observation_startup_seconds":21,"meets_120s_target":false,"classification":"COLD_RESCUE_TOO_SLOW","note":"Exact runtime end is unknown and is not invented. Recovery gap is conservatively measured from the last durable meaningful predecessor commit to first meaningful successor recovery progress."}],
   "current_paths":[
     {"path":"Work GitHub event trigger","class":"FAST_EVENT_CANDIDATE","state":"NOT_PROVISIONED","can_meet_120s_in_principle":true,"next":"Provision trigger and run bounded write-surface probe."},
-    {"path":"Actions five-minute rescue producer","class":"BEST_EFFORT_RESCUE","state":"GUARD_SELF_TEST_PASS_CONSUMER_INACTIVE","can_meet_120s_in_principle":false,"reason":"Minimum five-minute cron plus documented delivery delay."},
-    {"path":"same canonical quarter shift","class":"COLD_RESCUE","state":"ACTIVE_OVERLAP_NOT_OBSERVED","can_meet_120s_in_principle":false,"reason":"One-quarter fallback plus scheduler jitter; same-canonical overlap was not observed."},
+    {"path":"Actions five-minute rescue producer","class":"BEST_EFFORT_RESCUE","state":"GUARD_SELF_TEST_PASS_CONSUMER_INACTIVE_NO_SCHEDULE_RUN_OBSERVED_YET","can_meet_120s_in_principle":false,"reason":"Minimum five-minute cron plus documented delivery delay; repository currently shows no schedule-event run yet."},
+    {"path":"same canonical quarter shift","class":"COLD_RESCUE","state":"ACTIVE_OBSERVED_483S_RECOVERY_GAP","can_meet_120s_in_principle":false,"reason":"Epoch18-to-19 live recovery measured 483 seconds from last meaningful predecessor progress to first replacement progress."},
     {"path":"Codex Cloud GitHub mention","class":"ALTERNATE_CLOUD_EXECUTOR","state":"NOT_CONNECTED","can_meet_120s_in_principle":"UNKNOWN"}
   ],
-  "healthy_runtime_note":"Epoch 18 demonstrates that a healthy invocation can continue useful work beyond 15 minutes under the hard continuation gate. Recovery score remains separate because abrupt platform loss is not yet covered by a fast independent wake.",
+  "healthy_runtime_note":"Epoch 18 demonstrated long healthy execution, but it also proved that behavioral no-yield policy cannot physically keep an invocation alive. Abrupt-boundary recovery therefore remains an independent P0 requirement.",
   "promotion_gate":"At least one independent wake path must demonstrate <=120s abrupt-loss recovery without authority rollback or duplicate substantive execution before recovery can be marked passing."
 }
