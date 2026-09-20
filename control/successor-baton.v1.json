@@ -1,5 +1,12 @@
 {
-  "policy_id": "RRULER_SUCCESSOR_BATON",
-  "version": 1,
-  "status": "DRAFT"
+  "policy_id":"RRULER_SUCCESSOR_BATON",
+  "version":1,
+  "status":"ACTIVE",
+  "canonical_spec":"docs/ROLLING_RRULE_BATON_SPEC.md",
+  "durable_packet_path":"state/NEXT_PACKET.json",
+  "source_of_truth":"GITHUB_DURABLE_STATE",
+  "reservation_capsule_authoritative":false,
+  "default_target_work_seconds":600,
+  "default_safety_margin_seconds":180,
+  "default_final_rearm_offset_seconds":60
 }
