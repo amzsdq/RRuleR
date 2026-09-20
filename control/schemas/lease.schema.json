@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/amzsdq/RRuleR/control/schemas/lease.schema.json",
+  "title": "RRuleR Fenced Lease",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "root_job_id", "work_unit_id", "owner_id", "authority_epoch", "lease_acquired_at", "lease_expires_at", "heartbeat_at", "checkpoint_id"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "root_job_id": {"type": "string", "minLength": 1},
+    "work_unit_id": {"type": "string", "minLength": 1},
+    "owner_id": {"type": "string", "minLength": 1},
+    "authority_epoch": {"type": "integer", "minimum": 0},
+    "lease_acquired_at": {"type": "string", "format": "date-time"},
+    "lease_expires_at": {"type": "string", "format": "date-time"},
+    "heartbeat_at": {"type": ["string", "null"], "format": "date-time"},
+    "checkpoint_id": {"type": ["string", "null"]}
+  }
+}
