@@ -4,12 +4,12 @@
   "root_job_id": "RRULER-UTILIZATION-002",
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "status": "WORKING",
-  "active_run_id": "RUN-20260920-2040",
-  "authority_epoch": 7,
-  "last_progress_at": "2026-09-20T21:06:00+09:00",
-  "last_progress_kind": "NO_SELF_TERMINATION_HARDENED",
-  "current_unit": "Validate no-self-termination policy and add measurable early-termination detection",
-  "next_wake_due_at": "2026-09-20T21:10:00+09:00",
+  "active_run_id": "RUN-20260920-2110",
+  "authority_epoch": 8,
+  "last_progress_at": "2026-09-20T21:10:33+09:00",
+  "last_progress_kind": "SUCCESSOR_CLAIMED_AND_NEXT_PHASE_SECURED",
+  "current_unit": "Add measurable early-termination detection and run-observation enforcement",
+  "next_wake_due_at": "2026-09-20T21:25:00+09:00",
   "successor_observed": false,
   "operator_ui_note": "UI is advisory; fresh fenced durable activity is authoritative corroboration."
 }
