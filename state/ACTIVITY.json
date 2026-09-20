@@ -5,10 +5,10 @@
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "status": "ARMED",
   "active_run_id": null,
-  "last_progress_at": "2026-09-20T20:31:00+09:00",
+  "last_progress_at": "2026-09-20T20:34:00+09:00",
   "last_progress_kind": "OPERATOR_RECOVERY",
   "current_unit": "Awaiting immediate canonical wake after utilization-gap repair",
-  "next_wake_due_at": "2026-09-20T20:33:00+09:00",
+  "next_wake_due_at": "2026-09-20T20:36:00+09:00",
   "successor_observed": false,
   "operator_ui_note": "Foreground composer state is advisory. Idle UI plus stale durable activity and no successor evidence is a utilization gap."
 }
