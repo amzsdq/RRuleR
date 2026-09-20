@@ -30,7 +30,7 @@ If prose and machine-readable relay fields disagree, fail closed and reconcile t
 
 `state/CURRENT.json` identifies current owner and monotonic `authority_epoch`.
 
-A stale run may read state but must not perform authoritative substantive writes after observing a newer epoch.
+A stale run may not roll authority backward or replay conflicting side effects. Scheduler-time mismatch alone is not a stop condition: if the live canonical continuation is verifiable, reconcile scheduler/owner/handoff metadata forward to the newest valid continuation and resume under a fresh authority claim.
 
 ## Continuous work
 
@@ -175,3 +175,16 @@ The operational target is not to terminate at minute 14. It is to keep each work
 - At successor handoff request: stop admitting work, close the smallest safe unit, persist exact next action/evidence, release authority immediately.
 - If no successor request arrives, continue useful small units rather than idling.
 - A worker must not intentionally run a monolithic 15-minute operation that cannot checkpoint; this is the runtime-timeout avoidance mechanism.
+
+
+## Utilization continuity precedence
+
+For RRULER-UTILIZATION, the operator's priority order is:
+
+1. preserve a verified next quarter wake;
+2. keep useful work running toward the 14-minute/15-minute target;
+3. perform fast baton handoff;
+4. repair internal scheduler/handoff bookkeeping without yielding;
+5. only then optimize secondary validation/cleanup.
+
+Internal scheduler-fence mismatches are therefore recoverable control-plane drift, not permission to idle. When the canonical automation remains enabled with a verifiable future quarter wake, repair CURRENT/ACTIVITY/HANDOFF to the newest continuation and proceed. Never restore an older schedule generation or authority epoch.

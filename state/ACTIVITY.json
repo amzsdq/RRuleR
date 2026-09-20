@@ -3,14 +3,14 @@
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "status": "WORKING",
-  "active_run_id": "RUN-20260920-2215",
+  "status": "ARMED",
+  "active_run_id": null,
   "authority_epoch": 11,
-  "substantive_work_started_at": "2026-09-20T22:16:28+09:00",
-  "last_progress_at": "2026-09-20T22:29:00+09:00",
-  "last_progress_kind": "HANDOFF_READY_AFTER_SCHEMA_AND_IDENTITY_HARDENING",
-  "current_unit": "Handoff-ready: preserve repaired identity/schema/CI evidence and close only tiny safe units until successor request.",
-  "next_wake_due_at": "2026-09-20T22:30:00+09:00",
+  "substantive_work_started_at": null,
+  "last_progress_at": "2026-09-20T23:08:00+09:00",
+  "last_progress_kind": "SCHEDULER_DRIFT_RECOVERED_FORWARD",
+  "current_unit": "Await 23:15 expected wake; that worker must rearm to :30 then begin the 14-minute utilization packet.",
+  "next_wake_due_at": "2026-09-20T23:15:00+09:00",
   "successor_observed": false,
-  "handoff_ready": true
+  "handoff_ready": false
 }
