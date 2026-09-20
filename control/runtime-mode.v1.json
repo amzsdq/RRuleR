@@ -1,9 +1,31 @@
 {
-  "policy_id":"RRULER_RUNTIME_MODE","version":1,"status":"ACTIVE","mode":"LONG_RUN_WITH_SLIDING_COLD_RESCUE","basis":"Live epoch 18 crossed 840 seconds and remained productive beyond the nominal 15-minute boundary, while same-canonical overlap at 01:15 was not observed.",
-  "owner_behavior":["WORK_CONTINUOUSLY_WHILE_PROGRAM_NONTERMINAL_AND_RUNTIME_ALIVE","DO_NOT_TREAT_QUARTER_BOUNDARY_AS_HANDOFF","KEEP_ONLY_SMALL_CHECKPOINT_SAFE_UNITS_AFTER_LONG_RUNTIME","BEFORE_A_CANONICAL_DUE_CAN_BE_LOST_WHILE_STILL_RUNNING_ROLL_THE_SAME_CANONICAL_FORWARD_TO_THE_NEXT_QUARTER","PERSIST_FRESH_PROGRESS_AND_EXACT_CONTINUATION","NEVER_DISABLE_CANONICAL_WHILE_PROGRAM_NONTERMINAL"],
-  "scheduler_role":"COLD_RESCUE_WAKE_NOT_ZERO_GAP_SUCCESSOR",
-  "same_canonical_overlap_assumption":"FORBIDDEN_UNTIL_POSITIVE_EVIDENCE",
-  "fallback_guarantee_target":"If the active invocation disappears, keep a future canonical wake no more than one quarter-cycle away plus scheduler jitter; do not accidentally leave the RRULE parked on a missed phase whose next occurrence is one hour later.",
-  "independent_fast_wake_upgrade":{"required_for_saas_grade_utilization":true,"preferred":"CHATGPT_WORK_GITHUB_EVENT_TRIGGER","producer":"GitHub PR event lane; optional guarded Actions stale-owner producer","activation_gate":"EVENT_WORKER_WRITE_SURFACE_PROBE_PASS","fallback_remains":"SAME_CANONICAL_SLIDING_COLD_RESCUE"},
-  "measurement":{"live_run_useful_span":"May exceed 900 seconds; keep measuring continuous evidence rather than forcing artificial turn closure.","recovery_gap":"Measure from last meaningful predecessor progress to first meaningful replacement-worker progress.","product_slo":"Optimize wall-clock useful-work coverage union, not number of nominal 15-minute turns."}
+  "policy_id": "RRULER_RUNTIME_MODE",
+  "version": 2,
+  "status": "ACTIVE",
+  "mode": "LONG_RUN_WITH_SLIDING_COLD_RESCUE",
+  "basis": "Live long-run evidence plus controlled same-canonical rolling wake tests support completion-relative continuation with a longer provisional rescue horizon.",
+  "owner_behavior": [
+    "WORK_CONTINUOUSLY_WHILE_PROGRAM_NONTERMINAL_AND_RUNTIME_ALIVE",
+    "TREAT_PACKET_TARGET_AS_PLANNING_HORIZON_NOT_STOP_TIMER",
+    "KEEP_CHECKPOINT_SAFE_UNITS_AS_PROVISIONAL_DEADLINE_APPROACHES",
+    "EXTEND_PROVISIONAL_CONTINUATION_BEFORE_COLLISION_WHEN_NEEDED",
+    "CHECKPOINT_AND_PLAN_SUCCESSOR_PACKET_BEFORE_NORMAL_RETURN",
+    "VERIFY_COMPLETION_RELATIVE_CONTINUATION",
+    "NEVER_DISABLE_CANONICAL_WHILE_PROGRAM_NONTERMINAL"
+  ],
+  "scheduler_role": "FAST_NORMAL_CONTINUATION_PLUS_COLD_RESCUE_WAKE",
+  "same_canonical_overlap_assumption": "FORBIDDEN_UNTIL_POSITIVE_EVIDENCE",
+  "fallback_guarantee_target": "If the active invocation disappears, the already-verified provisional future occurrence provides bounded cold rescue; normal successful closes move the next occurrence to a short completion-relative delay.",
+  "independent_fast_wake_upgrade": {
+    "required_for_saas_grade_utilization": true,
+    "preferred": "CHATGPT_WORK_GITHUB_EVENT_TRIGGER",
+    "producer": "GitHub PR event lane; optional guarded Actions stale-owner producer",
+    "activation_gate": "EVENT_WORKER_WRITE_SURFACE_PROBE_PASS",
+    "fallback_remains": "SAME_CANONICAL_SLIDING_COLD_RESCUE"
+  },
+  "measurement": {
+    "live_run_useful_span": "May exceed 900 seconds; keep measuring continuous evidence rather than forcing artificial turn closure.",
+    "recovery_gap": "Measure from last meaningful predecessor progress to first meaningful replacement-worker progress.",
+    "product_slo": "Optimize union of evidenced useful-work intervals, normal continuation gap, and abrupt-loss recovery latency independently."
+  }
 }
