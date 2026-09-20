@@ -2,11 +2,11 @@
   "schema_version": "1.0",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "trusted_observed_through": "2026-09-20T21:56:22+00:00",
-  "provenance_kind": "GITHUB_COMMIT_COMMITTER_TIMESTAMP",
-  "provenance_ref": "97a07415d57cbfd0c50f9928559acfa1bb15d648",
+  "trusted_observed_through": "2026-09-20T22:36:27+00:00",
+  "provenance_kind": "GITHUB_ACTIONS_OBSERVED_TIMESTAMP",
+  "provenance_ref": "35542168328",
   "boundary": "OBSERVED",
   "counts_as_useful_work": false,
   "monotonic_forward_only": true,
-  "note": "This timestamp is an independently durable GitHub observation boundary. It is not useful-work evidence and does not bridge gaps; it only caps caller-supplied observed_through for promotion evaluation."
+  "note": "Monotonically advanced from an independently durable successful GitHub Actions workflow completion timestamp. This boundary is not useful-work evidence, does not bridge gaps, and only caps caller-supplied observed_through for promotion evaluation."
 }
