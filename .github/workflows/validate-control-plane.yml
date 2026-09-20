@@ -128,7 +128,7 @@ jobs:
 
           assert runtime['components']['wake_source']['current_adapter']=='RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE'
           assert runtime['successor_baton']['packet_path']=='state/NEXT_PACKET.json'
-          assert mode['scheduler_role']=='FAST_NORMAL_CONTINUATION_PLUS_COLD_RESCUE_WAKE'
+          assert mode['scheduler_role']=='ACTIVE_FAST_CONTINUATION_PLUS_BOUNDED_COLD_RESCUE'
           assert 'LOAD_OR_REFRESH_SUCCESSOR_PACKET_FROM_EXACT_DURABLE_NEXT_ACTION' in recovery['recovery_sequence']
 
           assert gate['status']=='ACTIVE'
