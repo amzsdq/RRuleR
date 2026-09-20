@@ -31,6 +31,15 @@ def _record_intersects_window(record:dict,start:datetime,end:datetime)->bool|Non
     except (KeyError,TypeError,ValueError):
         return None
     return b>start and a<end
+def _merge_intervals(intervals:list[tuple[datetime,datetime,int]])->list[tuple[datetime,datetime]]:
+    """Return the union of already-clipped intervals; overlap remains separately auditable/rejectable."""
+    merged=[]
+    for a,b,_ in sorted(intervals):
+        if not merged or a>merged[-1][1]:
+            merged.append([a,b])
+        elif b>merged[-1][1]:
+            merged[-1][1]=b
+    return [(a,b) for a,b in merged]
 def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->dict:
     records=data.get("records",[]); ids=Counter(r.get("record_id") for r in records if r.get("record_id")); duplicate_ids=sorted(k for k,v in ids.items() if v>1)
     record_results=[]; intervals=[]
@@ -53,8 +62,9 @@ def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->
     for a,b,idx in intervals:
         x,y=max(a,start),min(b,end,horizon)
         if y>x: clipped.append((x,y,idx))
-    useful=sum((b-a).total_seconds() for a,b,_ in clipped); gaps=[]; cursor=start
-    for a,b,idx in clipped:
+    union=_merge_intervals(clipped)
+    useful=sum((b-a).total_seconds() for a,b in union); gaps=[]; cursor=start
+    for a,b in union:
         if a>cursor: gaps.append((cursor,a))
         cursor=max(cursor,b)
     if cursor<end: gaps.append((cursor,end))
@@ -72,7 +82,7 @@ def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->
     if overlap_in_window: reasons.append("OVERLAPPING_INTERVALS")
     if max_gap>MAX_GAP_SECONDS: reasons.append("UNEXPLAINED_GAP_GT_120_SECONDS")
     if useful<TARGET_USEFUL_SECONDS: reasons.append("USEFUL_SECONDS_LT_840")
-    result["window"]={"start_at":start.isoformat(),"end_at":end.isoformat(),"observed_through":horizon.isoformat(),"useful_seconds":useful,"maximum_unexplained_gap_seconds":max_gap,"interval_count":len(clipped),"reasons":reasons}
+    result["window"]={"start_at":start.isoformat(),"end_at":end.isoformat(),"observed_through":horizon.isoformat(),"useful_seconds":useful,"maximum_unexplained_gap_seconds":max_gap,"interval_count":len(clipped),"union_interval_count":len(union),"reasons":reasons}
     result["promotion"]="VALID_ACCEPTED" if not reasons else "REJECTED"; return result
 def main()->int:
     if len(sys.argv) not in (2,3,4):
