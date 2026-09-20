@@ -11,22 +11,25 @@
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-005",
+    "id": "CP-UTILIZATION-006",
     "state": "CONTINUE",
     "completed": [
       "Hard no-self-termination invariant persisted and validated",
-      "Scheduler rearm now derives next due from actual wake plus at least 15 minutes",
+      "Scheduler rearm derives next due from actual wake plus at least 15 minutes",
       "21:28 run secured same-canonical next wake at 21:43 before substantive work",
-      "Created state/RUN_OBSERVATIONS.jsonl so utilization is measured per run instead of inferred only from commit bursts",
-      "Claimed authority epoch 9 for RUN-20260920-2128"
+      "Claimed authority epoch 9 for RUN-20260920-2128",
+      "Current live run added to canonical state/RUNS.jsonl ledger",
+      "Run-observation schema aligned with measurable end contract and CI run 141 passed",
+      "Accidental duplicate state/RUN_OBSERVATIONS.jsonl ledger removed after reconciliation"
     ],
     "evidence": [
-      "commit 41bf6aa3d09864643ea7f9e44a43df0727ed5133 created first live run observation",
-      "commit 8faa7676265026817269ff402359d38b04b525e8 refreshed fenced activity for the 21:28 run",
-      "same canonical automation was verified enabled with next recurrence at 21:43 KST"
+      "commit 1e55bc6c15f37c27b4011ae127f494d7a3462a6c records the current live run in state/RUNS.jsonl",
+      "commit 3332717f8f1614ccc4865167ec611aca67403bb2 aligns schema fields with end_reason/program_status_at_end and handoff evidence",
+      "GitHub Actions run 35510756499 completed success",
+      "commit 8d5134f188dd1cf861c69c8597d9306144221d78 removes the duplicate ledger"
     ],
-    "observation": "The active root now has direct per-run measurement. The current run remains non-terminal and must continue useful work until a permitted end condition occurs.",
-    "next_action": "Harden the validator and operating docs so every run must create/close a run observation and voluntary early termination becomes measurable; then continue to the next unresolved utilization gap in the same turn."
+    "observation": "Per-run utilization measurement now uses one canonical ledger and a schema matching the validator's measurable-end contract. The active run remains non-terminal; successor-cycle evidence is still required.",
+    "next_action": "Continue useful work during RUN-20260920-2128 and, when the 21:43 successor is actually observed, durably classify this predecessor end/handoff and compute the measurable gap without inference."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_SELF_SHIFT_FROM_ACTUAL_WAKE",
