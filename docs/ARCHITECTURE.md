@@ -31,21 +31,71 @@ If not, the previous run did not checkpoint enough state.
 - **RUN** — one actual ChatGPT execution.
 - **WORK UNIT** — smallest meaningful safely checkpointable unit.
 - **CHECKPOINT** — durable continuation state.
+- **SUCCESSOR OBSERVED** — evidence that the next scheduled execution has actually begun; mere clock arrival is insufficient.
 
 Task phases do not need to align with TURN boundaries.
 
 ## Continuous-work principle
 
-Workers do not stop merely because research ended, writing began, a milestone was crossed, or a schedule boundary approaches. Scheduler boundaries rotate executors; they do not define business phases.
+Workers do not stop merely because research ended, writing began, a milestone was crossed, a checkpoint was written, or a schedule boundary arrived.
+
+The normal control loop is:
+
+```text
+secure next wake
+ -> work unit
+ -> checkpoint if useful
+ -> immediately continue another admissible unit
+ -> ...
+ -> successor actually observed
+ -> finish current smallest unit
+ -> durable handoff
+ -> predecessor end
+```
+
+This is deliberately optimized for high useful-work utilization.
 
 ## Runtime handoff
 
-At handoff:
+At successor-triggered handoff:
 
-1. stop starting new large units;
-2. finish current smallest safe unit;
-3. persist checkpoint, duration/progress, and exact next action;
-4. emit concise STATUS and end;
-5. successor reconstructs and continues.
+1. successor execution is actually observed;
+2. predecessor stops starting new substantive units;
+3. predecessor finishes the current smallest safe unit;
+4. predecessor persists checkpoint, duration/progress, evidence, ambiguous side effects, and exact next action;
+5. predecessor emits concise STATUS and ends;
+6. successor waits for durable handoff if needed, then reconstructs and continues.
 
-If same-automation overlap/queue is unsupported, use `clean-stop -> next scheduled wake -> resume` rather than depending on simultaneous predecessor/successor execution.
+If same-canonical overlap/queue is unsupported, the system must not depend on it for correctness. Durable GitHub state remains sufficient for continuation. However, the predecessor still must not voluntarily stop early merely to create a gap.
+
+## Utilization metric
+
+For an observation window:
+
+```text
+useful_work_utilization =
+  useful substantive work time
+  / wall-clock time in which the root job is intended to be active
+```
+
+Classify separately:
+
+- productive work;
+- checkpoint/handoff overhead;
+- scheduler/runtime idle gap;
+- external blocked time;
+- platform outage time.
+
+Platform-wide outages and explicit external blocks should not be conflated with relay scheduling overhead.
+
+## Correctness before optimization
+
+High utilization never authorizes:
+
+- duplicate substantive execution;
+- stale-authority writes;
+- replay of ambiguous irreversible side effects;
+- skipping durable checkpoint requirements;
+- unsafe overlap.
+
+The target is **high utilization subject to correctness invariants**, not activity for its own sake.
