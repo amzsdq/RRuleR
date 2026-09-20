@@ -2,15 +2,15 @@
   "schema_version":"1.1",
   "program_id":"RRULER-PROGRAM-001",
   "root_job_id":"RRULER-UTILIZATION-003",
-  "handoff_state":"ROLLING_WAKE_ARMED",
+  "handoff_state":"SUCCESSOR_OBSERVED_AUTHORITY_CLAIMED",
   "predecessor_run_id":"RUN-UTIL-20260921-032900",
-  "successor_run_id":null,
+  "successor_run_id":"RUN-UTIL-20260921-033304",
   "successor_expected_at":"2026-09-21T03:32:00+09:00",
-  "successor_observed_at":null,
+  "successor_observed_at":"2026-09-21T03:33:04+09:00",
   "request_persisted_at":null,
   "predecessor_last_progress_at":"2026-09-21T03:30:21+09:00",
-  "recovery_basis":"No failure takeover in this generation. Same canonical was provisionally armed to 03:42 before work, then final-rearmed to 03:32 after checkpoint. The next actual wake must verify the completion-relative continuation; future wake metadata alone is not success evidence.",
-  "active_unit":"UTIL-EXP-011 first production rolling RRULE lifecycle validation",
-  "checkpoint_id":"CP-UTILIZATION-034",
-  "next_action":"On actual 03:32 wake, verify same canonical and newest expected due, record observed scheduler delay, provisional-arm the next rescue deadline, claim the next authority epoch, and continue normalized rolling utilization measurement."
+  "recovery_basis":"Normal rolling successor wake observed on the same canonical; no failure takeover. Successor provisionally rearmed to 03:46 and claimed authority epoch 23.",
+  "active_unit":"UTIL-EXP-011 normalized rolling utilization measurement",
+  "checkpoint_id":"CP-UTILIZATION-035",
+  "next_action":"Continue useful work, persist rolling sample evidence, then final-rearm same canonical to close+1m before normal return."
 }
