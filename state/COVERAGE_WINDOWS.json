@@ -1,0 +1,10 @@
+{
+  "schema_version":"1.0","program_id":"RRULER-PROGRAM-001","purpose":"Product utilization is evaluated in fixed 900-second wall-clock windows, independent of how many workers or handoffs cover the window. This prevents artificial worker-turn boundaries from distorting the SaaS-relevant KPI.",
+  "window_seconds":900,"target_useful_coverage_seconds":840,"target_fraction":0.9333333333,"maximum_unexplained_internal_gap_seconds":120,
+  "rules":{"worker_identity_irrelevant_to_window":true,"union_overlapping_useful_intervals":true,"duplicate_work_counts_once":true,"scheduler_wait_excluded":true,"heartbeat_only_excluded":true,"window_can_be_covered_by_one_long_run":true,"window_can_be_covered_by_multiple_fenced_workers":true,"handoff_not_required_to_close_window":true},
+  "windows":[
+    {"window_id":"COV-20260921-0100","start":"2026-09-21T01:00:00+09:00","end":"2026-09-21T01:15:00+09:00","status":"PROVISIONAL_PASS_AWAITING_GAP_AUDIT","evidenced_interval_start":"2026-09-21T01:00:48+09:00","evidence_continues_past_window_end":true,"provisional_useful_coverage_seconds":852,"uncovered_seconds":48,"provisional_fraction":0.9466666667,"target_met_provisionally":true,"basis":"Epoch 18 substantive work started at 01:00:48 and fresh meaningful durable progress exists both before and after the 01:15 boundary. Final PASS requires automated confirmation that internal durable evidence gaps across the window are <=120 seconds."},
+    {"window_id":"COV-20260921-0115","start":"2026-09-21T01:15:00+09:00","end":"2026-09-21T01:30:00+09:00","status":"OPEN","evidenced_interval_start":"2026-09-21T01:15:00+09:00","basis":"Same epoch 18 remained actively productive across 01:15; continue collecting evidence until platform boundary or window end."}
+  ],
+  "acceptance":"Three consecutive audited fixed windows with >=840 seconds useful coverage establish the initial P0 utilization pass; worker count and handoff count do not matter. Thereafter retain as regression SLO."
+}
