@@ -4,12 +4,12 @@
   "root_job_id": "RRULER-UTILIZATION-002",
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "status": "WORKING",
-  "active_run_id": "RUN-20260920-2110",
-  "authority_epoch": 8,
-  "last_progress_at": "2026-09-20T21:15:00+09:00",
-  "last_progress_kind": "EARLY_END_VALIDATOR_IMPLEMENTED",
-  "current_unit": "Reconcile validator CI and continue utilization measurement hardening",
-  "next_wake_due_at": "2026-09-20T21:25:00+09:00",
+  "active_run_id": "RUN-20260920-2128",
+  "authority_epoch": 9,
+  "last_progress_at": "2026-09-20T21:29:00+09:00",
+  "last_progress_kind": "LIVE_UTILIZATION_MEASUREMENT_STARTED",
+  "current_unit": "Measure actual active-turn utilization and eliminate voluntary early termination gaps",
+  "next_wake_due_at": "2026-09-20T21:43:00+09:00",
   "successor_observed": false,
   "operator_ui_note": "UI is advisory; fresh fenced durable activity is authoritative corroboration."
 }
