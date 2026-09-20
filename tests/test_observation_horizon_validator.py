@@ -11,6 +11,19 @@ class ObservationHorizonValidatorTests(unittest.TestCase):
         source = {"status": "completed", "conclusion": "success", "updated_at": "2026-09-20T23:05:48Z"}
         self.assertTrue(validate(horizon, POLICY, source))
 
+    def test_accepts_forward_transition(self):
+        previous = {"trusted_observed_through": "2026-09-20T23:04:48+00:00"}
+        horizon = {"provenance_kind": "GITHUB_ACTIONS_OBSERVED_TIMESTAMP", "provenance_ref": "123", "trusted_observed_through": "2026-09-20T23:05:48+00:00"}
+        source = {"status": "completed", "conclusion": "success", "updated_at": "2026-09-20T23:05:48Z"}
+        self.assertTrue(validate(horizon, POLICY, source, previous=previous))
+
+    def test_rejects_horizon_rollback(self):
+        previous = {"trusted_observed_through": "2026-09-20T23:06:48+00:00"}
+        horizon = {"provenance_kind": "GITHUB_ACTIONS_OBSERVED_TIMESTAMP", "provenance_ref": "123", "trusted_observed_through": "2026-09-20T23:05:48+00:00"}
+        source = {"status": "completed", "conclusion": "success", "updated_at": "2026-09-20T23:05:48Z"}
+        with self.assertRaisesRegex(ValueError, "rollback"):
+            validate(horizon, POLICY, source, previous=previous)
+
     def test_rejects_forged_timestamp(self):
         horizon = {"provenance_kind": "GITHUB_ACTIONS_OBSERVED_TIMESTAMP", "provenance_ref": "123", "trusted_observed_through": "2026-09-20T23:06:48+00:00"}
         source = {"status": "completed", "conclusion": "success", "updated_at": "2026-09-20T23:05:48Z"}
