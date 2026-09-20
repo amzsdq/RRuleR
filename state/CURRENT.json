@@ -1,56 +1,37 @@
 {
-  "schema_version": "1.0",
-  "repository": "amzsdq/RRuleR",
-  "program_id": "RRULER-PROGRAM-001",
-  "program_status": "CONTINUE",
-  "root_job_id": "RRULER-UTILIZATION-002",
-  "root_goal": "Enforce continuous useful-work utilization across root boundaries and make liveness observable without depending on chat UI alone.",
-  "status": "CONTINUE",
-  "current_owner": "RUN-20260920-2128",
-  "authority_epoch": 9,
-  "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "WORKING",
-  "checkpoint": {
-    "id": "CP-UTILIZATION-006",
-    "state": "CONTINUE",
-    "completed": [
-      "Hard no-self-termination invariant persisted and validated",
-      "Scheduler rearm derives next due from actual wake plus at least 15 minutes",
-      "21:28 run secured same-canonical next wake at 21:43 before substantive work",
-      "Claimed authority epoch 9 for RUN-20260920-2128",
-      "Current live run added to canonical state/RUNS.jsonl ledger",
-      "Run-observation schema aligned with measurable end contract and CI run 141 passed",
-      "Accidental duplicate state/RUN_OBSERVATIONS.jsonl ledger removed after reconciliation",
-      "Operator-defined rolling 15-minute worker protocol adopted: successor REARM+VERIFY precedes HANDOFF_REQUEST; predecessor closes smallest safe unit and saves before release.",
-      "Each successor must plan a useful work packet sized for approximately the next 15-minute window; early completion pulls another useful bounded unit instead of idling."
-    ],
-    "evidence": [
-      "commit 1e55bc6c15f37c27b4011ae127f494d7a3462a6c records the current live run in state/RUNS.jsonl",
-      "commit 3332717f8f1614ccc4865167ec611aca67403bb2 aligns schema fields with end_reason/program_status_at_end and handoff evidence",
-      "GitHub Actions run 35510756499 completed success",
-      "commit 8d5134f188dd1cf861c69c8597d9306144221d78 removes the duplicate ledger"
-    ],
-    "observation": "Relay semantics changed from open-ended same-turn work selection to an explicit rolling 15-minute work-packet pipeline with successor-first rearm and request-driven handoff.",
-    "next_action": "At the next actual successor wake, verify sequence: REARM+VERIFY -> HANDOFF_REQUEST -> predecessor safe-unit close/save/release -> successor epoch claim -> ~15m work packet execution."
+  "schema_version":"1.0",
+  "repository":"amzsdq/RRuleR",
+  "program_id":"RRULER-PROGRAM-001",
+  "program_status":"CONTINUE",
+  "root_job_id":"RRULER-UTILIZATION-002",
+  "root_goal":"Enforce continuous useful-work utilization across root boundaries and make liveness observable without depending on chat UI alone.",
+  "status":"CONTINUE",
+  "current_owner":"RUN-20260920-2145",
+  "authority_epoch":10,
+  "canonical_automation_id":"6aaf8a993eb08191b8d0ab1d9662e4b2",
+  "run_state":"WORKING",
+  "checkpoint":{
+    "id":"CP-UTILIZATION-007",
+    "state":"CONTINUE",
+    "completed":["Rolling 15-minute worker protocol adopted","RUN-20260920-2145 rearmed the same canonical RRULE to 22:01 before requesting handoff","Durable handoff request persisted for predecessor RUN-20260920-2128","Predecessor activity remained unchanged beyond the configured 20-minute overdue threshold","Continuation advanced to RUN-20260920-2145 at authority epoch 10"],
+    "evidence":["commit f12f4400e4c115ab392e472335a5fcbe4032e241 records successor rearm verification and HANDOFF_REQUEST","state/ACTIVITY.json last_progress_at remained 2026-09-20T21:30:00+09:00 through the liveness overdue threshold"],
+    "observation":"First rolling handoff exposed the stale-predecessor recovery case: an inactive predecessor cannot acknowledge a handoff request, so the configured overdue recovery path must restore continuation.",
+    "next_action":"Execute a roughly 15-minute packet formalizing stale-predecessor handoff recovery and validator coverage while the 22:01 successor wake remains secured."
   },
-  "continuation": {
-    "mechanism": "RRULE_HOURLY_SELF_SHIFT_FROM_ACTUAL_WAKE",
-    "cadence_minutes_effective": 15,
-    "rrule_frequency": "HOURLY",
-    "phase_step_minutes": 15,
-    "next_wake_first": true,
-    "next_due_at": "2026-09-20T21:43:00+09:00",
-    "current_phase_minute": 43,
-    "handoff_trigger": "SUCCESSOR_REARM_VERIFIED_THEN_DURABLE_HANDOFF_REQUEST",
-    "voluntary_idle_before_successor_forbidden": true,
-    "root_completion_is_stop_condition": false,
-    "program_terminal_disabled_required": true,
-    "work_packet_horizon_minutes": 15,
-    "work_packet_boundary_is_stop_condition": false
+  "continuation":{
+    "mechanism":"RRULE_HOURLY_SELF_SHIFT_FROM_ACTUAL_WAKE",
+    "cadence_minutes_effective":15,
+    "rrule_frequency":"HOURLY",
+    "phase_step_minutes":15,
+    "next_wake_first":true,
+    "next_due_at":"2026-09-20T22:01:00+09:00",
+    "current_phase_minute":1,
+    "handoff_trigger":"SUCCESSOR_REARM_VERIFIED_THEN_DURABLE_HANDOFF_REQUEST",
+    "voluntary_idle_before_successor_forbidden":true,
+    "root_completion_is_stop_condition":false,
+    "program_terminal_disabled_required":true,
+    "work_packet_horizon_minutes":15,
+    "work_packet_boundary_is_stop_condition":false
   },
-  "safety": {
-    "public_repo": true,
-    "secrets_allowed": false,
-    "reference_repo_amzsdq_R": "READ_ONLY"
-  }
+  "safety":{"public_repo":true,"secrets_allowed":false,"reference_repo_amzsdq_R":"READ_ONLY"}
 }
