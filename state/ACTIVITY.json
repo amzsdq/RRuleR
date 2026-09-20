@@ -7,10 +7,10 @@
   "active_run_id": "RUN-UTIL-20260920-231559",
   "authority_epoch": 12,
   "substantive_work_started_at": "2026-09-20T23:16:15+09:00",
-  "last_progress_at": "2026-09-20T23:28:00+09:00",
-  "last_progress_kind": "LARGE_UNIT_ADMISSION_CLOSED",
-  "current_unit": "UTIL-EXP-002: handoff-preparation window; perform only tiny safe validation/checkpoint units and keep exact durable boundaries fresh until actual successor request.",
+  "last_progress_at": "2026-09-20T23:29:00+09:00",
+  "last_progress_kind": "HANDOFF_READY_CHECKPOINT",
+  "current_unit": "HANDOFF_READY: continue only tiny safe checks until actual successor request; successor must rearm canonical to :45 before requesting baton.",
   "next_wake_due_at": "2026-09-20T23:30:00+09:00",
   "successor_observed": false,
-  "handoff_ready": false
+  "handoff_ready": true
 }
