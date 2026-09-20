@@ -39,9 +39,11 @@ jobs:
           controls=json.load(open('/tmp/controls.json')); current=json.load(open('/tmp/current.json'))
           assert controls['status']=='ACTIVE'
           assert current['continuation']['active_control_registry']=='control/ACTIVE_CONTROLS.json'
-          required={'control/run-continuation-gate.v1.json','control/scheduler-fence.v1.json','control/handoff-recovery.v1.json','state/CURRENT.json','state/ACTIVITY.json','state/HANDOFF.json','state/TURN_PLAN.json','state/UTILIZATION.json'}
+          required={'control/run-continuation-gate.v1.json','control/scheduler-fence.v1.json','control/rolling-rrule-lifecycle.v1.json','control/successor-baton.v1.json','control/saas-parity-gates.v1.json','control/handoff-recovery.v1.json','state/CURRENT.json','state/ACTIVITY.json','state/HANDOFF.json','state/TURN_PLAN.json','state/UTILIZATION.json','state/NEXT_PACKET.json','state/SAAS_PARITY.json'}
           assert required <= set(controls['mandatory_on_wake'])
-          assert 'NONTERMINAL_OWNER_MUST_CONTINUE_USEFUL_WORK_UNTIL_AUTHORITY_TRANSFER' in controls['hard_invariants']
+          assert 'DURABLE_SUCCESSOR_PACKET_PRECEDES_NORMAL_RETURN' in controls['hard_invariants']
+          assert 'RESERVATION_PACKET_CACHE_IS_NON_AUTHORITATIVE' in controls['hard_invariants']
+          assert 'STRUCTURAL_PARITY_REQUIRES_EVIDENCE_NOT_PROSE' in controls['hard_invariants']
           token=os.environ['GH_TOKEN']; repo=os.environ['REPO']; sha=os.environ['SHA']
           for path in controls['mandatory_on_wake']:
               req=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{path}?ref={sha}',headers={'Authorization':f'Bearer {token}','Accept':'application/vnd.github+json'})
