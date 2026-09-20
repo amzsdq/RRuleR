@@ -6,9 +6,9 @@
   "status": "WORKING",
   "active_run_id": "RUN-20260920-2110",
   "authority_epoch": 8,
-  "last_progress_at": "2026-09-20T21:10:33+09:00",
-  "last_progress_kind": "SUCCESSOR_CLAIMED_AND_NEXT_PHASE_SECURED",
-  "current_unit": "Add measurable early-termination detection and run-observation enforcement",
+  "last_progress_at": "2026-09-20T21:15:00+09:00",
+  "last_progress_kind": "EARLY_END_VALIDATOR_IMPLEMENTED",
+  "current_unit": "Reconcile validator CI and continue utilization measurement hardening",
   "next_wake_due_at": "2026-09-20T21:25:00+09:00",
   "successor_observed": false,
   "operator_ui_note": "UI is advisory; fresh fenced durable activity is authoritative corroboration."
