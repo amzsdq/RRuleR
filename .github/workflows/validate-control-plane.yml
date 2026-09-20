@@ -23,12 +23,12 @@ jobs:
           set -euo pipefail
           required=(
             "README.md" "AGENTS.md" "control/POLICY.md" "control/relay-policy.v1.json"
-            "state/CURRENT.json" "state/HANDOFF.json" "state/RELAY_VALIDATION.json" "state/EVENTS.jsonl" "state/RUNS.jsonl" "state/README.md"
+            "state/CURRENT.json" "state/HANDOFF.json" "state/ACTIVITY.json" "state/RELAY_VALIDATION.json" "state/EVENTS.jsonl" "state/RUNS.jsonl" "state/README.md"
             "docs/ARCHITECTURE.md" "docs/DESIGN_DECISIONS.md" "docs/DURABLE_EXECUTION_MODEL.md"
             "docs/FAILURE_RECOVERY.md" "docs/HANDOFF_PROTOCOL.md" "docs/OPERATIONS.md"
             "docs/RELAY_RRULE_SELF_UPDATE.md" "docs/SECURITY.md" "docs/STATE_MODEL.md" "docs/UTILIZATION.md"
             "experiments/rrule-self-relay/README.md" "experiments/rrule-self-relay/REPRO_CHECKLIST.md"
-            "schemas/current-state.schema.json" "schemas/handoff.schema.json" "schemas/relay-event.schema.json" "schemas/run-observation.schema.json" "schemas/relay-validation.schema.json"
+            "schemas/current-state.schema.json" "schemas/handoff.schema.json" "schemas/activity.schema.json" "schemas/relay-event.schema.json" "schemas/run-observation.schema.json" "schemas/relay-validation.schema.json"
             "control/schemas/checkpoint.schema.json" "control/schemas/lease.schema.json" "control/schemas/effect-record.schema.json"
           )
           for path in "${required[@]}"; do
@@ -39,45 +39,68 @@ jobs:
           fetch() { curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/$1?ref=$SHA" -o "$2"; }
           fetch state/CURRENT.json /tmp/current.json
           fetch state/HANDOFF.json /tmp/handoff.json
+          fetch state/ACTIVITY.json /tmp/activity.json
           fetch state/RELAY_VALIDATION.json /tmp/relay-validation.json
           fetch state/EVENTS.jsonl /tmp/events.jsonl
           fetch state/RUNS.jsonl /tmp/runs.jsonl
           fetch control/relay-policy.v1.json /tmp/relay-policy.json
+          fetch schemas/current-state.schema.json /tmp/current-schema.json
+          fetch schemas/handoff.schema.json /tmp/handoff-schema.json
+          fetch schemas/activity.schema.json /tmp/activity-schema.json
           fetch schemas/relay-validation.schema.json /tmp/relay-validation-schema.json
           fetch control/schemas/checkpoint.schema.json /tmp/checkpoint-schema.json
           fetch control/schemas/lease.schema.json /tmp/lease-schema.json
           fetch control/schemas/effect-record.schema.json /tmp/effect-schema.json
 
-          python -m json.tool /tmp/current.json >/dev/null
-          python -m json.tool /tmp/handoff.json >/dev/null
-          python -m json.tool /tmp/relay-validation.json >/dev/null
-          python -m json.tool /tmp/relay-validation-schema.json >/dev/null
-          python -m json.tool /tmp/relay-policy.json >/dev/null
-          python -m json.tool /tmp/checkpoint-schema.json >/dev/null
-          python -m json.tool /tmp/lease-schema.json >/dev/null
-          python -m json.tool /tmp/effect-schema.json >/dev/null
+          for f in /tmp/current.json /tmp/handoff.json /tmp/activity.json /tmp/relay-validation.json /tmp/relay-policy.json /tmp/current-schema.json /tmp/handoff-schema.json /tmp/activity-schema.json /tmp/relay-validation-schema.json /tmp/checkpoint-schema.json /tmp/lease-schema.json /tmp/effect-schema.json; do
+            python -m json.tool "$f" >/dev/null
+          done
 
           python - <<'PY'
           import json
-          p=json.load(open('/tmp/current.json')); policy=json.load(open('/tmp/relay-policy.json')); handoff=json.load(open('/tmp/handoff.json')); validation=json.load(open('/tmp/relay-validation.json'))
-          required=['schema_version','repository','root_job_id','root_goal','status','current_owner','authority_epoch','canonical_automation_id','checkpoint','continuation','safety']
+          p=json.load(open('/tmp/current.json'))
+          policy=json.load(open('/tmp/relay-policy.json'))
+          handoff=json.load(open('/tmp/handoff.json'))
+          activity=json.load(open('/tmp/activity.json'))
+          validation=json.load(open('/tmp/relay-validation.json'))
+
+          required=['schema_version','repository','program_id','program_status','root_job_id','root_goal','status','current_owner','authority_epoch','canonical_automation_id','run_state','checkpoint','continuation','safety']
           missing=[k for k in required if k not in p]
           if missing: raise SystemExit(f"CURRENT.json missing: {missing}")
-          if p['status'] not in {'CONTINUE','COMPLETE','BLOCKED_EXTERNAL','DEGRADED_CONTINUATION'}: raise SystemExit('invalid status')
+          if p['program_status'] not in {'CONTINUE','PROGRAM_COMPLETE','BLOCKED_EXTERNAL','DEGRADED_CONTINUATION'}: raise SystemExit('invalid program_status')
+          if p['status'] not in {'CONTINUE','COMPLETE','BLOCKED_EXTERNAL','DEGRADED_CONTINUATION'}: raise SystemExit('invalid root status')
           if not isinstance(p['authority_epoch'],int) or p['authority_epoch']<0: raise SystemExit('invalid authority_epoch')
+
           cp=p['checkpoint']
           for k in ['id','state','completed','evidence','next_action']:
               if k not in cp: raise SystemExit(f'checkpoint missing: {k}')
+
           cont=p['continuation']
-          if cont.get('mechanism')!='RRULE_PHASE_ROTATION' or cont.get('next_wake_first') is not True: raise SystemExit('continuation invariant failed')
-          if cont.get('current_phase_minute') not in {0,15,30,45}: raise SystemExit('invalid phase')
+          if cont.get('mechanism')!='RRULE_HOURLY_PHASE_ROTATION_15M': raise SystemExit('continuation mechanism mismatch')
+          if cont.get('rrule_frequency')!='HOURLY' or cont.get('phase_step_minutes')!=15 or cont.get('cadence_minutes_effective')!=15: raise SystemExit('continuation cadence invariant failed')
+          phase=cont.get('current_phase_minute')
+          if not isinstance(phase,int) or not 0 <= phase <= 59: raise SystemExit('invalid phase')
+          if cont.get('next_wake_first') is not True: raise SystemExit('next-wake-first invariant failed')
           if cont.get('voluntary_idle_before_successor_forbidden') is not True: raise SystemExit('utilization invariant missing')
           if cont.get('handoff_trigger')!='SUCCESSOR_ACTUALLY_OBSERVED': raise SystemExit('handoff trigger mismatch')
-          if handoff.get('handoff_state') not in {'PREDECESSOR_ACTIVE','SUCCESSOR_DUE','SUCCESSOR_OBSERVED','HANDOFF_DRAIN','HANDOFF_COMMITTED','SUCCESSOR_ACTIVE','TERMINAL'}: raise SystemExit('invalid handoff_state')
-          if handoff.get('root_job_id')!=p.get('root_job_id'): raise SystemExit('handoff root mismatch')
+          if cont.get('root_completion_is_stop_condition') is not False: raise SystemExit('root completion must not be a program stop condition')
+          if cont.get('program_terminal_disabled_required') is not True: raise SystemExit('program terminal disable invariant missing')
+
+          allowed_handoff={'ARMED_NO_ACTIVE_OWNER','PREDECESSOR_ACTIVE','SUCCESSOR_DUE','SUCCESSOR_OBSERVED','HANDOFF_DRAIN','HANDOFF_COMMITTED','SUCCESSOR_ACTIVE','TERMINAL'}
+          if handoff.get('handoff_state') not in allowed_handoff: raise SystemExit('invalid handoff_state')
+          if handoff.get('program_id')!=p.get('program_id') or handoff.get('root_job_id')!=p.get('root_job_id'): raise SystemExit('handoff identity mismatch')
+
+          allowed_activity={'ARMED','WORKING','HANDOFF','PROGRAM_COMPLETE','BLOCKED_EXTERNAL','DEGRADED_CONTINUATION'}
+          if activity.get('status') not in allowed_activity: raise SystemExit('invalid activity status')
+          if activity.get('program_id')!=p.get('program_id') or activity.get('root_job_id')!=p.get('root_job_id') or activity.get('canonical_automation_id')!=p.get('canonical_automation_id'): raise SystemExit('activity identity mismatch')
+          if activity.get('status')=='WORKING' and not activity.get('active_run_id'): raise SystemExit('WORKING activity requires active_run_id')
+
           if p['safety'].get('public_repo') is not True or p['safety'].get('secrets_allowed') is not False: raise SystemExit('public safety invariant failed')
           if policy.get('status')!='ACTIVE' or policy.get('scheduler',{}).get('canonical_reuse_required') is not True: raise SystemExit('relay policy inactive')
+          if policy.get('scheduler',{}).get('mechanism')!='RRULE_HOURLY_PHASE_ROTATION_15M': raise SystemExit('relay scheduler policy mismatch')
           if policy.get('utilization',{}).get('voluntary_idle_while_useful_work_exists_forbidden') is not True: raise SystemExit('relay utilization invariant failed')
+          if policy.get('program_continuity',{}).get('root_completion_does_not_imply_program_completion') is not True: raise SystemExit('program continuity invariant failed')
+
           if validation.get('canonical_automation_id') != p.get('canonical_automation_id'): raise SystemExit('validation canonical mismatch')
           if validation.get('status') not in {'IN_PROGRESS','PASS','FAIL'}: raise SystemExit('invalid validation status')
           acceptance=validation.get('acceptance',{})
@@ -86,6 +109,7 @@ jobs:
           allowed_accept={'PASS','PASS_WITH_SCOPE','PENDING','FAIL'}
           for k in mandatory:
               if acceptance[k].get('status') not in allowed_accept: raise SystemExit(f'invalid acceptance status: {k}')
+
           event_ids=set()
           allowed_events={'WAKE_ARMED','WAKE_UPDATE_VERIFIED','WORK_STARTED','CHECKPOINT','SUCCESSOR_OBSERVED','HANDOFF','DEGRADED_CONTINUATION','COMPLETE','BLOCKED_EXTERNAL'}
           for n,line in enumerate(open('/tmp/events.jsonl'),1):
@@ -95,6 +119,7 @@ jobs:
                   if k not in e: raise SystemExit(f'event {n} missing {k}')
               if e['event_type'] not in allowed_events or e['event_id'] in event_ids: raise SystemExit(f'invalid/duplicate event {n}')
               event_ids.add(e['event_id'])
+
           run_ids=set()
           for n,line in enumerate(open('/tmp/runs.jsonl'),1):
               if not line.strip(): continue
@@ -103,5 +128,5 @@ jobs:
                   if k not in o: raise SystemExit(f'run {n} missing {k}')
               if o['classification'] not in {'ACTIVE','HANDOFF','COMPLETE','BLOCKED_EXTERNAL','PLATFORM_ENDED','DEGRADED_CONTINUATION'} or o['observation_id'] in run_ids: raise SystemExit(f'invalid/duplicate run {n}')
               run_ids.add(o['observation_id'])
-          print(f'RRuleR control-plane validation passed; events={len(event_ids)} runs={len(run_ids)} relay_validation={validation["status"]}')
+          print(f'RRuleR control-plane validation passed; events={len(event_ids)} runs={len(run_ids)} relay_validation={validation["status"]} activity={activity["status"]}')
           PY
