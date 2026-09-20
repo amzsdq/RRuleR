@@ -1,38 +1,13 @@
 {
-  "policy_id": "RRULER_HANDOFF_RECOVERY",
-  "version": 2,
-  "status": "ACTIVE",
-  "purpose": "Prevent an inactive predecessor from deadlocking a successor after a durable handoff request while avoiding takeover from a fresh predecessor.",
-  "normal_path": "Wait for predecessor durable handoff commit while predecessor activity remains fresh.",
-  "stale_path": {
-    "eligible_when_predecessor_freshness": "SUSPECT_OR_OVERDUE",
-    "handoff_ack_grace_seconds": 120,
-    "requires_no_new_predecessor_progress_during_grace": true,
-    "requires_handoff_request_still_pending": true,
-    "requires_successor_rearm_verified": true,
-    "requires_program_non_terminal": true,
-    "already_stale_fast_path": {
-      "enabled": true,
-      "eligible_when_last_predecessor_progress_age_seconds_gte": 120,
-      "additional_post_request_grace_seconds": 0,
-      "requires_immediate_re_read_after_request": true,
-      "requires_predecessor_progress_unchanged_on_re_read": true,
-      "rationale": "Do not add a second 120-second idle tax when the predecessor was already stale for at least the full recovery grace before the successor request. Freshness protection is based on observed predecessor progress age, not request age alone."
-    }
-  },
-  "recovery_sequence": [
-    "RE_READ_CURRENT_ACTIVITY_HANDOFF",
-    "VERIFY_PREDECESSOR_STILL_SUSPECT_OR_OVERDUE_AND_UNCHANGED",
-    "ADVANCE_AUTHORITY_EPOCH_TO_SUCCESSOR",
-    "MARK_SUCCESSOR_WORKING",
-    "MARK_HANDOFF_RECOVERED_TAKEOVER",
-    "DO_NOT_REPLAY_PREDECESSOR_ACTIVE_UNIT_BLINDLY",
-    "PLAN_15_MIN_WORK_PACKET_FROM_EXACT_DURABLE_NEXT_ACTION",
-    "CONTINUE_WORK"
-  ],
-  "normal_handoff_preferred": true,
-  "timeout_is_recovery_not_normal_handoff": true,
-  "successor_may_not_take_over_while_predecessor_is_fresh": true,
-  "predecessor_should_check_pending_handoff_after_each_bounded_unit": true,
-  "exact_predecessor_end_time_must_not_be_invented": true
+  "policy_id":"RRULER_HANDOFF_RECOVERY","version":3,"status":"ACTIVE","purpose":"Recover authority when a prior durable owner is stale without duplicating substantive work. Under the active rolling runtime, normal completion-relative wake is reconstruction/continuation, not a fixed-quarter predecessor/successor handoff protocol.",
+  "active_runtime_mode":"RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE",
+  "normal_path":"On a valid same-canonical rolling wake, verify newest schedule generation, provisionally rearm, reconstruct exact durable checkpoint, then claim a fresh authority epoch when the prior run is no longer active. Do not require a clock-bound handoff request.",
+  "stale_path":{"eligible_when_predecessor_freshness":"SUSPECT_OR_OVERDUE","recovery_grace_seconds":120,"requires_no_new_predecessor_progress_during_grace":true,"requires_successor_rearm_verified":true,"requires_program_non_terminal":true,"already_stale_fast_path":{"enabled":true,"eligible_when_last_predecessor_progress_age_seconds_gte":120,"additional_grace_seconds":0,"requires_immediate_re_read":true,"requires_predecessor_progress_unchanged_on_re_read":true,"rationale":"Do not add a second 120-second idle tax when predecessor was already stale for the full recovery grace."}},
+  "recovery_sequence":["RE_READ_CURRENT_ACTIVITY_HANDOFF","VERIFY_NEWEST_SCHEDULE_GENERATION_AND_PROGRAM_NONTERMINAL","VERIFY_PREDECESSOR_STALE_OR_NORMAL_PRIOR_RUN_CLOSED","ADVANCE_AUTHORITY_EPOCH_TO_SUCCESSOR","MARK_SUCCESSOR_WORKING","DO_NOT_REPLAY_AMBIGUOUS_SIDE_EFFECTS","PLAN_CURRENT_ROLLING_OBJECTIVE_FROM_EXACT_DURABLE_NEXT_ACTION","CONTINUE_WORK"],
+  "normal_handoff_preferred_when_true_concurrent_successor_exists":true,
+  "timeout_is_recovery_not_normal_handoff":true,
+  "successor_may_not_take_over_while_predecessor_is_fresh_and_conflicting":true,
+  "fixed_quarter_handoff_request_required":false,
+  "legacy_note":"Version 2 request/ack wording reflected the retired fixed-quarter rolling-worker design. Historical evidence remains valid; active recovery semantics follow rolling completion-relative lifecycle.",
+  "exact_predecessor_end_time_must_not_be_invented":true
 }
