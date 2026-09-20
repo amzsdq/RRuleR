@@ -5,19 +5,24 @@
   "type": "object",
   "required": [
     "schema_version",
+    "program_id",
     "root_job_id",
     "handoff_state",
     "predecessor_run_id",
+    "successor_run_id",
     "successor_expected_at",
     "successor_observed_at",
     "active_unit",
+    "checkpoint_id",
     "next_action"
   ],
   "properties": {
     "schema_version": {"const": "1.0"},
+    "program_id": {"type": "string", "minLength": 1},
     "root_job_id": {"type": "string", "minLength": 1},
     "handoff_state": {
       "enum": [
+        "ARMED_NO_ACTIVE_OWNER",
         "PREDECESSOR_ACTIVE",
         "SUCCESSOR_DUE",
         "SUCCESSOR_OBSERVED",
@@ -27,11 +32,11 @@
         "TERMINAL"
       ]
     },
-    "predecessor_run_id": {"type": "string", "minLength": 1},
+    "predecessor_run_id": {"type": ["string", "null"]},
     "successor_run_id": {"type": ["string", "null"]},
-    "successor_expected_at": {"type": "string", "minLength": 1},
-    "successor_observed_at": {"type": ["string", "null"]},
-    "active_unit": {"type": "string", "minLength": 1},
+    "successor_expected_at": {"type": "string", "format": "date-time"},
+    "successor_observed_at": {"type": ["string", "null"], "format": "date-time"},
+    "active_unit": {"type": ["string", "null"]},
     "checkpoint_id": {"type": ["string", "null"]},
     "next_action": {"type": "string", "minLength": 1}
   },
