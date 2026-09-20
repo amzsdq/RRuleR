@@ -6,31 +6,26 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "root_goal": "Raise and verify average observed useful-work span to at least 840 seconds per 15-minute turn while preserving a ~60-second runtime-safe baton-pass margin.",
   "status": "CONTINUE",
-  "current_owner": "RUN-UTIL-20260920-231559",
-  "authority_epoch": 12,
+  "current_owner": "RUN-UTIL-20260920-234225",
+  "authority_epoch": 13,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "HANDOFF_DRAIN",
+  "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-015",
+    "id": "CP-UTILIZATION-016",
     "state": "CONTINUE",
     "completed": [
-      "23:15 expected wake rearmed the same canonical hourly RRULE to :30 before substantive work and claimed authority epoch 12.",
-      "Repaired deterministic CI validator to match scheduler-fence v2 forward-recovery semantics; subsequent validation passed.",
-      "Opened a durable live RUNS observation for the 23:15 utilization turn rather than relying on schedule arithmetic.",
-      "Expanded docs/UTILIZATION.md with the valid-turn 14+1 measurement protocol and explicit 840-second acceptance gate.",
-      "Expanded docs/HANDOFF_PROTOCOL.md with positive successor-evidence ordering and baton-request requirements.",
-      "Bound RELAY_VALIDATION utilization measurement acceptance to the live 23:15 experiment.",
-      "23:30 successor positively woke at 23:32:22, rearmed the same canonical hourly RRULE to :45, verified rearm success, and persisted durable successor handoff evidence without taking predecessor authority."
+      "Recovered the stale epoch-12 predecessor after positive successor evidence and more than the configured recovery grace with no newer predecessor progress.",
+      "Verified and rearmed the same canonical hourly RRULE forward from :45 to :00 before substantive work.",
+      "Advanced authority to epoch 13 without replaying the predecessor active unit blindly."
     ],
     "evidence": [
-      "canonical automation verified next phase BYMINUTE=45",
-      "CI run 35516038296 completed success after validator repair",
-      "CI run 35516072374 completed success with the new live RUNS observation",
-      "state/ACTIVITY.json has durable substantive start 23:16:15 and progressive checkpoints through 23:30:15",
-      "state/HANDOFF.json records successor RUN-UTIL-20260920-233222 observed at 23:32:22 after successful :45 rearm"
+      "Prior predecessor last durable progress was 23:30:15 KST.",
+      "Durable successor evidence was recorded at 23:32:22 KST.",
+      "At recovery time the stale interval exceeded the 120-second handoff recovery grace.",
+      "Canonical automation update to the next :00 quarter slot returned SUCCESS."
     ],
-    "observation": "The 23:15 predecessor has positive successor evidence and is now in handoff drain. Authority remains epoch 12 until predecessor commits handoff or bounded stale-predecessor recovery becomes eligible; the verified future continuation is already advanced to :45.",
-    "next_action": "Predecessor must close the smallest safe unit and commit exact measurement/checkpoint boundaries. If it remains unchanged through the configured recovery grace and is proven SUSPECT/OVERDUE, successor may advance authority under control/handoff-recovery.v1.json."
+    "observation": "The prior turn reached the 840-second observed progress boundary but failed to commit its own handoff. Recovery therefore advances authority rather than allowing the baton pipeline to deadlock.",
+    "next_action": "Execute UTIL-EXP-002 under epoch 13: keep useful work checkpointable, refresh durable progress frequently, and prepare for successor-triggered handoff near the next quarter boundary."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_QUARTER_SELF_SHIFT",
@@ -38,8 +33,8 @@
     "rrule_frequency": "HOURLY",
     "phase_step_minutes": 15,
     "next_wake_first": true,
-    "next_due_at": "2026-09-20T23:45:00+09:00",
-    "current_phase_minute": 45,
+    "next_due_at": "2026-09-21T00:00:00+09:00",
+    "current_phase_minute": 0,
     "handoff_trigger": "SUCCESSOR_REARM_VERIFIED_THEN_DURABLE_HANDOFF_REQUEST",
     "voluntary_idle_before_successor_forbidden": true,
     "root_completion_is_stop_condition": false,
@@ -47,7 +42,7 @@
     "work_packet_horizon_minutes": 14,
     "work_packet_boundary_is_stop_condition": false,
     "scheduler_fence_policy": "control/scheduler-fence.v1.json",
-    "next_phase_minute": 0,
+    "next_phase_minute": 15,
     "quarter_cycle": [0,15,30,45],
     "utilization_target_seconds": 840,
     "utilization_goal_min_valid_turns": 3,
