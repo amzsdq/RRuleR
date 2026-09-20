@@ -2,12 +2,12 @@
   "schema_version": "1.0",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "handoff_state": "PREDECESSOR_ACTIVE",
+  "handoff_state": "SUCCESSOR_OBSERVED",
   "predecessor_run_id": "RUN-UTIL-20260920-231559",
-  "successor_run_id": null,
+  "successor_run_id": "RUN-UTIL-20260920-233222",
   "successor_expected_at": "2026-09-20T23:30:00+09:00",
-  "successor_observed_at": null,
+  "successor_observed_at": "2026-09-20T23:32:22+09:00",
   "active_unit": "UTIL-EXP-002 checkpointable utilization work and live measurement hardening",
-  "checkpoint_id": "CP-UTILIZATION-013",
-  "next_action": "Predecessor continues bounded useful work. At :30 successor wake, successor rearms canonical to :45 then persists handoff request; predecessor closes smallest safe unit and commits exact measurement boundaries."
+  "checkpoint_id": "CP-UTILIZATION-014",
+  "next_action": "Successor has verified canonical rearm to :45 and requested baton. Predecessor must stop admitting new substantive units, close the smallest safe unit, persist exact measurement/checkpoint evidence, and commit handoff. Successor waits or applies bounded stale-predecessor recovery only if eligibility is proven."
 }
