@@ -3,6 +3,7 @@
 ## Files
 
 - `CURRENT.json` — compact machine-readable projection of the current root job.
+- `HANDOFF.json` — explicit predecessor/successor coordination state for the current handoff.
 - `EVENTS.jsonl` — append-oriented public-safe relay event ledger.
 - `RUNS.jsonl` — run/handoff/utilization observation ledger.
 
