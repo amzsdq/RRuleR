@@ -33,8 +33,10 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 │  └─ relay-event.schema.json
 ├─ docs/
 │  ├─ ARCHITECTURE.md
+│  ├─ HANDOFF_PROTOCOL.md
 │  ├─ OPERATIONS.md
 │  ├─ RELAY_RRULE_SELF_UPDATE.md
+│  ├─ STATE_MODEL.md
 │  └─ UTILIZATION.md
 ├─ experiments/
 │  └─ rrule-self-relay/
