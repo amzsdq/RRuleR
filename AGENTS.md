@@ -7,11 +7,12 @@ A ChatGPT session is disposable. Durable GitHub state is authoritative.
 ## Mandatory startup
 
 1. Read `control/POLICY.md`.
-2. Read `state/CURRENT.json`.
-3. Resolve root goal, status, owner/authority epoch, latest checkpoint, and exact next action.
-4. On a relay wake, establish/verify the next wake before substantive work.
-5. Read only the task-specific files needed for the current work unit.
-6. Continue from durable state; never restart completed work merely because local chat context is missing.
+2. On a relay run, read `control/relay-policy.v1.json` as the machine-readable relay contract.
+3. Read `state/CURRENT.json`.
+4. Resolve root goal, status, owner/authority epoch, latest checkpoint, and exact next action.
+5. On a relay wake, establish/verify the next wake before substantive work.
+6. Read only the task-specific files needed for the current work unit.
+7. Continue from durable state; never restart completed work merely because local chat context is missing.
 
 ## Utilization rule
 
