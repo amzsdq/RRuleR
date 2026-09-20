@@ -27,10 +27,7 @@ jobs:
         run: |
           import json
           from pathlib import Path
-
-          def load(p):
-              return json.loads(Path(p).read_text())
-
+          def load(p): return json.loads(Path(p).read_text())
           rc=load('control/runtime-continuity.v1.json')
           ew=load('control/event-wake-candidate.v1.json')
           util=load('state/UTILIZATION.json')
@@ -38,7 +35,6 @@ jobs:
           ledger=load('state/EVENT_WAKE_LEDGER.json')
           exps=load('state/UTILIZATION_EXPERIMENTS.json')
           current=load('state/CURRENT.json')
-
           assert rc['status']=='ACTIVE'
           assert rc['principle']=='DURABLE_WORKFLOW_DISPOSABLE_REASONING_WORKER'
           required={'invocation_useful_span_seconds','continuation_gap_seconds','window_useful_coverage_seconds','scheduler_delivery_delay_seconds','handoff_overhead_seconds'}
@@ -46,7 +42,6 @@ jobs:
           assert rc['progress_evidence']['timestamp_only_heartbeat_counts_as_useful_work'] is False
           assert rc['progress_evidence']['maximum_unexplained_gap_seconds_for_acceptance']==120
           assert current['continuation']['runtime_continuity_policy']=='control/runtime-continuity.v1.json'
-
           m=util['measurement']
           assert 'window_useful_coverage_definition' in m
           assert m['continuous_progress_evidence_required'] is True
@@ -54,16 +49,19 @@ jobs:
           if latest and latest.get('classification')=='RUNTIME_INVOCATION_ENDED_EARLY':
               assert latest['valid_for_840s_acceptance'] is False
               assert latest['continuation_gap_seconds'] >= 0
-
           ids={x['id']:x for x in wa['adapters']}
           assert wa['active_adapter']=='SCHEDULED_QUARTER_SHIFT'
           assert ids['WORK_GITHUB_EVENT_TRIGGER']['status'].startswith('CANDIDATE')
           assert ew['status']=='CANDIDATE_NOT_ACTIVE'
           assert ew['dedupe']['ledger_path']=='state/EVENT_WAKE_LEDGER.json'
-          assert ew['anti_recursion']['acknowledgement_must_not_emit_trigger_event'] is True
-          assert ew['promotion_gate']['recursive_trigger_count_max']==0
+          assert ew['dedupe']['one_outstanding_continuation_token'] is True
+          chain=ew['controlled_chain']
+          assert chain['enabled_in_candidate_test'] is True
+          assert chain['max_unacknowledged_generation_ahead']==1
+          assert chain['ack_event_must_not_itself_emit_next_event'] is True
+          assert chain['next_event_may_be_emitted_only_by_current_authority_owner'] is True
+          assert ew['promotion_gate']['unbounded_event_storm_count_max']==0
           assert ledger['status']=='INACTIVE_CANDIDATE'
-
           expmap={x['id']:x for x in exps['experiments']}
           assert expmap['UTIL-EXP-005']['status']=='FALSIFIED_AS_SUFFICIENT'
           assert expmap['UTIL-EXP-006']['status']=='ACTIVE'
