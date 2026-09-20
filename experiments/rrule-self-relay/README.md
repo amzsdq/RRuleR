@@ -4,6 +4,8 @@
 
 Verify that one recurring ChatGPT automation can preserve its canonical ID and recurring RRULE while rotating `BYMINUTE` to produce an effective 15-minute relay, with GitHub as durable state and high useful-work utilization.
 
+For a fresh-session step-by-step reproduction procedure, see [REPRO_CHECKLIST.md](REPRO_CHECKLIST.md).
+
 ## Canonical automation
 
 `6aaf8a993eb08191b8d0ab1d9662e4b2`
