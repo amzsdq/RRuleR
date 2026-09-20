@@ -3,25 +3,39 @@
   "repository": "amzsdq/RRuleR",
   "root_job_id": "RRULER-BOOTSTRAP-001",
   "root_goal": "Bootstrap RRuleR as a public-safe durable control plane and document/reproduce the RRULE self-update relay.",
-  "status": "ACTIVE",
+  "status": "CONTINUE",
   "current_owner": "CHATGPT_RELAY",
   "authority_epoch": 1,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "checkpoint": {
-    "id": "CP-BOOTSTRAP-001",
-    "state": "ACTIVE",
+    "id": "CP-BOOTSTRAP-002",
+    "state": "VERIFIED",
     "completed": [
-      "Repository philosophy established",
-      "Bootstrap/control/architecture/relay documents created"
+      "Repository philosophy and bootstrap contract established",
+      "Control policy and architecture persisted",
+      "RRULE self-update relay reproduction guide persisted",
+      "Machine-readable durable CURRENT state established",
+      "RRULE validation experiment ledger established",
+      "GitHub Actions control-plane validator created and passed run 35505295915",
+      "Same canonical recurring automation armed and moved from :30 phase to :45 phase without one-shot conversion"
     ],
-    "next_action": "Validate repository structure and record scheduled successor wake/resume evidence."
+    "evidence": [
+      "workflow_run:35505295915 conclusion=success",
+      "automation_id:6aaf8a993eb08191b8d0ab1d9662e4b2",
+      "schedule_after_checkpoint:RRULE:FREQ=HOURLY;BYMINUTE=45;BYSECOND=0",
+      "next_due_kst:2026-09-20T19:45:00+09:00"
+    ],
+    "observation": "The :30 scheduled successor did not appear as a concurrent run while the bootstrap run was still active; same-canonical overlap is therefore not assumed.",
+    "next_action": "At the 19:45 scheduled wake, read this checkpoint first, update the same recurring automation to the :00 phase (20:00 KST), record that the scheduled successor actually resumed from GitHub, then continue validation without redoing bootstrap work."
   },
   "continuation": {
     "mechanism": "RRULE_PHASE_ROTATION",
     "cadence_minutes_effective": 15,
     "recurring_base": "FREQ=HOURLY",
     "next_wake_first": true,
-    "fallback_semantics": "Existing hourly RRULE may provide degraded self-rescue if a phase update fails and the old schedule remains alive."
+    "next_due_at": "2026-09-20T19:45:00+09:00",
+    "current_phase_minute": 45,
+    "fallback_semantics": "If a phase update fails and the previous hourly RRULE remains verified intact, classify DEGRADED_CONTINUATION and use the surviving hourly recurrence as a recovery opportunity."
   },
   "safety": {
     "public_repo": true,
