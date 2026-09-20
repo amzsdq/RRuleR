@@ -1,8 +1,21 @@
 {
-  "schema_version":"1.1","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","authority_epoch":18,"run_id":"RUN-UTIL-20260921-010000","status":"ACTIVE","phase":"PRIMARY_ACCEPTED_LONG_RUN_FALLBACK_EXECUTION","objective_id":"UTIL-EXP-007","objective":"Validate that machine no-yield authority sustains genuinely useful long-run work, then harden measurement and wake/recovery architecture without manufacturing utilization evidence.","expected_useful_seconds":840,
-  "acceptance_criteria":["Hard continuation gate exists, is mandatory and CI-validated.","Healthy invocation crosses 840 seconds while continuing useful work.","Same-canonical overlap behavior is measured rather than assumed.","Wall-clock utilization audit excludes heartbeat-only evidence.","Independent wake candidates are tested honestly and negative results persisted."],
-  "checkpointable_substeps":["Hard continuation gate and active-control registry.","Cross 840 seconds of live useful work.","Measure same-canonical overlap and recover scheduler forward.","Harden fixed-window substantive-evidence audit and independent wake architecture."],"current_substep":4,
-  "handoff_boundary":"Current mode is LONG_RUN_WITH_SLIDING_COLD_RESCUE because same-canonical overlap was not observed. If a genuine independent successor appears, transfer at the smallest safe unit; otherwise continue until platform boundary while keeping a future rescue wake armed.",
-  "early_finish_fallback":"Advance P0 measurement rigor, independent wake feasibility, recovery SLO, or another highest-value SaaS-competitiveness gap; never create filler merely to maintain evidence cadence.","created_for_next_wake":false,"started_at":"2026-09-21T01:00:48+09:00","last_progress_at":"2026-09-21T01:22:41+09:00",
-  "progress_evidence":["Hard continuation gate implemented and validated.","Epoch 18 crossed 840 seconds and remained productive beyond the 15-minute boundary.","01:15 same-canonical successor overlap was not observed; canonical was rolled forward to 01:30.","Actions rescue producer self-test passed under inactive guard.","Codex Cloud GitHub mention probe returned NOT_CONNECTED.","Fixed-window audit was hardened to exclude ACTIVITY-only heartbeats; this revoked a false PASS because the true max substantive evidence gap was 125 seconds versus 120 allowed.","Substantive evidence policy and separate abrupt-loss recovery SLO are now durable."]
+  "schema_version":"1.1",
+  "program_id":"RRULER-PROGRAM-001",
+  "root_job_id":"RRULER-UTILIZATION-003",
+  "authority_epoch":19,
+  "run_id":"RUN-UTIL-20260921-013250",
+  "status":"ACTIVE",
+  "phase":"OBJECTIVE_ACCEPTED_CONTINUING_UNTIL_PLATFORM_BOUNDARY_OR_INDEPENDENT_HANDOFF",
+  "objective_id":"UTIL-EXP-008",
+  "objective":"Convert the observed epoch-18 disappearance into exact recovery-gap evidence, distinguish behavioral no-yield enforcement from physical runtime continuity, and advance the highest-value independent-wake/recovery control without introducing duplicate execution.",
+  "expected_useful_seconds":840,
+  "acceptance_criteria":["Epoch 18 end is classified without inventing an exact runtime end timestamp.","Recovery gap uses last meaningful predecessor evidence and first meaningful epoch-19 progress, and is recorded separately from healthy-run utilization.","Cold-rescue scheduling remains armed but is explicitly non-authorizing for voluntary final.","At least one concrete recovery-latency control or measurement improvement is implemented and validated.","If still alive near 01:45, the canonical is rolled to 02:00 and useful work continues rather than yielding."],
+  "checkpointable_substeps":["Recover stale epoch 18 and claim epoch 19.","Record abrupt-boundary recovery evidence and scorecard impact.","Audit independent-wake/rescue producer behavior since installation.","Implement the highest-value safe recovery improvement or falsification test."],
+  "current_substep":2,
+  "handoff_boundary":"No scheduled quarter boundary is a handoff. Transfer only to a genuine independent successor or on validated authority loss; otherwise keep working and slide the cold-rescue wake forward.",
+  "early_finish_fallback":"Advance event-consumer provisioning evidence, recovery-latency measurement, or duplicate-safe stale-owner detection; never wait for the armed cold-rescue wake.",
+  "created_for_next_wake":false,
+  "started_at":"2026-09-21T01:33:11+09:00",
+  "last_progress_at":"2026-09-21T01:34:20+09:00",
+  "progress_evidence":["Canonical rearmed to 01:45 before substantive recovery work.","Epoch 18 stale condition verified from both ACTIVITY and commit history.","Authority advanced monotonically from epoch 18 to 19."]
 }
