@@ -7,9 +7,9 @@
   "active_run_id": "RUN-UTIL-20260920-235858",
   "authority_epoch": 14,
   "substantive_work_started_at": "2026-09-20T23:59:54+09:00",
-  "last_progress_at": "2026-09-21T00:01:14+09:00",
-  "last_progress_kind": "PLATFORM_BOUNDARY_AND_MEASUREMENT_HARDENING",
-  "current_unit": "UTIL-EXP-003: already-stale fast recovery is CI-bound; official hourly scheduling boundary and actual-vs-expected successor measurement risk are now documented. Continue useful checkpointable work toward a valid 14-minute observed span.",
+  "last_progress_at": "2026-09-21T00:03:23+09:00",
+  "last_progress_kind": "CONTINUOUS_EVIDENCE_POLICY_BOUND",
+  "current_unit": "UTIL-EXP-003: machine relay policy now requires <=120s unexplained progress gaps for a counted 14-minute turn, preventing sparse timestamps from falsely passing the work-duration target.",
   "next_wake_due_at": "2026-09-21T00:15:00+09:00",
   "successor_observed": false,
   "handoff_ready": false
