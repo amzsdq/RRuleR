@@ -1,16 +1,16 @@
 {
-  "schema_version":"1.0",
+  "schema_version":"1.1",
   "program_id":"RRULER-PROGRAM-001",
   "root_job_id":"RRULER-UTILIZATION-003",
-  "handoff_state":"RECOVERED_TAKEOVER",
-  "predecessor_run_id":"RUN-UTIL-20260921-010000",
-  "successor_run_id":"RUN-UTIL-20260921-013250",
-  "successor_expected_at":"2026-09-21T01:30:00+09:00",
-  "successor_observed_at":"2026-09-21T01:32:50+09:00",
-  "request_persisted_at":"2026-09-21T01:33:11+09:00",
-  "predecessor_last_progress_at":"2026-09-21T01:25:08+09:00",
-  "recovery_basis":"Epoch 18 had no substantive commit after 01:25:08 and no durable activity after 01:24:11; both were stale well beyond the 120-second recovery threshold when the cold-rescue wake arrived. Immediate reread showed no newer predecessor progress.",
-  "active_unit":"UTIL-EXP-008 pre-final gate live retest and recovery-gap reduction",
-  "checkpoint_id":"CP-UTILIZATION-027",
-  "next_action":"Epoch 19 owns authority. Keep the canonical cold-rescue wake sliding forward, measure the actual epoch18-to-epoch19 gap without inference, and continue useful P0 work without voluntary final while program_status remains CONTINUE."
+  "handoff_state":"ROLLING_WAKE_ARMED",
+  "predecessor_run_id":"RUN-UTIL-20260921-032900",
+  "successor_run_id":null,
+  "successor_expected_at":"2026-09-21T03:32:00+09:00",
+  "successor_observed_at":null,
+  "request_persisted_at":null,
+  "predecessor_last_progress_at":"2026-09-21T03:30:21+09:00",
+  "recovery_basis":"No failure takeover in this generation. Same canonical was provisionally armed to 03:42 before work, then final-rearmed to 03:32 after checkpoint. The next actual wake must verify the completion-relative continuation; future wake metadata alone is not success evidence.",
+  "active_unit":"UTIL-EXP-011 first production rolling RRULE lifecycle validation",
+  "checkpoint_id":"CP-UTILIZATION-034",
+  "next_action":"On actual 03:32 wake, verify same canonical and newest expected due, record observed scheduler delay, provisional-arm the next rescue deadline, claim the next authority epoch, and continue normalized rolling utilization measurement."
 }
