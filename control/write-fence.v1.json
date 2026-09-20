@@ -1,0 +1,40 @@
+{
+  "policy_id": "RRULER_GLOBAL_WRITE_FENCE",
+  "version": 1,
+  "status": "ACTIVE",
+  "purpose": "Make authority_epoch behave as an enforceable fencing token at the Git branch mutation boundary rather than a policy-only advisory field.",
+  "protected_authoritative_paths": [
+    "state/CURRENT.json",
+    "state/ACTIVITY.json",
+    "state/HANDOFF.json",
+    "state/UTILIZATION.json",
+    "state/RUNS.jsonl",
+    "state/EVENTS.jsonl",
+    "control/*.json"
+  ],
+  "normal_authority_write_protocol": [
+    "READ_FRESH_MAIN_HEAD",
+    "READ_FRESH_CURRENT_FROM_THAT_HEAD",
+    "VERIFY_CURRENT_OWNER_AND_AUTHORITY_EPOCH_MATCH_WRITER",
+    "BUILD_ALL_PROTECTED_CHANGES_AS_ONE_TREE_FROM_THAT_HEAD_TREE",
+    "CREATE_COMMIT_WITH_EXACT_FRESH_HEAD_AS_PARENT",
+    "UPDATE_MAIN_REF_NON_FORCE",
+    "IF_REF_MOVED_REJECT_STALE_PACKET_RE_READ_AND_REAUTHORIZE"
+  ],
+  "required_git_primitives": {
+    "blob": "CREATE_BLOB",
+    "tree": "CREATE_TREE_FROM_FRESH_BASE_TREE",
+    "commit": "CREATE_COMMIT_PARENT_EQUALS_FRESH_MAIN_HEAD",
+    "publish": "UPDATE_REF_FORCE_FALSE"
+  },
+  "contents_api_rule": "Do not use per-file contents-API update_file/create_file/delete_file for authority-sensitive protected-state mutation after this policy is active, because a stale worker can otherwise update a different file after authority moved. Use one branch-head CAS packet instead.",
+  "successor_pre_authority_exception": {
+    "allowed_operations": ["SCHEDULER_REARM_EXTERNAL", "HANDOFF_REQUEST"],
+    "github_handoff_request_still_requires_branch_head_cas": true,
+    "must_not_claim_or_modify_predecessor_owned_substantive_result": true
+  },
+  "why": "A lease/epoch field is not a true fence unless stale writes are rejected at the mutation boundary. Non-force ref update of a commit whose parent is the freshly observed main head provides a repository-wide compare-and-swap: if any competing authoritative commit advances main first, the stale sibling commit cannot fast-forward main.",
+  "recovery_on_cas_conflict": "Never force. Re-read main and CURRENT, verify authority again, reconstruct the intended packet against fresh state, and retry only if still authorized.",
+  "force_update_forbidden": true,
+  "rollback_authority_epoch_forbidden": true
+}
