@@ -2,12 +2,12 @@
   "schema_version": "1.0",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "handoff_state": "ARMED_NO_ACTIVE_OWNER",
-  "predecessor_run_id": null,
+  "handoff_state": "PREDECESSOR_ACTIVE",
+  "predecessor_run_id": "RUN-UTIL-20260920-231559",
   "successor_run_id": null,
-  "successor_expected_at": "2026-09-20T23:15:00+09:00",
+  "successor_expected_at": "2026-09-20T23:30:00+09:00",
   "successor_observed_at": null,
-  "active_unit": null,
-  "checkpoint_id": "CP-UTILIZATION-012",
-  "next_action": "23:15 successor wakes, rearms same canonical to :30, claims fresh authority, plans and executes the next ~14-minute work packet."
+  "active_unit": "UTIL-EXP-002 checkpointable utilization work and live measurement hardening",
+  "checkpoint_id": "CP-UTILIZATION-013",
+  "next_action": "Predecessor continues bounded useful work. At :30 successor wake, successor rearms canonical to :45 then persists handoff request; predecessor closes smallest safe unit and commits exact measurement boundaries."
 }
