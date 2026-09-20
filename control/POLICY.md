@@ -73,7 +73,7 @@ If same-canonical overlap is unsupported, correctness falls back to durable reco
 
 ## Scheduler policy
 
-Scheduler mechanism is replaceable. The active relay uses the same canonical automation on a recurring 15-minute RRULE. It must not be converted to one-shot and must not be replaced merely to continue normal work.
+Scheduler mechanism is replaceable. The active mechanism is same-canonical hourly RRULE phase rotation. Because minute-frequency recurring schedules are not supported by the scheduler, each wake first moves the same recurring hourly RRULE by +15 minutes modulo 60. This produces an effective 15-minute cadence without converting to one-shot or creating a replacement automation.
 
 Architectural invariant:
 
@@ -90,8 +90,8 @@ The ChatGPT composer/stop-button state is not authoritative durable state, but i
 
 ## Failure semantics
 
-- Recurrence repair failure while a prior valid RRULE remains alive is `DEGRADED_CONTINUATION`, not immediate death.
-- A surviving recurrence may provide a recovery opportunity.
+- Recurrence phase-update failure while a prior valid RRULE remains alive is `DEGRADED_CONTINUATION`, not immediate death.
+- A surviving recurrence may provide a slower recovery opportunity.
 - Disabled/deleted/missing automation is not rescued by that fallback.
 - Repeated blind retry without a new hypothesis or reconciliation evidence is forbidden.
 
