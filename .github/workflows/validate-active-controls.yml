@@ -3,7 +3,17 @@ name: Validate active controls
 on:
   push:
     branches: ["main"]
+    paths:
+      - 'control/ACTIVE_CONTROLS.json'
+      - 'state/CURRENT.json'
+      - 'control/run-continuation-gate.v1.json'
+      - '.github/workflows/validate-active-controls.yml'
   pull_request:
+    paths:
+      - 'control/ACTIVE_CONTROLS.json'
+      - 'state/CURRENT.json'
+      - 'control/run-continuation-gate.v1.json'
+      - '.github/workflows/validate-active-controls.yml'
   workflow_dispatch:
 
 permissions:
