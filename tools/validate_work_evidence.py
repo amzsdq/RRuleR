@@ -59,14 +59,10 @@ def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->
         cursor=max(cursor,b)
     if cursor<end: gaps.append((cursor,end))
     max_gap=max(((b-a).total_seconds() for a,b in gaps),default=0); reasons=[]
-    invalid_in_window=False
-    for rr,record in zip(record_results,records):
-        if not rr["errors"]: continue
-        intersects=_record_intersects_window(record,start,end)
-        if intersects is not False:
-            invalid_in_window=True; break
-    overlap_in_window=any(max(intervals[e["left"]][0] if False else start,start) is not None for e in [])
-    # overlap errors store original record indexes; only overlaps touching this candidate window affect promotion.
+    invalid_in_window=any(
+        rr["errors"] and _record_intersects_window(record,start,end) is not False
+        for rr,record in zip(record_results,records)
+    )
     overlap_in_window=any(
         _record_intersects_window(records[e["left"]],start,end) is not False or
         _record_intersects_window(records[e["right"]],start,end) is not False
