@@ -7,10 +7,10 @@
   "active_run_id": "RUN-20260920-2215",
   "authority_epoch": 11,
   "substantive_work_started_at": "2026-09-20T22:16:28+09:00",
-  "last_progress_at": "2026-09-20T22:18:30+09:00",
-  "last_progress_kind": "CONTROL_STATE_IDENTITY_REPAIRED_AND_SCHEMA_HARDENED",
-  "current_unit": "Validate repaired cross-file identity and strengthen utilization evidence so the next successor can measure rather than infer useful span.",
+  "last_progress_at": "2026-09-20T22:29:00+09:00",
+  "last_progress_kind": "HANDOFF_READY_AFTER_SCHEMA_AND_IDENTITY_HARDENING",
+  "current_unit": "Handoff-ready: preserve repaired identity/schema/CI evidence and close only tiny safe units until successor request.",
   "next_wake_due_at": "2026-09-20T22:30:00+09:00",
   "successor_observed": false,
-  "handoff_ready": false
+  "handoff_ready": true
 }
