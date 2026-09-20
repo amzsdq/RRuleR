@@ -5,6 +5,7 @@ on:
     branches: ["main"]
     paths:
       - 'state/COVERAGE_WINDOWS.json'
+      - 'control/evidence-policy.v1.json'
       - '.github/workflows/audit-coverage-windows.yml'
   workflow_dispatch:
 
@@ -24,10 +25,12 @@ jobs:
         run: |
           set -euo pipefail
           curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/state/COVERAGE_WINDOWS.json?ref=$SHA" -o /tmp/windows.json
+          curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/control/evidence-policy.v1.json?ref=$SHA" -o /tmp/evidence-policy.json
           python - <<'PY'
           import json, os, urllib.parse, urllib.request
           from datetime import datetime, timezone, timedelta
-          d=json.load(open('/tmp/windows.json')); limit=d['maximum_unexplained_internal_gap_seconds']; token=os.environ['GH_TOKEN']; repo=os.environ['REPO']; failures=[]
+          d=json.load(open('/tmp/windows.json')); ep=json.load(open('/tmp/evidence-policy.json')); token=os.environ['GH_TOKEN']; repo=os.environ['REPO']; failures=[]
+          limit=ep['acceptance_gap_seconds']; assert limit==d['maximum_unexplained_internal_gap_seconds']; assert 'ACTIVITY_HEARTBEAT_ONLY' in ep['never_counts_by_itself']
           headers={'Authorization':f'Bearer {token}','Accept':'application/vnd.github+json'}
           def dt(s): return datetime.fromisoformat(s).astimezone(timezone.utc)
           def get(url):
@@ -47,8 +50,7 @@ jobs:
               continuity_points=sorted(set(before+([min(after)] if after else [])))
               gaps=[(b-a).total_seconds() for a,b in zip(continuity_points,continuity_points[1:])]
               worst=max(gaps,default=0); crosses=bool(after) and (min(after)-end).total_seconds()<=limit
-              claimed=w.get('useful_coverage_seconds',w.get('provisional_useful_coverage_seconds',0))
-              ok=worst<=limit and crosses and claimed>=d['target_useful_coverage_seconds']
+              claimed=w.get('useful_coverage_seconds',w.get('provisional_useful_coverage_seconds',0)); ok=worst<=limit and crosses and claimed>=d['target_useful_coverage_seconds']
               print(json.dumps({'window_id':w['window_id'],'substantive_commit_points':substantive,'max_gap_seconds':worst,'crosses_end_within_limit':crosses,'pass':ok},separators=(',',':')))
               if not ok: failures.append(w['window_id'])
           if failures: raise SystemExit('coverage window audit failed: '+','.join(failures))
