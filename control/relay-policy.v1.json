@@ -1,7 +1,7 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
-  "policy_revision": 3,
+  "policy_revision": 4,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
@@ -25,7 +25,10 @@
     "document_boundary_is_yield_condition": false,
     "root_completion_is_yield_condition": false,
     "scheduled_time_is_yield_condition": false,
-    "normal_final_response_while_active_predecessor_forbidden": true
+    "normal_final_response_while_active_predecessor_forbidden": true,
+    "nonterminal_voluntary_turn_end_forbidden": true,
+    "after_each_work_unit": "SELECT_AND_EXECUTE_NEXT_USEFUL_UNIT_IN_SAME_TURN",
+    "no_obvious_unit_action": "INSPECT_DURABLE_STATE_FOR_HIGHEST_VALUE_UNRESOLVED_INVARIANT"
   },
   "program_continuity": {
     "enabled": true,
@@ -87,6 +90,13 @@
     "root_complete_requires_evidence": true,
     "program_complete_requires_evidence": true,
     "disable_same_canonical_only_on_program_terminal": true,
-    "program_terminal_schedules_successor": false
+    "program_terminal_schedules_successor": false,
+    "voluntary_turn_end_allowed_only_for": [
+      "PROGRAM_COMPLETE",
+      "BLOCKED_EXTERNAL",
+      "COMMITTED_SUCCESSOR_HANDOFF",
+      "EXPLICIT_OPERATOR_STOP",
+      "PLATFORM_ENFORCED_TERMINATION"
+    ]
   }
 }
