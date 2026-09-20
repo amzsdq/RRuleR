@@ -1,0 +1,59 @@
+{
+  "policy_id": "RRULER_RELAY_POLICY",
+  "version": 1,
+  "status": "ACTIVE",
+  "source_of_truth": "GITHUB_DURABLE_STATE",
+  "scheduler": {
+    "mechanism": "RRULE_PHASE_ROTATION",
+    "canonical_reuse_required": true,
+    "one_shot_conversion_forbidden": true,
+    "recurring_frequency": "HOURLY",
+    "quarter_sequence": [0, 15, 30, 45],
+    "timing_mode": "exact_schedule",
+    "next_wake_first": true
+  },
+  "utilization": {
+    "first_class_objective": true,
+    "start_work_immediately_after_wake_verification": true,
+    "voluntary_idle_while_useful_work_exists_forbidden": true,
+    "checkpoint_is_yield_condition": false,
+    "milestone_is_yield_condition": false,
+    "document_boundary_is_yield_condition": false,
+    "scheduled_time_is_yield_condition": false
+  },
+  "handoff": {
+    "trigger": "SUCCESSOR_ACTUALLY_OBSERVED",
+    "scheduled_time_alone_is_trigger": false,
+    "on_trigger": [
+      "STOP_STARTING_NEW_SUBSTANTIVE_UNITS",
+      "FINISH_CURRENT_SMALLEST_SAFE_UNIT",
+      "PERSIST_HANDOFF_CHECKPOINT",
+      "EMIT_CONCISE_STATUS",
+      "PREDECESSOR_END"
+    ],
+    "successor_must_avoid_duplicate_active_unit": true,
+    "same_canonical_overlap_required_for_correctness": false
+  },
+  "fallback": {
+    "self_update_failure_with_old_rrule_intact": "DEGRADED_CONTINUATION",
+    "old_hourly_rrule_may_act_as_low_frequency_recovery_opportunity": true,
+    "disabled_deleted_missing_automation_self_rescued": false
+  },
+  "authority": {
+    "chat_is_authoritative": false,
+    "durable_state_is_authoritative": true,
+    "stale_authority_substantive_write_forbidden": true
+  },
+  "safety": {
+    "public_repo": true,
+    "secrets_allowed": false,
+    "private_source_material_allowed": false,
+    "ambiguous_irreversible_effect_blind_replay_forbidden": true,
+    "duplicate_substantive_execution_forbidden": true
+  },
+  "terminal": {
+    "complete_requires_evidence": true,
+    "complete_disables_same_canonical_automation": true,
+    "complete_schedules_successor": false
+  }
+}
