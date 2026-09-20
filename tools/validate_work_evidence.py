@@ -3,13 +3,36 @@
 from __future__ import annotations
 import json, sys
 from collections import Counter
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 WINDOW_SECONDS=900; TARGET_USEFUL_SECONDS=840; MAX_GAP_SECONDS=120; ACCEPTED="SUBSTANTIVE_ACCEPTED"
 def ts(value:str)->datetime:
     dt=datetime.fromisoformat(value)
     if dt.tzinfo is None: raise ValueError("timestamp must include timezone")
     return dt
+def fixed_window_start(value:str|datetime)->datetime:
+    """Return the deterministic 900s wall-clock bucket containing value.
+
+    Buckets are anchored to Unix epoch multiples of WINDOW_SECONDS. This is a
+    measurement boundary only; it does not reconstruct retired scheduler
+    quarter-cycle semantics.
+    """
+    dt=ts(value) if isinstance(value,str) else value
+    if dt.tzinfo is None: raise ValueError("timestamp must include timezone")
+    epoch_seconds=int(dt.timestamp())
+    bucket=epoch_seconds-(epoch_seconds%WINDOW_SECONDS)
+    return datetime.fromtimestamp(bucket,tz=timezone.utc).astimezone(dt.tzinfo)
+def enumerate_completed_fixed_windows(first_observed:str,last_observed:str)->list[str]:
+    """Enumerate fully observed deterministic 900s windows, oldest first."""
+    first,last=ts(first_observed),ts(last_observed)
+    if last<first: raise ValueError("last_observed precedes first_observed")
+    start=fixed_window_start(first)
+    if first>start: start+=timedelta(seconds=WINDOW_SECONDS)
+    out=[]
+    while start+timedelta(seconds=WINDOW_SECONDS)<=last:
+        out.append(start.isoformat())
+        start+=timedelta(seconds=WINDOW_SECONDS)
+    return out
 def validate_record(record:dict)->list[str]:
     errors=[]
     for key in ("record_id","start_at","end_at","kind","artifact","qualification","basis"):
@@ -35,10 +58,8 @@ def _merge_intervals(intervals:list[tuple[datetime,datetime,int]])->list[tuple[d
     """Return the union of already-clipped intervals; overlap remains separately auditable/rejectable."""
     merged=[]
     for a,b,_ in sorted(intervals):
-        if not merged or a>merged[-1][1]:
-            merged.append([a,b])
-        elif b>merged[-1][1]:
-            merged[-1][1]=b
+        if not merged or a>merged[-1][1]: merged.append([a,b])
+        elif b>merged[-1][1]: merged[-1][1]=b
     return [(a,b) for a,b in merged]
 def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->dict:
     records=data.get("records",[]); ids=Counter(r.get("record_id") for r in records if r.get("record_id")); duplicate_ids=sorted(k for k,v in ids.items() if v>1)
@@ -56,28 +77,19 @@ def audit(data:dict,window_start:str|None=None,observed_through:str|None=None)->
     start=ts(window_start); end=start+timedelta(seconds=WINDOW_SECONDS)
     horizon=ts(observed_through) if observed_through else max((b for _,b,_ in intervals),default=None)
     if horizon is None or horizon<end:
-        result["window"]={"start_at":start.isoformat(),"end_at":end.isoformat(),"observed_through":horizon.isoformat() if horizon else None,"reasons":["WINDOW_NOT_YET_COMPLETE"]}
-        return result
+        result["window"]={"start_at":start.isoformat(),"end_at":end.isoformat(),"observed_through":horizon.isoformat() if horizon else None,"reasons":["WINDOW_NOT_YET_COMPLETE"]}; return result
     clipped=[]
     for a,b,idx in intervals:
         x,y=max(a,start),min(b,end,horizon)
         if y>x: clipped.append((x,y,idx))
-    union=_merge_intervals(clipped)
-    useful=sum((b-a).total_seconds() for a,b in union); gaps=[]; cursor=start
+    union=_merge_intervals(clipped); useful=sum((b-a).total_seconds() for a,b in union); gaps=[]; cursor=start
     for a,b in union:
         if a>cursor: gaps.append((cursor,a))
         cursor=max(cursor,b)
     if cursor<end: gaps.append((cursor,end))
     max_gap=max(((b-a).total_seconds() for a,b in gaps),default=0); reasons=[]
-    invalid_in_window=any(
-        rr["errors"] and _record_intersects_window(record,start,end) is not False
-        for rr,record in zip(record_results,records)
-    )
-    overlap_in_window=any(
-        _record_intersects_window(records[e["left"]],start,end) is not False or
-        _record_intersects_window(records[e["right"]],start,end) is not False
-        for e in overlap_errors
-    )
+    invalid_in_window=any(rr["errors"] and _record_intersects_window(record,start,end) is not False for rr,record in zip(record_results,records))
+    overlap_in_window=any(_record_intersects_window(records[e["left"]],start,end) is not False or _record_intersects_window(records[e["right"]],start,end) is not False for e in overlap_errors)
     if invalid_in_window: reasons.append("INVALID_RECORD_PRESENT")
     if overlap_in_window: reasons.append("OVERLAPPING_INTERVALS")
     if max_gap>MAX_GAP_SECONDS: reasons.append("UNEXPLAINED_GAP_GT_120_SECONDS")
