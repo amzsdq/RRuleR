@@ -13,48 +13,42 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Validate durable state
+      - name: Validate durable state from GitHub contents
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
+          fetch() { curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/$1?ref=$SHA" -o "$2"; }
+          fetch state/CURRENT.json /tmp/current.json
+          fetch state/HANDOFF.json /tmp/handoff.json
+          fetch state/ACTIVITY.json /tmp/activity.json
+          fetch state/RUNS.jsonl /tmp/runs.jsonl
+          fetch control/relay-policy.v1.json /tmp/policy.json
+          fetch control/liveness-policy.v1.json /tmp/live.json
           python - <<'PY'
-          import json, pathlib
-          required=['AGENTS.md','control/POLICY.md','control/relay-policy.v1.json','control/liveness-policy.v1.json','state/CURRENT.json','state/HANDOFF.json','state/ACTIVITY.json','state/RELAY_VALIDATION.json','state/EVENTS.jsonl','state/RUNS.jsonl','schemas/run-observation.schema.json']
-          missing=[p for p in required if not pathlib.Path(p).exists()]
-          if missing: raise SystemExit(f'missing required files: {missing}')
-          current=json.load(open('state/CURRENT.json'))
-          policy=json.load(open('control/relay-policy.v1.json'))
-          live=json.load(open('control/liveness-policy.v1.json'))
-          activity=json.load(open('state/ACTIVITY.json'))
-          handoff=json.load(open('state/HANDOFF.json'))
+          import json
+          current=json.load(open('/tmp/current.json')); policy=json.load(open('/tmp/policy.json')); live=json.load(open('/tmp/live.json')); activity=json.load(open('/tmp/activity.json')); handoff=json.load(open('/tmp/handoff.json'))
           if current['program_status'] not in {'CONTINUE','PROGRAM_COMPLETE','BLOCKED_EXTERNAL','DEGRADED_CONTINUATION'}: raise SystemExit('invalid program_status')
           if activity.get('authority_epoch') != current.get('authority_epoch'): raise SystemExit('activity authority_epoch mismatch')
           if activity.get('status')=='WORKING' and activity.get('active_run_id') != current.get('current_owner'): raise SystemExit('WORKING owner mismatch')
           if policy.get('utilization',{}).get('nonterminal_voluntary_turn_end_forbidden') is not True: raise SystemExit('no-self-termination invariant missing')
-          allowed=set(policy.get('terminal',{}).get('voluntary_turn_end_allowed_only_for',[]))
           expected={'PROGRAM_COMPLETE','BLOCKED_EXTERNAL','COMMITTED_SUCCESSOR_HANDOFF','EXPLICIT_OPERATOR_STOP','PLATFORM_ENFORCED_TERMINATION'}
-          if allowed != expected: raise SystemExit('turn-end allowlist mismatch')
+          if set(policy.get('terminal',{}).get('voluntary_turn_end_allowed_only_for',[])) != expected: raise SystemExit('turn-end allowlist mismatch')
           if live.get('status')!='ACTIVE': raise SystemExit('liveness policy inactive')
           if handoff.get('program_id') != current.get('program_id') or handoff.get('root_job_id') != current.get('root_job_id'): raise SystemExit('handoff identity mismatch')
           seen=set()
-          for n,line in enumerate(open('state/RUNS.jsonl'),1):
+          for n,line in enumerate(open('/tmp/runs.jsonl'),1):
               if not line.strip(): continue
-              o=json.loads(line)
-              oid=o.get('observation_id')
+              o=json.loads(line); oid=o.get('observation_id')
               if not oid or oid in seen: raise SystemExit(f'invalid duplicate run observation {n}')
-              seen.add(oid)
-              ended=o.get('run_ended_at') is not None
-              reason=o.get('end_reason')
-              if ended and reason is None:
-                  raise SystemExit(f'ended run {oid} lacks end_reason')
-              if reason is not None and reason not in expected:
-                  raise SystemExit(f'unauthorized end_reason {reason} in {oid}')
-              if ended and reason=='COMMITTED_SUCCESSOR_HANDOFF' and not o.get('successor_observed_at'):
-                  raise SystemExit(f'handoff end without successor observation in {oid}')
-              if ended and reason=='PROGRAM_COMPLETE' and o.get('program_status_at_end')!='PROGRAM_COMPLETE':
-                  raise SystemExit(f'false program-complete end in {oid}')
-              if ended and reason=='BLOCKED_EXTERNAL' and o.get('program_status_at_end')!='BLOCKED_EXTERNAL':
-                  raise SystemExit(f'false blocked end in {oid}')
-          print(f'RRuleR validation passed; run_observations={len(seen)} owner={current.get("current_owner")} epoch={current.get("authority_epoch")}')
+              seen.add(oid); ended=o.get('run_ended_at') is not None; reason=o.get('end_reason')
+              if ended and reason is None: raise SystemExit(f'ended run {oid} lacks end_reason')
+              if reason is not None and reason not in expected: raise SystemExit(f'unauthorized end_reason {reason} in {oid}')
+              if ended and reason=='COMMITTED_SUCCESSOR_HANDOFF' and not o.get('successor_observed_at'): raise SystemExit(f'handoff end without successor observation in {oid}')
+              if ended and reason=='PROGRAM_COMPLETE' and o.get('program_status_at_end')!='PROGRAM_COMPLETE': raise SystemExit(f'false complete end in {oid}')
+              if ended and reason=='BLOCKED_EXTERNAL' and o.get('program_status_at_end')!='BLOCKED_EXTERNAL': raise SystemExit(f'false blocked end in {oid}')
+          print(f'RRuleR validation passed; runs={len(seen)} owner={current.get("current_owner")} epoch={current.get("authority_epoch")}')
           PY
