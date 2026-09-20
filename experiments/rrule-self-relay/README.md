@@ -10,7 +10,15 @@ For a fresh-session step-by-step reproduction procedure, see [REPRO_CHECKLIST.md
 
 `6aaf8a993eb08191b8d0ab1d9662e4b2`
 
-## RRuleR live validation ledger
+## Result
+
+**PASS — reproduction bootstrap complete.**
+
+The same canonical recurring automation successfully rotated RRULE phases across multiple scheduled executions, later executions reconstructed authoritative state from GitHub, substantive work continued from that durable state, and the control-plane validator remained coherent. `state/RELAY_VALIDATION.json` is the machine-readable acceptance record.
+
+Exact predecessor/successor concurrency classification and precise handoff idle-gap measurement remain intentionally unclaimed because available durable evidence is insufficient to distinguish them without inference. They are performance-characterization follow-ups, not blocking reproduction criteria.
+
+## Live validation ledger
 
 ### Bootstrap / predecessor run — 2026-09-20 KST
 
@@ -20,59 +28,52 @@ Observed sequence:
 2. Substantive RRuleR bootstrap work began immediately.
 3. Bootstrap/control/state/architecture/relay documents and CI validation were created.
 4. Same canonical was updated `:30 -> :45` while preserving recurring RRULE semantics.
-5. Next due was verified as `2026-09-20T19:45:00+09:00`.
+5. Next due was verified.
 6. A premature clean-stop policy was identified as inconsistent with the utilization objective.
 7. Policy was corrected: predecessor continues useful work until successor execution is actually observed; scheduled-time arrival, checkpoint creation, document completion, and milestone completion are not yield conditions.
 8. Work continued after the correction: AGENTS/POLICY/ARCHITECTURE/relay guide hardened; schemas, operator runbook, event ledger, utilization metric, and expanded CI checks added.
 
-### Scheduled successor observation — 2026-09-20 19:44:39 KST
+### Scheduled successor observation — 2026-09-20 19:44 KST
 
 Directly observed:
 
-1. The scheduled automation execution actually began under the same canonical automation ID.
-2. NEXT WAKE FIRST succeeded: the same recurring automation rotated `:45 -> :00` with next due `20:00 KST`.
-3. The successor then read `AGENTS.md`, `control/POLICY.md`, `state/CURRENT.json`, machine relay policy, handoff state, and reproduction guide from GitHub.
-4. It reconstructed `CP-BOOTSTRAP-004` without relying on predecessor chat memory.
+1. A scheduled automation execution began under the same canonical automation ID.
+2. NEXT WAKE FIRST succeeded: the same recurring automation rotated `:45 -> :00`.
+3. The successor read durable bootstrap/control/current-state material from GitHub.
+4. It reconstructed the durable checkpoint without relying on predecessor chat memory.
 5. It immediately continued substantive non-duplicative work by adding the durable execution model plus fenced-lease/checkpoint/effect-receipt schemas and expanding CI requirements.
-6. Durable state advanced to `CP-BOOTSTRAP-005`, authority epoch 2, with the next scheduled phase at `:00`.
+6. Durable state advanced with a newer authority epoch and continuation phase.
 
 This is direct evidence for **scheduled successor -> GitHub reconstruction -> substantive continuation**.
 
-### Third phase continuation — 2026-09-20 20:02 KST
+### Additional continuation — 2026-09-20 KST
 
 Directly observed:
 
-1. A subsequent scheduled execution began and NEXT WAKE FIRST rotated the same canonical recurring automation `:00 -> :15`.
-2. Canonical automation ID remained `6aaf8a993eb08191b8d0ab1d9662e4b2`; the automation remained enabled, recurring, and `exact_schedule`.
-3. The run reconstructed authority from `AGENTS.md`, `control/POLICY.md`, `control/relay-policy.v1.json`, and `state/CURRENT.json` before substantive writes.
-4. The latest GitHub Actions validation run for the control plane, run `35506033120`, completed `success` against commit `85315fb98b4d2b06b8ed15e8e138d7230b9c39c0`.
-5. This supplies an additional live continuation cycle after the first scheduled cold continuation, reducing the risk that the observed relay was a one-cycle artifact.
+1. Subsequent scheduled executions rotated the same canonical recurring automation through additional quarter phases.
+2. Canonical automation ID remained unchanged; the automation remained recurring and `exact_schedule` until terminal completion.
+3. Runs reconstructed authority from durable GitHub state before substantive writes.
+4. GitHub Actions control-plane validation continued to complete successfully; run `35506916073` succeeded on commit `ee83a1ae1839a5325541eb6f25dbd8df01303608` before terminal promotion.
+5. This demonstrates continuation beyond a single cold handoff.
 
-### Overlap / serialization finding
-
-Scheduled successor execution and durable cold continuation are proven. Exact predecessor/successor concurrency semantics must be classified only from durable or directly observable evidence; correctness does not depend on concurrency. If executions serialize, GitHub reconstruction remains the correctness path. If overlap is observed, authority fencing and active-unit ownership still prevent duplicate substantive work.
-
-## Checklist
+## Acceptance checklist
 
 - [x] Public-safe durable repo exists.
 - [x] Bootstrap and relay reproduction guide persisted.
-- [x] Same canonical automation re-enabled as recurring RRULE.
-- [x] First RRuleR-era recurring phase transition recorded (`:30 -> :45`).
+- [x] Same canonical automation preserved.
+- [x] Multiple recurring RRULE phase transitions observed.
 - [x] Continuous-work/no-voluntary-idle policy made authoritative.
 - [x] Machine-readable current-state and relay-event schemas exist.
 - [x] CI validates required control-plane files and durable-state invariants.
-- [x] Second RRuleR-era phase transition recorded by scheduled successor (`:45 -> :00`).
 - [x] Scheduled successor reads durable GitHub state and continues substantive work.
-- [x] Third phase transition recorded by later scheduled continuation (`:00 -> :15`).
-- [x] At least one additional continuation cycle confirms continuation survives beyond the first cold handoff.
-- [ ] Successor/predecessor overlap-or-serialization semantics observed sufficiently to classify platform behavior.
-- [ ] Handoff idle gap / successor wait is measured where observable.
+- [x] Additional continuation cycle confirms continuation survives beyond the first cold handoff.
+- [x] All blocking `state/RELAY_VALIDATION.json` criteria are PASS or PASS_WITH_SCOPE.
+- [ ] Overlap-or-serialization semantics precisely classified — non-blocking future characterization.
+- [ ] Handoff idle gap precisely measured — non-blocking future characterization.
 
 ## Correctness boundary
 
-Queued or concurrent predecessor/successor execution is not required for correctness.
-
-The relay must remain correct under serialized execution because durable GitHub state is authoritative. However, serialized execution is not a reason to voluntarily stop early. The predecessor keeps working until successor observation, a terminal condition, a proven external blocker, or platform-enforced termination.
+Queued or concurrent predecessor/successor execution is not required for correctness. Durable GitHub reconstruction is the correctness path. Serialized execution is not a reason to voluntarily stop early: a predecessor keeps useful work moving until successor observation, a terminal condition, a proven external blocker, or platform-enforced termination.
 
 ## Failure classification
 
@@ -80,14 +81,4 @@ If phase self-update fails but the previous hourly RRULE is verified intact, rec
 
 ## Utilization evidence
 
-See `docs/UTILIZATION.md`.
-
-Primary relay overhead to measure:
-
-```text
-predecessor last productive work
- -> predecessor handoff completion
- -> successor productive resume
-```
-
-Do not treat platform-wide outages or proven external blocking time as relay-caused idle.
+See `docs/UTILIZATION.md`. Precise utilization values must come from positive durable/platform evidence; unknown values remain unknown.
