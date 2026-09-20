@@ -3,8 +3,8 @@ import pathlib
 import unittest
 MODULE_PATH=pathlib.Path(__file__).parents[1]/"tools"/"validate_work_evidence.py"
 spec=importlib.util.spec_from_file_location("validate_work_evidence",MODULE_PATH); validator=importlib.util.module_from_spec(spec); spec.loader.exec_module(validator)
-def rec(start,end,qualification="SUBSTANTIVE_ACCEPTED",start_boundary="OBSERVED",end_boundary="OBSERVED",observed_seconds=None):
-    out={"start_at":start,"end_at":end,"kind":"implementation_or_refactor","artifact":"tools/example.py@commit","qualification":qualification,"basis":"material behavior change","start_boundary":start_boundary,"end_boundary":end_boundary}
+def rec(start,end,qualification="SUBSTANTIVE_ACCEPTED",start_boundary="OBSERVED",end_boundary="OBSERVED",observed_seconds=None,record_id=None):
+    out={"record_id":record_id or f"WE-{start}-{end}","start_at":start,"end_at":end,"kind":"implementation_or_refactor","artifact":"tools/example.py@commit","qualification":qualification,"basis":"material behavior change","start_boundary":start_boundary,"end_boundary":end_boundary}
     if observed_seconds is not None: out["observed_seconds"]=observed_seconds
     return out
 class WorkEvidenceValidatorTests(unittest.TestCase):
@@ -16,6 +16,9 @@ class WorkEvidenceValidatorTests(unittest.TestCase):
         self.assertIn("OBSERVED_SECONDS_MISMATCH",validator.validate_record(rec("2026-09-21T05:00:00+09:00","2026-09-21T05:01:00+09:00",observed_seconds=61)))
     def test_accepts_matching_declared_duration(self):
         self.assertNotIn("OBSERVED_SECONDS_MISMATCH",validator.validate_record(rec("2026-09-21T05:00:00+09:00","2026-09-21T05:01:00+09:00",observed_seconds=60)))
+    def test_rejects_duplicate_record_identity(self):
+        data={"records":[rec("2026-09-21T05:00:00+09:00","2026-09-21T05:07:00+09:00",record_id="DUP"),rec("2026-09-21T05:08:00+09:00","2026-09-21T05:15:00+09:00",record_id="DUP")]}
+        out=validator.audit(data,"2026-09-21T05:00:00+09:00","2026-09-21T05:15:00+09:00"); self.assertEqual(out["duplicate_record_ids"],["DUP"]); self.assertEqual(out["promotion"],"REJECTED")
     def test_incomplete_window_is_not_rejected_or_promoted(self):
         data={"records":[rec("2026-09-21T05:00:00+09:00","2026-09-21T05:07:00+09:00")]}
         out=validator.audit(data,"2026-09-21T05:00:00+09:00","2026-09-21T05:10:00+09:00")
