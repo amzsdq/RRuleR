@@ -33,4 +33,22 @@ class WorkEvidenceSelectionTests(unittest.TestCase):
         self.assertEqual(out["longest_consecutive_accepted"],3)
         self.assertEqual(out["selected_windows"],["2026-09-20T21:00:00+00:00","2026-09-20T21:15:00+00:00","2026-09-20T21:30:00+00:00"])
 
+    def test_malformed_first_observed_fails_closed(self):
+        out=validator.evaluate_consecutive_windows({"records":[]},"not-a-time","2026-09-21T06:45:00+09:00")
+        self.assertEqual(out["p0_acceptance"],"NOT_YET")
+        self.assertEqual(out["selected_windows"],[])
+        self.assertIsNotNone(out["observation_boundary_error"])
+
+    def test_naive_last_observed_fails_closed(self):
+        out=validator.evaluate_consecutive_windows({"records":[]},"2026-09-21T05:00:00+09:00","2026-09-21T06:45:00")
+        self.assertEqual(out["p0_acceptance"],"NOT_YET")
+        self.assertEqual(out["completed_window_count"],0)
+        self.assertIn("timezone",out["observation_boundary_error"])
+
+    def test_reversed_observation_bounds_fail_closed(self):
+        out=validator.evaluate_consecutive_windows({"records":[]},"2026-09-21T07:00:00+09:00","2026-09-21T06:45:00+09:00")
+        self.assertEqual(out["p0_acceptance"],"NOT_YET")
+        self.assertEqual(out["longest_consecutive_accepted"],0)
+        self.assertIn("precedes",out["observation_boundary_error"])
+
 if __name__=="__main__": unittest.main()
