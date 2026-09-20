@@ -1,7 +1,7 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
-  "policy_revision": 10,
+  "policy_revision": 11,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
@@ -197,6 +197,54 @@
       "current_substep",
       "handoff_boundary",
       "early_finish_fallback"
+    ]
+  },
+  "program_goals": {
+    "competitive_agent_saas": {
+      "priority": "PROGRAM",
+      "status": "ACTIVE",
+      "dimensions": [
+        "SUSTAINED_USEFUL_WORK",
+        "DURABLE_BACKGROUND_CONTINUATION",
+        "FAILURE_RECOVERY",
+        "MULTI_AGENT_ORCHESTRATION",
+        "TOOL_ENVIRONMENT_REACH",
+        "OBSERVABILITY_OPERATOR_CONTROL",
+        "COMPLETION_VERIFICATION",
+        "SECURITY_GOVERNANCE",
+        "SETUP_REPRODUCIBILITY"
+      ],
+      "parity_requires_evidence": true
+    },
+    "utilization": {
+      "priority": "P0",
+      "status": "ACTIVE_UNTIL_ACCEPTANCE_THEN_REGRESSION_SLO",
+      "target_useful_seconds_per_900s_turn": 840,
+      "minimum_valid_turns": 3,
+      "maximum_unexplained_progress_gap_seconds": 120,
+      "protect_after_pass": true
+    }
+  },
+  "autonomous_rnd": {
+    "repo_scope": "amzsdq/RRuleR",
+    "broad_reversible_repo_mutation_authorized": true,
+    "web_prior_art_research_authorized": true,
+    "self_select_next_objective_by": "HIGHEST_EXPECTED_EFFECT_ON_PROGRAM_GOALS",
+    "failed_intervention_requires_new_hypothesis_or_evidence": true,
+    "negative_results_must_be_preserved": true,
+    "external_consequential_actions_outside_scope": true,
+    "platform_and_security_constraints_still_apply": true,
+    "loop": [
+      "MEASURE_FAILURE",
+      "LOCALIZE_ROOT_CAUSE",
+      "TEST_HYPOTHESIS_FALSIFICATION",
+      "SEARCH_INTERNAL_EVIDENCE",
+      "SEARCH_EXTERNAL_PRIOR_ART_IF_USEFUL",
+      "GENERATE_ALTERNATIVES_IF_UNCERTAIN",
+      "SELECT_HIGHEST_EXPECTED_EFFECT",
+      "IMPLEMENT",
+      "VALIDATE",
+      "LIVE_RETEST"
     ]
   }
 }

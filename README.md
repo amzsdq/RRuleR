@@ -86,3 +86,11 @@ After the next wake is secured, useful-work utilization is a first-class objecti
 ## Public-safety rule
 
 This repository is public. Never persist secrets, session cookies, tokens, passwords, private conversation content, private-repository content, personal data, or other sensitive material. Persist only public-safe state, hashes, opaque references, or sanitized summaries.
+
+
+## Program goals
+
+1. Build RRuleR toward credible competitiveness with commercial long-running agent SaaS on persistence, recovery, orchestration, observability, verification, governance, usability, and especially sustained useful work.
+2. P0 until proven: >=840 seconds of evidenced useful work per intended 900-second relay turn across at least three valid turns; then preserve this as a regression SLO while advancing other dimensions.
+
+See `state/PROGRAM_GOALS.json` and `docs/COMPETITIVE_BASELINE.md`.

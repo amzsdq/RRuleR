@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "program_id": "RRULER-PROGRAM-001",
+  "status": "ACTIVE",
+  "goals": [
+    {
+      "goal_id": "GOAL-COMPETE-SAAS",
+      "priority": "PROGRAM",
+      "statement": "Build RRuleR into a production-oriented autonomous agent runtime/control plane that can credibly compete with commercial agent SaaS for long-running autonomous work.",
+      "acceptance_mode": "MULTI_DIMENSION_EVIDENCE",
+      "dimensions": [
+        {
+          "id": "UTILIZATION",
+          "target": "Sustained useful work with minimal dead time",
+          "priority": "P0"
+        },
+        {
+          "id": "PERSISTENCE",
+          "target": "Cold-start continuation from durable state"
+        },
+        {
+          "id": "RECOVERY",
+          "target": "Session/scheduler/tool failures recover without duplicate harmful work"
+        },
+        {
+          "id": "ORCHESTRATION",
+          "target": "Safe delegation and multi-agent coordination where beneficial"
+        },
+        {
+          "id": "TOOL_REACH",
+          "target": "Useful work across available tools/environments with replaceable adapters"
+        },
+        {
+          "id": "OBSERVABILITY",
+          "target": "Operator can see current state, progress, failures, utilization and next action"
+        },
+        {
+          "id": "VERIFICATION",
+          "target": "Completion and side effects independently evidenced"
+        },
+        {
+          "id": "GOVERNANCE",
+          "target": "Public-safe, auditable authority and security boundaries"
+        },
+        {
+          "id": "USABILITY",
+          "target": "Fresh session can reproduce/operate system with low manual setup"
+        }
+      ]
+    },
+    {
+      "goal_id": "GOAL-UTILIZATION-P0",
+      "priority": "P0",
+      "statement": "Achieve and sustain at least 840 seconds of evidenced useful work per intended 900-second relay turn with safe baton handoff.",
+      "acceptance": {
+        "minimum_valid_completed_turns": 3,
+        "rolling_mean_useful_seconds_gte": 840,
+        "maximum_unexplained_progress_gap_seconds": 120,
+        "handoff": "SUCCESSOR_TRIGGERED_FAST_BATON",
+        "after_pass": "RETAIN_AS_REGRESSION_SLO"
+      }
+    }
+  ],
+  "autonomy": {
+    "authorized_scope": "amzsdq/RRuleR",
+    "mode": "SELF_DIRECTED_R_AND_D",
+    "next_objective_selection": "HIGHEST_EXPECTED_EFFECT_ON_ACTIVE_GOALS",
+    "failed_experiment_behavior": "DIAGNOSE_RESEARCH_REDESIGN_RETEST",
+    "operator_approval_not_required_for": "REVERSIBLE_RRULER_REPO_RESEARCH_DESIGN_IMPLEMENTATION_TESTING",
+    "operator_or_platform_gate_still_required_for": [
+      "CONSEQUENTIAL_ACTIONS_OUTSIDE_RRULER",
+      "SECRETS_OR_PRIVATE_DATA",
+      "OTHER_REPOSITORY_MUTATION",
+      "PLATFORM_RESTRICTED_ACTIONS"
+    ]
+  }
+}

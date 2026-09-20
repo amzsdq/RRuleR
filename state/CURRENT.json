@@ -4,21 +4,23 @@
   "program_id": "RRULER-PROGRAM-001",
   "program_status": "CONTINUE",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "root_goal": "Raise and verify average observed useful-work span to at least 840 seconds per 15-minute turn while preserving a ~60-second runtime-safe baton-pass margin.",
+  "root_goal": "P0: achieve and sustain >=840 seconds of evidenced useful work per 900-second relay turn; use failures to drive autonomous diagnosis, external-reference research, redesign, implementation, and retest while preserving the broader commercial-SaaS-competitive program goal.",
   "status": "CONTINUE",
   "current_owner": "RUN-UTIL-20260921-001349",
   "authority_epoch": 15,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-019",
+    "id": "CP-PROGRAM-GOALS-001",
     "state": "CONTINUE",
     "completed": [
       "Rearmed the same canonical hourly RRULE from :15 to :30 and verified SUCCESS before successor work.",
       "Persisted a durable HANDOFF_REQUEST for epoch-14 predecessor after rearm verification.",
       "Observed predecessor activity last progressed at 00:03:23 KST; at successor observation 00:13:49 KST it was already stale well beyond the 120-second recovery threshold.",
       "Re-read durable activity after handoff request and found predecessor progress unchanged; applied handoff-recovery v2 already-stale fast path and advanced authority to epoch 15.",
-      "Adopted plan-first utilization experiment: each authority owner must persist one coherent primary turn objective expected to consume 10-14 minutes before substantive execution."
+      "Adopted plan-first utilization experiment: each authority owner must persist one coherent primary turn objective expected to consume 10-14 minutes before substantive execution.",
+      "Operator elevated two durable goals: commercial-agent-SaaS competitiveness as the program goal, with useful-work utilization as P0.",
+      "Broad autonomous RRuleR repo authority adopted for reversible research/design/implementation/testing changes; external or non-RRuleR consequential actions remain outside this scope."
     ],
     "evidence": [
       "Canonical automation update to :30 returned SUCCESS.",
@@ -26,8 +28,8 @@
       "Fresh ACTIVITY still showed epoch 14 last_progress_at=2026-09-21T00:03:23+09:00 after the request.",
       "control/handoff-recovery.v1.json v2 permits zero additional post-request grace when predecessor was already stale >=120s and unchanged on immediate re-read."
     ],
-    "observation": "The prior heartbeat-centric intervention still allowed a worker to begin with undersized/miscellaneous work. The next experiment changes admission: choose the outcome-level 14-minute objective first, then execute its checkpointable substeps.",
-    "next_action": "At the next expected wake, REARM+VERIFY, obtain authority, persist state/TURN_PLAN.json with one 10-14 minute primary objective and 2-5 checkpointable substeps, then execute it continuously until successor handoff."
+    "observation": "Utilization remains the dominant bottleneck: commercial systems emphasize persistent/background execution, orchestration and observability, but those features are low value if the active reasoning worker collapses after only a few minutes.",
+    "next_action": "Next wake: rearm, claim authority, replace TURN_PLAN with one coherent 10-14 minute objective chosen by highest expected effect on P0 utilization; if a utilization intervention fails, investigate root cause and external prior art before choosing a materially different intervention."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_QUARTER_SELF_SHIFT",
@@ -64,5 +66,10 @@
     "public_repo": true,
     "secrets_allowed": false,
     "reference_repo_amzsdq_R": "READ_ONLY"
+  },
+  "program_goal": {
+    "primary": "Build RRuleR into a production-oriented autonomous agent runtime/control plane that can credibly compete with commercial agent SaaS on long-running useful work, reliability, recoverability, orchestration, observability, and operator usability within the available ChatGPT/GitHub environment.",
+    "p0": "Achieve and sustain >=840 seconds of evidenced useful work per intended 900-second relay turn with safe baton handoff and no unexplained progress gap >120 seconds.",
+    "authority_scope": "Operator grants broad autonomous mutation/research/experimentation authority inside amzsdq/RRuleR, subject to platform/security constraints and public-repository safety."
   }
 }

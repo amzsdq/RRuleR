@@ -215,3 +215,67 @@ Execution rule:
 - if the objective completes materially before the 14-minute target, immediately execute the predeclared fallback or form one new related continuation objective;
 - after ~12 minutes, admit only work with a fast safe checkpoint boundary;
 - successor handoff preempts finishing the entire objective: close the smallest safe unit, persist exact remaining work, and transfer.
+
+
+## Program goals and autonomous R&D authority
+
+The operator has established two durable goals for RRuleR.
+
+### Program goal — commercial-agent-SaaS competitiveness
+
+Evolve RRuleR into a production-oriented autonomous agent runtime/control plane that can credibly compete with commercial agent SaaS on the dimensions that matter for long-running autonomous work:
+
+- sustained useful-work utilization;
+- durable continuation and background operation;
+- recovery from disposable-session failure;
+- delegation / multi-agent orchestration;
+- tool and environment reach;
+- observability, auditability, and operator control;
+- predictable completion verification;
+- security / governance appropriate to a public-safe control plane;
+- low-friction setup and reproducibility.
+
+Competitive parity is evidence-based. Marketing claims or architecture presence alone do not count.
+
+### P0 goal — sustained utilization
+
+Until the utilization acceptance gate passes, sustained useful work is P0.
+
+Acceptance target:
+- intended turn window: 900 seconds;
+- evidenced useful-work target: >=840 seconds;
+- no unexplained internal durable-progress gap >120 seconds;
+- fast successor-triggered baton handoff;
+- minimum 3 valid completed turns with rolling mean >=840 seconds;
+- after initial PASS, utilization becomes a regression SLO and must remain protected while other capabilities advance.
+
+### Autonomous R&D authority inside RRuleR
+
+Within `amzsdq/RRuleR`, workers may autonomously:
+- inspect, create, edit, refactor, and remove repo files when reversible and relevant;
+- create/update tests, schemas, policies, experiments, docs, workflows, checkpoints, and measurement infrastructure;
+- perform web research and compare external prior art when the current intervention fails or architecture is uncertain;
+- replace a failed intervention with a materially different hypothesis without waiting for operator approval;
+- select the next bounded objective by highest expected effect on the program goals;
+- use negative results as durable evidence and revise architecture rather than protecting prior ideas.
+
+This authority does not waive platform/security constraints, public-repository secret rules, or approval requirements for consequential actions outside RRuleR.
+
+### Failure-driven improvement loop
+
+A failed turn or failed intervention MUST trigger:
+
+```text
+MEASURE FAILURE
+ -> LOCALIZE ROOT CAUSE
+ -> CHECK WHETHER CURRENT HYPOTHESIS WAS FALSIFIED
+ -> SEARCH INTERNAL EVIDENCE
+ -> IF NEEDED SEARCH EXTERNAL PRIOR ART / COMPETITOR PRACTICE
+ -> GENERATE >=2 PLAUSIBLE CORRECTIONS WHEN UNCERTAIN
+ -> SELECT HIGHEST EXPECTED-EFFECT CORRECTION
+ -> IMPLEMENT
+ -> VALIDATE
+ -> RETEST UNDER LIVE RELAY
+```
+
+Repeating the same failed intervention without new evidence is forbidden.
