@@ -32,6 +32,7 @@ jobs:
             "state/RUNS.jsonl"
             "state/README.md"
             "docs/ARCHITECTURE.md"
+            "docs/FAILURE_RECOVERY.md"
             "docs/HANDOFF_PROTOCOL.md"
             "docs/OPERATIONS.md"
             "docs/RELAY_RRULE_SELF_UPDATE.md"
