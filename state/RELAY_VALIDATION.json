@@ -6,20 +6,17 @@
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "status": "PASS",
   "acceptance": {
-    "canonical_id_preserved": {"status": "PASS", "blocking": true},
-    "recurring_rrule_preserved": {"status": "PASS", "blocking": true},
-    "two_or_more_phase_transitions": {"status": "PASS", "blocking": true},
-    "scheduled_cold_continuation_from_github": {"status": "PASS", "blocking": true},
-    "additional_cycle_without_continuation_loss": {"status": "PASS", "blocking": true},
-    "github_state_coherent": {"status": "PASS", "blocking": true},
-    "runtime_timeout_does_not_break_cycle": {"status": "PASS_WITH_SCOPE", "blocking": true},
-    "overlap_or_serialization_semantics_classified": {"status": "PENDING", "blocking": false},
-    "utilization_handoff_measurement": {"status": "PENDING", "blocking": false}
+    "canonical_id_preserved": {"status":"PASS","blocking":true},
+    "recurring_rrule_preserved": {"status":"PASS","blocking":true},
+    "two_or_more_phase_transitions": {"status":"PASS","blocking":true},
+    "scheduled_cold_continuation_from_github": {"status":"PASS","blocking":true},
+    "additional_cycle_without_continuation_loss": {"status":"PASS","blocking":true},
+    "github_state_coherent": {"status":"PASS","blocking":true},
+    "runtime_timeout_does_not_break_cycle": {"status":"PASS_WITH_SCOPE","blocking":true},
+    "overlap_or_serialization_semantics_classified": {"status":"PENDING","blocking":false},
+    "utilization_handoff_measurement": {"status":"PENDING","blocking":true,"detail":"Active root now requires durable run-end reason and timing evidence sufficient to distinguish platform termination, successor handoff, and unauthorized voluntary early end."}
   },
-  "pass_rule": "PASS applies to the bootstrap relay reproduction root, not the overall RRuleR program.",
-  "decision": {
-    "root": "ROOT_PASS",
-    "program": "CONTINUE"
-  },
-  "next_action": "Treat this as historical root acceptance evidence. Read state/CURRENT.json for live program status."
+  "pass_rule": "PASS applies to the historical bootstrap relay reproduction root, not the overall RRuleR program or current utilization root.",
+  "decision": {"root":"ROOT_PASS","program":"CONTINUE"},
+  "next_action": "Current utilization root remains CONTINUE until run termination reason/timing is durably measurable and at least one successor cycle demonstrates the rule."
 }
