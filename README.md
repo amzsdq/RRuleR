@@ -12,7 +12,7 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 
 - **GitHub** — durable truth, checkpoints, control state, policy, evidence, history.
 - **ChatGPT sessions** — disposable reasoning/execution workers.
-- **ChatGPT Automations** — wake mechanism, never source of truth.
+- **ChatGPT Automations** — replaceable wake mechanism, never source of truth.
 - **GitHub Actions** — deterministic validation, reconciliation, testing, and housekeeping.
 - **Private/external storage** — only for material that must not be public.
 
@@ -23,20 +23,20 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 ├─ AGENTS.md
 ├─ control/
 │  ├─ POLICY.md
-│  └─ relay-policy.v1.json
+│  ├─ relay-policy.v1.json
+│  └─ schemas/                 # execution contracts: checkpoint/lease/effect receipt
 ├─ state/
 │  ├─ CURRENT.json
 │  ├─ HANDOFF.json
 │  ├─ EVENTS.jsonl
+│  ├─ RUNS.jsonl
 │  └─ README.md
-├─ schemas/
-│  ├─ current-state.schema.json
-│  ├─ handoff.schema.json
-│  ├─ relay-event.schema.json
-│  └─ run-observation.schema.json
+├─ schemas/                    # relay/current-state observation schemas
 ├─ docs/
 │  ├─ ARCHITECTURE.md
 │  ├─ DESIGN_DECISIONS.md
+│  ├─ DURABLE_EXECUTION_MODEL.md
+│  ├─ DELEGATION_MODEL.md
 │  ├─ FAILURE_RECOVERY.md
 │  ├─ HANDOFF_PROTOCOL.md
 │  ├─ OPERATIONS.md
@@ -46,7 +46,8 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 │  └─ UTILIZATION.md
 ├─ experiments/
 │  └─ rrule-self-relay/
-│     └─ README.md
+│     ├─ README.md
+│     └─ REPRO_CHECKLIST.md
 └─ .github/workflows/
    └─ validate-control-plane.yml
 ```
@@ -63,6 +64,12 @@ A fresh session reads:
 6. `docs/RELAY_RRULE_SELF_UPDATE.md` when operating the relay
 
 Then it reconstructs state, validates authority, establishes the next wake, and immediately performs substantive work.
+
+## Core execution semantics
+
+`docs/DURABLE_EXECUTION_MODEL.md` defines the scheduler-independent correctness layer: fenced authority/leases, cold-start checkpoints, idempotent effect receipts, completion verification, liveness and recovery. `docs/DELEGATION_MODEL.md` layers disposable coordinator/worker/verifier/supervisor roles on top of those invariants.
+
+The RRULE relay is therefore a scheduler adapter, not the runtime's durable brain.
 
 ## Utilization rule
 
