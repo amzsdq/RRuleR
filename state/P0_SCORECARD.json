@@ -1,37 +1,8 @@
 {
-  "schema_version":"1.0",
-  "program_id":"RRULER-PROGRAM-001",
-  "goal":"Sustained useful-work coverage >=93.33% with 840/900 diagnostic acceptance and no unexplained internal gap >120s.",
-  "status":"NOT_YET_PASSING",
-  "current_epoch":18,
-  "metrics":{
-    "valid_completed_turns":1,
-    "minimum_required_valid_turns":3,
-    "latest_valid_useful_seconds":735,
-    "latest_valid_target_seconds":840,
-    "latest_valid_ratio":0.8166666667,
-    "rolling_mean_valid_useful_seconds":735,
-    "unexplained_gap_limit_seconds":120,
-    "epoch17_gap_audit":"PASS",
-    "epoch17_scheduler_delivery_delay_seconds":68,
-    "epoch17_startup_overhead_seconds":16,
-    "epoch17_dead_tail_seconds":40,
-    "epoch18_prework_budget_loss_seconds":48,
-    "epoch18_max_possible_before_next_boundary_seconds":852,
-    "epoch18_840_feasible":true
-  },
-  "active_interventions":[
-    {"id":"HARD_CONTINUATION_GATE","state":"IMPLEMENTED_VALIDATED","expected_effect":"Reduce voluntary early return after objective/checkpoint completion."},
-    {"id":"EVENT_WAKE_CHAIN","state":"AWAITING_TRIGGER_PROVISIONING","expected_effect":"Replace long single-invocation dependence with fast disposable micro-generation continuation."},
-    {"id":"ACTIONS_5M_RESCUE","state":"INSTALLED_GUARDED_INERT","expected_effect":"Bound recovery delay when an active event-chain worker disappears before emitting continuation."},
-    {"id":"QUARTER_FALLBACK","state":"ACTIVE","expected_effect":"Independent recovery path while faster wake layers remain unproven."},
-    {"id":"COMMIT_GAP_AUDIT","state":"ACTIVE_VALIDATED","expected_effect":"Prevent false utilization claims from sparse endpoints."}
-  ],
-  "dominant_risks":[
-    "Reasoning invocation may still stop before 840 seconds despite explicit continuation authority.",
-    "Quarter-hour scheduler jitter/startup overhead can mathematically consume the 60-second margin.",
-    "Event-trigger provisioning is not exposed by the current automation/plugin tool surface.",
-    "Event-triggered Work write action-surface parity still needs one live isolated probe."
-  ],
-  "next_decision":"If epoch 18 reaches >=840 evidenced seconds, keep hard gate as baseline but still pursue event/overlap wake for jitter tolerance. If epoch 18 ends early, classify exact last progress and prioritize faster wake/micro-generation architecture rather than adding more prose policy."
+  "schema_version":"1.0","program_id":"RRULER-PROGRAM-001","goal":"Sustained useful-work coverage >=93.33% with 840/900 diagnostic acceptance and no unexplained internal gap >120s.","status":"NOT_YET_PASSING","current_epoch":18,
+  "metrics":{"valid_completed_turns":1,"minimum_required_valid_turns":3,"latest_valid_useful_seconds":735,"latest_valid_target_seconds":840,"latest_valid_ratio":0.8166666667,"rolling_mean_valid_useful_seconds":735,"unexplained_gap_limit_seconds":120,"epoch17_gap_audit":"PASS","epoch17_scheduler_delivery_delay_seconds":68,"epoch17_startup_overhead_seconds":16,"epoch17_dead_tail_seconds":40,"epoch18_prework_budget_loss_seconds":48,"epoch18_max_possible_before_next_boundary_seconds":852,"epoch18_840_feasible":true,"epoch18_live_endpoint_span_at_011102_seconds":614,"epoch18_still_working_at_011102":true},
+  "active_interventions":[{"id":"HARD_CONTINUATION_GATE","state":"IMPLEMENTED_VALIDATED_LIVE_TEST_ACTIVE","expected_effect":"Reduce voluntary early return after objective/checkpoint completion."},{"id":"EVENT_WAKE_CHAIN","state":"AWAITING_TRIGGER_PROVISIONING","expected_effect":"Replace long single-invocation dependence with fast disposable micro-generation continuation."},{"id":"ACTIONS_5M_RESCUE","state":"INSTALLED_GUARDED_INERT","expected_effect":"Bound recovery delay when an active event-chain worker disappears before emitting continuation."},{"id":"QUARTER_FALLBACK","state":"ACTIVE","expected_effect":"Independent recovery path while faster wake layers remain unproven."},{"id":"COMMIT_GAP_AUDIT","state":"ACTIVE_VALIDATED","expected_effect":"Prevent false utilization claims from sparse endpoints."}],
+  "live_interpretation":"Epoch 18 has already remained substantively active for more than ten minutes after its 01:00:48 work start, substantially exceeding epoch 16's 145-second failure. This is encouraging but not yet a pass; the interval must remain productive to >=840 seconds and then pass the evidence-gap audit.",
+  "dominant_risks":["Reasoning invocation may still stop before 840 seconds despite explicit continuation authority.","Quarter-hour scheduler jitter/startup overhead can mathematically consume the 60-second margin.","Event-trigger provisioning is not exposed by the current automation/plugin tool surface.","Event-triggered Work write action-surface parity still needs one live isolated probe."],
+  "next_decision":"If epoch 18 reaches >=840 evidenced seconds, keep hard gate as baseline but still pursue event/overlap wake for jitter tolerance. If epoch 18 ends early, classify exact last progress and prioritize faster event/micro-generation or overlap wake mechanisms rather than adding more prose policy."
 }
