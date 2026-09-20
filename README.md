@@ -24,10 +24,15 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 ├─ control/
 │  ├─ POLICY.md
 │  ├─ relay-policy.v1.json
+│  ├─ rolling-rrule-lifecycle.v1.json
+│  ├─ successor-baton.v1.json
+│  ├─ saas-parity-gates.v1.json
 │  └─ schemas/                 # execution contracts: checkpoint/lease/effect receipt
 ├─ state/
 │  ├─ CURRENT.json
 │  ├─ HANDOFF.json
+│  ├─ NEXT_PACKET.json
+│  ├─ SAAS_PARITY.json
 │  ├─ RELAY_VALIDATION.json   # machine acceptance ledger for the live relay
 │  ├─ EVENTS.jsonl
 │  ├─ RUNS.jsonl
@@ -42,6 +47,8 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 │  ├─ HANDOFF_PROTOCOL.md
 │  ├─ OPERATIONS.md
 │  ├─ RELAY_RRULE_SELF_UPDATE.md
+│  ├─ ROLLING_RRULE_BATON_SPEC.md
+│  ├─ SAAS_PARITY_ARCHITECTURE.md
 │  ├─ SECURITY.md
 │  ├─ STATE_MODEL.md
 │  └─ UTILIZATION.md
@@ -61,9 +68,10 @@ A fresh session reads:
 2. `control/POLICY.md`
 3. on relay runs, `control/relay-policy.v1.json`
 4. `state/CURRENT.json`
-5. `state/HANDOFF.json` and `state/RELAY_VALIDATION.json` when continuing/validating a relay
-6. the referenced checkpoint/task/spec
-7. `docs/RELAY_RRULE_SELF_UPDATE.md` when operating the relay
+5. `state/NEXT_PACKET.json`, `state/HANDOFF.json`, and `state/RELAY_VALIDATION.json` when continuing/validating a relay
+6. `control/successor-baton.v1.json` and the referenced checkpoint/task/spec
+7. `docs/ROLLING_RRULE_BATON_SPEC.md` when operating the rolling relay
+8. `state/SAAS_PARITY.json` when selecting architecture work after utilization/recovery is protected
 
 Then it reconstructs state, validates authority, establishes the next wake, and immediately performs substantive work.
 
@@ -75,7 +83,7 @@ The RRULE relay is therefore a scheduler adapter, not the runtime's durable brai
 
 ## Utilization rule
 
-After the next wake is secured, useful-work utilization is a first-class objective.
+After a provisional future continuation is verified, useful-work utilization is a first-class objective. On normal close, the worker checkpoints, leaves the next durable work packet, and establishes a short completion-relative continuation.
 
 - Do not voluntarily idle while useful admissible work remains.
 - Do not stop because a document, milestone, checkpoint, phase, or quarter-hour boundary was reached.

@@ -1,0 +1,32 @@
+{
+  "schema_version":"1.0",
+  "program_id":"RRULER-PROGRAM-001",
+  "status":"ACTIVE",
+  "policy":"control/saas-parity-gates.v1.json",
+  "assessment_date":"2026-09-21",
+  "model_quality_scored_separately":true,
+  "gates":{
+    "DURABLE_RESUME":"STRONG",
+    "ROLLING_SCHEDULER":"PROVING",
+    "SIDE_EFFECT_SAFETY":"STRONG_DESIGN_NEEDS_MORE_LIVE_FAULT_EVIDENCE",
+    "RECOVERY":"PROVING",
+    "DELEGATION":"PARTIAL",
+    "QUEUE_BACKPRESSURE":"GAP",
+    "HUMAN_CONTROL":"GAP",
+    "OBSERVABILITY":"PARTIAL",
+    "TRIGGER_ADAPTERS":"PARTIAL",
+    "GOVERNANCE":"PARTIAL_STRONG",
+    "VERSIONING_REPLAY":"GAP",
+    "REPRODUCIBILITY":"PARTIAL"
+  },
+  "next_targets":[
+    "rolling baton production proof",
+    "queue and backpressure controller",
+    "durable human approval interrupt",
+    "delegation fan-out convergence proof",
+    "version replay compatibility",
+    "unified operator scorecard",
+    "second trigger adapter acceptance",
+    "cold bootstrap acceptance"
+  ]
+}

@@ -1,9 +1,9 @@
 {
-  "schema_version":"1.5",
-  "program_id":"RRULER-PROGRAM-001",
-  "status":"ACTIVE",
-  "purpose":"Single machine-readable registry of control artifacts that every fresh worker must load before substantive work.",
-  "mandatory_on_wake":[
+  "schema_version": "1.6",
+  "program_id": "RRULER-PROGRAM-001",
+  "status": "ACTIVE",
+  "purpose": "Single machine-readable registry of control artifacts that every fresh worker must load before substantive work.",
+  "mandatory_on_wake": [
     "control/relay-policy.v1.json",
     "control/scheduler-fence.v1.json",
     "control/rolling-rrule-lifecycle.v1.json",
@@ -16,10 +16,20 @@
     "state/ACTIVITY.json",
     "state/HANDOFF.json",
     "state/TURN_PLAN.json",
-    "state/UTILIZATION.json"
+    "state/UTILIZATION.json",
+    "control/successor-baton.v1.json",
+    "control/saas-parity-gates.v1.json",
+    "state/NEXT_PACKET.json",
+    "state/SAAS_PARITY.json"
   ],
-  "mandatory_before_corrective_experiment_selection":["control/evidence-policy.v1.json","control/recovery-slo.v1.json","state/EXPERIMENTS.jsonl","state/P0_SCORECARD.json","state/WAKE_ARCHITECTURE.json"],
-  "hard_invariants":[
+  "mandatory_before_corrective_experiment_selection": [
+    "control/evidence-policy.v1.json",
+    "control/recovery-slo.v1.json",
+    "state/EXPERIMENTS.jsonl",
+    "state/P0_SCORECARD.json",
+    "state/WAKE_ARCHITECTURE.json"
+  ],
+  "hard_invariants": [
     "DURABLE_STATE_IS_AUTHORITATIVE",
     "AUTHORITY_EPOCH_MONOTONIC",
     "MINIMUM_FENCE_THEN_PROVISIONAL_REARM_AND_VERIFY_BEFORE_FULL_RESTORE_OR_SUBSTANTIVE_WORK",
@@ -28,7 +38,10 @@
     "NONTERMINAL_PROGRAM_MUST_RETAIN_VERIFIED_CONTINUATION",
     "DUPLICATE_SUBSTANTIVE_SIDE_EFFECTS_FORBIDDEN",
     "CANONICAL_DISABLE_ONLY_ON_PROGRAM_TERMINAL_OR_EXPLICIT_OPERATOR_STOP",
-    "FAILED_INTERVENTION_MUST_NOT_BE_REPEATED_WITHOUT_NEW_EVIDENCE"
+    "FAILED_INTERVENTION_MUST_NOT_BE_REPEATED_WITHOUT_NEW_EVIDENCE",
+    "DURABLE_SUCCESSOR_PACKET_PRECEDES_NORMAL_RETURN",
+    "RESERVATION_PACKET_CACHE_IS_NON_AUTHORITATIVE",
+    "STRUCTURAL_PARITY_REQUIRES_EVIDENCE_NOT_PROSE"
   ],
-  "conflict_rule":"If a mandatory artifact conflicts with another mandatory artifact, fail closed only for the disputed side effect, reconcile the control conflict durably, and continue safe useful work rather than treating the conflict as program completion."
+  "conflict_rule": "If a mandatory artifact conflicts with another mandatory artifact, fail closed only for the disputed side effect, reconcile the control conflict durably, and continue safe useful work rather than treating the conflict as program completion."
 }

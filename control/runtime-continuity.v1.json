@@ -1,8 +1,77 @@
 {
-  "policy_id":"RRULER_RUNTIME_CONTINUITY","version":3,"status":"ACTIVE","principle":"DURABLE_WORKFLOW_DISPOSABLE_REASONING_WORKER","components":{"wake_source":{"responsibility":"Start a fresh reasoning invocation at the next supported opportunity.","current_adapter":"RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE","lifecycle_policy":"control/rolling-rrule-lifecycle.v1.json","must_not_be_treated_as":"proof that predecessor stayed alive"},"reasoning_worker":{"responsibility":"Perform useful checkpointable work while invocation exists.","mortality":"EXPECTED","must_not_be_treated_as":"durable process"},"durable_continuation":{"responsibility":"Persist exact resumable state and side-effect evidence after meaningful units.","current_adapter":"GITHUB_DURABLE_STATE"},"supervisor_measurement":{"responsibility":"Detect stale workers, recover ownership, and measure useful coverage/dead gaps without inference.","current_adapter":"NEXT_WAKE_OBSERVATION_PLUS_DURABLE_STATE"}},
-  "required_metrics":["invocation_useful_span_seconds","continuation_gap_seconds","window_useful_coverage_seconds","scheduler_delivery_delay_seconds","rearm_overhead_seconds"],
-  "scheduler_budget":{"evaluation_window_seconds":900,"target_useful_seconds":840,"active_scheduler":"ROLLING_COMPLETION_RELATIVE","normal_target_work_seconds":600,"normal_final_rearm_offset_seconds":60,"provisional_rescue_offset_seconds":780,"historical_fixed_boundary_rule":"RETAIN_FOR_PRE_MIGRATION_EVIDENCE_ONLY","rule":"Under the rolling scheduler, measure actual wake-to-work, work-to-final-rearm, and final-rearm-to-next-wake intervals. Do not infer a quarter-boundary deadline that no longer governs production. Preserve pre-migration fixed-quarter budget classifications as historical evidence only."},
-  "early_runtime_end":{"classification":"RUNTIME_INVOCATION_ENDED_EARLY","conditions":["plan was ACTIVE and valid","useful admissible work remained or fallback continuation was required","no terminal or committed handoff evidence exists","later wake observes predecessor stale"],"response":["do not infer useful work across the gap","recover at next available verified wake","preserve exact checkpoint","compare invocation span across experiments","if repeated, target wake/runtime adapter rather than adding policy prose"]},
-  "rolling_recovery":{"startup":"minimum fence then provisional same-canonical rearm before full restore/substantive work","normal_close":"checkpoint then same-canonical final rearm to actual close + configured offset and verify","mutation_failure":"retry once when safe; if older verified future continuation survives, classify DEGRADED_CONTINUATION within its safety envelope; otherwise fail closed before conflicting substantive side effects","stale_occurrence":"recover forward to newest verified schedule and never roll DTSTART or authority backward"},
-  "progress_evidence":{"timestamp_only_heartbeat_counts_as_useful_work":false,"meaningful_unit_or_material_advancement_required":true,"maximum_unexplained_gap_seconds_for_acceptance":120},"design_reference":"docs/RUNTIME_CONTINUITY_ARCHITECTURE.md"
+  "policy_id": "RRULER_RUNTIME_CONTINUITY",
+  "version": 3,
+  "status": "ACTIVE",
+  "principle": "DURABLE_WORKFLOW_DISPOSABLE_REASONING_WORKER",
+  "components": {
+    "wake_source": {
+      "responsibility": "Start a fresh reasoning invocation at the next supported opportunity.",
+      "current_adapter": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE",
+      "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
+      "must_not_be_treated_as": "proof that predecessor stayed alive"
+    },
+    "reasoning_worker": {
+      "responsibility": "Perform useful checkpointable work while invocation exists.",
+      "mortality": "EXPECTED",
+      "must_not_be_treated_as": "durable process"
+    },
+    "durable_continuation": {
+      "responsibility": "Persist exact resumable state and side-effect evidence after meaningful units.",
+      "current_adapter": "GITHUB_DURABLE_STATE"
+    },
+    "supervisor_measurement": {
+      "responsibility": "Detect stale workers, recover ownership, and measure useful coverage/dead gaps without inference.",
+      "current_adapter": "NEXT_PACKET_PLUS_NEXT_WAKE_OBSERVATION_PLUS_DURABLE_STATE"
+    }
+  },
+  "required_metrics": [
+    "invocation_useful_span_seconds",
+    "continuation_gap_seconds",
+    "window_useful_coverage_seconds",
+    "scheduler_delivery_delay_seconds",
+    "rearm_overhead_seconds"
+  ],
+  "scheduler_budget": {
+    "evaluation_window_seconds": 900,
+    "target_useful_seconds": 840,
+    "active_scheduler": "ROLLING_COMPLETION_RELATIVE",
+    "normal_target_work_seconds": 600,
+    "normal_final_rearm_offset_seconds": 60,
+    "provisional_rescue_offset_seconds": 780,
+    "historical_fixed_boundary_rule": "RETAIN_FOR_PRE_MIGRATION_EVIDENCE_ONLY",
+    "rule": "Under the rolling scheduler, measure actual wake-to-work, work-to-final-rearm, and final-rearm-to-next-wake intervals. Do not infer a quarter-boundary deadline that no longer governs production. Preserve pre-migration fixed-quarter budget classifications as historical evidence only."
+  },
+  "early_runtime_end": {
+    "classification": "RUNTIME_INVOCATION_ENDED_EARLY",
+    "conditions": [
+      "plan was ACTIVE and valid",
+      "useful admissible work remained or fallback continuation was required",
+      "no terminal or committed handoff evidence exists",
+      "later wake observes predecessor stale"
+    ],
+    "response": [
+      "do not infer useful work across the gap",
+      "recover at next available verified wake",
+      "preserve exact checkpoint",
+      "compare invocation span across experiments",
+      "if repeated, target wake/runtime adapter rather than adding policy prose"
+    ]
+  },
+  "rolling_recovery": {
+    "startup": "minimum fence then provisional same-canonical rearm before full restore/substantive work",
+    "normal_close": "checkpoint then same-canonical final rearm to actual close + configured offset and verify",
+    "mutation_failure": "retry once when safe; if older verified future continuation survives, classify DEGRADED_CONTINUATION within its safety envelope; otherwise fail closed before conflicting substantive side effects",
+    "stale_occurrence": "recover forward to newest verified schedule and never roll DTSTART or authority backward"
+  },
+  "progress_evidence": {
+    "timestamp_only_heartbeat_counts_as_useful_work": false,
+    "meaningful_unit_or_material_advancement_required": true,
+    "maximum_unexplained_gap_seconds_for_acceptance": 120
+  },
+  "design_reference": "docs/RUNTIME_CONTINUITY_ARCHITECTURE.md",
+  "successor_baton": {
+    "policy": "control/successor-baton.v1.json",
+    "packet_path": "state/NEXT_PACKET.json",
+    "purpose": "Shift next-work selection into the warm predecessor while keeping durable state authoritative."
+  }
 }

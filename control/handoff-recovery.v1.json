@@ -1,6 +1,6 @@
 {
   "policy_id": "RRULER_HANDOFF_RECOVERY",
-  "version": 2,
+  "version": 3,
   "status": "ACTIVE",
   "purpose": "Prevent an inactive predecessor from deadlocking a successor after a durable handoff request while avoiding takeover from a fresh predecessor.",
   "normal_path": "Wait for predecessor durable handoff commit while predecessor activity remains fresh.",
@@ -27,12 +27,14 @@
     "MARK_SUCCESSOR_WORKING",
     "MARK_HANDOFF_RECOVERED_TAKEOVER",
     "DO_NOT_REPLAY_PREDECESSOR_ACTIVE_UNIT_BLINDLY",
-    "PLAN_15_MIN_WORK_PACKET_FROM_EXACT_DURABLE_NEXT_ACTION",
+    "LOAD_OR_REFRESH_SUCCESSOR_PACKET_FROM_EXACT_DURABLE_NEXT_ACTION",
     "CONTINUE_WORK"
   ],
   "normal_handoff_preferred": true,
   "timeout_is_recovery_not_normal_handoff": true,
   "successor_may_not_take_over_while_predecessor_is_fresh": true,
   "predecessor_should_check_pending_handoff_after_each_bounded_unit": true,
-  "exact_predecessor_end_time_must_not_be_invented": true
+  "exact_predecessor_end_time_must_not_be_invented": true,
+  "successor_packet_policy": "control/successor-baton.v1.json",
+  "packet_target_is_stop_timer": false
 }
