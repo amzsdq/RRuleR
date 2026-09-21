@@ -34,11 +34,35 @@ def audit_startup_ack(ack: dict, expected_main_canonical_id: str) -> dict:
     generation_key = ack.get("generation_key")
     if due and generation_key and generation_key != f"DUE:{due}":
         errors.append("STARTUP_ACK_GENERATION_KEY_DUE_MISMATCH")
+    boot_started = ack.get("boot_started_at")
+    rearm_verified = ack.get("rearm_verified_at")
+    provisional_due = ack.get("verified_provisional_due_at")
+    status = ack.get("status")
+    if rearm_verified and not boot_started:
+        errors.append("STARTUP_ACK_REARM_WITHOUT_BOOT")
+    if status == "REARM_VERIFIED":
+        if not boot_started:
+            errors.append("STARTUP_ACK_REARM_STATUS_WITHOUT_BOOT")
+        if not rearm_verified:
+            errors.append("STARTUP_ACK_REARM_STATUS_WITHOUT_VERIFIED_AT")
+        if not provisional_due:
+            errors.append("STARTUP_ACK_REARM_STATUS_WITHOUT_PROVISIONAL_DUE")
+    if boot_started and due and _ts(boot_started) < _ts(due):
+        errors.append("STARTUP_ACK_BOOT_BEFORE_EXPECTED_GENERATION_DUE")
+    if boot_started and rearm_verified and _ts(rearm_verified) < _ts(boot_started):
+        errors.append("STARTUP_ACK_REARM_BEFORE_BOOT")
+    if rearm_verified and provisional_due and _ts(provisional_due) <= _ts(rearm_verified):
+        errors.append("STARTUP_ACK_PROVISIONAL_DUE_NOT_FUTURE")
     return {
         "valid": not errors,
         "errors": errors,
         "observed_main_canonical_id": ack.get("main_canonical_id"),
         "expected_main_canonical_id": expected_main_canonical_id,
+        "generation_key": generation_key,
+        "boot_started_at": boot_started,
+        "rearm_verified_at": rearm_verified,
+        "verified_provisional_due_at": provisional_due,
+        "status": status,
     }
 
 
