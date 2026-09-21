@@ -47,6 +47,8 @@ jobs:
           fetch tests/test_build_turn_review.py "$SHA" /tmp/rruler/tests/test_build_turn_review.py
           fetch tools/audit_successor_progress.py "$SHA" /tmp/rruler/tools/audit_successor_progress.py
           fetch tests/test_audit_successor_progress.py "$SHA" /tmp/rruler/tests/test_audit_successor_progress.py
+          fetch tools/evaluate_event_rescue.py "$SHA" /tmp/rruler/tools/evaluate_event_rescue.py
+          fetch tests/test_evaluate_event_rescue.py "$SHA" /tmp/rruler/tests/test_evaluate_event_rescue.py
           mapfile -t PARENT_SHAS < <(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$REPO/commits/$SHA" | python -c 'import json,sys; d=json.load(sys.stdin); [print(p["sha"]) for p in d.get("parents", [])]')
           PREVIOUS_FILES=()
           i=0
