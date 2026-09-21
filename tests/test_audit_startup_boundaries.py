@@ -97,6 +97,55 @@ def test_startup_ack_accepts_matching_canonical_and_generation():
     assert result["startup_ack_audit"]["valid"] is True
 
 
+def test_startup_ack_rearm_verified_requires_complete_ordered_receipt():
+    expected = "MAIN"
+    ack = {
+        "main_canonical_id": expected,
+        "current_expected_due_at": "2026-09-22T00:54:59+09:00",
+        "generation_key": "DUE:2026-09-22T00:54:59+09:00",
+        "boot_started_at": "2026-09-22T00:54:31+09:00",
+        "rearm_verified_at": "2026-09-22T00:54:48+09:00",
+        "verified_provisional_due_at": "2026-09-22T01:08:00+09:00",
+        "status": "REARM_VERIFIED",
+    }
+    result = audit_startup_ack(ack, expected)
+    assert result["valid"] is False
+    assert result["errors"] == ["STARTUP_ACK_BOOT_BEFORE_EXPECTED_GENERATION_DUE"]
+
+
+def test_startup_ack_rearm_verified_accepts_due_then_boot_then_rearm_then_future_fallback():
+    expected = "MAIN"
+    ack = {
+        "main_canonical_id": expected,
+        "current_expected_due_at": "2026-09-22T00:54:20+09:00",
+        "generation_key": "DUE:2026-09-22T00:54:20+09:00",
+        "boot_started_at": "2026-09-22T00:54:31+09:00",
+        "rearm_verified_at": "2026-09-22T00:54:48+09:00",
+        "verified_provisional_due_at": "2026-09-22T01:08:00+09:00",
+        "status": "REARM_VERIFIED",
+    }
+    result = audit_startup_ack(ack, expected)
+    assert result["valid"] is True
+    assert result["errors"] == []
+
+
+def test_startup_ack_rearm_status_rejects_missing_receipt_fields():
+    expected = "MAIN"
+    ack = {
+        "main_canonical_id": expected,
+        "current_expected_due_at": "2026-09-22T00:54:20+09:00",
+        "generation_key": "DUE:2026-09-22T00:54:20+09:00",
+        "status": "REARM_VERIFIED",
+    }
+    result = audit_startup_ack(ack, expected)
+    assert result["valid"] is False
+    assert result["errors"] == [
+        "STARTUP_ACK_REARM_STATUS_WITHOUT_BOOT",
+        "STARTUP_ACK_REARM_STATUS_WITHOUT_VERIFIED_AT",
+        "STARTUP_ACK_REARM_STATUS_WITHOUT_PROVISIONAL_DUE",
+    ]
+
+
 def test_audit_includes_next_sample_and_validates_recovery_lineage():
     failed = {"sample_id":"S0","scheduled_due_at":"2026-09-21T10:00:00+00:00","successor_observed_at":"2026-09-21T10:01:00+00:00","exclusion_reason":"STARTUP_ACK_MISSING","validity":"INCOMPLETE"}
     recovered = {"sample_id":"S1","recovery_of_sample_id":"S0","recovery_kind":"FIXED_WATCHDOG_PREBOOTSTRAP","scheduled_due_at":"2026-09-21T10:05:00+00:00","generation_key":"DUE:2026-09-21T10:05:00+00:00","successor_observed_at":"2026-09-21T10:05:20+00:00","boot_started_at":"2026-09-21T10:05:30+00:00","rearm_verified_at":"2026-09-21T10:05:40+00:00","authority_claim_at":"2026-09-21T10:05:50+00:00","first_durable_useful_at":"2026-09-21T10:06:00+00:00"}
