@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_STARTUP_WATCHDOG",
-  "version": 2,
+  "version": 3,
   "status": "ACTIVE",
-  "purpose": "Close the pre-bootstrap availability gap that the MAIN worker's own provisional rearm cannot cover.",
+  "purpose": "Close pre-bootstrap availability gaps and repair clearly idle MAIN schedules that are alive but materially farther out than the normal END+60 continuation.",
   "role": "LIVENESS_AND_PREBOOTSTRAP_RECOVERY_ONLY",
   "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "watchdog_canonical_id": "6ab11b3af3608191b68dcec5e3fed081",
@@ -16,7 +16,9 @@
     "main_recovery_due_offset_seconds": 60,
     "rationale": "Allow ordinary provider delivery jitter while bounding a missing-bootstrap hole far below the hourly RRULE fallback.",
     "enabled_rearm_required": true,
-    "enabled_verification_required": true
+    "enabled_verification_required": true,
+    "idle_distant_due_extra_slack_seconds": 120,
+    "idle_recovery_due_offset_seconds": 60
   },
   "startup_receipts": {
     "path": "state/STARTUP_ACK.json",
@@ -32,7 +34,8 @@
     "HEALTHY_BOOTSTRAP": "Generation-matched BOOT_STARTED and REARM_VERIFIED exist, or newer unambiguous durable state proves bootstrap and continuation succeeded.",
     "STARTUP_ACK_MISSING": "now >= MAIN expected_due + 180s and no generation-matched BOOT_STARTED/equivalent newer bootstrap evidence exists.",
     "BOOTSTRAP_REARM_MISSING": "BOOT_STARTED exists but REARM_VERIFIED/newer verified continuation does not exist after the configured grace.",
-    "WATCHDOG_AMBIGUOUS": "Pause/terminal state, authority, due generation, receipts, or live MAIN metadata conflict enough that mutation cannot be proven safe."
+    "WATCHDOG_AMBIGUOUS": "Pause/terminal state, authority, due generation, receipts, or live MAIN metadata conflict enough that mutation cannot be proven safe.",
+    "IDLE_DISTANT_DUE": "Program is CONTINUE, MAIN is enabled, fresh durable state proves there is no active substantive turn, a last observed closed-turn END is known, and live MAIN due is later than (last closed END + 60s + 120s). A WORKING/ambiguous owner is never classified idle by timeout guess alone."
   },
   "actions": {
     "HEALTHY_BOOTSTRAP": [
@@ -63,6 +66,15 @@
       "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S",
       "SET_SAME_WATCHDOG_IS_ENABLED_TRUE",
       "VERIFY_SAME_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE"
+    ],
+    "IDLE_DISTANT_DUE": [
+      "REARM_SAME_MAIN_CANONICAL_TO_NOW_PLUS_60S",
+      "SET_SAME_MAIN_IS_ENABLED_TRUE",
+      "VERIFY_MAIN_ENABLED_AND_DUE",
+      "PERSIST_WATCHDOG_RECOVERY",
+      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S",
+      "SET_SAME_WATCHDOG_IS_ENABLED_TRUE",
+      "VERIFY_SAME_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE"
     ]
   },
   "main_sync_contract": {
@@ -87,5 +99,16 @@
     "success_condition": "same canonical id + is_enabled=true + exact one-shot intended due are all verified",
     "failure_condition": "schedule changed but enabled=false, due mismatch, or canonical mismatch; treat as failed continuation and retry once when safe",
     "reason": "A fired one-shot may be disabled by the scheduler; changing only DTSTART is not sufficient continuation proof."
+  },
+  "idle_distant_due_guard": {
+    "purpose": "Repair the case where MAIN remains enabled but, while nobody is substantively working, its next wake is unnecessarily far away.",
+    "idle_proof_required": true,
+    "idle_proof_rule": "Use fresh durable state, not absence of recent chat/tool output. Treat idle as proven only when no fresh CURRENT/ACTIVITY/HANDOFF/startup evidence establishes an active substantive owner and the latest applicable run has an observed close boundary. If CURRENT or ACTIVITY says WORKING and ownership freshness cannot be disproven by an existing authority/liveness rule, classify WATCHDOG_AMBIGUOUS instead of IDLE_DISTANT_DUE.",
+    "expected_fast_due_rule": "latest observed eligible closed-turn END + 60 seconds",
+    "extra_slack_seconds": 120,
+    "trigger_rule": "MAIN enabled=true AND program CONTINUE AND idle proven AND live MAIN due > expected_fast_due + 120 seconds.",
+    "active_provisional_exemption": "A future ~13 minute provisional continuation belonging to a proven active WORKING turn is healthy safety coverage and MUST NOT be pulled forward by this rule.",
+    "missing_boundary_rule": "If latest closed END or owner state is unknown/conflicting, do not infer idle or expected fast due; classify WATCHDOG_AMBIGUOUS and recheck.",
+    "recovery": "Rearm only the SAME MAIN canonical to now+60s with is_enabled=true, verify live metadata, record recovery, and recheck the SAME Watchdog at now+240s."
   }
 }
