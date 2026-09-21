@@ -26,13 +26,15 @@ jobs:
         run: |
           set -euo pipefail
           fetch() { curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/$1?ref=$2" -o "$3"; }
-          mkdir -p /tmp/rruler/tools /tmp/rruler/tests /tmp/rruler/state /tmp/rruler/control
-          for p in state/CURRENT.json state/ACTIVITY.json state/HANDOFF.json state/TURN_PLAN.json state/UTILIZATION.json state/PROGRAM_GOALS.json state/WORK_EVIDENCE.json state/OBSERVATION_HORIZON.json state/PREDICTIVE_PREARM_CANARY.json control/ACTIVE_CONTROLS.json control/relay-policy.v1.json control/scheduler-fence.v1.json control/rolling-rrule-lifecycle.v1.json control/handoff-recovery.v1.json control/run-continuation-gate.v1.json control/rolling-window-promotion.v1.json control/observation-horizon.v1.json; do fetch "$p" "$SHA" "/tmp/rruler/$p"; done
+          mkdir -p /tmp/rruler/tools /tmp/rruler/tests /tmp/rruler/state /tmp/rruler/control /tmp/rruler/schemas
+          for p in state/CURRENT.json state/ACTIVITY.json state/HANDOFF.json state/TURN_PLAN.json state/UTILIZATION.json state/PROGRAM_GOALS.json state/WORK_EVIDENCE.json state/RUNS.jsonl state/OBSERVATION_HORIZON.json state/PREDICTIVE_PREARM_CANARY.json state/SUCCESSOR_STARTUP.json control/ACTIVE_CONTROLS.json control/relay-policy.v1.json control/scheduler-fence.v1.json control/rolling-rrule-lifecycle.v1.json control/handoff-recovery.v1.json control/run-continuation-gate.v1.json control/rolling-window-promotion.v1.json control/observation-horizon.v1.json schemas/run-observation.schema.json; do fetch "$p" "$SHA" "/tmp/rruler/$p"; done
           fetch tools/validate_work_evidence.py "$SHA" /tmp/rruler/tools/validate_work_evidence.py
           fetch tools/append_work_evidence.py "$SHA" /tmp/rruler/tools/append_work_evidence.py
+          fetch tools/summarize_work_evidence.py "$SHA" /tmp/rruler/tools/summarize_work_evidence.py
           fetch tools/validate_observation_horizon.py "$SHA" /tmp/rruler/tools/validate_observation_horizon.py
           fetch tests/test_work_evidence_validator.py "$SHA" /tmp/rruler/tests/test_work_evidence_validator.py
           fetch tests/test_append_work_evidence.py "$SHA" /tmp/rruler/tests/test_append_work_evidence.py
+          fetch tests/test_summarize_work_evidence.py "$SHA" /tmp/rruler/tests/test_summarize_work_evidence.py
           mapfile -t PARENT_SHAS < <(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$REPO/commits/$SHA" | python -c 'import json,sys; d=json.load(sys.stdin); [print(p["sha"]) for p in d.get("parents", [])]')
           PREVIOUS_FILES=()
           i=0
@@ -50,7 +52,7 @@ jobs:
           current=load('state/CURRENT.json'); activity=load('state/ACTIVITY.json'); turn=load('state/TURN_PLAN.json'); util=load('state/UTILIZATION.json'); goals=load('state/PROGRAM_GOALS.json'); controls=load('control/ACTIVE_CONTROLS.json'); policy=load('control/relay-policy.v1.json'); fence=load('control/scheduler-fence.v1.json'); lifecycle=load('control/rolling-rrule-lifecycle.v1.json'); recovery=load('control/handoff-recovery.v1.json'); gate=load('control/run-continuation-gate.v1.json'); promotion=load('control/rolling-window-promotion.v1.json'); evidence=load('state/WORK_EVIDENCE.json'); horizon=load('state/OBSERVATION_HORIZON.json'); horizon_policy=load('control/observation-horizon.v1.json'); prearm=load('state/PREDICTIVE_PREARM_CANARY.json')
           if controls.get('status')!='ACTIVE': raise SystemExit('active control registry inactive')
           if current.get('continuation',{}).get('active_control_registry')!='control/ACTIVE_CONTROLS.json': raise SystemExit('active control registry pointer drift')
-          required={'control/run-continuation-gate.v1.json','control/scheduler-fence.v1.json','control/handoff-recovery.v1.json','state/CURRENT.json','state/ACTIVITY.json','state/HANDOFF.json','state/TURN_PLAN.json','state/UTILIZATION.json','state/PREDICTIVE_PREARM_CANARY.json'}
+          required={'control/run-continuation-gate.v1.json','control/scheduler-fence.v1.json','control/handoff-recovery.v1.json','state/CURRENT.json','state/ACTIVITY.json','state/HANDOFF.json','state/TURN_PLAN.json','state/UTILIZATION.json','state/PREDICTIVE_PREARM_CANARY.json','state/SUCCESSOR_STARTUP.json'}
           if not required <= set(controls.get('mandatory_on_wake',[])): raise SystemExit('mandatory registry baseline incomplete')
           if 'NONTERMINAL_PROGRAM_MUST_RETAIN_VERIFIED_CONTINUATION' not in controls.get('hard_invariants',[]): raise SystemExit('continuation invariant missing')
           if 'PREDICTIVE_PREARM_MUST_NOT_CREATE_DUAL_SUBSTANTIVE_AUTHORITY' not in controls.get('hard_invariants',[]): raise SystemExit('predictive prearm authority invariant missing')
@@ -87,4 +89,5 @@ jobs:
           PY
           python -m unittest discover -s tests -p 'test_*.py' -v
           python tools/validate_work_evidence.py state/WORK_EVIDENCE.json
+          python tools/summarize_work_evidence.py state/WORK_EVIDENCE.json 64 state/RUNS.jsonl >/tmp/run-summary.json
           python tools/validate_observation_horizon.py state/OBSERVATION_HORIZON.json control/observation-horizon.v1.json "${PREVIOUS_FILES[@]}"
