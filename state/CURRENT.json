@@ -30,13 +30,13 @@
       "state/WORK_EVIDENCE.json@343dbff"
     ],
     "observation": "Operator recovery after a receipt-less fast MAIN invocation. MAIN->MAIN is the normal path; provisional and Watchdog are emergency-only. Final CONTINUE close now requires live verified END+60 MAIN due.",
-    "next_action": "Successor must write BOOT_STARTED for DUE:2026-09-21T23:10:59+09:00 before provisional rearm; normal future closes must prove MAIN END+60 before final."
+    "next_action": "Await generation-matched BOOT_STARTED for DUE:2026-09-21T23:14:40+09:00. Normal continuation remains MAIN->MAIN; Watchdog is emergency-only."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T23:10:59+09:00",
+    "next_due_at": "2026-09-21T23:14:40+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -60,7 +60,7 @@
       "normal_check_offset_seconds": 180,
       "recovery_recheck_seconds": 240,
       "main_recovery_due_offset_seconds": 60,
-      "next_watchdog_due_at": "2026-09-21T23:13:59+09:00",
+      "next_watchdog_due_at": "2026-09-21T23:17:40+09:00",
       "coverage": "ARMED_EMERGENCY_ONLY",
       "last_classification": "HEALTHY_CONTINUATION_ARMED",
       "last_recovery_at": "2026-09-21T22:33:20+09:00",
@@ -70,7 +70,7 @@
       "idle_distant_due_extra_slack_seconds": 120,
       "idle_distant_due_recovery_offset_seconds": 60
     },
-    "next_due_source": "OPERATOR_FAST_PATH_RECOVERY_NOW_PLUS_60_SECONDS"
+    "next_due_source": "OPERATOR_NORMAL_MAIN_RETRY_NOW_PLUS_60_SECONDS"
   },
   "safety": {
     "public_repo": true,
