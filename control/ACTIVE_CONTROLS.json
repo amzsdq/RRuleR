@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.3",
+  "schema_version": "2.4",
   "program_id": "RRULER-PROGRAM-001",
   "status": "ACTIVE",
   "purpose": "Single machine-readable registry of control artifacts that every fresh worker must load before substantive work.",
@@ -50,8 +50,10 @@
     "FAILED_INTERVENTION_MUST_NOT_BE_REPEATED_WITHOUT_NEW_EVIDENCE",
     "INCOMPLETE_OR_INFERRED_UTILIZATION_WINDOW_MUST_NOT_BE_PROMOTED",
     "CALLER_SUPPLIED_OBSERVATION_HORIZON_MUST_NOT_EXCEED_DURABLE_TRUSTED_HORIZON",
-    "PREBOOTSTRAP_GAP_MUST_HAVE_INDEPENDENT_WATCHDOG_COVERAGE",
-    "STARTUP_RECEIPTS_MUST_NOT_BE_INFERRED"
+    "STARTUP_RECEIPTS_MUST_NOT_BE_INFERRED",
+    "NORMAL_CONTINUATION_DEPENDS_ONLY_ON_SAME_MAIN",
+    "SAME_MAIN_RECURRING_RRULE_IS_COLD_FALLBACK",
+    "WATCHDOG_DISABLED_STANDBY_NOT_NORMAL_DEPENDENCY"
   ],
-  "conflict_rule": "If mandatory artifacts conflict, fail closed only for the disputed side effect, reconcile the control conflict durably, and continue safe useful work rather than treating the conflict as program completion. Predictive prearm is an explicit canary only; unsafe overlap, rollback, or failed useful-work handoff restores the verified completion-relative fallback."
+  "conflict_rule": "If mandatory artifacts conflict, fail closed only for the disputed side effect, reconcile durably, and continue safe useful work. Normal continuity is SAME MAIN END+60 with SAME MAIN recurring RRULE cold fallback; Watchdog is disabled standby and may not be reintroduced as a normal dependency."
 }
