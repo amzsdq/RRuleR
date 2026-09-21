@@ -31,6 +31,13 @@ def _seconds(start: str | None, end: str | None) -> int | None:
 
 
 def _generation_kind(sample: dict) -> str:
+    if (
+        sample.get("operator_rescheduled") is True
+        or sample.get("validity") == "EXCLUDED_OPERATOR_RESCHEDULED"
+        or sample.get("exclusion_reason")
+        in {"OPERATOR_RESCHEDULED_GENERATION", "EXPLICIT_OPERATOR_RESCHEDULE"}
+    ):
+        return "OPERATOR_RESCHEDULED"
     if sample.get("recovery_kind"):
         return sample["recovery_kind"]
     if sample.get("recovery_of_sample_id"):
@@ -125,7 +132,11 @@ def summarize(run_lines: list[str], startup: dict) -> dict:
         raw_samples.append(startup["next_sample"])
     gaps = [_startup_gap(sample) for sample in raw_samples]
     normal = [gap for gap in gaps if gap["generation_kind"] == "NORMAL_SCHEDULER"]
-    recovery = [gap for gap in gaps if gap["generation_kind"] != "NORMAL_SCHEDULER"]
+    operator_rescheduled = [gap for gap in gaps if gap["generation_kind"] == "OPERATOR_RESCHEDULED"]
+    recovery = [
+        gap for gap in gaps
+        if gap["generation_kind"] not in {"NORMAL_SCHEDULER", "OPERATOR_RESCHEDULED"}
+    ]
 
     return {
         "v4_closed_turn_count": len(closed),
@@ -137,6 +148,7 @@ def summarize(run_lines: list[str], startup: dict) -> dict:
         "successor_gap_samples": gaps,
         "normal_scheduler_gap_samples": normal,
         "normal_scheduler_comparison_samples": [gap for gap in normal if gap["comparison_eligible"]],
+        "operator_rescheduled_gap_samples": operator_rescheduled,
         "recovery_gap_samples": recovery,
         "unknown_policy": "MISSING_USEFUL_OR_BOUNDARY_VALUES_REMAIN_NULL_NOT_ZERO",
     }
