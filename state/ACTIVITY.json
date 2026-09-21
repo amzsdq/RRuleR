@@ -1,1 +1,17 @@
-{"schema_version":"1.0","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","canonical_automation_id":"6aaf8a993eb08191b8d0ab1d9662e4b2","status":"WORKING","active_run_id":"RUN-UTIL-20260921-182937","authority_epoch":64,"substantive_work_started_at":"2026-09-21T18:29:37+09:00","last_progress_at":"2026-09-21T18:33:40+09:00","last_progress_kind":"SHORT_TURN_ENFORCEMENT_HARDENED","current_unit":"Complete STARTUP-003 prospectively while enforcing the 8-minute minimum CONTINUE work floor and repairing stale measurement state.","next_wake_due_at":"2026-09-21T18:43:06+09:00","successor_observed":true,"handoff_ready":false,"operator_ui_note":"STARTUP-002 latest complete sample: due->observation 155s, observation->claim 21s, claim->first-useful 0s. STARTUP-003 active; missing boundaries remain unknown."}
+{
+  "schema_version": "1.0",
+  "program_id": "RRULER-PROGRAM-001",
+  "root_job_id": "RRULER-UTILIZATION-003",
+  "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
+  "status": "WORKING",
+  "active_run_id": "RUN-UTIL-20260921-184232",
+  "authority_epoch": 65,
+  "substantive_work_started_at": "2026-09-21T18:42:32+09:00",
+  "last_progress_at": "2026-09-21T18:47:30+09:00",
+  "last_progress_kind": "TURN_CLOSE_REPORTING_AND_STARTUP_AUDIT_IMPLEMENTED",
+  "current_unit": "Complete the v4 live retest tooling, integrated CI check, and bounded-turn durable close.",
+  "next_wake_due_at": "2026-09-21T18:53:00+09:00",
+  "successor_observed": false,
+  "handoff_ready": false,
+  "operator_ui_note": "Immediate post-maintenance run; excluded from scheduler due-to-observation comparison. Six focused local assertions passed; integrated CI pending."
+}
