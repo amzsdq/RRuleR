@@ -1,40 +1,40 @@
 {
   "policy_id": "RRULER_RUN_CONTINUATION_GATE",
-  "version": 2,
+  "version": 3,
   "status": "ACTIVE",
-  "purpose": "Require an active worker to keep performing useful work while the program remains non-terminal unless authority has been safely transferred.",
-  "program_nonterminal_states": [
-    "CONTINUE",
-    "DEGRADED_CONTINUATION"
-  ],
+  "purpose": "Require an active worker to keep performing useful work while the program remains non-terminal until the bounded turn closes with a verified same-canonical continuation or authority is otherwise safely transferred.",
+  "program_nonterminal_states": ["CONTINUE","DEGRADED_CONTINUATION"],
   "default_for_nonterminal_owner": "MUST_CONTINUE_USEFUL_WORK",
   "run_end_allowed_only_for": [
+    "VERIFIED_SAME_CANONICAL_CONTINUATION",
     "COMMITTED_SUCCESSOR_HANDOFF",
     "EXPLICIT_OPERATOR_STOP",
     "PLATFORM_ENFORCED_TERMINATION"
   ],
-  "program_end_allowed_only_for": [
-    "PROGRAM_COMPLETE",
-    "BLOCKED_EXTERNAL",
-    "EXPLICIT_OPERATOR_STOP"
-  ],
+  "program_end_allowed_only_for": ["PROGRAM_COMPLETE","BLOCKED_EXTERNAL","EXPLICIT_OPERATOR_STOP"],
   "never_end_because": [
-    "WORK_PACKET_COMPLETE",
-    "PRIMARY_OBJECTIVE_COMPLETE",
-    "CHECKPOINT_COMPLETE",
-    "DOCUMENT_COMPLETE",
-    "CI_PASS",
-    "MILESTONE_COMPLETE",
-    "ROOT_COMPLETE",
-    "PLAN_COMPLETE",
-    "NO_OBVIOUS_NEXT_TASK",
-    "WAITING_FOR_NEXT_WAKE",
-    "SCHEDULE_BOUNDARY"
+    "WORK_PACKET_COMPLETE","PRIMARY_OBJECTIVE_COMPLETE","CHECKPOINT_COMPLETE","DOCUMENT_COMPLETE","CI_PASS","MILESTONE_COMPLETE","ROOT_COMPLETE","PLAN_COMPLETE","NO_OBVIOUS_NEXT_TASK","WAITING_FOR_NEXT_WAKE","SCHEDULE_BOUNDARY"
   ],
+  "bounded_turn_close_rule": {
+    "required_before_verified_continuation_end": [
+      "TARGET_BOUNDED_WORK_ENVELOPE_REACHED_OR_SMALLEST_SAFE_INFLIGHT_UNIT_FINISHED",
+      "LATEST_CHECKPOINT_PERSISTED",
+      "SAME_CANONICAL_FUTURE_CONTINUATION_MUTATED_AND_VERIFIED",
+      "DURABLE_EXPECTED_DUE_PERSISTED",
+      "TURN_STATUS_AND_RUN_EVIDENCE_PERSISTED"
+    ],
+    "local_success_alone_never_satisfies_rule": true,
+    "future_wake_without_same_canonical_verification_never_satisfies_rule": true
+  },
   "nonterminal_no_handoff_rule": {
     "final_response": "FORBIDDEN",
     "run_end": "FORBIDDEN",
     "required_action": "SELECT_AND_EXECUTE_NEXT_USEFUL_ADMISSIBLE_UNIT"
+  },
+  "nonterminal_verified_continuation_rule": {
+    "final_response": "ALLOWED_AFTER_BOUNDED_TURN_CLOSE_ONLY",
+    "run_end": "ALLOWED_AFTER_BOUNDED_TURN_CLOSE_ONLY",
+    "required_action": "RETURN_WITH_CONTINUE_STATUS_AND_PRESERVE_CANONICAL"
   },
   "nonterminal_committed_handoff_rule": {
     "final_response": "ALLOWED_FOR_PREDECESSOR_ONLY",
@@ -49,18 +49,15 @@
     "canonical_disable_requires_program_terminal_or_explicit_operator_stop": true,
     "final_without_fresh_pre_final_authorization_is_incident": "EARLY_VOLUNTARY_FINAL_RESPONSE",
     "waiting_for_cold_rescue_is_not_valid_end_reason": true,
-    "future_wake_exists_does_not_authorize_current_owner_to_end": true
+    "future_wake_exists_does_not_authorize_current_owner_to_end": true,
+    "verified_same_canonical_continuation_authorizes_only_bounded_turn_end_not_program_end": true
   },
   "final_response_is_authoritative_side_effect": true,
   "pre_final_authorization": {
     "required": true,
-    "source_of_truth": [
-      "state/CURRENT.json",
-      "state/HANDOFF.json",
-      "control/run-continuation-gate.v1.json"
-    ],
+    "source_of_truth": ["state/CURRENT.json","state/HANDOFF.json","control/run-continuation-gate.v1.json"],
     "check_immediately_before_user_visible_final": true,
-    "authorization_rule": "ALLOW_ONLY_IF_RUN_END_ALLOWED",
+    "authorization_rule": "ALLOW_ONLY_IF_RUN_END_ALLOWED_AND_BOUNDED_CLOSE_REQUIREMENTS_SATISFIED",
     "if_denied": "DO_NOT_EMIT_FINAL_CONTINUE_USEFUL_WORK",
     "stale_prior_check_forbidden": true,
     "normal_status_report_does_not_authorize_final": true
