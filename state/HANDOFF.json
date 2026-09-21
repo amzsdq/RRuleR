@@ -2,16 +2,16 @@
   "schema_version": "1.2",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "handoff_state": "SUCCESSOR_ARMED",
+  "handoff_state": "SUCCESSOR_WORKING",
   "handoff_mode": "COMPLETION_RELATIVE_SAME_CANONICAL",
   "predecessor_run_id": "RUN-UTIL-20260921-185559",
   "predecessor_authority_epoch": 66,
-  "successor_run_id": null,
+  "successor_run_id": "RUN-UTIL-20260921-193957",
   "successor_expected_at": "2026-09-21T19:05:06+09:00",
-  "successor_observed_at": null,
+  "successor_observed_at": "2026-09-21T19:38:45+09:00",
   "predecessor_last_progress_at": "2026-09-21T19:02:56+09:00",
   "recovery_basis": "Operator-requested immediate post-maintenance run. Do not use this invocation as an ordinary scheduler due-to-observation sample. Preserve forward-only generation and collect STARTUP-003 only from the next eligible scheduled handoff.",
-  "active_unit": "Complete STARTUP-004 and review the second eligible v4 live turn.",
+  "active_unit": "Review second eligible turn and harden missing-successor observability.",
   "checkpoint_id": "CP-UTILIZATION-101",
-  "next_action": "Record successor observation/claim/first-useful boundaries and compare exact-second end-to-due correction against STARTUP-003."
+  "next_action": "Create first useful artifact, record STARTUP-005 first-useful, then continue bounded work."
 }
