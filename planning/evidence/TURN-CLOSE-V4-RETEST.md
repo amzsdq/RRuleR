@@ -85,3 +85,8 @@ The first three eligible post-repair turns lasted 554s, 504s, and 498s. Accepted
 ## Epoch 75 operator-reschedule classification
 
 The normal MAIN v4 successor due at 00:02:08 KST was invoked at 00:05:12.368456 but produced no durable bootstrap receipt. The operator then explicitly rescheduled the same MAIN for 00:13:08; the resulting turn began at 00:14:46, wrote BOOT_STARTED immediately, and live-verified its recurring provisional fallback at 00:27:46 without using Watchdog. This generation is preserved as STARTUP-017 but excluded from normal END+60 and emergency-recovery comparisons. Audit and summary tools now place explicit/legacy operator-reset markers in a dedicated bucket; focused exact-code checks passed.
+
+
+## Epoch 76 exact one-shot category canary result
+
+The one-shot due at 00:25:53 KST was invoked at 00:27:31.651380, then platform completion left the same canonical without a preserved future DTSTART. No generation-matched BOOT_STARTED or REARM_VERIFIED was observed. The canary is therefore rejected, recorded as STARTUP-018, and excluded from normal RRULE, operator-rescheduled, and emergency-recovery comparisons. SAME MAIN recurring RRULE was restored and live-verified with provisional DTSTART 00:43:10; Watchdog remained unused. Audit and summary tools now expose a dedicated rejected-one-shot bucket, and exact remote-code checks passed.
