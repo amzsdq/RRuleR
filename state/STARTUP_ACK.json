@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
-  "main_canonical_id": "6ab14f7951848191b65e4b5d4bc979d8",
-  "current_expected_due_at": "2026-09-22T01:38:00+09:00",
-  "generation_key": "DUE:2026-09-22T01:38:00+09:00",
-  "boot_started_at": null,
-  "boot_started_authority_epoch": null,
+  "main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
+  "current_expected_due_at": "2026-09-22T00:54:59+09:00",
+  "generation_key": "DUE:2026-09-22T00:54:59+09:00",
+  "boot_started_at": "2026-09-22T00:54:31+09:00",
+  "boot_started_authority_epoch": "MIGRATION-v5.1",
   "rearm_verified_at": null,
   "verified_provisional_due_at": null,
-  "status": "AWAITING_BOOT_STARTED",
-  "last_updated_at": "2026-09-22T00:45:22+09:00",
-  "note": "Operator-created replacement MAIN is now authoritative. Retired predecessor must remain disabled. Await first startup receipt from new canonical."
+  "status": "BOOT_STARTED",
+  "last_updated_at": "2026-09-22T00:54:31+09:00",
+  "note": "Authoritative operator-created MAIN v5.1 bootstrap observed. Both predecessor canonicals remain retired/disabled."
 }
