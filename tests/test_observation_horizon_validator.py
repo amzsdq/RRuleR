@@ -1,5 +1,8 @@
+import json
+import tempfile
 import unittest
-from tools.validate_observation_horizon import validate
+from pathlib import Path
+from tools.validate_observation_horizon import load_predecessor_states, validate
 
 
 POLICY = {"accepted_provenance_kinds": ["GITHUB_ACTIONS_OBSERVED_TIMESTAMP", "GITHUB_COMMIT_COMMITTER_TIMESTAMP"]}
@@ -42,6 +45,21 @@ class ObservationHorizonValidatorTests(unittest.TestCase):
         horizon = {"provenance_kind": "GITHUB_ACTIONS_OBSERVED_TIMESTAMP", "provenance_ref": "123", "trusted_observed_through": "2026-09-20T23:05:48+00:00"}
         source = {"status": "completed", "conclusion": "success", "updated_at": "2026-09-20T23:05:48Z"}
         self.assertTrue(validate(horizon, POLICY, source, previous_states=parents))
+
+    def test_rejects_explicit_missing_predecessor_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            missing = Path(directory) / "missing-parent.json"
+            with self.assertRaisesRegex(ValueError, "predecessor.*missing"):
+                load_predecessor_states([missing])
+
+    def test_loads_all_explicit_predecessor_files(self):
+        with tempfile.TemporaryDirectory() as directory:
+            first = Path(directory) / "parent-1.json"
+            second = Path(directory) / "parent-2.json"
+            first.write_text(json.dumps({"trusted_observed_through": "2026-09-20T23:04:48+00:00"}))
+            second.write_text(json.dumps({"trusted_observed_through": "2026-09-20T23:05:48+00:00"}))
+            states = load_predecessor_states([first, second])
+            self.assertEqual(len(states), 2)
 
     def test_rejects_forged_timestamp(self):
         horizon = {"provenance_kind": "GITHUB_ACTIONS_OBSERVED_TIMESTAMP", "provenance_ref": "123", "trusted_observed_through": "2026-09-20T23:06:48+00:00"}
