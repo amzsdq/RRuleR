@@ -28,7 +28,7 @@ def validate(record):
     outcome = record['turn_outcome']
     if outcome not in {'CONTINUE', 'COMPLETE', 'BLOCKED', 'PAUSED'}:
         raise ValueError('invalid turn_outcome')
-    if record['close_decision'] not in {'TIME_BOUNDARY', 'BUDGET_EXHAUSTED', 'EXCEPTION', 'HANDOFF', 'TERMINAL'}:
+    if record['close_decision'] not in {'TIME_BOUNDARY', 'TARGET_REACHED_SAFE_BOUNDARY', 'BUDGET_EXHAUSTED', 'EXCEPTION', 'HANDOFF', 'TERMINAL'}:
         raise ValueError('invalid close_decision')
     if outcome == 'CONTINUE':
         if record['end_reason'] not in {'VERIFIED_SAME_CANONICAL_CONTINUATION', 'COMMITTED_SUCCESSOR_HANDOFF', 'PLATFORM_ENFORCED_TERMINATION'}:
