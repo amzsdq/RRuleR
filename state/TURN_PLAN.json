@@ -22,15 +22,18 @@
     "Run focused and actual-ledger validation.",
     "Close with exact END+60 MAIN and enabled Watchdog."
   ],
-  "current_substep": 2,
+  "current_substep": 5,
   "handoff_boundary": "Epoch 72 active after fixed-Watchdog recovery and verified provisional protection.",
   "early_finish_fallback": "Add exact paired-generation summary assertions or repair stale ACTIVITY close semantics.",
   "created_for_next_wake": false,
   "started_at": "2026-09-21T22:15:37+09:00",
-  "last_progress_at": "2026-09-21T22:19:35+09:00",
+  "last_progress_at": "2026-09-21T22:24:53+09:00",
   "progress_evidence": [
     "BOOT_STARTED 22:16:29 for DUE:2026-09-21T22:13:24+09:00",
     "REARM_VERIFIED 22:17:18; MAIN due 22:29:29 enabled",
-    "Watchdog due 22:32:29 enabled and exact one-shot"
+    "Watchdog due 22:32:29 enabled and exact one-shot",
+    "STARTUP-011/012 paired evidence committed; first useful boundary 22:21:10.",
+    "11 focused startup audit tests passed; actual ledger valid with 12 samples and 3 recovery generations.",
+    "WORK_EVIDENCE validation passed for epoch 72 record."
   ]
 }
