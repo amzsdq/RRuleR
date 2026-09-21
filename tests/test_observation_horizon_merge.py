@@ -41,12 +41,13 @@ class ObservationHorizonMergeTests(unittest.TestCase):
             validate(current, POLICY, source("2026-09-20T23:05:48Z"), previous_states=[left, right])
 
     def test_rejects_retired_identity_reuse_from_either_parent(self):
-        left = horizon("200", "2026-09-20T23:00:00+00:00")
-        right = horizon("201", "2026-09-20T23:01:00+00:00")
-        records = canonical([provenance_record(left)])
-        current = horizon("201", "2026-09-20T23:01:00+00:00", records)
+        retired = horizon("201", "2026-09-20T22:30:00+00:00")
+        left = horizon("200", "2026-09-20T23:00:00+00:00", [provenance_record(retired)])
+        right = horizon("202", "2026-09-20T23:01:00+00:00")
+        records = canonical([provenance_record(retired), provenance_record(left), provenance_record(right)])
+        current = horizon("201", "2026-09-20T23:05:48+00:00", records)
         with self.assertRaisesRegex(ValueError, "retired.*cannot be reused"):
-            validate(current, POLICY, source("2026-09-20T23:01:00Z"), previous_states=[left, right])
+            validate(current, POLICY, source("2026-09-20T23:05:48Z"), previous_states=[left, right])
 
 if __name__ == "__main__":
     unittest.main()
