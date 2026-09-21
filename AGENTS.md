@@ -66,9 +66,10 @@ Useful-work utilization is a first-class objective.
 - Keep checkpoints current enough for cold resume without fabricating activity.
 - Never pad, sleep, split trivial changes, or invent unrelated busywork to consume time or satisfy evidence cadence.
 - Prefer units with safe checkpoint boundaries; as runtime exposure grows, shift toward smaller units rather than idling.
-- A CONTINUE turn has a **short-turn diagnostic threshold of 8 elapsed minutes** unless a real stop condition applies. Finishing one experiment setup, scheduler mutation, measurement capture, CI check, or bounded substep before 8 minutes is not permission to end.
-- If the current substep becomes wait-bound, immediately switch to another safe authorized runnable item from the same work spec/project rather than ending the turn. Waiting for a future observation is not a blocker while other useful work exists.
-- A short CONTINUE turn (<8 minutes) is an exception that MUST record a concrete `short_turn_reason` and the exhausted alternatives. Acceptable reasons are limited to: actual platform-enforced termination, explicit operator intervention, authority/fencing failure closed, or no safe runnable work anywhere in the active work spec/project after an explicit scan.
+- Normal CONTINUE turns use **work-unit chaining** rather than an 8-minute floor as the primary rule. When a bounded unit finishes and elapsed time is still <10 minutes, immediately start the next clear, low-risk, checkpointable authorized unit from the active work spec/project if it fits the remaining platform safety budget.
+- If the obvious next unit is too large or risky, decompose it and execute the smallest safe useful slice that can be checkpointed cleanly. A unit becoming wait-bound is not permission to end while another safe runnable item exists.
+- At >=10 elapsed minutes, do not start a new large unit. Finish only the smallest safe in-flight unit, checkpoint, hand off, and close. Treat ~12 elapsed minutes as a soft upper bound for normal operation; crossing it requires an actual in-flight safety/atomicity reason, not a desire to keep working.
+- A normal CONTINUE turn ending <10 minutes is an exception and MUST record why no clear low-risk checkpointable next unit could safely be started. Turns <8 minutes remain a high-severity short-turn diagnostic.
 
 ### Forward useful-work evidence capture
 
@@ -95,7 +96,7 @@ Before the first substantive action after authority acquisition, persist a prima
 - smallest safe boundary for each substep;
 - a related fallback continuation unit if the objective finishes materially early.
 
-Do not re-plan merely because an intermediate substep completed. If the objective finishes and useful work remains, execute the fallback or form a related continuation objective.
+Do not re-plan merely because an intermediate substep completed. If the objective or bounded unit finishes before 10 elapsed minutes and a clear low-risk checkpointable next unit exists, execute that next unit in the same turn. Once elapsed time reaches 10 minutes, stop starting new large units and close after the smallest safe in-flight boundary; normal turns should usually finish between 10 and about 12 minutes.
 
 ## Utilization optimization loop
 
@@ -160,10 +161,11 @@ DURATION=<Xm Ys or Xs>
 STATUS=<CONTINUE|COMPLETE|BLOCKED|PAUSED>
 ```
 
-Short-turn guard:
-- `STATUS=CONTINUE` with `DURATION<8m` is presumptively a utilization failure.
-- Before closing such a turn, scan the active work spec/project for the next safe runnable unit and continue working if one exists.
-- If a short turn is unavoidable, persist `short_turn_reason` and `alternatives_checked` in the durable run record; do not use vague reasons such as "experiment armed", "waiting for next wake", "CI pending", or "nothing obvious".
+Turn-duration guard:
+- `STATUS=CONTINUE` with `DURATION<10m` requires a concrete reason why no clear low-risk checkpointable next unit could safely be started; scan the active work spec/project first.
+- `DURATION<8m` remains a high-severity utilization failure unless an allowlisted real exception applies.
+- At `DURATION>=10m`, do not start a new large unit. Finish only the smallest safe in-flight unit and close; ~12m is the normal soft ceiling.
+- Persist `short_turn_reason` and `alternatives_checked` for any CONTINUE close below 10m. Vague reasons such as "experiment armed", "waiting for next wake", "CI pending", or "nothing obvious" are invalid.
 
 Semantics:
 - `CONTINUE` — useful authorized work remains; durable resume target/continuation is preserved.
