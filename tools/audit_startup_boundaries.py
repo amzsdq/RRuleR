@@ -17,6 +17,10 @@ ONE_SHOT_CANARY_EXCLUSIONS = {
     "SCHEDULE_CATEGORY_CANARY_REJECTED",
     "ONE_SHOT_CANARY_FAILURE",
 }
+COLD_FALLBACK_CLASSES = {
+    "SAME_MAIN_NATURAL_HOURLY_COLD_FALLBACK_AFTER_MISSED_FAST_SHIFT",
+    "HOURLY_FALLBACK_RECOVERY",
+}
 
 
 def _ts(value: str) -> datetime:
@@ -159,6 +163,12 @@ def audit(
             or sample.get("validity")
             in {"EXCLUDED_OPERATOR_RESCHEDULED", "EXCLUDED_OPERATOR_MAINTENANCE_RECOVERY"}
         )
+        generation_class = sample.get("generation_class") or sample.get("classification")
+        cold_fallback_generation = (
+            sample.get("cold_fallback") is True
+            or generation_class in COLD_FALLBACK_CLASSES
+            or sample.get("validity") == "EXCLUDED_HOURLY_FALLBACK_RECOVERY"
+        )
         comparison_ready = bool(due and sample.get("successor_observed_at"))
         acknowledged_invalid = (
             sample.get("validity") == "INVALID"
@@ -172,6 +182,8 @@ def audit(
             comparison_exclusion = "SCHEDULE_CATEGORY_CANARY_REJECTED"
         elif operator_rescheduled:
             comparison_exclusion = "OPERATOR_RESCHEDULED_GENERATION"
+        elif cold_fallback_generation:
+            comparison_exclusion = "SAME_MAIN_NATURAL_HOURLY_COLD_FALLBACK"
         elif recovery_generation:
             comparison_exclusion = f"{recovery_kind or 'UNKNOWN'}_GENERATION"
         elif not comparison_ready:
@@ -192,12 +204,13 @@ def audit(
             "startup_receipt_complete": bool(sample.get("boot_started_at") and sample.get("rearm_verified_at")),
             "operator_rescheduled_generation": operator_rescheduled,
             "rejected_one_shot_canary": rejected_one_shot_canary,
+            "cold_fallback_generation": cold_fallback_generation,
             "recovery_generation": recovery_generation,
             "recovery_kind": recovery_kind,
             "recovery_lineage_valid": recovery_lineage_valid,
             "scheduler_comparison_eligible": (
                 comparison_ready and not maintenance_interrupted and not rejected_one_shot_canary
-                and not operator_rescheduled and not recovery_generation and not errors
+                and not operator_rescheduled and not cold_fallback_generation and not recovery_generation and not errors
             ),
             "scheduler_comparison_exclusion": comparison_exclusion,
         })
@@ -213,6 +226,7 @@ def audit(
         "startup_ack_audit": ack_audit,
         "scheduler_comparison_eligible_count": sum(item["scheduler_comparison_eligible"] for item in results),
         "watchdog_recovery_generation_count": sum(item["recovery_generation"] for item in results),
+        "cold_fallback_generation_count": sum(item["cold_fallback_generation"] for item in results),
         "operator_rescheduled_generation_count": sum(
             item["operator_rescheduled_generation"] for item in results
         ),
