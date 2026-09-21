@@ -1,6 +1,6 @@
 {
   "policy_id": "RRULER_RUNTIME_CONTINUITY",
-  "version": 6,
+  "version": 7,
   "status": "ACTIVE",
   "principle": "DURABLE_WORKFLOW_DISPOSABLE_REASONING_WORKER",
   "components": {
@@ -38,10 +38,15 @@
     "target_useful_seconds": 840,
     "active_scheduler": "ROLLING_SAME_CANONICAL_SELF_RELIANT",
     "normal_target_work_seconds": 600,
+    "normal_continue_minimum_elapsed_seconds": 600,
     "p0_max_average_non_useful_gap_seconds_for_600s_turn": 42.9,
     "verified_fallback_final_rearm_offset_seconds": 60,
-    "provisional_rescue_offset_seconds": 780,
-    "rule": "Normal close shifts SAME MAIN to exact END+60. If that occurrence is lost before bootstrap, the SAME MAIN recurring RRULE supplies the natural hourly cold fallback. Watchdog is not required."
+    "provisional_rescue_offset_seconds": 660,
+    "provisional_extension_guard_seconds": 90,
+    "provisional_extension_offset_seconds": 180,
+    "routine_short_rolling_refresh_forbidden": true,
+    "retired_provisional_rescue_offset_seconds": 780,
+    "rule": "For a normal ~600s nonterminal CONTINUE turn, arm SAME MAIN once at observed wake/arm reference +660s and normally do not mutate it mid-turn. Extend once before collision only if useful authorized work or close handling clearly threatens that due. Normal close shifts SAME MAIN to exact END+60. If that occurrence is lost before bootstrap, the SAME MAIN recurring RRULE supplies the natural hourly cold fallback. Watchdog is not required."
   },
   "startup_receipt_generation_fence": {
     "required": true,
@@ -56,7 +61,8 @@
     "purpose": "Hide scheduler delivery latency under predecessor useful work.",
     "single_substantive_authority_required": true,
     "fresh_predecessor_blocks_successor_substantive_takeover": true,
-    "provisional_cold_rescue_horizon_unchanged": true,
+    "provisional_cold_rescue_horizon_unchanged": false,
+    "current_provisional_rescue_horizon_seconds": 660,
     "rollback_on": [
       "UNSAFE_SUBSTANTIVE_OVERLAP",
       "DUPLICATE_SUBSTANTIVE_SIDE_EFFECT",
@@ -83,7 +89,7 @@
     ]
   },
   "rolling_recovery": {
-    "startup": "minimum fence, persist generation-matched BOOT_STARTED, then classify normal vs predictive vs recovery before substantive authority",
+    "startup": "minimum fence, persist generation-matched BOOT_STARTED, arm and verify SAME MAIN +660s provisional, then classify normal vs predictive vs recovery before substantive authority",
     "normal_close": "checkpoint then live-verify SAME MAIN END+60; do not arm Watchdog",
     "mutation_failure": "retry once when safe; if older verified future continuation survives, classify DEGRADED_CONTINUATION within its safety envelope; otherwise fail closed before conflicting substantive side effects",
     "stale_occurrence": "classify a natural SAME MAIN recurrence after missing bootstrap as MAIN_COLD_FALLBACK_RECOVERY; recover forward without replacing the canonical"
