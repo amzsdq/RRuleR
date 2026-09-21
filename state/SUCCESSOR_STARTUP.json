@@ -133,23 +133,49 @@
       "due_to_observation_seconds": 73,
       "exclusion_reason": "STARTUP_ACK_MISSING",
       "audit_note": "Automation history proves invocation at 19:50:28.457228 KST. No durable BOOT_STARTED, provisional REARM_VERIFIED, authority claim, useful-work boundary, or self-rearm followed. Preserve all missing boundaries as unknown."
+    },
+    {
+      "sample_id": "STARTUP-007",
+      "scheduled_due_at": "2026-09-21T20:49:15+09:00",
+      "successor_observed_at": "2026-09-21T20:48:49+09:00",
+      "boot_started_at": "2026-09-21T20:49:21+09:00",
+      "rearm_verified_at": "2026-09-21T20:49:46+09:00",
+      "authority_claim_at": "2026-09-21T20:50:15+09:00",
+      "first_durable_useful_at": "2026-09-21T20:52:13+09:00",
+      "due_to_observation_seconds": -26,
+      "observation_to_boot_seconds": 32,
+      "boot_to_rearm_verified_seconds": 25,
+      "rearm_verified_to_claim_seconds": 29,
+      "validity": "EXCLUDED_HOURLY_FALLBACK_RECOVERY",
+      "exclusion_reason": "NOT_NORMAL_END_PLUS_60_GENERATION",
+      "classification": "HOURLY_FALLBACK_RECOVERED_WITH_BOOTSTRAP_STAGE_EVIDENCE",
+      "required_fields": [
+        "scheduled_due_at",
+        "successor_observed_at",
+        "boot_started_at",
+        "rearm_verified_at",
+        "authority_claim_at",
+        "first_durable_useful_at"
+      ],
+      "rule": "This wake belongs to the next hourly fallback occurrence after STARTUP-006 lacked durable acknowledgement. Use for recovery-stage diagnostics, not normal END+60 comparison.",
+      "claim_to_first_useful_seconds": 118,
+      "due_to_first_useful_seconds": 178
     }
   ],
   "next_sample": {
-    "sample_id": "STARTUP-007",
-    "scheduled_due_at": "2026-09-21T20:49:15+09:00",
-    "successor_observed_at": "2026-09-21T20:48:49+09:00",
-    "boot_started_at": "2026-09-21T20:49:21+09:00",
-    "rearm_verified_at": "2026-09-21T20:49:46+09:00",
-    "authority_claim_at": "2026-09-21T20:50:15+09:00",
-    "first_durable_useful_at": "2026-09-21T20:52:13+09:00",
-    "due_to_observation_seconds": -26,
-    "observation_to_boot_seconds": 32,
-    "boot_to_rearm_verified_seconds": 25,
-    "rearm_verified_to_claim_seconds": 29,
-    "validity": "EXCLUDED_HOURLY_FALLBACK_RECOVERY",
-    "exclusion_reason": "NOT_NORMAL_END_PLUS_60_GENERATION",
-    "classification": "HOURLY_FALLBACK_RECOVERED_WITH_BOOTSTRAP_STAGE_EVIDENCE",
+    "sample_id": "STARTUP-008",
+    "predecessor_run_id": "RUN-UTIL-20260921-204946",
+    "predecessor_last_useful_at": "2026-09-21T20:59:31+09:00",
+    "predecessor_run_ended_at": "2026-09-21T21:00:19+09:00",
+    "scheduled_due_at": "2026-09-21T21:01:19+09:00",
+    "successor_observed_at": null,
+    "boot_started_at": null,
+    "rearm_verified_at": null,
+    "authority_claim_at": null,
+    "first_durable_useful_at": null,
+    "predecessor_last_useful_to_end_seconds": 48,
+    "end_to_due_seconds": 60,
+    "generation_key": "DUE:2026-09-21T21:01:19+09:00",
     "required_fields": [
       "scheduled_due_at",
       "successor_observed_at",
@@ -158,9 +184,9 @@
       "authority_claim_at",
       "first_durable_useful_at"
     ],
-    "rule": "This wake belongs to the next hourly fallback occurrence after STARTUP-006 lacked durable acknowledgement. Use for recovery-stage diagnostics, not normal END+60 comparison.",
-    "claim_to_first_useful_seconds": 118,
-    "due_to_first_useful_seconds": 178
+    "rule": "First prospective normal-close sample under fixed Startup Watchdog. MAIN must write generation-matched BOOT_STARTED before provisional arm and REARM_VERIFIED after verification.",
+    "validity": "PENDING_SUCCESSOR",
+    "classification": "EXACT_END_PLUS_60_WITH_STARTUP_WATCHDOG_ARMED"
   },
-  "decision_rule": "STARTUP-006 demonstrates an invoked occurrence with no durable bootstrap acknowledgement. STARTUP-007 records the hourly fallback recovery stages. Observability does not itself provide an independent fast wake."
+  "decision_rule": "STARTUP-008 tests the complete MAIN receipt path plus independent fixed Watchdog coverage. Keep Watchdog actions non-substantive and do not infer missing receipts."
 }
