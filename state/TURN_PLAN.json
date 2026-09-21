@@ -2,40 +2,35 @@
   "schema_version": "1.1",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "authority_epoch": 73,
-  "run_id": "RUN-UTIL-20260921-223441",
-  "status": "COMPLETED",
-  "phase": "IDLE_DISTANT_DUE_SAFETY",
-  "objective_id": "WS-P001-002-CLOSE-STATE-PROJECTION",
-  "objective": "Make normal close publish an unambiguous non-WORKING durable projection so the Watchdog can distinguish idle distant schedules from active provisional rescue coverage.",
+  "authority_epoch": 74,
+  "run_id": "RUN-UTIL-20260921-235045",
+  "status": "IN_PROGRESS",
+  "phase": "MAIN_SELF_RELIANT_POLICY_ALIGNMENT",
+  "objective_id": "WS-P001-002-MAIN-SELF-RELIANT-V4",
+  "objective": "Make SAME MAIN RRULE the complete normal continuation path and retain Watchdog only as disabled explicit emergency standby.",
   "expected_useful_seconds": 600,
   "acceptance_criteria": [
-    "Lifecycle defines one ordered close-state projection after continuation verification.",
-    "Closed/HANDOFF_READY activity cannot retain an active run id.",
-    "A validator rejects contradictory CURRENT/ACTIVITY/HANDOFF close projections.",
-    "Focused tests and current state validation pass."
+    "Lifecycle normal close requires only live-verified SAME MAIN END+60 and durable non-WORKING projection.",
+    "Normal close neither arms nor requires Watchdog.",
+    "SAME MAIN recurring RRULE natural recurrence is documented as cold fallback.",
+    "Active controls and operator guidance no longer require Watchdog for ordinary continuity.",
+    "Focused repository consistency checks pass."
   ],
   "checkpointable_substeps": [
-    "Claim epoch 73 after verified recovery bootstrap.",
-    "Specify the close-state projection in lifecycle and AGENTS guidance.",
-    "Implement a small validator with contradictory/valid fixtures.",
-    "Run focused tests and validate live state.",
-    "Close at >=600s with exact END+60 MAIN and enabled Watchdog."
+    "Claim epoch 74 after generation-matched BOOT_STARTED and REARM_VERIFIED.",
+    "Update lifecycle and continuation gate.",
+    "Update relay policy, active controls, and AGENTS guidance.",
+    "Search for stale normal-path Watchdog requirements and reconcile material conflicts.",
+    "Checkpoint and close with live-verified SAME MAIN END+60."
   ],
-  "current_substep": 5,
-  "handoff_boundary": "Epoch 73 closed after 707 seconds with exact END+60 MAIN and enabled Watchdog at MAIN due+180.",
-  "early_finish_fallback": "Add paired-generation evidence for the 22:26:45 failure and 22:34:20 recovery.",
+  "current_substep": 2,
+  "handoff_boundary": null,
+  "early_finish_fallback": "Add a deterministic policy-consistency check that rejects normal-close Watchdog requirements.",
   "created_for_next_wake": false,
-  "started_at": "2026-09-21T22:34:41+09:00",
-  "last_progress_at": "2026-09-21T22:46:28+09:00",
+  "started_at": "2026-09-21T23:50:45+09:00",
+  "last_progress_at": "2026-09-21T23:52:20+09:00",
   "progress_evidence": [
-    "BOOT_STARTED 22:35:28 for DUE:2026-09-21T22:34:20+09:00",
-    "REARM_VERIFIED 22:35:59; MAIN due 22:48:28 enabled",
-    "Watchdog due 22:51:28 enabled and exact one-shot",
-    "Lifecycle v10 defines a consistent non-WORKING close projection and AGENTS requires validation.",
-    "validate_close_projection.py plus five focused tests added; live WORKING projection passes.",
-    "Control-plane workflow now fetches and executes the new validator.",
-    "STARTUP-013/014 recovery lineage audited across 14 samples; 88 discovered tests passed.",
-    "Atomic HANDOFF_READY close projection persisted; same MAIN and Watchdog live-verified enabled at 22:47:28 and 22:50:28."
+    "BOOT_STARTED 23:50:45 for DUE:2026-09-21T23:52:00+09:00",
+    "REARM_VERIFIED 23:51:45.997376; SAME MAIN recurring provisional due 00:03:45 enabled"
   ]
 }
