@@ -4,7 +4,7 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "authority_epoch": 71,
   "run_id": "RUN-UTIL-20260921-215434",
-  "status": "COMPLETE_PENDING_CONTINUATION",
+  "status": "COMPLETED",
   "phase": "WATCHDOG_RECOVERY_OBSERVABILITY",
   "objective_id": "WS-P001-002-RECOVERY-SEGMENT-REPORTING",
   "objective": "Expose Watchdog recovery segments in turn-close summaries without collapsing missing boundaries to zero or comparing recovery generations as normal scheduler samples.",
@@ -27,12 +27,13 @@
   "early_finish_fallback": "Add canonical-ID consistency validation for STARTUP_ACK recovery generations.",
   "created_for_next_wake": false,
   "started_at": "2026-09-21T21:54:34+09:00",
-  "last_progress_at": "2026-09-21T22:05:25+09:00",
+  "last_progress_at": "2026-09-21T22:06:23+09:00",
   "progress_evidence": [
     "Watchdog recovery generation 21:54:52 entered BOOT_STARTED and REARM_VERIFIED",
     "MAIN provisional due 22:09:11 enabled and verified",
     "Watchdog due 22:12:11 enabled and verified",
     "Recovery segment summary implemented; 6 focused tests passed.",
-    "STARTUP_ACK canonical identity validation implemented; 9 focused tests passed."
+    "STARTUP_ACK canonical identity validation implemented; 9 focused tests passed.",
+    "RUNS validation passed; MAIN due 22:07:23 and Watchdog due 22:10:23 live-verified enabled."
   ]
 }
