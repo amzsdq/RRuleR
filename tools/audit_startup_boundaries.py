@@ -35,9 +35,12 @@ def audit_startup_ack(ack: dict, expected_main_canonical_id: str) -> dict:
     if due and generation_key and generation_key != f"DUE:{due}":
         errors.append("STARTUP_ACK_GENERATION_KEY_DUE_MISMATCH")
     boot_started = ack.get("boot_started_at")
+    boot_epoch = ack.get("boot_started_authority_epoch")
     rearm_verified = ack.get("rearm_verified_at")
     provisional_due = ack.get("verified_provisional_due_at")
     status = ack.get("status")
+    if boot_started and generation_key and boot_epoch != generation_key:
+        errors.append("STARTUP_ACK_BOOT_EPOCH_GENERATION_MISMATCH")
     if rearm_verified and not boot_started:
         errors.append("STARTUP_ACK_REARM_WITHOUT_BOOT")
     if status == "REARM_VERIFIED":
@@ -58,6 +61,7 @@ def audit_startup_ack(ack: dict, expected_main_canonical_id: str) -> dict:
         "expected_main_canonical_id": expected_main_canonical_id,
         "generation_key": generation_key,
         "boot_started_at": boot_started,
+        "boot_started_authority_epoch": boot_epoch,
         "rearm_verified_at": rearm_verified,
         "verified_provisional_due_at": provisional_due,
         "status": status,
@@ -180,62 +184,46 @@ def audit(
         results.append({
             "sample_id": sample.get("sample_id"),
             "raw_sample": sample,
-            "predecessor_run_found": run is not None,
-            "predecessor_recorded_end": predecessor_end,
             "errors": errors,
-            "unacknowledged_errors": unacknowledged_errors,
             "acknowledged_invalid": acknowledged_invalid,
             "startup_receipt_complete": bool(sample.get("boot_started_at") and sample.get("rearm_verified_at")),
-            "operator_rescheduled_generation": operator_rescheduled,
-            "rejected_one_shot_canary": rejected_one_shot_canary,
-            "recovery_generation": recovery_generation,
             "recovery_kind": recovery_kind,
             "recovery_lineage_valid": recovery_lineage_valid,
-            "scheduler_comparison_eligible": (
-                comparison_ready and not maintenance_interrupted and not rejected_one_shot_canary
-                and not operator_rescheduled and not recovery_generation and not errors
-            ),
+            "scheduler_comparison_eligible": comparison_exclusion is None,
             "scheduler_comparison_exclusion": comparison_exclusion,
         })
-    ack_audit = None
+
+    startup_ack_audit = None
     if startup_ack is not None and expected_main_canonical_id is not None:
-        ack_audit = audit_startup_ack(startup_ack, expected_main_canonical_id)
+        startup_ack_audit = audit_startup_ack(startup_ack, expected_main_canonical_id)
+
+    all_errors = [error for result in results for error in ([] if result["acknowledged_invalid"] else result["errors"])]
+    if startup_ack_audit and not startup_ack_audit["valid"]:
+        all_errors.extend(startup_ack_audit["errors"])
     return {
-        "sample_count": len(results),
-        "valid": (
-            not any(item["unacknowledged_errors"] for item in results)
-            and (ack_audit is None or ack_audit["valid"])
-        ),
-        "startup_ack_audit": ack_audit,
-        "scheduler_comparison_eligible_count": sum(item["scheduler_comparison_eligible"] for item in results),
-        "watchdog_recovery_generation_count": sum(item["recovery_generation"] for item in results),
-        "operator_rescheduled_generation_count": sum(
-            item["operator_rescheduled_generation"] for item in results
-        ),
-        "rejected_one_shot_canary_count": sum(
-            item["rejected_one_shot_canary"] for item in results
-        ),
+        "valid": not all_errors,
         "results": results,
-        "raw_evidence_policy": "PRESERVED_WITH_EXCLUSION_NOT_DELETED_OR_REWRITTEN",
+        "scheduler_comparison_eligible_count": sum(r["scheduler_comparison_eligible"] for r in results),
+        "watchdog_recovery_generation_count": sum(r["recovery_kind"] == "FIXED_WATCHDOG_PREBOOTSTRAP" for r in results),
+        "provisional_cold_rescue_generation_count": sum(r["recovery_kind"] == "PROVISIONAL_COLD_RESCUE" for r in results),
+        "startup_ack_audit": startup_ack_audit,
     }
 
 
 def main() -> int:
-    if len(sys.argv) not in {3, 5}:
-        print(
-            "usage: audit_startup_boundaries.py SUCCESSOR_STARTUP_JSON RUNS_JSONL "
-            "[STARTUP_ACK_JSON EXPECTED_MAIN_CANONICAL_ID]",
-            file=sys.stderr,
-        )
-        return 2
-    startup = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-    runs = Path(sys.argv[2]).read_text(encoding="utf-8").splitlines()
-    startup_ack = json.loads(Path(sys.argv[3]).read_text(encoding="utf-8")) if len(sys.argv) == 5 else None
-    expected_main = sys.argv[4] if len(sys.argv) == 5 else None
-    result = audit(startup, runs, startup_ack, expected_main)
+    root = Path(__file__).resolve().parents[1]
+    startup = json.loads((root / "state" / "SUCCESSOR_STARTUP.json").read_text())
+    run_lines = (root / "state" / "RUNS.jsonl").read_text().splitlines()
+    ack_path = root / "state" / "STARTUP_ACK.json"
+    current_path = root / "state" / "CURRENT.json"
+    ack = json.loads(ack_path.read_text()) if ack_path.exists() else None
+    expected = None
+    if current_path.exists():
+        expected = json.loads(current_path.read_text()).get("canonical_automation_id")
+    result = audit(startup, run_lines, ack, expected)
     print(json.dumps(result, indent=2, sort_keys=True))
-    return int(not result["valid"])
+    return 0 if result["valid"] else 1
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())
