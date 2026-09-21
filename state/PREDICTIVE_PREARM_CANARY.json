@@ -2,7 +2,7 @@
   "schema_version":"1.0",
   "program_id":"RRULER-PROGRAM-001",
   "experiment_id":"UTIL-EXP-018",
-  "status":"ARMING_FIRST_CANARY",
+  "status":"FIRST_CANARY_ARMED",
   "purpose":"Measure whether a same-canonical successor armed before predecessor close can hide scheduler latency without concurrent substantive ownership.",
   "p0_gap_budget_seconds":42.9,
   "cold_rescue_offset_seconds":780,
@@ -13,5 +13,5 @@
   "required_sample_fields":["sample_id","predecessor_run_id","predictive_due_at","successor_observed_at","predecessor_last_useful_at","successor_first_useful_at","post_close_gap_seconds","overlap_or_fence_result","duplicate_substantive_side_effect_observed","schedule_rollback_observed"],
   "promotion_rule":{"minimum_safe_samples":2,"maximum_post_close_gap_seconds":42,"requires_no_duplicate_substantive_side_effect":true,"requires_no_schedule_rollback":true,"then_requires_valid_fixed_900s_window":true},
   "rollback_on":["UNSAFE_SUBSTANTIVE_OVERLAP","DUPLICATE_SUBSTANTIVE_SIDE_EFFECT","SCHEDULE_ROLLBACK","MISSED_SUCCESSOR"],
-  "active_sample":{"sample_id":"PREARM-CANARY-001","predecessor_run_id":"RUN-UTIL-20260921-170146","authority_epoch":60,"predecessor_observed_start_at":"2026-09-21T17:01:46+09:00","target_bounded_close_at":"2026-09-21T17:11:46+09:00","candidate_predictive_due_at":"2026-09-21T17:11:16+09:00","state":"PLANNED_NOT_YET_ARMED"}
+  "active_sample":{"sample_id":"PREARM-CANARY-001","predecessor_run_id":"RUN-UTIL-20260921-170146","authority_epoch":60,"predecessor_observed_start_at":"2026-09-21T17:01:46+09:00","target_bounded_close_at":"2026-09-21T17:11:46+09:00","predictive_due_at":"2026-09-21T17:11:16+09:00","armed_at":"2026-09-21T17:05:54+09:00","state":"ARMED_VERIFIED","expected_behavior":"Predecessor continues useful work to close. If successor arrives early, it fences and does not claim conflicting substantive authority."}
 }
