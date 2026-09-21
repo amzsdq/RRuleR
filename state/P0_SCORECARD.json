@@ -1,1 +1,72 @@
-{"schema_version":"2.1","program_id":"RRULER-PROGRAM-001","goal":"Sustained wall-clock useful-work coverage >=93.33% with substantive durable-evidence gaps <=120s.","status":"STARTUP_003_CANARY_ACTIVE_ZERO_ACCEPTED_WINDOWS","current_epoch":64,"metrics":{"evaluation_window_seconds":900,"target_useful_seconds":840,"target_fraction":0.9333333333,"required_consecutive_audited_windows":3,"passing_consecutive_windows":0,"accepted_rolling_windows":0,"bounded_turn_target_useful_seconds":600,"minimum_continue_turn_seconds":480,"p0_max_average_non_useful_gap_seconds_for_600s_turn":42.9,"verified_fallback_final_rearm_offset_seconds":60,"latest_complete_startup_sample":"STARTUP-002","latest_due_to_observation_seconds":155,"latest_observation_to_claim_seconds":21,"latest_claim_to_first_useful_seconds":0,"epoch59_wall_seconds":626,"epoch59_strict_useful_seconds":557,"epoch59_strict_wall_coverage_ratio":0.8898},"active_interventions":[{"id":"PROSPECTIVE_WORK_EVIDENCE_CAPTURE","state":"IMPLEMENTED_REGRESSION_MONITORING","expected_effect":"Prevent multi-epoch measurement blackout without backfilling unknown time."},{"id":"SHORT_CONTINUE_TURN_GUARD","state":"IMPLEMENTED_AND_MACHINE_DIAGNOSTIC","expected_effect":"Prevent 1-3 minute voluntary CONTINUE turns from silently satisfying the 10-minute bounded-work intent."},{"id":"PLANNING_SPINE","state":"IMPLEMENTED","expected_effect":"Bind local work to PROGRAM -> PROJECT -> WORK SPEC -> NOW -> TURN_PLAN and reduce local optimization drift."},{"id":"BOUNDED_TURN_CONTINUATION_GATE_V3","state":"IMPLEMENTED","expected_effect":"Permit safe bounded close only with verified same-canonical continuation while preserving program nonterminal semantics."},{"id":"UTIL_EXP_019_STARTUP_SEGMENTATION","state":"STARTUP_003_ACTIVE","expected_effect":"Separate scheduler delivery from post-observation startup and optimize the largest measured segment."},{"id":"STRICT_FIXED_WINDOW_PROMOTION","state":"IMPLEMENTED","expected_effect":"Reject incomplete/inferred windows and unknown-time inflation."}],"live_interpretation":"UTIL-EXP-018 failed its first canary and was rolled back. New prospective STARTUP-002 evidence measured due->observation 155s, observation->claim 21s, and claim->first-useful 0s, making scheduler delivery the largest measured segment in that sample. STARTUP-003 is a guarded timing retry justified by this new evidence, not promotion of the failed canary. The current worker also enforces an 8-minute minimum normal CONTINUE turn and aims for 10 minutes.","dominant_risks":["No fixed 900-second utilization window is accepted yet.","Scheduler delivery jitter remains poorly characterized.","Predictive overlap remains unsafe if single-authority fencing is violated.","Recent 1-3 minute voluntary CONTINUE turns materially damaged utilization; the new guard needs live validation.","No independent event consumer is provisioned, so same-canonical scheduler remains a single-provider dependency."],"next_decision":"Finish a live 8-10 minute guarded turn, then complete STARTUP-003 using observed boundaries only. If scheduler delivery remains dominant and handoff is safe, repeat measured compensation before any promotion; otherwise rollback and target the newly measured dominant segment."}
+{
+  "schema_version": "2.2",
+  "program_id": "RRULER-PROGRAM-001",
+  "goal": "Sustained wall-clock useful-work coverage >=93.33% with substantive durable-evidence gaps <=120s.",
+  "status": "CONTINUOUS_RELAY_MAIN_V4_ACTIVE_ZERO_ACCEPTED_WINDOWS",
+  "current_epoch": 74,
+  "metrics": {
+    "evaluation_window_seconds": 900,
+    "target_useful_seconds": 840,
+    "target_fraction": 0.9333333333,
+    "required_consecutive_audited_windows": 3,
+    "passing_consecutive_windows": 0,
+    "accepted_rolling_windows": 0,
+    "bounded_turn_target_useful_seconds": 600,
+    "minimum_continue_turn_seconds": 480,
+    "p0_max_average_non_useful_gap_seconds_for_600s_turn": 42.9,
+    "verified_fallback_final_rearm_offset_seconds": 60,
+    "latest_complete_startup_sample": "STARTUP-002",
+    "latest_due_to_observation_seconds": 155,
+    "latest_observation_to_claim_seconds": 21,
+    "latest_claim_to_first_useful_seconds": 0,
+    "epoch59_wall_seconds": 626,
+    "epoch59_strict_useful_seconds": 557,
+    "epoch59_strict_wall_coverage_ratio": 0.8898
+  },
+  "active_interventions": [
+    {
+      "id": "PROSPECTIVE_WORK_EVIDENCE_CAPTURE",
+      "state": "IMPLEMENTED_REGRESSION_MONITORING",
+      "expected_effect": "Prevent multi-epoch measurement blackout without backfilling unknown time."
+    },
+    {
+      "id": "SHORT_CONTINUE_TURN_GUARD",
+      "state": "IMPLEMENTED_AND_MACHINE_DIAGNOSTIC",
+      "expected_effect": "Prevent 1-3 minute voluntary CONTINUE turns from silently satisfying the 10-minute bounded-work intent."
+    },
+    {
+      "id": "PLANNING_SPINE",
+      "state": "IMPLEMENTED",
+      "expected_effect": "Bind local work to PROGRAM -> PROJECT -> WORK SPEC -> NOW -> TURN_PLAN and reduce local optimization drift."
+    },
+    {
+      "id": "BOUNDED_TURN_CONTINUATION_GATE_V3",
+      "state": "IMPLEMENTED",
+      "expected_effect": "Permit safe bounded close only with verified same-canonical continuation while preserving program nonterminal semantics."
+    },
+    {
+      "id": "UTIL_EXP_019_STARTUP_SEGMENTATION",
+      "state": "STARTUP_003_ACTIVE",
+      "expected_effect": "Separate scheduler delivery from post-observation startup and optimize the largest measured segment."
+    },
+    {
+      "id": "STRICT_FIXED_WINDOW_PROMOTION",
+      "state": "IMPLEMENTED",
+      "expected_effect": "Reject incomplete/inferred windows and unknown-time inflation."
+    },
+    {
+      "id": "MAIN_SELF_RELIANT_V4",
+      "state": "ACTIVE_FIRST_LIVE_TURN",
+      "expected_effect": "Make SAME MAIN END+60 the only normal successor and use the SAME MAIN natural hourly RRULE as cold fallback, with Watchdog disabled standby."
+    }
+  ],
+  "live_interpretation": "Predictive prearm remains rolled back. MAIN v4 is the active correction: compact early BOOT_STARTED/REARM_VERIFIED, exact END+60 hard close, SAME MAIN recurring hourly cold fallback, and no normal Watchdog dependency. Epoch 74 is the first live validation turn; no P0 pass is claimed.",
+  "dominant_risks": [
+    "No fixed 900-second utilization window is accepted yet.",
+    "Scheduled invocation can occur without durable BOOT_STARTED.",
+    "Scheduler delivery and bootstrap reliability remain sparsely characterized.",
+    "SAME MAIN hourly cold fallback limits worst-case recovery but does not meet a <=120s abrupt-loss target.",
+    "Duplicate/conflicting authority must remain fenced on stale or natural recurrence."
+  ],
+  "next_decision": "Close epoch 74 only after exact live SAME MAIN END+60 verification, then observe the next fast wake's BOOT_STARTED/REARM_VERIFIED. If it fails, preserve missing boundaries and classify the later natural recurring wake as MAIN_COLD_FALLBACK_RECOVERY."
+}
