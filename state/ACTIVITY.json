@@ -7,11 +7,11 @@
   "active_run_id": "RUN-UTIL-20260921-185559",
   "authority_epoch": 66,
   "substantive_work_started_at": "2026-09-21T18:55:59+09:00",
-  "last_progress_at": "2026-09-21T18:55:59+09:00",
-  "last_progress_kind": "SUCCESSOR_AUTHORITY_CLAIMED",
-  "current_unit": "Review the first eligible v4 closed turn and complete STARTUP-003 prospectively.",
+  "last_progress_at": "2026-09-21T18:57:04+09:00",
+  "last_progress_kind": "FIRST_LIVE_REVIEW_AND_STARTUP_003_COMPLETE",
+  "current_unit": "Implement exact-second completion-relative rearm evidence/guarding and continue v4 live retest.",
   "next_wake_due_at": "2026-09-21T19:08:00+09:00",
   "successor_observed": true,
   "handoff_ready": false,
-  "operator_ui_note": "STARTUP-003 observed at 18:54:48 KST, authority claimed at 18:55:59 KST; first durable useful boundary pending."
+  "operator_ui_note": "STARTUP-003 valid: last-useful->end 69s, end->due 134s, due->observe 48s, observe->claim 71s, claim->first-useful 65s."
 }
