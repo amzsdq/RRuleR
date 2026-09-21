@@ -7,14 +7,39 @@ A ChatGPT session is disposable. Fresh durable GitHub state is authoritative.
 ## Mandatory startup
 
 1. Read `control/ACTIVE_CONTROLS.json`, then all artifacts it marks mandatory on wake.
-2. Read `state/CURRENT.json`, `state/ACTIVITY.json`, `state/HANDOFF.json`, and `state/TURN_PLAN.json`.
-3. Resolve root goal, program status, owner/authority epoch, latest checkpoint, exact next action, current activity evidence, and durable expected next due.
-4. Apply `control/scheduler-fence.v1.json` before substantive side effects. A timing/generation mismatch is recovery work when a newer valid same-canonical continuation exists; reconcile forward and never roll schedule generation or authority backward.
-5. Before substantive work, establish and verify a valid successor/continuation path for THIS SAME canonical according to the active rolling lifecycle. Never create a replacement canonical merely to continue this actor.
-6. Persist WORKING activity before or with the first substantive durable change after authority is obtained.
-7. Persist one primary turn objective in `state/TURN_PLAN.json` before substantive execution.
-8. Read only task-specific files needed for the current objective.
-9. Continue from durable state; never restart completed work merely because local chat context is missing.
+2. Read `planning/PROGRAM.md` and `state/NOW.json`. Follow NOW's project and work-spec references and reconstruct the full PROGRAM -> PROJECT -> WORK SPEC chain.
+3. Read `state/CURRENT.json`, `state/ACTIVITY.json`, `state/HANDOFF.json`, and `state/TURN_PLAN.json`.
+4. Resolve north-star goal, active project, active work spec, program status, owner/authority epoch, latest checkpoint, exact next action, current activity evidence, and durable expected next due.
+5. Apply `control/scheduler-fence.v1.json` before substantive side effects. A timing/generation mismatch is recovery work when a newer valid same-canonical continuation exists; reconcile forward and never roll schedule generation or authority backward.
+6. Before substantive work, establish and verify a valid successor/continuation path for THIS SAME canonical according to the active rolling lifecycle. Never create a replacement canonical merely to continue this actor.
+7. Persist WORKING activity before or with the first substantive durable change after authority is obtained.
+8. Persist one primary turn objective in `state/TURN_PLAN.json` before substantive execution. The turn objective MUST implement the active work spec; it must not silently invent a different project or strategy.
+9. Read only task-specific files needed for the current objective.
+10. Continue from durable state; never restart completed work merely because local chat context is missing.
+
+## Planning spine and anti-local-optimization
+
+The canonical planning hierarchy is:
+
+```text
+planning/PROGRAM.md
+ -> planning/projects/<project>.md
+ -> planning/work-specs/<work-spec>.md
+ -> state/NOW.json
+ -> state/TURN_PLAN.json
+```
+
+- `PROGRAM` defines the north-star goal and ordered project roadmap.
+- A `PROJECT` is an outcome-oriented phase with explicit exit criteria.
+- A `WORK SPEC` is the implementable unit with scope and acceptance checklist.
+- `NOW` is a pointer to the active chain and exact resume target.
+- `TURN_PLAN` is only the bounded execution plan for the current turn.
+
+Before starting a substantive unit, be able to state which work-spec acceptance item it advances. Do not execute work merely because it is nearby, technically interesting, or already open in context.
+
+Rules, controls, tests, workflows, and process are instruments. Add, strengthen, modify, consolidate, or retire them according to expected net contribution to the active project and program goals. Fewer rules are not inherently better; more rules are not inherently safer.
+
+When progress changes, update the work-spec acceptance/evidence first, then project/program roll-up if needed, then `state/NOW.json`, and only then the next turn plan.
 
 ## Active rolling continuation
 
