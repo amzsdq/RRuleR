@@ -4,35 +4,35 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "authority_epoch": 80,
   "run_id": "RUN-UTIL-20260922-013717",
-  "status": "ACTIVE",
+  "status": "CLOSE_READY",
   "phase": "V5_4_ADAPTIVE_PROVISIONAL_LIVE_VERIFICATION",
   "objective_id": "WS-P001-002-V5.4-PROVISIONAL",
-  "objective": "Verify the repaired SAME-MAIN provisional horizon in live operation: +660s once for a normal 600s turn, no routine +2m rolling refresh, exact END+60 normal close, and no regression of the 600s hard floor.",
+  "objective": "Verify the repaired SAME-MAIN provisional horizon in live operation: +660s once for a normal 600s turn, no routine +2m rolling refresh, guarded extension only when due is threatened, exact END+60 normal close, and no regression of the 600s hard floor.",
   "expected_useful_seconds": 600,
   "acceptance_criteria": [
     "Generation-matched BOOT_STARTED and REARM_VERIFIED are durable for the 01:38 generation.",
-    "Live authoritative MAIN is enabled recurring FREQ=HOURLY at verified provisional due 01:48:17 KST.",
-    "Fresh ACTIVE_CONTROLS and lifecycle policy agree on +660s provisional and 600s normal CONTINUE hard floor.",
-    "No routine mid-turn schedule mutation occurs unless the verified provisional due is genuinely threatened.",
+    "Fresh ACTIVE_CONTROLS/lifecycle/CI/runtime/scheduler-fence agree on +660s provisional and 600s hard floor.",
+    "No routine short-rolling schedule mutation occurred; exactly one guarded extension was used only after initial due entered the 90s collision guard.",
+    "Integrated control-plane validation passes on the extended projection.",
     "Normal close uses SAME MAIN exact observed END+60 and persists the same due to CURRENT/ACTIVITY/HANDOFF."
   ],
   "checkpointable_substeps": [
     "Persist generation-matched bootstrap and provisional rearm receipts.",
-    "Audit fresh active controls and state for stale +780s or short-rolling default authority.",
-    "Continue prospective utilization evidence/corrective work while before the 600s voluntary floor.",
-    "At >=600s finish smallest safe unit, checkpoint, exact END+60 rearm, live verify and persist close projection."
+    "Audit and repair stale +780s/CI authority.",
+    "Continue useful authorized work through >=600 observed elapsed seconds.",
+    "Exact END+60 rearm, live verify, persist close projection, then hand off."
   ],
-  "current_substep": 2,
-  "handoff_boundary": "V5_4_LIVE_VERIFICATION_IN_PROGRESS",
-  "early_finish_fallback": "Before 600 observed elapsed seconds, continue with active-policy drift search, prospective utilization evidence, or another safe authorized residual unit; do not pad and do not voluntarily close CONTINUE.",
+  "current_substep": 4,
+  "handoff_boundary": "READY_FOR_EXACT_END_PLUS_60_CLOSE",
   "created_for_next_wake": false,
   "started_at": "2026-09-22T01:37:17+09:00",
-  "last_progress_at": "2026-09-22T01:38:20+09:00",
+  "last_progress_at": "2026-09-22T01:48:41+09:00",
   "progress_evidence": [
-    "Fresh NOW is ACTIVE and points to WS-P001-002 sustained utilization work.",
-    "Generation-matched BOOT_STARTED persisted at 01:37:17 KST.",
-    "SAME MAIN live metadata verified enabled recurring FREQ=HOURLY at provisional DTSTART 01:48:17 KST.",
-    "REARM_VERIFIED persisted for the same generation; retired predecessors remain disabled.",
-    "Fresh ACTIVE_CONTROLS and rolling lifecycle both encode +660s provisional, 600s hard floor, and retirement of routine short rolling."
+    "BOOT_STARTED 01:37:17 and initial REARM_VERIFIED 01:37:29 are durable.",
+    "Initial SAME MAIN provisional 01:48:17 was live verified.",
+    "Stale 780s assumptions repaired in CI, runtime-continuity, and scheduler-fence; ACTIVE_CONTROLS now requires CI sync surfaces.",
+    "600-second hard floor was exceeded before close preparation.",
+    "At 01:47:20 initial provisional entered <=90s guard, so SAME MAIN was extended exactly once to 01:50:17 and live update was verified.",
+    "Integrated control-plane validation on the extended state passed at 01:48:22 KST."
   ]
 }
