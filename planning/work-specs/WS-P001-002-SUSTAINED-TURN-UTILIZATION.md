@@ -78,7 +78,7 @@ Predictive prearm is rolled back; completion-relative same-canonical continuatio
 
 ## Exact resume step
 
-Complete `UTIL-EXP-019` prospectively on the next handoff. Persist predecessor last-useful and due boundaries, then require the successor to record invocation observation, authority claim, and first durable useful work separately. Rank the measured segments and implement the highest-effect correction. Do not repeat `UTIL-EXP-018` until new evidence explains or materially reduces successor-start delay.
+Continue `UTIL-EXP-019` with five observed boundaries: invocation, `BOOT_STARTED`, provisional `REARM_VERIFIED`, authority claim, and first durable useful work. `STARTUP-006` is the first confirmed `STARTUP_ACK_MISSING` sample and must retain unknown missing boundaries. The guarded event-rescue evaluator and workflow gate are implemented, but fast recovery is not active until a supported GitHub PR event consumer is provisioned, its bounded write probe passes, and an outstanding generation is atomically claimed. Do not report detection as recovery or repeat predictive prearm without new evidence.
 
 ## Decision rule
 
