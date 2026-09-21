@@ -71,6 +71,11 @@ jobs:
           required={'control/run-continuation-gate.v1.json','control/scheduler-fence.v1.json','control/handoff-recovery.v1.json','state/CURRENT.json','state/ACTIVITY.json','state/HANDOFF.json','state/TURN_PLAN.json','state/UTILIZATION.json','state/PREDICTIVE_PREARM_CANARY.json','state/SUCCESSOR_STARTUP.json'}
           if not required <= set(controls.get('mandatory_on_wake',[])): raise SystemExit('mandatory registry baseline incomplete')
           if 'NONTERMINAL_PROGRAM_MUST_RETAIN_VERIFIED_CONTINUATION' not in controls.get('hard_invariants',[]): raise SystemExit('continuation invariant missing')
+          if 'ALL_HUMAN_READABLE_TIME_OFFSETS_MUST_INCLUDE_EXPLICIT_UNITS' not in controls.get('hard_invariants',[]): raise SystemExit('explicit time-unit invariant missing')
+          if lifecycle.get('time_unit_safety',{}).get('required') is not True: raise SystemExit('lifecycle time-unit safety missing')
+          if gate.get('time_unit_safety',{}).get('required') is not True: raise SystemExit('gate time-unit safety missing')
+          if '1 minute (60 seconds)' not in lifecycle.get('normal_final_rearm',{}).get('due',''): raise SystemExit('normal close offset lacks explicit unit')
+          if 'END+60' in controls.get('conflict_rule','') or 'NOW+180' in controls.get('conflict_rule',''): raise SystemExit('ambiguous bare time arithmetic in active controls')
           if 'PREDICTIVE_PREARM_MUST_NOT_CREATE_DUAL_SUBSTANTIVE_AUTHORITY' not in controls.get('hard_invariants',[]): raise SystemExit('predictive prearm authority invariant missing')
           required_self_reliance={'NORMAL_CONTINUATION_DEPENDS_ONLY_ON_SAME_MAIN','SAME_MAIN_RECURRING_RRULE_IS_COLD_FALLBACK','WATCHDOG_DISABLED_STANDBY_NOT_NORMAL_DEPENDENCY'}
           if not required_self_reliance <= set(controls.get('hard_invariants',[])): raise SystemExit('MAIN self-reliance invariants missing')
