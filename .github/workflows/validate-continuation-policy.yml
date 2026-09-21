@@ -42,7 +42,10 @@ jobs:
           assert set(gate['program_nonterminal_states'])=={'CONTINUE','DEGRADED_CONTINUATION'}
           assert gate['default_for_nonterminal_owner']=='MUST_CONTINUE_USEFUL_WORK'
           assert gate['nonterminal_no_handoff_rule']['required_action']=='SELECT_AND_EXECUTE_NEXT_USEFUL_ADMISSIBLE_UNIT'
-          assert set(gate['run_end_allowed_only_for'])=={'COMMITTED_SUCCESSOR_HANDOFF','EXPLICIT_OPERATOR_STOP','PLATFORM_ENFORCED_TERMINATION'}
+          assert set(gate['run_end_allowed_only_for'])=={'VERIFIED_SAME_CANONICAL_CONTINUATION','COMMITTED_SUCCESSOR_HANDOFF','EXPLICIT_OPERATOR_STOP','PLATFORM_ENFORCED_TERMINATION'}
+          close=set(gate['bounded_turn_close_rule']['required_before_verified_continuation_end'])
+          assert {'LATEST_CHECKPOINT_PERSISTED','SAME_CANONICAL_FUTURE_CONTINUATION_MUTATED_AND_VERIFIED','DURABLE_EXPECTED_DUE_PERSISTED','TURN_STATUS_AND_RUN_EVIDENCE_PERSISTED'} <= close
+          assert gate['bounded_turn_close_rule']['local_success_alone_never_satisfies_rule'] is True
           required={'PRIMARY_OBJECTIVE_COMPLETE','CI_PASS','ROOT_COMPLETE','WAITING_FOR_NEXT_WAKE','SCHEDULE_BOUNDARY'}
           assert required <= set(gate['never_end_because'])
           util=policy['utilization']
