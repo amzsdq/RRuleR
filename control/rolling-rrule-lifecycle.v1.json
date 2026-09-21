@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 21,
+  "version": 22,
   "status": "ACTIVE",
-  "purpose": "CLEAN MIGRATED MAIN v5.5: SAME MAIN recurring RRULE -> verified provisional -> compact schedule trace -> bounded useful work with durable per-unit duration/evidence + chat trace -> SAME MAIN exact END+60 shift + final due trace. Prior MAIN canonicals remain retired; Watchdog is disabled break-glass only.",
+  "purpose": "CLEAN MIGRATED MAIN v5.6: SAME MAIN recurring RRULE -> verified 11-minute (660-second) provisional -> bounded useful work -> SAME MAIN ACTUAL END + exactly 1 minute (60 seconds) shift. All human-readable relay timing uses explicit units.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
   "startup_order": [
     "READ_MINIMUM_FENCE_CURRENT_AND_CANONICAL_AUTHORITY",
@@ -39,19 +39,19 @@
   },
   "provisional_arm": {
     "when": "Immediately after minimum stale-wake/fence/authority validation and BOOT_STARTED receipt, before full restore or substantive work.",
-    "due": "observed wake/arm reference + 660 seconds for the normal ~600s bounded envelope.",
-    "reason": "Evidence-backed adaptive long provisional: prior SHORT_ROLLING +2m A/B variant produced an overlapping duplicate invocation, while LONG_PROVISIONAL +11m completed >600s with no observed overlap and only initial/final schedule mutations. The former +780s/13m horizon is unnecessarily long for the normal ~10m envelope.",
+    "due": "observed wake/arm reference + exactly 11 minutes (660 seconds) for the normal 10-minute (600-second) bounded envelope.",
+    "reason": "Evidence-backed adaptive long provisional: prior SHORT_ROLLING 2-minute (120-second) A/B variant produced an overlapping duplicate invocation, while LONG_PROVISIONAL 11-minute (660-second) completed beyond 10 minutes (600 seconds) with no observed overlap and only initial/final schedule mutations. The former 13-minute (780-second) horizon is unnecessarily long.",
     "verification_required": true,
     "mutation_failure": "Retry once when safe. If an older verified future continuation remains alive, enter DEGRADED_CONTINUATION and continue only within its safety envelope; otherwise fail closed before substantive side effects.",
     "normal_midturn_mutation": false,
-    "extension_rule": "Only if useful authorized work or required close handling clearly threatens to cross the verified provisional due, extend THIS SAME MAIN before collision, preferably to NOW+180s, live-verify, and record the exception.",
+    "extension_rule": "Only if useful authorized work or required close handling clearly threatens to cross the verified provisional due, extend THIS SAME MAIN before collision, preferably to NOW + exactly 3 minutes (180 seconds), live-verify, and record the exception.",
     "forbidden_normal_strategy": "REPEATED_SHORT_ROLLING_REFRESH",
     "retired_horizon_seconds": 780
   },
   "work": {
-    "rule": "Perform sustained useful authorized work by chaining bounded units. For a normal nonterminal CONTINUE turn, 600 observed elapsed seconds is the minimum voluntary duration. Before 600s, start the next clear low-risk checkpointable unit, independent fallback/residual unit, or smaller decomposed slice. CI pending, local packet completion, checkpoint completion, secured continuation, or no-obvious-next-task never authorize a voluntary pre-600s CONTINUE close. Earlier end must be STOP/PAUSE, durable terminal, genuine BLOCKED/fail-closed authority or safety state, or platform-enforced termination and must be reported as such. At >=600s, do not start a new large unit; close after the smallest safe in-flight boundary. Normal soft ceiling is ~720s. V5.5 TRACE CANARY: whenever a bounded substantive unit is actually complete and its observed START/END/DURATION plus artifact-backed work evidence are durably persisted, emit exactly one compact user-visible completion trace, then immediately continue same-wake work while the 600s floor is unmet. A trace is observability, never a close signal.",
+    "rule": "Perform sustained useful authorized work by chaining bounded units. For a normal nonterminal CONTINUE turn, 10 minutes (600 observed elapsed seconds) is the minimum voluntary duration. Before 10 minutes (600 seconds), start the next clear low-risk checkpointable unit, independent fallback/residual unit, or smaller decomposed slice. CI pending, local packet completion, checkpoint completion, secured continuation, or no-obvious-next-task never authorize a voluntary pre-10-minute (pre-600-second) CONTINUE close. Earlier end must be STOP/PAUSE, durable terminal, genuine BLOCKED/fail-closed authority or safety state, or platform-enforced termination and must be reported as such. At or after 10 minutes (600 seconds), do not start a new large unit; close after the smallest safe in-flight boundary. Normal soft ceiling is about 12 minutes (720 seconds). V5.5 TRACE CANARY: whenever a bounded substantive unit is actually complete and its observed START/END/DURATION plus artifact-backed work evidence are durably persisted, emit exactly one compact user-visible completion trace, then immediately continue same-wake work while the 10-minute (600-second) floor is unmet. A trace is observability, never a close signal.",
     "checkpoint_rule": "Persist enough durable progress that a cold successor can resume without chat context.",
-    "collision_rule": "Normally do not mutate the schedule mid-turn. If useful work or required close handling will plausibly cross the +660s provisional due, extend THIS SAME MAIN once before collision (prefer NOW+180s), live-verify, persist the newer due, then continue. Never allow stale queued wakes to gain substantive authority.",
+    "collision_rule": "Normally do not mutate the schedule mid-turn. If useful work or required close handling will plausibly cross the 11-minute (660-second) provisional due, extend THIS SAME MAIN once before collision, preferably to NOW + exactly 3 minutes (180 seconds), live-verify, persist the newer due, then continue. Never allow stale queued wakes to gain substantive authority.",
     "unit_chaining_required_before_target": true,
     "new_large_unit_forbidden_after_target": true,
     "soft_ceiling_seconds": 720,
@@ -68,19 +68,19 @@
       "VALIDATE_CURRENT_ACTIVITY_HANDOFF_PROJECTION",
       "RETURN"
     ],
-    "due": "actual observed turn END timestamp + exactly 60 seconds, preserving seconds exactly; minute rounding is forbidden",
+    "due": "actual observed turn END timestamp + exactly 1 minute (60 seconds), preserving seconds exactly; minute rounding is forbidden",
     "verification_required": true,
     "status": "REQUIRED_NORMAL_PATH",
     "computation_tool": "tools/compute_completion_due.py",
     "precision_rule": "Pass local_dtstart with YYYYMMDDTHHMMSS under the canonical timezone. Do not truncate or round seconds.",
-    "exception_rule": "Any delay other than +60 seconds on a normal CONTINUE close requires a fresh durable platform/safety/task constraint and an explicit exception_reason recorded with the run. Do not add extra local slack merely because scheduler delivery itself may be late.",
+    "exception_rule": "Any delay other than exactly 1 minute (60 seconds) after actual observed END on a normal CONTINUE close requires a fresh durable platform/safety/task constraint and an explicit exception_reason recorded with the run. Do not add extra local slack merely because scheduler delivery itself may be late.",
     "delivery_jitter_rule": "Measure scheduled-due -> actual invocation separately. Do not hide provider delivery latency by lengthening the local completion-relative offset.",
     "watchdog_sync_failure": "NOT_APPLICABLE_IN_NORMAL_PATH",
     "watchdog_reenable_rule": "FORBIDDEN_DURING_NORMAL_CLOSE",
     "watchdog_verification_rule": "Watchdog verification is not required for normal MAIN close because Watchdog remains disabled standby.",
     "close_state_projection": {
       "purpose": "Give the Startup Watchdog durable positive proof that the predecessor is no longer substantively active, without inferring idle from silence.",
-      "after": "Only after SAME MAIN END+60 continuation is live-verified and its exact due is known.",
+      "after": "Only after SAME MAIN ACTUAL END + exactly 1 minute (60 seconds) continuation is live-verified and its exact due is known.",
       "current": {
         "run_state": "HANDOFF_COMMITTED",
         "owner_rule": "Retain the just-closed predecessor run as current_owner until successor authority advances.",
@@ -108,7 +108,7 @@
       "normal_continue_final_forbidden_until": [
         "ACTUAL_END_OBSERVED",
         "LATEST_CHECKPOINT_PERSISTED",
-        "SAME_MAIN_RECURRING_SCHEDULE_MUTATED_TO_END_PLUS_EXACTLY_60_SECONDS",
+        "SAME_MAIN_RECURRING_SCHEDULE_MUTATED_TO_ACTUAL_END_PLUS_EXACTLY_1_MINUTE_60_SECONDS",
         "LIVE_MAIN_REREAD_SAME_CANONICAL_ENABLED_RECURRING_EXACT_DSTART",
         "EXACT_FAST_DUE_PERSISTED_TO_CURRENT_ACTIVITY_HANDOFF",
         "NON_WORKING_CLOSE_PROJECTION_VALIDATED"
@@ -116,7 +116,7 @@
       "provisional_due_cannot_satisfy_gate": true,
       "watchdog_coverage_cannot_satisfy_gate": true,
       "retry_rule": "Retry MAIN fast rearm once when safe. If exact live verification still fails, classify DEGRADED_CONTINUATION; do not claim a normal CONTINUE close.",
-      "final_response_rule": "Normal STATUS=CONTINUE final is forbidden until the exact END+60 MAIN continuation is proven live."
+      "final_response_rule": "Normal STATUS=CONTINUE final is forbidden until the SAME MAIN continuation at ACTUAL END + exactly 1 minute (60 seconds) is proven live."
     }
   },
   "predictive_prearm_canary": {
@@ -177,15 +177,15 @@
     "activation_rule": "Only explicit operator activation or a fresh durable emergency policy decision after both MAIN fast continuation and MAIN recurring cold-fallback are diagnosed insufficient."
   },
   "normal_path_invariant": {
-    "expected_path": "CURRENT_MAIN_NORMAL_CLOSE -> SAME_CURRENT_MAIN_RECURRING_SHIFTED_TO_END_PLUS_60 -> NEXT_MAIN",
-    "provisional_role": "ADAPTIVE_LONG_IN_FLIGHT_CRASH_INSURANCE_PLUS_11M_FOR_NORMAL_10M_ENVELOPE",
+    "expected_path": "CURRENT_MAIN_NORMAL_CLOSE -> SAME_CURRENT_MAIN_RECURRING_SHIFTED_TO_ACTUAL_END_PLUS_EXACTLY_1_MINUTE_60_SECONDS -> NEXT_MAIN",
+    "provisional_role": "ADAPTIVE_LONG_IN_FLIGHT_CRASH_INSURANCE_11_MINUTES_660_SECONDS_FOR_NORMAL_10_MINUTES_600_SECONDS_ENVELOPE",
     "watchdog_role": "DISABLED_BREAK_GLASS_EMERGENCY_ONLY",
     "experiment": "CUSTOM_RECURRING_CATEGORY_CANARY_ENDED_BY_OPERATOR_MIGRATION",
     "forbidden_substitutions": [
       "REACTIVATE_RETIRED_PREDECESSOR_MAIN",
       "NORMAL_CLOSE_WITH_PROVISIONAL_DUE_LEFT_AS_SUCCESSOR",
       "NORMAL_CLOSE_RELYING_ON_WATCHDOG_AS_EXPECTED_SUCCESSOR",
-      "FINAL_RESPONSE_BEFORE_LIVE_END_PLUS_60_MAIN_VERIFICATION"
+      "FINAL_RESPONSE_BEFORE_LIVE_ACTUAL_END_PLUS_1_MINUTE_60_SECONDS_MAIN_VERIFICATION"
     ]
   },
   "current_main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
@@ -214,6 +214,25 @@
     ],
     "trace_never_authorizes_close": true,
     "batching_rule": "Do not batch independently persisted unit completions unless they are one atomic bounded unit.",
-    "final_due_trace": "After exact END+60 SAME MAIN live verification and durable close projection, emit `다음 예약을 <HH:MM:SS KST>로 갱신했습니다.`"
+    "final_due_trace": "After SAME MAIN ACTUAL END + exactly 1 minute (60 seconds) live verification and durable close projection, emit `다음 예약을 <HH:MM:SS KST>로 갱신했습니다.`"
+  },
+  "time_unit_safety": {
+    "required": true,
+    "rule": "Every human-readable duration, offset, timeout, threshold, or guard must include an explicit unit. Critical relay timings must include both human unit and exact seconds.",
+    "canonical_examples": [
+      "1 minute (60 seconds)",
+      "10 minutes (600 seconds)",
+      "11 minutes (660 seconds)",
+      "12 minutes (720 seconds)",
+      "3 minutes (180 seconds)"
+    ],
+    "forbidden_examples": [
+      "END+60",
+      "NOW+180",
+      "+660",
+      "600 floor"
+    ],
+    "machine_seconds_fields": "Numeric fields whose names end in _seconds are seconds by schema; explanatory prose must still state units.",
+    "rrule_note": "FREQ=HOURLY is recurrence metadata and never converts explicit second offsets into minutes or hours."
   }
 }
