@@ -104,3 +104,24 @@ def test_incomplete_watchdog_recovery_preserves_unknown_segments():
     assert gap["due_to_first_useful_seconds"] is None
     assert gap["complete_recovery_boundary_set"] is False
     assert gap["evidence_valid"] is False
+
+
+def test_operator_rescheduled_sample_has_own_bucket_and_preserves_unknowns():
+    startup = {"samples": [{
+        "sample_id": "OP-PARTIAL",
+        "validity": "EXCLUDED_OPERATOR_RESCHEDULED",
+        "scheduled_due_at": "2026-09-22T00:13:08+09:00",
+        "successor_observed_at": "2026-09-22T00:14:46+09:00",
+        "boot_started_at": None,
+        "rearm_verified_at": None,
+        "authority_claim_at": None,
+        "first_durable_useful_at": None,
+    }]}
+    out = summarize([], startup)
+    gap = out["operator_rescheduled_gap_samples"][0]
+    assert gap["generation_kind"] == "OPERATOR_RESCHEDULED"
+    assert gap["due_to_observation_seconds"] == 98
+    assert gap["observation_to_boot_seconds"] is None
+    assert gap["comparison_eligible"] is False
+    assert out["normal_scheduler_gap_samples"] == []
+    assert out["recovery_gap_samples"] == []
