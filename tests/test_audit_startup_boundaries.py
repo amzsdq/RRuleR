@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
-from audit_startup_boundaries import audit
+from audit_startup_boundaries import audit, audit_startup_ack
 
 
 def _run(obs="OBS-RUN-UTIL-1", end="2026-09-21T10:10:00+00:00"):
@@ -71,3 +71,27 @@ def test_recovery_generation_fails_closed_on_wrong_source_or_generation():
     out = audit({"samples":[source,recovered]}, [])
     assert out["valid"] is False
     assert out["results"][1]["errors"] == ["GENERATION_KEY_DUE_MISMATCH", "RECOVERY_KIND_UNKNOWN"]
+
+
+def test_startup_ack_fails_closed_on_mixed_main_canonical_id():
+    expected = "6aaf8a993eb08191b8d0ab1d9662e4b2"
+    ack = {
+        "main_canonical_id": "6aaf8a993eb08191b68dcec5e3fed081",
+        "current_expected_due_at": "2026-09-21T21:54:52+09:00",
+        "generation_key": "DUE:2026-09-21T21:54:52+09:00",
+    }
+    result = audit_startup_ack(ack, expected)
+    assert result["valid"] is False
+    assert result["errors"] == ["STARTUP_ACK_MAIN_CANONICAL_ID_MISMATCH"]
+
+
+def test_startup_ack_accepts_matching_canonical_and_generation():
+    expected = "6aaf8a993eb08191b8d0ab1d9662e4b2"
+    ack = {
+        "main_canonical_id": expected,
+        "current_expected_due_at": "2026-09-21T21:54:52+09:00",
+        "generation_key": "DUE:2026-09-21T21:54:52+09:00",
+    }
+    result = audit({"samples": []}, [], ack, expected)
+    assert result["valid"] is True
+    assert result["startup_ack_audit"]["valid"] is True
