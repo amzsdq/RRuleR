@@ -26,19 +26,33 @@ def provenance_history(state):
     if not isinstance(history, list): raise ValueError("observation provenance history must be a list")
     return history
 
-def validate_history_transition(horizon, predecessor):
-    current_history = provenance_history(horizon); previous_history = provenance_history(predecessor)
-    if current_history[:len(previous_history)] != previous_history:
-        raise ValueError("observation provenance history is append-only")
-    same_identity = provenance_identity(predecessor) == provenance_identity(horizon)
-    if same_identity:
-        if current_history != previous_history:
-            raise ValueError("same observation provenance identity cannot mutate provenance history")
-        return
-    expected = previous_history + [provenance_record(predecessor)]
-    if current_history != expected:
-        raise ValueError("provenance replacement must append the predecessor identity and timestamp exactly once")
+def record_key(record):
+    return (record.get("provenance_kind"), str(record.get("provenance_ref", "")), record.get("provenance_attempt"), record.get("trusted_observed_through"))
+
+def validate_history_merge(horizon, predecessors):
+    """Treat retirement history as an immutable set ledger and reconcile all merge parents."""
+    current_history = provenance_history(horizon)
+    current_keys = [record_key(record) for record in current_history]
+    if len(current_keys) != len(set(current_keys)):
+        raise ValueError("observation provenance history contains duplicate retirement records")
+    required = set()
     current_identity = provenance_identity(horizon)
+    for predecessor in predecessors:
+        previous_history = provenance_history(predecessor)
+        previous_keys = [record_key(record) for record in previous_history]
+        if len(previous_keys) != len(set(previous_keys)):
+            raise ValueError("predecessor observation provenance history contains duplicate retirement records")
+        required.update(previous_keys)
+        if provenance_identity(predecessor) != current_identity:
+            required.add(record_key(provenance_record(predecessor)))
+    if set(current_keys) != required:
+        missing = required - set(current_keys)
+        extra = set(current_keys) - required
+        if missing: raise ValueError("observation provenance history lost required merge-parent retirement records")
+        if extra: raise ValueError("observation provenance history contains unexplained retirement records")
+    # Canonical order makes independently reconciled merge histories converge deterministically.
+    if current_keys != sorted(current_keys, key=lambda key: tuple("" if v is None else str(v) for v in key)):
+        raise ValueError("observation provenance history is not in deterministic canonical order")
     for record in current_history:
         if provenance_identity(record) == current_identity:
             raise ValueError("retired observation provenance identity cannot be reused")
@@ -59,7 +73,8 @@ def validate(horizon, policy, source, previous=None, previous_states=None):
         previous_trusted = predecessor.get("trusted_observed_through")
         if provenance_identity(predecessor) == current_identity and previous_trusted != trusted:
             raise ValueError("same observation provenance identity cannot be repinned to a different timestamp; replace provenance explicitly")
-        validate_history_transition(horizon, predecessor)
+    if predecessors:
+        validate_history_merge(horizon, predecessors)
     if kind == "GITHUB_ACTIONS_OBSERVED_TIMESTAMP":
         if not ref.isdigit(): raise ValueError("GitHub Actions provenance ref must be a run id")
         expected_attempt = horizon.get("provenance_attempt")
