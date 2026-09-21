@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.8",
+  "schema_version": "2.9",
   "program_id": "RRULER-PROGRAM-001",
   "status": "ACTIVE",
   "purpose": "Single machine-readable registry of control artifacts that every fresh worker must load before substantive work.",
@@ -54,7 +54,8 @@
     "NORMAL_CONTINUATION_DEPENDS_ONLY_ON_SAME_MAIN",
     "WATCHDOG_DISABLED_STANDBY_NOT_NORMAL_DEPENDENCY",
     "SAME_MAIN_RECURRING_RRULE_IS_COLD_FALLBACK",
-    "RETIRED_MAIN_CANONICAL_MUST_NEVER_REACTIVATE"
+    "RETIRED_MAIN_CANONICAL_MUST_NEVER_REACTIVATE",
+    "ALL_RETIRED_MAIN_CANONICALS_MUST_NEVER_REACTIVATE"
   ],
-  "conflict_rule": "If mandatory artifacts conflict, fail closed only for the disputed side effect and reconcile durably. The fresh CURRENT canonical is the sole normal MAIN. Preserve its operator-created recurring schedule category and shift only the SAME current MAIN to exact END+60. Never reactivate the retired predecessor. Watchdog remains disabled standby."
+  "conflict_rule": "If mandatory artifacts conflict, fail closed only for the disputed side effect and reconcile durably. The fresh CURRENT canonical is the sole normal MAIN. Current clean MAIN=6ab152b636748191a71873ba4d5ef551. Preserve its recurring schedule and shift only THIS SAME MAIN to exact END+60. Never reactivate retired MAIN canonicals 6ab14f7951848191b65e4b5d4bc979d8 or 6aaf8a993eb08191b8d0ab1d9662e4b2. Watchdog remains disabled standby."
 }
