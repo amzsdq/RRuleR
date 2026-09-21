@@ -65,7 +65,7 @@
     "old_verified_future_rrule_may_act_as_recovery_opportunity": true,
     "disabled_deleted_missing_automation_self_rescued": false,
     "rollback_on_live_scheduler_regression": "RESTORE_LAST_VERIFIED_SLOWER_CADENCE_WITHOUT_REPLACING_CANONICAL",
-    "fast_shifted_wake_lost_before_bootstrap": "SAME_MAIN_NATURAL_CUSTOM_RECURRING_OCCURRENCE",
+    "fast_shifted_wake_lost_before_bootstrap": "SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE",
     "watchdog_required_for_normal_correctness": false
   },
   "authority": {
