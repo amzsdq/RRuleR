@@ -3,15 +3,15 @@
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "status": "WORKING",
+  "status": "HANDOFF_READY",
   "active_run_id": "RUN-UTIL-20260921-184232",
   "authority_epoch": 65,
   "substantive_work_started_at": "2026-09-21T18:42:32+09:00",
-  "last_progress_at": "2026-09-21T18:47:30+09:00",
-  "last_progress_kind": "TURN_CLOSE_REPORTING_AND_STARTUP_AUDIT_IMPLEMENTED",
+  "last_progress_at": "2026-09-21T18:50:37+09:00",
+  "last_progress_kind": "V4_RETEST_IMPLEMENTATION_CHECKPOINTED",
   "current_unit": "Complete the v4 live retest tooling, integrated CI check, and bounded-turn durable close.",
-  "next_wake_due_at": "2026-09-21T18:53:00+09:00",
+  "next_wake_due_at": "2026-09-21T18:54:00+09:00",
   "successor_observed": false,
-  "handoff_ready": false,
-  "operator_ui_note": "Immediate post-maintenance run; excluded from scheduler due-to-observation comparison. Six focused local assertions passed; integrated CI pending."
+  "handoff_ready": true,
+  "operator_ui_note": "Bounded turn reached 8-minute floor. STARTUP-002 invalidated for boundary inconsistency; next scheduled successor is the first eligible prospective replacement sample."
 }
