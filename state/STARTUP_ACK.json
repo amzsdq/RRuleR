@@ -5,9 +5,9 @@
   "generation_key": "DUE:2026-09-22T00:30:39+09:00",
   "boot_started_at": "2026-09-22T00:30:10+09:00",
   "boot_started_authority_epoch": 76,
-  "rearm_verified_at": null,
-  "verified_provisional_due_at": null,
-  "status": "BOOT_STARTED",
-  "last_updated_at": "2026-09-22T00:32:00+09:00",
-  "note": "Operator-driven v4.2 RRULE restoration generation began 29 seconds before its scheduled DTSTART. Preserve as an operator-rescheduled generation; one-shot canary is rejected and Watchdog is unused."
+  "rearm_verified_at": "2026-09-22T00:31:29+09:00",
+  "verified_provisional_due_at": "2026-09-22T00:43:10+09:00",
+  "status": "REARM_VERIFIED",
+  "last_updated_at": "2026-09-22T00:31:29+09:00",
+  "note": "SAME MAIN recurring RRULE was live re-read enabled with exact provisional DTSTART 00:43:10. One-shot canary remains rejected; Watchdog was not used."
 }
