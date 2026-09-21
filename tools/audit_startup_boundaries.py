@@ -60,16 +60,29 @@ def audit(startup: dict, run_lines: list[str]) -> dict:
         recovery_of = sample.get("recovery_of_sample_id")
         recovery_source = samples_by_id.get(recovery_of) if recovery_of else None
         recovery_generation = recovery_of is not None
+        recovery_kind = sample.get("recovery_kind")
+        if recovery_generation and recovery_kind is None and recovery_source:
+            if recovery_source.get("exclusion_reason") == "STARTUP_ACK_MISSING":
+                recovery_kind = "FIXED_WATCHDOG_PREBOOTSTRAP"
+            elif recovery_source.get("exclusion_reason") == "MISSING_DURABLE_FIRST_USEFUL_AFTER_VERIFIED_BOOTSTRAP":
+                recovery_kind = "PROVISIONAL_COLD_RESCUE"
         recovery_lineage_valid = None
         if recovery_generation:
+            expected_source_exclusion = {
+                "FIXED_WATCHDOG_PREBOOTSTRAP": "STARTUP_ACK_MISSING",
+                "PROVISIONAL_COLD_RESCUE": "MISSING_DURABLE_FIRST_USEFUL_AFTER_VERIFIED_BOOTSTRAP",
+            }.get(recovery_kind)
             recovery_lineage_valid = bool(
                 recovery_source
-                and recovery_source.get("exclusion_reason") == "STARTUP_ACK_MISSING"
+                and expected_source_exclusion
+                and recovery_source.get("exclusion_reason") == expected_source_exclusion
             )
             if not recovery_source:
                 errors.append("RECOVERY_SOURCE_SAMPLE_MISSING")
-            elif recovery_source.get("exclusion_reason") != "STARTUP_ACK_MISSING":
-                errors.append("RECOVERY_SOURCE_NOT_STARTUP_ACK_MISSING")
+            elif expected_source_exclusion is None:
+                errors.append("RECOVERY_KIND_UNKNOWN")
+            elif recovery_source.get("exclusion_reason") != expected_source_exclusion:
+                errors.append("RECOVERY_SOURCE_CLASS_MISMATCH")
 
         exclusion = sample.get("exclusion_reason")
         maintenance_interrupted = (
@@ -86,7 +99,7 @@ def audit(startup: dict, run_lines: list[str]) -> dict:
         if maintenance_interrupted:
             comparison_exclusion = "OPERATOR_MAINTENANCE_INTERRUPTION"
         elif recovery_generation:
-            comparison_exclusion = "WATCHDOG_RECOVERY_GENERATION"
+            comparison_exclusion = f"{recovery_kind or 'UNKNOWN'}_GENERATION"
         elif not comparison_ready:
             comparison_exclusion = "MISSING_OBSERVED_BOUNDARY"
         elif errors:
@@ -104,6 +117,7 @@ def audit(startup: dict, run_lines: list[str]) -> dict:
             "acknowledged_invalid": acknowledged_invalid,
             "startup_receipt_complete": bool(sample.get("boot_started_at") and sample.get("rearm_verified_at")),
             "recovery_generation": recovery_generation,
+            "recovery_kind": recovery_kind,
             "recovery_lineage_valid": recovery_lineage_valid,
             "scheduler_comparison_eligible": (
                 comparison_ready and not maintenance_interrupted and not recovery_generation and not errors
