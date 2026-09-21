@@ -91,11 +91,13 @@ def test_startup_ack_accepts_matching_canonical_and_generation():
 
 def test_startup_ack_rearm_verified_accepts_early_delivery_with_ordered_receipts():
     expected = "MAIN"
+    generation = "DUE:2026-09-22T00:54:59+09:00"
     ack = {
         "main_canonical_id": expected,
         "current_expected_due_at": "2026-09-22T00:54:59+09:00",
-        "generation_key": "DUE:2026-09-22T00:54:59+09:00",
+        "generation_key": generation,
         "boot_started_at": "2026-09-22T00:54:31+09:00",
+        "boot_started_authority_epoch": generation,
         "rearm_verified_at": "2026-09-22T00:54:48+09:00",
         "verified_provisional_due_at": "2026-09-22T01:08:00+09:00",
         "status": "REARM_VERIFIED",
@@ -103,6 +105,23 @@ def test_startup_ack_rearm_verified_accepts_early_delivery_with_ordered_receipts
     result = audit_startup_ack(ack, expected)
     assert result["valid"] is True
     assert result["errors"] == []
+
+
+def test_startup_ack_rejects_boot_receipt_from_other_generation():
+    expected = "MAIN"
+    ack = {
+        "main_canonical_id": expected,
+        "current_expected_due_at": "2026-09-22T00:58:13+09:00",
+        "generation_key": "DUE:2026-09-22T00:58:13+09:00",
+        "boot_started_at": "2026-09-22T01:01:03+09:00",
+        "boot_started_authority_epoch": "DUE:2026-09-22T00:54:59+09:00",
+        "rearm_verified_at": "2026-09-22T01:01:20+09:00",
+        "verified_provisional_due_at": "2026-09-22T01:20:00+09:00",
+        "status": "REARM_VERIFIED",
+    }
+    result = audit_startup_ack(ack, expected)
+    assert result["valid"] is False
+    assert result["errors"] == ["STARTUP_ACK_BOOT_EPOCH_GENERATION_MISMATCH"]
 
 
 def test_startup_ack_rearm_status_rejects_missing_receipt_fields():
@@ -115,11 +134,13 @@ def test_startup_ack_rearm_status_rejects_missing_receipt_fields():
 
 def test_startup_ack_rejects_rearm_before_boot_and_nonfuture_fallback():
     expected = "MAIN"
+    generation = "DUE:2026-09-22T00:54:20+09:00"
     ack = {
         "main_canonical_id": expected,
         "current_expected_due_at": "2026-09-22T00:54:20+09:00",
-        "generation_key": "DUE:2026-09-22T00:54:20+09:00",
+        "generation_key": generation,
         "boot_started_at": "2026-09-22T00:55:00+09:00",
+        "boot_started_authority_epoch": generation,
         "rearm_verified_at": "2026-09-22T00:54:48+09:00",
         "verified_provisional_due_at": "2026-09-22T00:54:48+09:00",
         "status": "REARM_VERIFIED",
