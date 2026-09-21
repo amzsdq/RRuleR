@@ -1,13 +1,14 @@
 {
   "schema_version": "1.0",
   "main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
-  "current_expected_due_at": "2026-09-22T00:58:13+09:00",
-  "generation_key": "DUE:2026-09-22T00:58:13+09:00",
-  "boot_started_at": "2026-09-22T01:01:03+09:00",
-  "boot_started_authority_epoch": "DUE:2026-09-22T00:58:13+09:00",
-  "rearm_verified_at": "2026-09-22T01:01:20+09:00",
-  "verified_provisional_due_at": "2026-09-22T01:20:00+09:00",
+  "current_expected_due_at": "2026-09-22T01:07:52+09:00",
+  "generation_key": "DUE:2026-09-22T01:07:52+09:00",
+  "boot_started_at": "2026-09-22T01:09:24+09:00",
+  "boot_started_authority_epoch": "DUE:2026-09-22T01:07:52+09:00",
+  "rearm_verified_at": "2026-09-22T01:09:30+09:00",
+  "verified_provisional_due_at": "2026-09-22T01:23:00+09:00",
   "status": "REARM_VERIFIED",
-  "last_updated_at": "2026-09-22T01:01:20+09:00",
-  "note": "Live automation metadata verified same canonical, enabled=true, recurring RRULE present, provisional due 01:20 KST. Retired predecessors remain disabled; watchdog remains disabled standby."
+  "last_updated_at": "2026-09-22T01:09:30+09:00",
+  "provider_delivery_delay_seconds": 92,
+  "note": "Generation-matched wake persisted. SAME MAIN verified enabled and recurring with provisional crash-insurance due beyond bounded turn; retired predecessors and watchdog remain disabled."
 }
