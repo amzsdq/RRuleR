@@ -28,6 +28,7 @@ def evaluate(current: dict[str, Any], activity: dict[str, Any], ledger: dict[str
     sample = startup.get("next_sample") or {}
     observed = sample.get("successor_observed_at")
     boot = sample.get("boot_started_at")
+    rearm = sample.get("rearm_verified_at")
     if observed and not boot:
         age = max(0, int((as_of - _ts(observed)).total_seconds()))
         if age >= 120:
@@ -35,6 +36,16 @@ def evaluate(current: dict[str, Any], activity: dict[str, Any], ledger: dict[str
                 "emit": True,
                 "reason": "ELIGIBLE",
                 "event_reason": "STARTUP_ACK_MISSING",
+                "age_seconds": age,
+                "sample_id": sample.get("sample_id"),
+            }
+    if boot and not rearm:
+        age = max(0, int((as_of - _ts(boot)).total_seconds()))
+        if age >= 120:
+            return {
+                "emit": True,
+                "reason": "ELIGIBLE",
+                "event_reason": "REARM_VERIFICATION_MISSING",
                 "age_seconds": age,
                 "sample_id": sample.get("sample_id"),
             }
