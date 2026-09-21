@@ -69,6 +69,16 @@ Do not rewrite history merely to improve presentation. Correct later with a new 
 
 Each non-empty line is a run observation following `schemas/run-observation.schema.json`.
 
+Every new bounded execution turn should durably record, when write authority is available:
+
+- actual `run_started_at`;
+- actual `run_ended_at`;
+- derived `duration_seconds`;
+- simple `turn_outcome`: `CONTINUE | COMPLETE | BLOCKED | PAUSED`;
+- the existing detailed classification/end-reason/evidence fields that apply.
+
+`turn_outcome` is an operator-readable turn result, not permission to collapse program semantics. If useful work remains after a local success, use `CONTINUE`; reserve `COMPLETE` for durable program terminal state.
+
 Use it to measure:
 
 - run start/end;
@@ -80,3 +90,4 @@ Use it to measure:
 - classification.
 
 Do not invent timing values that were not observed. Null is preferable to fabricated precision.
+
