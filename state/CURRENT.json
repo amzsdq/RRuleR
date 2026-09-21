@@ -9,16 +9,17 @@
   "current_owner": "RUN-UTIL-20260921-223441",
   "authority_epoch": 73,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "WORKING",
+  "run_state": "HANDOFF_COMMITTED",
   "checkpoint": {
     "id": "CP-UTILIZATION-111",
-    "state": "VERIFIED",
+    "state": "COMPLETE",
     "completed": [
       "Recovered the receipt-less 22:26:45 generation through the fixed Startup Watchdog and established generation-matched BOOT_STARTED and REARM_VERIFIED.",
       "Defined lifecycle v10 atomic close-state projection across CURRENT, ACTIVITY, and HANDOFF.",
       "Implemented validate_close_projection.py with five discoverable regression tests and integrated it into control-plane CI.",
       "Recorded STARTUP-013/014 failed-normal and fixed-Watchdog recovery lineage without inferring missing boundaries.",
-      "Validated the 14-sample startup ledger and ran all 88 discovered tests successfully."
+      "Validated the 14-sample startup ledger and ran all 88 discovered tests successfully.",
+      "Closed epoch 73 with an atomic non-WORKING projection and live-verified same-canonical continuation."
     ],
     "evidence": [
       "tools/validate_close_projection.py@a5ad905",
@@ -29,13 +30,13 @@
       "state/WORK_EVIDENCE.json@343dbff"
     ],
     "observation": "The close-state contract now prevents a completed predecessor from remaining durably WORKING, which makes IDLE_DISTANT_DUE recovery depend on explicit state rather than silence.",
-    "next_action": "Close epoch 73 with an atomic HANDOFF_READY projection and verify exact same-canonical MAIN and Watchdog continuation."
+    "next_action": "Successor must write BOOT_STARTED for DUE:2026-09-21T22:47:28+09:00 before provisional rearm and continue WS-P001-002."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T22:48:28+09:00",
+    "next_due_at": "2026-09-21T22:47:28+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -59,9 +60,9 @@
       "normal_check_offset_seconds": 180,
       "recovery_recheck_seconds": 240,
       "main_recovery_due_offset_seconds": 60,
-      "next_watchdog_due_at": "2026-09-21T22:51:28+09:00",
-      "coverage": "HEALTHY_BOOTSTRAP",
-      "last_classification": "HEALTHY_BOOTSTRAP",
+      "next_watchdog_due_at": "2026-09-21T22:50:28+09:00",
+      "coverage": "ARMED_FOR_NEXT_GENERATION",
+      "last_classification": "HEALTHY_CONTINUATION_ARMED",
       "last_recovery_at": "2026-09-21T22:33:20+09:00",
       "enabled_verified": true,
       "policy_version": 3,
@@ -69,7 +70,7 @@
       "idle_distant_due_extra_slack_seconds": 120,
       "idle_distant_due_recovery_offset_seconds": 60
     },
-    "next_due_source": "PROVISIONAL_BOOTSTRAP_REARM"
+    "next_due_source": "ACTUAL_OBSERVED_TURN_END_PLUS_60_SECONDS"
   },
   "safety": {
     "public_repo": true,
