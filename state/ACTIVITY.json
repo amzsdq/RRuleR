@@ -7,11 +7,11 @@
   "active_run_id": null,
   "authority_epoch": 78,
   "substantive_work_started_at": "2026-09-22T01:01:20+09:00",
-  "last_progress_at": "2026-09-22T01:06:41+09:00",
-  "last_progress_kind": "GENERATION_FENCE_POLICY_ALIGNED_PENDING_LATEST_INTEGRATED_CI",
-  "current_unit": "Generation-bound startup receipt enforcement is implemented across audit, tests, active controls, runtime continuity, and scheduler startup order; latest integrated CI is pending after rapid push concurrency cancellations.",
-  "next_wake_due_at": "PENDING_EXACT_END_PLUS_60_REARM",
+  "last_progress_at": "2026-09-22T01:06:52+09:00",
+  "last_progress_kind": "NORMAL_CLOSE_END_PLUS_60_VERIFIED",
+  "current_unit": "Generation-bound startup receipt enforcement implemented and policy-aligned; executable integrated CI result remains to be observed on the next wake.",
+  "next_wake_due_at": "2026-09-22T01:07:52+09:00",
   "successor_observed": false,
   "handoff_ready": true,
-  "operator_ui_note": "No further independent low-risk unit was started because the remaining acceptance item is the latest integrated CI result; additional unrelated pushes would keep cancelling that validation run."
+  "operator_ui_note": "SAME MAIN exact END+60 recurring continuation live-verified. Retired predecessors and Watchdog remain disabled."
 }
