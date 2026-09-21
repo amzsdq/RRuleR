@@ -1,0 +1,11 @@
+{
+  "policy_id":"RRULER_PREMATURE_WAKE_FENCE",
+  "version":1,
+  "status":"ACTIVE",
+  "purpose":"Prevent an invocation observed before the currently verified successor due from overwriting or consuming that still-pending fast occurrence.",
+  "rule":"Before BOOT_STARTED/provisional rearm/substantive authority, compare observed invocation time with fresh durable verified_next_fast_due_at / successor_expected_at. If invocation is earlier than the pending verified due, classify PREMATURE_INVOCATION. Do not count it as delivery success, do not advance authority, and do not replace the pending due with an 11-minute (660-second) provisional. Preserve or restore the SAME MAIN recurring DTSTART to the pending verified due when it is still future and live-safe. Only a generation whose observed invocation is at/after its expected due may proceed through the normal provisional-arm path.",
+  "timing_semantics":{"normal_final_rearm":"ACTUAL END + exactly 1 minute (60 seconds)","normal_provisional":"eligible wake reference + exactly 11 minutes (660 seconds)","premature_tolerance_seconds":0,"premature_tolerance_human":"0 seconds; any invocation before the verified due is not evidence of that due being delivered"},
+  "forbidden":["PREMATURE_INVOCATION_OVERWRITES_PENDING_FAST_DUE","PREMATURE_INVOCATION_COUNTS_AS_P0_B_PASS","PREMATURE_INVOCATION_ADVANCES_SUBSTANTIVE_AUTHORITY","PREMATURE_INVOCATION_REARMS_11_MINUTE_660_SECOND_PROVISIONAL_BEFORE_PENDING_DUE"],
+  "evidence_basis":"Epoch 85 invocation was observed at 08:28:42 KST while the predecessor's live-verified fast due remained 08:29:51 KST, 1 minute 9 seconds (69 seconds) later. Blind provisional rearm would have canceled the still-pending P0-B test, so the pending due was restored before it elapsed.",
+  "rollback":"Remove this fence only if controlled evidence proves early invocation is the provider's valid delivery semantics and preserving the pending due causes worse correctness; until then fail closed for substantive authority on premature wakes."
+}
