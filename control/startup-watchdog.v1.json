@@ -1,134 +1,15 @@
 {
-  "policy_id": "RRULER_STARTUP_WATCHDOG",
-  "version": 8,
-  "status": "STANDBY_DISABLED_BY_DEFAULT",
-  "purpose": "Break-glass emergency recovery only for the clean operator-created MAIN canonical. Normal continuity is SAME MAIN END+60 plus SAME MAIN recurring schedule. Retired MAIN canonicals are never recovery targets.",
-  "role": "BREAK_GLASS_EMERGENCY_RECOVERY_ONLY",
-  "main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
-  "watchdog_canonical_id": "6ab11b3af3608191b68dcec5e3fed081",
-  "scheduler_mode": "MANUAL_OR_EXPLICITLY_ACTIVATED_ONE_SHOT",
-  "substantive_work_forbidden": true,
-  "source_of_truth": "FRESH_GITHUB_DURABLE_STATE",
-  "normal_monitoring": {
-    "enabled": false,
-    "rationale": "Normal monitoring and per-turn arming are intentionally removed. The current operator-created MAIN must be self-reliant.",
-    "main_recovery_due_offset_seconds": 60
-  },
-  "startup_receipts": {
-    "path": "state/STARTUP_ACK.json",
-    "required": [
-      "BOOT_STARTED",
-      "REARM_VERIFIED"
-    ],
-    "boot_started_rule": "MAIN writes BOOT_STARTED immediately after minimum fresh NOW/CURRENT/canonical/fence validation and before provisional arm/full restore/substantive work.",
-    "rearm_verified_rule": "MAIN writes REARM_VERIFIED immediately after same-canonical provisional continuation is successfully mutated and verified.",
-    "generation_key": "main_expected_due_at plus newest durable schedule/authority generation available at bootstrap; missing data must remain unknown rather than inferred."
-  },
-  "classifications": {
-    "HEALTHY_BOOTSTRAP": "Generation-matched BOOT_STARTED and REARM_VERIFIED exist, or newer unambiguous durable state proves bootstrap and continuation succeeded.",
-    "STARTUP_ACK_MISSING": "now >= MAIN expected_due + 180s and no generation-matched BOOT_STARTED/equivalent newer bootstrap evidence exists.",
-    "BOOTSTRAP_REARM_MISSING": "BOOT_STARTED exists but REARM_VERIFIED/newer verified continuation does not exist after the configured grace.",
-    "WATCHDOG_AMBIGUOUS": "Pause/terminal state, authority, due generation, receipts, or live MAIN metadata conflict enough that mutation cannot be proven safe.",
-    "IDLE_DISTANT_DUE": "Program is CONTINUE, MAIN is enabled, fresh durable state proves there is no active substantive turn, a last observed closed-turn END is known, and live MAIN due is later than (last closed END + 60s + 120s). A WORKING/ambiguous owner is never classified idle by timeout guess alone."
-  },
-  "actions": {
-    "HEALTHY_BOOTSTRAP": [
-      "KEEP_WATCHDOG_DISABLED",
-      "DO_NOT_MUTATE_MAIN"
-    ],
-    "STARTUP_ACK_MISSING": [
-      "NO_AUTOMATIC_ACTION_WHILE_STANDBY_DISABLED",
-      "REQUIRE_EXPLICIT_EMERGENCY_ACTIVATION_BEFORE_ANY_MUTATION",
-      "REARM_SAME_MAIN_CANONICAL_TO_NOW_PLUS_60S",
-      "VERIFY_MAIN_ENABLED_AND_DUE",
-      "PERSIST_WATCHDOG_RECOVERY",
-      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S",
-      "SET_SAME_WATCHDOG_IS_ENABLED_TRUE",
-      "VERIFY_SAME_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE"
-    ],
-    "BOOTSTRAP_REARM_MISSING": [
-      "NO_AUTOMATIC_ACTION_WHILE_STANDBY_DISABLED",
-      "REQUIRE_EXPLICIT_EMERGENCY_ACTIVATION_BEFORE_ANY_MUTATION",
-      "REARM_SAME_MAIN_CANONICAL_TO_NOW_PLUS_60S_WHEN_FENCE_PERMITS",
-      "VERIFY_MAIN_ENABLED_AND_DUE",
-      "PERSIST_WATCHDOG_RECOVERY",
-      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S",
-      "SET_SAME_WATCHDOG_IS_ENABLED_TRUE",
-      "VERIFY_SAME_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE"
-    ],
-    "WATCHDOG_AMBIGUOUS": [
-      "NO_AUTOMATIC_ACTION_WHILE_STANDBY_DISABLED",
-      "REQUIRE_EXPLICIT_EMERGENCY_ACTIVATION_BEFORE_ANY_MUTATION",
-      "FAIL_CLOSED_ON_MAIN_MUTATION",
-      "PERSIST_AMBIGUITY",
-      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S",
-      "SET_SAME_WATCHDOG_IS_ENABLED_TRUE",
-      "VERIFY_SAME_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE"
-    ],
-    "IDLE_DISTANT_DUE": [
-      "NO_AUTOMATIC_ACTION_WHILE_STANDBY_DISABLED",
-      "REQUIRE_EXPLICIT_EMERGENCY_ACTIVATION_BEFORE_ANY_MUTATION",
-      "REARM_SAME_MAIN_CANONICAL_TO_NOW_PLUS_60S",
-      "SET_SAME_MAIN_IS_ENABLED_TRUE",
-      "VERIFY_MAIN_ENABLED_AND_DUE",
-      "PERSIST_WATCHDOG_RECOVERY",
-      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S",
-      "SET_SAME_WATCHDOG_IS_ENABLED_TRUE",
-      "VERIFY_SAME_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE"
-    ]
-  },
-  "main_sync_contract": {
-    "normal_close": "DO_NOT_ARM_WATCHDOG. MAIN normal close verifies only SAME MAIN END+60 and durable close projection.",
-    "failure_semantics": "Watchdog being disabled is healthy normal state, not degraded coverage.",
-    "pause_terminal": "Explicit operator PAUSED/STOP or durable terminal prevents any emergency wake."
-  },
-  "prompt_sync_contract": {
-    "rule": "GitHub policy is authoritative. MAIN must not arm this Watchdog during normal turns. Emergency recovery may target only the fresh CURRENT canonical, never either retired predecessor.",
-    "replacement_forbidden": true,
-    "rrule_for_watchdog_forbidden": true
-  },
-  "safety": {
-    "duplicate_substantive_work_forbidden": true,
-    "watchdog_never_claims_substantive_authority": true,
-    "replacement_main_forbidden": true,
-    "replacement_watchdog_forbidden": true,
-    "stale_generation_rollback_forbidden": true
-  },
-  "self_rearm_contract": {
-    "invariant": "Automatic Watchdog self-relay is not part of normal operation and is disabled by default.",
-    "success_condition": "For an explicitly activated emergency run, any mutation must preserve the same canonical and be live-verified.",
-    "failure_condition": "Fail closed; do not create a replacement Watchdog.",
-    "reason": "One-shot completion semantics can disable the actor after firing, so normal correctness must never depend on Watchdog self-relay."
-  },
-  "idle_distant_due_guard": {
-    "purpose": "Retired from normal operation. MAIN recurring RRULE is the built-in cold fallback.",
-    "idle_proof_required": true,
-    "idle_proof_rule": "Use fresh durable state, not absence of recent chat/tool output. Treat idle as proven only when no fresh CURRENT/ACTIVITY/HANDOFF/startup evidence establishes an active substantive owner and the latest applicable run has an observed close boundary. If CURRENT or ACTIVITY says WORKING and ownership freshness cannot be disproven by an existing authority/liveness rule, classify WATCHDOG_AMBIGUOUS instead of IDLE_DISTANT_DUE.",
-    "expected_fast_due_rule": "latest observed eligible closed-turn END + 60 seconds",
-    "extra_slack_seconds": 120,
-    "trigger_rule": "MAIN enabled=true AND program CONTINUE AND idle proven AND live MAIN due > expected_fast_due + 120 seconds.",
-    "active_provisional_exemption": "A future ~13 minute provisional continuation belonging to a proven active WORKING turn is healthy safety coverage and MUST NOT be pulled forward by this rule.",
-    "missing_boundary_rule": "If latest closed END or owner state is unknown/conflicting, do not infer idle or expected fast due; classify WATCHDOG_AMBIGUOUS and recheck.",
-    "recovery": "Rearm only the SAME MAIN canonical to now+60s with is_enabled=true, verify live metadata, record recovery, and recheck the SAME Watchdog at now+240s.",
-    "enabled": false
-  },
-  "normal_path_contract": {
-    "expected_normal_successor": "SAME_MAIN_AT_PREDECESSOR_END_PLUS_60_SECONDS",
-    "cold_fallback": "SAME_MAIN_NATURAL_RECURRING_RRULE_OCCURRENCE",
-    "watchdog_is_expected_normal_successor": false,
-    "watchdog_may_authorize_normal_close": false,
-    "main_must_arm_watchdog": false,
-    "arming_order": "NONE_IN_NORMAL_OPERATION"
-  },
-  "emergency_activation_gate": {
-    "normal_operation": false,
-    "explicit_operator_or_durable_emergency_decision_required": true,
-    "activate_only_after_same_main_fast_and_natural_rrule_paths_are_diagnosed_insufficient": true,
-    "auto_activation_for_missing_receipt_forbidden": true,
-    "disable_after_verified_recovery": true
-  },
-  "retired_main_canonicals": [
-    "6ab14f7951848191b65e4b5d4bc979d8",
-    "6aaf8a993eb08191b8d0ab1d9662e4b2"
-  ]
+  "policy_id":"RRULER_STARTUP_WATCHDOG","version":9,"status":"STANDBY_DISABLED_BY_DEFAULT","purpose":"Break-glass emergency recovery only for the clean operator-created MAIN canonical. Normal continuity is SAME MAIN END+60 plus SAME MAIN recurring schedule. Retired MAIN canonicals are never recovery targets.","role":"BREAK_GLASS_EMERGENCY_RECOVERY_ONLY","main_canonical_id":"6ab152b636748191a71873ba4d5ef551","watchdog_canonical_id":"6ab11b3af3608191b68dcec5e3fed081","scheduler_mode":"MANUAL_OR_EXPLICITLY_ACTIVATED_ONE_SHOT","substantive_work_forbidden":true,"source_of_truth":"FRESH_GITHUB_DURABLE_STATE",
+  "normal_monitoring":{"enabled":false,"rationale":"Normal monitoring and per-turn arming are intentionally removed. The current operator-created MAIN must be self-reliant.","main_recovery_due_offset_seconds":60},
+  "startup_receipts":{"path":"state/STARTUP_ACK.json","required":["BOOT_STARTED","REARM_VERIFIED"],"boot_started_rule":"MAIN writes BOOT_STARTED immediately after minimum fresh NOW/CURRENT/canonical/fence validation and before provisional arm/full restore/substantive work.","rearm_verified_rule":"MAIN writes REARM_VERIFIED immediately after same-canonical provisional continuation is successfully mutated and verified.","generation_key":"main_expected_due_at plus newest durable schedule/authority generation available at bootstrap; missing data must remain unknown rather than inferred."},
+  "classifications":{"HEALTHY_BOOTSTRAP":"Generation-matched BOOT_STARTED and REARM_VERIFIED exist, or newer unambiguous durable state proves bootstrap and continuation succeeded.","STARTUP_ACK_MISSING":"now >= MAIN expected_due + 180s and no generation-matched BOOT_STARTED/equivalent newer bootstrap evidence exists.","BOOTSTRAP_REARM_MISSING":"BOOT_STARTED exists but REARM_VERIFIED/newer verified continuation does not exist after the configured grace.","WATCHDOG_AMBIGUOUS":"Pause/terminal state, authority, due generation, receipts, or live MAIN metadata conflict enough that mutation cannot be proven safe.","IDLE_DISTANT_DUE":"Program is CONTINUE, MAIN is enabled, fresh durable state proves there is no active substantive turn, a last observed closed-turn END is known, and live MAIN due is later than (last closed END + 60s + 120s). A WORKING/ambiguous owner is never classified idle by timeout guess alone."},
+  "actions":{"HEALTHY_BOOTSTRAP":["KEEP_WATCHDOG_DISABLED","DO_NOT_MUTATE_MAIN"],"STARTUP_ACK_MISSING":["NO_AUTOMATIC_ACTION_WHILE_STANDBY_DISABLED","REQUIRE_EXPLICIT_EMERGENCY_ACTIVATION_BEFORE_ANY_MUTATION","REARM_SAME_MAIN_CANONICAL_TO_NOW_PLUS_60S","VERIFY_MAIN_ENABLED_AND_DUE","PERSIST_WATCHDOG_RECOVERY"],"BOOTSTRAP_REARM_MISSING":["NO_AUTOMATIC_ACTION_WHILE_STANDBY_DISABLED","REQUIRE_EXPLICIT_EMERGENCY_ACTIVATION_BEFORE_ANY_MUTATION","REARM_SAME_MAIN_CANONICAL_TO_NOW_PLUS_60S_WHEN_FENCE_PERMITS","VERIFY_MAIN_ENABLED_AND_DUE","PERSIST_WATCHDOG_RECOVERY"],"WATCHDOG_AMBIGUOUS":["NO_AUTOMATIC_ACTION_WHILE_STANDBY_DISABLED","REQUIRE_EXPLICIT_EMERGENCY_ACTIVATION_BEFORE_ANY_MUTATION","FAIL_CLOSED_ON_MAIN_MUTATION","PERSIST_AMBIGUITY"],"IDLE_DISTANT_DUE":["NO_AUTOMATIC_ACTION_WHILE_STANDBY_DISABLED","REQUIRE_EXPLICIT_EMERGENCY_ACTIVATION_BEFORE_ANY_MUTATION","REARM_SAME_MAIN_CANONICAL_TO_NOW_PLUS_60S","SET_SAME_MAIN_IS_ENABLED_TRUE","VERIFY_MAIN_ENABLED_AND_DUE","PERSIST_WATCHDOG_RECOVERY"]},
+  "main_sync_contract":{"normal_close":"DO_NOT_ARM_WATCHDOG. MAIN normal close verifies only SAME MAIN END+60 and durable close projection.","failure_semantics":"Watchdog being disabled is healthy normal state, not degraded coverage.","pause_terminal":"Explicit operator PAUSED/STOP or durable terminal prevents any emergency wake."},
+  "prompt_sync_contract":{"rule":"GitHub policy is authoritative. MAIN must not arm this Watchdog during normal turns. Emergency recovery may target only the fresh CURRENT canonical, never either retired predecessor.","replacement_forbidden":true,"rrule_for_watchdog_forbidden":true},
+  "safety":{"duplicate_substantive_work_forbidden":true,"watchdog_never_claims_substantive_authority":true,"replacement_main_forbidden":true,"replacement_watchdog_forbidden":true,"stale_generation_rollback_forbidden":true},
+  "self_rearm_contract":{"invariant":"Automatic Watchdog self-relay is not part of normal operation and is disabled by default.","success_condition":"For an explicitly activated emergency run, any mutation must preserve the same canonical and be live-verified.","failure_condition":"Fail closed; do not create a replacement Watchdog.","reason":"Normal correctness must never depend on Watchdog self-relay."},
+  "idle_distant_due_guard":{"purpose":"Retired from normal operation. MAIN recurring RRULE is the built-in cold fallback.","idle_proof_required":true,"idle_proof_rule":"Use fresh durable state, not absence of recent chat/tool output. Treat idle as proven only when no fresh CURRENT/ACTIVITY/HANDOFF/startup evidence establishes an active substantive owner and the latest applicable run has an observed close boundary.","expected_fast_due_rule":"latest observed eligible closed-turn END + 60 seconds","extra_slack_seconds":120,"trigger_rule":"MAIN enabled=true AND program CONTINUE AND idle proven AND live MAIN due > expected_fast_due + 120 seconds.","active_provisional_exemption":"A verified future +660-second provisional continuation, or one guarded extension belonging to a proven active WORKING turn, is healthy crash insurance and MUST NOT be pulled forward by this disabled guard.","missing_boundary_rule":"If latest closed END or owner state is unknown/conflicting, do not infer idle or expected fast due; classify WATCHDOG_AMBIGUOUS and recheck.","recovery":"Rearm only the SAME MAIN canonical to now+60s with is_enabled=true and verify live metadata, but only after explicit break-glass activation.","enabled":false},
+  "normal_path_contract":{"expected_normal_successor":"SAME_MAIN_AT_PREDECESSOR_END_PLUS_60_SECONDS","cold_fallback":"SAME_MAIN_NATURAL_RECURRING_RRULE_OCCURRENCE","watchdog_is_expected_normal_successor":false,"watchdog_may_authorize_normal_close":false,"main_must_arm_watchdog":false,"arming_order":"NONE_IN_NORMAL_OPERATION"},
+  "emergency_activation_gate":{"normal_operation":false,"explicit_operator_or_durable_emergency_decision_required":true,"activate_only_after_same_main_fast_and_natural_rrule_paths_are_diagnosed_insufficient":true,"auto_activation_for_missing_receipt_forbidden":true,"disable_after_verified_recovery":true},
+  "retired_main_canonicals":["6ab14f7951848191b65e4b5d4bc979d8","6aaf8a993eb08191b8d0ab1d9662e4b2"]
 }
