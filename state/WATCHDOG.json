@@ -5,15 +5,15 @@
   "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "watchdog_canonical_id": "6ab11b3af3608191b68dcec5e3fed081",
   "mode": "ONE_SHOT_SELF_RELAY",
-  "status": "ARMED",
-  "main_expected_due_at": "2026-09-21T21:01:19+09:00",
-  "next_watchdog_due_at": "2026-09-21T21:04:19+09:00",
+  "status": "RECOVERY_ARMED",
+  "main_expected_due_at": "2026-09-21T21:11:09+09:00",
+  "next_watchdog_due_at": "2026-09-21T21:14:09+09:00",
   "startup_grace_seconds": 180,
   "recovery_recheck_seconds": 240,
   "main_recovery_due_offset_seconds": 60,
-  "last_classification": null,
-  "last_recovery_at": null,
-  "last_recovery_reason": null,
+  "last_classification": "STARTUP_ACK_MISSING",
+  "last_recovery_at": "2026-09-21T21:10:09+09:00",
+  "last_recovery_reason": "MAIN invocation was observed at 2026-09-21T21:03:20.817126+09:00 for the 2026-09-21T21:01:19+09:00 generation, but no generation-matched BOOT_STARTED, REARM_VERIFIED, or newer verified continuation existed after the 180-second grace. The same MAIN canonical was rearmed for now+60s.",
   "prompt_policy_version": "1.1-GITHUB-SYNC",
-  "last_updated_at": "2026-09-21T21:01:01+09:00"
+  "last_updated_at": "2026-09-21T21:10:09+09:00"
 }
