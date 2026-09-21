@@ -6,37 +6,31 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "root_goal": "P0 sustained evidenced useful-work coverage",
   "status": "CONTINUE",
-  "current_owner": "RUN-UTIL-20260921-223441",
-  "authority_epoch": 73,
+  "current_owner": "RUN-UTIL-20260921-235045",
+  "authority_epoch": 74,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "HANDOFF_COMMITTED",
+  "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-111",
-    "state": "COMPLETE",
+    "id": "CP-UTILIZATION-112",
+    "state": "IN_PROGRESS",
     "completed": [
-      "Recovered the receipt-less 22:26:45 generation through the fixed Startup Watchdog and established generation-matched BOOT_STARTED and REARM_VERIFIED.",
-      "Defined lifecycle v10 atomic close-state projection across CURRENT, ACTIVITY, and HANDOFF.",
-      "Implemented validate_close_projection.py with five discoverable regression tests and integrated it into control-plane CI.",
-      "Recorded STARTUP-013/014 failed-normal and fixed-Watchdog recovery lineage without inferring missing boundaries.",
-      "Validated the 14-sample startup ledger and ran all 88 discovered tests successfully.",
-      "Closed epoch 73 with an atomic non-WORKING projection and live-verified same-canonical continuation."
+      "Persisted generation-matched BOOT_STARTED for DUE:2026-09-21T23:52:00+09:00.",
+      "Live-verified SAME MAIN recurring provisional RRULE at 2026-09-22T00:03:45+09:00 and persisted REARM_VERIFIED.",
+      "Claimed authority epoch 74 for MAIN self-reliant policy alignment."
     ],
     "evidence": [
-      "tools/validate_close_projection.py@a5ad905",
-      "tests/test_validate_close_projection.py@8d0a357",
-      "control/rolling-rrule-lifecycle.v1.json@5aa4774",
-      ".github/workflows/validate-control-plane.yml@d0776bb",
-      "state/SUCCESSOR_STARTUP.json@0336564",
-      "state/WORK_EVIDENCE.json@343dbff"
+      "state/STARTUP_ACK.json@be3b752",
+      "state/TURN_PLAN.json@a09e90d",
+      "live SAME MAIN metadata: enabled recurring DTSTART 2026-09-22T00:03:45+09:00"
     ],
-    "observation": "Operator switched runtime to self-reliant MAIN. Normal correctness no longer depends on Watchdog; SAME MAIN END+60 is fast path and SAME MAIN hourly RRULE is cold fallback.",
-    "next_action": "Await generation-matched BOOT_STARTED for DUE:2026-09-21T23:52:00+09:00 from compact MAIN v4.0 bootstrap."
+    "observation": "MAIN v4 bootstrapped before its scheduled due and secured its own recurring crash-insurance fallback. Watchdog remains disabled standby and is not part of normal continuity.",
+    "next_action": "Reconcile active control and lifecycle artifacts so normal close depends only on SAME MAIN END+60; then add deterministic consistency checks and close through the fast-rearm hard gate."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T23:52:00+09:00",
+    "next_due_at": "2026-09-22T00:03:45+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -62,7 +56,7 @@
       "enabled_verified": false,
       "policy_version": 5
     },
-    "next_due_source": "OPERATOR_SELF_RELIANT_MAIN_V4_RECOVERY",
+    "next_due_source": "MAIN_V4_PROVISIONAL_CRASH_INSURANCE",
     "cold_fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE"
   },
   "safety": {
