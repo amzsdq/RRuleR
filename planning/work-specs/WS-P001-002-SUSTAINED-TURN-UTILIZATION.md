@@ -29,24 +29,30 @@ Make one bounded wake spend most of its available execution budget on substantiv
 
 ## Acceptance
 
-- [ ] Current-turn useful-work evidence is captured without multi-epoch lag.
+- [x] Current-turn useful-work evidence is captured without multi-epoch lag.
 - [ ] Baseline wake utilization is computed from durable evidence with unknown time left unknown.
 - [ ] Dominant causes of under-utilization are ranked by measured impact.
 - [ ] At least one correction is implemented against the highest-impact cause.
 - [ ] The correction is retested across multiple valid windows/turns.
 - [ ] Results either meet P001 thresholds or produce a durable next experiment based on evidence.
 
-Acceptance progress: **0 / 6**
+Acceptance progress: **1 / 6**
 
-## Evidence-pipeline diagnosis (2026-09-21)
+## Evidence-pipeline diagnosis and repair (2026-09-21)
 
-`state/WORK_EVIDENCE.json` is a strict acceptance ledger, not an automatic activity feed. Its last accepted record is authority epoch 43 even though `state/CURRENT.json` advanced to epoch 58. No collector/generator exists under `tools/`; the repository contains validators for evidence and observation horizons, but evidence insertion depended on the active worker explicitly persisting qualifying observed intervals. Later turns continued to create substantive artifacts without advancing this ledger. This is the direct cause of the multi-epoch freshness gap.
+`state/WORK_EVIDENCE.json` was a strict acceptance ledger, not an automatic activity feed. Its last accepted record was authority epoch 43 even though `state/CURRENT.json` advanced to epoch 58. No collector/generator existed under `tools/`; evidence insertion depended on the active worker explicitly persisting qualifying observed intervals. Later turns continued to create substantive artifacts without advancing this ledger. This was the direct cause of the multi-epoch freshness gap.
 
-Correction direction: make qualifying-evidence capture an explicit close-of-substantive-unit responsibility, while preserving the existing rule that unknown time remains unknown and scheduler/heartbeat-only activity never becomes useful-work evidence.
+Repair applied:
+- added `tools/append_work_evidence.py`, which computes duration from caller-supplied observed boundaries and rejects duplicate IDs, overlaps, naive timestamps, and invalid resulting ledgers;
+- added focused regression tests and integrated them into control-plane CI;
+- added forward evidence capture to the worker bootstrap contract;
+- persisted `WE-20260921-E59-001` during the resumed turn, proving the ledger can advance with the active epoch without historical inference.
+
+This fixes the capture-path omission, but does not retroactively claim epochs 44-58 as useful time. Those intervals remain unknown unless independently observed evidence already proves them.
 
 ## Exact resume step
 
-1. Implement and exercise a deterministic current-turn evidence-capture path that cannot promote inferred time.
+1. Verify integrated CI for the new append path.
 2. Produce a current baseline from durable run/activity/commit evidence without inventing missing time.
 3. Rank the dominant causes of under-utilization from that baseline.
 4. Choose the next intervention by expected effect on useful-work occupancy, not by proximity of the code being inspected.
