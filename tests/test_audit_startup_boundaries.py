@@ -150,3 +150,23 @@ def test_legacy_operator_reset_marker_is_classified_as_operator_rescheduled():
     result = audit({"samples": [sample]}, [])["results"][0]
     assert result["operator_rescheduled_generation"] is True
     assert result["scheduler_comparison_exclusion"] == "OPERATOR_RESCHEDULED_GENERATION"
+
+
+def test_rejected_one_shot_canary_is_preserved_but_excluded():
+    sample = {
+        "sample_id": "ONE-SHOT",
+        "schedule_mode": "EXACT_ONE_SHOT_SELF_UPDATE_CANARY",
+        "scheduled_due_at": "2026-09-22T00:25:53+09:00",
+        "successor_observed_at": "2026-09-22T00:27:31.651380+09:00",
+        "boot_started_at": None,
+        "rearm_verified_at": None,
+        "validity": "EXCLUDED_SCHEDULE_CATEGORY_CANARY",
+        "exclusion_reason": "SCHEDULE_CATEGORY_CANARY_REJECTED",
+    }
+    out = audit({"samples": [sample]}, [])
+    result = out["results"][0]
+    assert out["valid"] is True
+    assert out["rejected_one_shot_canary_count"] == 1
+    assert result["startup_receipt_complete"] is False
+    assert result["scheduler_comparison_eligible"] is False
+    assert result["scheduler_comparison_exclusion"] == "SCHEDULE_CATEGORY_CANARY_REJECTED"
