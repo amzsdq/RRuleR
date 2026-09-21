@@ -8,8 +8,14 @@ on:
       - 'control/rolling-rrule-lifecycle.v1.json'
       - 'control/ACTIVE_CONTROLS.json'
       - 'control/relay-policy.v1.json'
+      - 'control/POLICY.md'
       - 'state/CURRENT.json'
       - 'state/UTILIZATION.json'
+      - 'schemas/run-observation.schema.json'
+      - 'tools/validate_run_records.py'
+      - 'tests/test_run_records.py'
+      - 'tools/summarize_turn_close.py'
+      - 'tests/test_summarize_turn_close.py'
       - '.github/workflows/validate-continuation-policy.yml'
   pull_request:
     paths:
@@ -17,8 +23,14 @@ on:
       - 'control/rolling-rrule-lifecycle.v1.json'
       - 'control/ACTIVE_CONTROLS.json'
       - 'control/relay-policy.v1.json'
+      - 'control/POLICY.md'
       - 'state/CURRENT.json'
       - 'state/UTILIZATION.json'
+      - 'schemas/run-observation.schema.json'
+      - 'tools/validate_run_records.py'
+      - 'tests/test_run_records.py'
+      - 'tools/summarize_turn_close.py'
+      - 'tests/test_summarize_turn_close.py'
       - '.github/workflows/validate-continuation-policy.yml'
   workflow_dispatch:
 
@@ -57,34 +69,15 @@ jobs:
           assert gate['bounded_turn_close_rule']['local_success_alone_never_satisfies_rule'] is True
           required={'PRIMARY_OBJECTIVE_COMPLETE','CI_PASS','ROOT_COMPLETE','WAITING_FOR_NEXT_WAKE','SCHEDULE_BOUNDARY','NO_OBVIOUS_NEXT_TASK'}
           assert required <= set(gate['never_end_because'])
-          decision=gate['turn_decision']
-          assert decision['target_elapsed_seconds']==600
-          assert decision['short_turn_threshold_seconds']==600
-          assert decision['normal_continue_minimum_elapsed_seconds']==600
-          assert decision['pre_600_voluntary_continue_close_forbidden'] is True
-          assert decision['normal_soft_ceiling_seconds']==720
+          decision=gate['turn_decision']; assert decision['target_elapsed_seconds']==600; assert decision['short_turn_threshold_seconds']==600; assert decision['normal_continue_minimum_elapsed_seconds']==600; assert decision['pre_600_voluntary_continue_close_forbidden'] is True; assert decision['normal_soft_ceiling_seconds']==720
           assert 'USER_VISIBLE_PROGRESS_TRACE_EMITTED' in set(gate['never_end_because'])
           assert gate['enforcement']['progress_trace_never_authorizes_close'] is True
           assert gate['enforcement']['unit_completion_trace_requires_durable_duration_and_work_evidence'] is True
           assert 'DURABLY_PERSISTED_BOUNDED_UNIT_COMPLETION_EMITS_USER_VISIBLE_TRACE_WITHOUT_END_AUTHORITY' in set(controls['hard_invariants'])
-          trace=lifecycle['chat_trace']
-          assert trace['enabled'] is True and trace['mode']=='DURABLE_UNIT_CHAT_TRACE_CANARY'
-          assert trace['trace_never_authorizes_close'] is True
-          util=policy['utilization']
-          assert util['voluntary_idle_while_useful_work_exists_forbidden'] is True
-          assert util['checkpoint_is_yield_condition'] is False
-          assert util['root_completion_is_yield_condition'] is False
-          assert util['after_each_work_unit']=='BEFORE_600S_SELECT_NEXT_SAFE_USEFUL_UNIT_OR_DECOMPOSE; AT_OR_AFTER_600S_FINISH_SMALLEST_SAFE_IN_FLIGHT_UNIT_AND_CLOSE'
-          assert util['minimum_normal_continue_elapsed_seconds']==600
-          assert util['pre_600_voluntary_normal_continue_close_forbidden'] is True
-          assert current['continuation']['run_continuation_gate_policy']=='control/run-continuation-gate.v1.json'
-          assert current['continuation']['minimum_continue_work_seconds']==600
-          assert utilization['execution_envelope']['minimum_continue_turn_seconds']==600
-          assert utilization['execution_envelope']['normal_continue_pre600_voluntary_close_forbidden'] is True
-          assert utilization['execution_envelope']['durable_unit_chat_trace_enabled'] is True
-          assert utilization['execution_envelope']['unit_trace_requires_persisted_observed_duration_and_work_evidence'] is True
-          assert utilization['execution_envelope']['progress_trace_is_never_close_authority'] is True
-          if current['program_status'] in gate['program_nonterminal_states']:
-              assert current['continuation']['program_terminal_disabled_required'] is True
+          trace=lifecycle['chat_trace']; assert trace['enabled'] is True and trace['mode']=='DURABLE_UNIT_CHAT_TRACE_CANARY'; assert trace['trace_never_authorizes_close'] is True
+          util=policy['utilization']; assert util['voluntary_idle_while_useful_work_exists_forbidden'] is True; assert util['checkpoint_is_yield_condition'] is False; assert util['root_completion_is_yield_condition'] is False; assert util['after_each_work_unit']=='BEFORE_600S_SELECT_NEXT_SAFE_USEFUL_UNIT_OR_DECOMPOSE; AT_OR_AFTER_600S_FINISH_SMALLEST_SAFE_IN_FLIGHT_UNIT_AND_CLOSE'; assert util['minimum_normal_continue_elapsed_seconds']==600; assert util['pre_600_voluntary_normal_continue_close_forbidden'] is True
+          assert current['continuation']['run_continuation_gate_policy']=='control/run-continuation-gate.v1.json'; assert current['continuation']['minimum_continue_work_seconds']==600
+          assert utilization['execution_envelope']['minimum_continue_turn_seconds']==600; assert utilization['execution_envelope']['normal_continue_pre600_voluntary_close_forbidden'] is True; assert utilization['execution_envelope']['durable_unit_chat_trace_enabled'] is True; assert utilization['execution_envelope']['unit_trace_requires_persisted_observed_duration_and_work_evidence'] is True; assert utilization['execution_envelope']['progress_trace_is_never_close_authority'] is True
+          if current['program_status'] in gate['program_nonterminal_states']: assert current['continuation']['program_terminal_disabled_required'] is True
           print('continuation authority + 600s hard-floor + v5.5 durable chat-trace validation passed')
           PY
