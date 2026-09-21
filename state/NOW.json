@@ -13,9 +13,9 @@
     "selection_rule": "Read fresh ACTIVE_CONTROLS each wake. Progress chat is observability only and never close authority. Before 600s, after each durably evidenced unit trace immediately select the next safe authorized unit. Preserve SAME MAIN recurring RRULE."
   },
   "turn_plan_role": "TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec and fresh ACTIVE_CONTROLS.",
-  "updated_at": "2026-09-22T02:01:43+09:00",
+  "updated_at": "2026-09-22T02:02:10+09:00",
   "resumed_by_operator_at": "2026-09-22T02:00:20+09:00",
   "maintenance_repair_ref": "planning/evidence/MAIN-V5.2-POLICY-SYNC-ROLLBACK.md",
   "active_runtime_revision": "MAIN_BOOTSTRAP_V5.5_DURABLE_UNIT_CHAT_TRACE_CANARY",
-  "operator_requested_next_due_at": "2026-09-22T02:02:43+09:00"
+  "operator_requested_next_due_at": "2026-09-22T02:04:10+09:00"
 }
