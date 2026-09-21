@@ -2,37 +2,35 @@
   "schema_version": "1.1",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "authority_epoch": 67,
-  "run_id": "RUN-UTIL-20260921-193957",
-  "status": "CHECKPOINTED",
-  "phase": "TURN_CLOSE_V4_CONTINUOUS_RETEST",
-  "objective_id": "WS-P001-002-TURN-CLOSE-V4-RETEST",
-  "objective": "Review the second eligible closed turn, preserve the incomplete STARTUP-004 evidence, and harden detection of invoked successors that leave no durable claim/useful progress.",
+  "authority_epoch": 68,
+  "run_id": "RUN-UTIL-20260921-204946",
+  "status": "ACTIVE",
+  "phase": "PRE_BOOTSTRAP_RECOVERY_GAP",
+  "objective_id": "WS-P001-002-PREBOOT-OBSERVABILITY",
+  "objective": "Make bootstrap entry and provisional rearm durably distinguishable, classify observed invocations with no startup acknowledgement, and identify the smallest executable independent-wake follow-up.",
   "expected_useful_seconds": 600,
   "acceptance_criteria": [
-    "Second eligible closed turn is reviewed from durable records.",
-    "STARTUP-004 delivery observation is preserved while missing boundaries remain unknown.",
-    "Operator-rescheduled STARTUP-005 is excluded from END+60 compliance comparison.",
-    "A machine-readable missing-successor-progress diagnostic is implemented and tested.",
-    "Current normal close arms exact END+60 continuation for a clean next sample."
+    "STARTUP-006 raw invocation is preserved while missing bootstrap/progress boundaries remain unknown.",
+    "BOOT_STARTED and REARM_VERIFIED have durable forward-only semantics.",
+    "STARTUP_ACK_MISSING is a distinct recovery class with a bounded acknowledgement deadline and no duplicate-authority permission.",
+    "Focused tests detect missing bootstrap acknowledgement without treating observability as actual recovery.",
+    "A concrete independent-wake implementation slice is selected or its platform dependency is durably identified."
   ],
   "checkpointable_substeps": [
-    "Append second live review row from RUNS/WORK_EVIDENCE/STARTUP.",
-    "Record STARTUP-005 first-useful boundary on the first substantive commit.",
-    "Implement and test missing successor durable-progress diagnostic.",
-    "Validate current ledgers and close with exact END+60."
+    "Reconcile STARTUP-006 and claim epoch 68 after provisional rearm.",
+    "Extend successor-start ledger/policy with BOOT_STARTED and REARM_VERIFIED.",
+    "Implement focused startup-ack audit tests and CI integration.",
+    "Inspect existing event-wake candidate and package the smallest executable recovery transport step.",
+    "Checkpoint and exact END+60 close."
   ],
-  "current_substep": 4,
-  "handoff_boundary": "All epoch-67 acceptance criteria completed; STARTUP-006 exact END+60 successor is armed.",
-  "early_finish_fallback": "Extend turn review tooling to surface incomplete successor samples and missing-claim/useful aging without treating them as scheduler delivery failures.",
-  "created_for_next_wake": true,
-  "started_at": "2026-09-21T19:39:57+09:00",
-  "last_progress_at": "2026-09-21T19:47:23+09:00",
+  "current_substep": 2,
+  "handoff_boundary": "STARTUP-006 reconciled; bootstrap-stage observability implementation begins.",
+  "early_finish_fallback": "Audit state/WAKE_ARCHITECTURE and event-wake candidate for an actually executable same-canonical wake path; do not mistake detection for recovery.",
+  "created_for_next_wake": false,
+  "started_at": "2026-09-21T20:49:46+09:00",
+  "last_progress_at": "2026-09-21T20:50:15+09:00",
   "progress_evidence": [
-    "planning/evidence/TURN-CLOSE-V4-RETEST.md@1cb12a07b0e98257d08b78273b2da6bde7581484",
-    "tools/audit_successor_progress.py@77d12e5893559b377bfeabbb335a64a81caa813f",
-    ".github/workflows/validate-control-plane.yml@274e4f2e3b2a9189c2d042205c997e72f72c5e48",
-    "tools/build_turn_review.py@8c990e52f7ae0ee162896ce647c7a3f15a114f58",
-    "9 focused tests passed locally"
+    "automation last_run_time=2026-09-21T10:50:28.457228+00:00",
+    "provisional DTSTART=20260921T210229"
   ]
 }
