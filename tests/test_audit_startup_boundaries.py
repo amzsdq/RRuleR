@@ -137,3 +137,16 @@ def test_operator_rescheduled_generation_is_preserved_but_excluded():
     assert result["startup_receipt_complete"] is True
     assert result["scheduler_comparison_eligible"] is False
     assert result["scheduler_comparison_exclusion"] == "OPERATOR_RESCHEDULED_GENERATION"
+
+
+def test_legacy_operator_reset_marker_is_classified_as_operator_rescheduled():
+    sample = {
+        "sample_id": "LEGACY-OP",
+        "validity": "EXCLUDED_OPERATOR_MAINTENANCE_RECOVERY",
+        "exclusion_reason": "OPERATOR_SCHEDULE_RESET",
+        "scheduled_due_at": "2026-09-21T23:52:00+09:00",
+        "successor_observed_at": "2026-09-21T23:50:45+09:00",
+    }
+    result = audit({"samples": [sample]}, [])["results"][0]
+    assert result["operator_rescheduled_generation"] is True
+    assert result["scheduler_comparison_exclusion"] == "OPERATOR_RESCHEDULED_GENERATION"
