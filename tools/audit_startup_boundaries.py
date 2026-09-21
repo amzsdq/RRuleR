@@ -23,8 +23,16 @@ def audit(startup: dict, run_lines: list[str]) -> dict:
         for run in (json.loads(line) for line in run_lines if line.strip())
         if run.get("observation_id")
     }
+    samples = startup.get("samples", [])
+    samples_by_id = {sample.get("sample_id"): sample for sample in samples}
+
+    def find_run(predecessor_id: str | None) -> dict | None:
+        if not predecessor_id:
+            return None
+        return runs.get(predecessor_id) or runs.get(f"OBS-{predecessor_id}")
+
     results = []
-    for sample in startup.get("samples", []):
+    for sample in samples:
         errors = []
         predecessor_id = sample.get("predecessor_run_id")
         run = find_run(predecessor_id)
@@ -32,30 +40,81 @@ def audit(startup: dict, run_lines: list[str]) -> dict:
         last_useful = sample.get("predecessor_last_useful_at")
         if predecessor_end and last_useful and _ts(last_useful) > _ts(predecessor_end):
             errors.append("PREDECESSOR_LAST_USEFUL_AFTER_RECORDED_END")
+
+        ordered = [
+            ("SUCCESSOR_AFTER_DUE", sample.get("scheduled_due_at"), sample.get("successor_observed_at")),
+            ("BOOT_BEFORE_SUCCESSOR_OBSERVATION", sample.get("successor_observed_at"), sample.get("boot_started_at")),
+            ("REARM_BEFORE_BOOT", sample.get("boot_started_at"), sample.get("rearm_verified_at")),
+            ("AUTHORITY_BEFORE_REARM", sample.get("rearm_verified_at"), sample.get("authority_claim_at")),
+            ("FIRST_USEFUL_BEFORE_AUTHORITY", sample.get("authority_claim_at"), sample.get("first_durable_useful_at")),
+        ]
+        for code, earlier, later in ordered[1:]:
+            if earlier and later and _ts(later) < _ts(earlier):
+                errors.append(code)
+
+        due = sample.get("scheduled_due_at")
+        generation_key = sample.get("generation_key")
+        if due and generation_key and generation_key != f"DUE:{due}":
+            errors.append("GENERATION_KEY_DUE_MISMATCH")
+
+        recovery_of = sample.get("recovery_of_sample_id")
+        recovery_source = samples_by_id.get(recovery_of) if recovery_of else None
+        recovery_generation = recovery_of is not None
+        recovery_lineage_valid = None
+        if recovery_generation:
+            recovery_lineage_valid = bool(
+                recovery_source
+                and recovery_source.get("exclusion_reason") == "STARTUP_ACK_MISSING"
+            )
+            if not recovery_source:
+                errors.append("RECOVERY_SOURCE_SAMPLE_MISSING")
+            elif recovery_source.get("exclusion_reason") != "STARTUP_ACK_MISSING":
+                errors.append("RECOVERY_SOURCE_NOT_STARTUP_ACK_MISSING")
+
         exclusion = sample.get("exclusion_reason")
         maintenance_interrupted = (
             sample.get("maintenance_interrupted") is True
             or exclusion in MAINTENANCE_EXCLUSIONS
         )
-        comparison_ready = bool(sample.get("scheduled_due_at") and sample.get("successor_observed_at"))
+        comparison_ready = bool(due and sample.get("successor_observed_at"))
+        acknowledged_invalid = (
+            sample.get("validity") == "INVALID"
+            and exclusion == "BOUNDARY_INCONSISTENCY"
+        )
+        unacknowledged_errors = [] if acknowledged_invalid else list(errors)
+
+        if maintenance_interrupted:
+            comparison_exclusion = "OPERATOR_MAINTENANCE_INTERRUPTION"
+        elif recovery_generation:
+            comparison_exclusion = "WATCHDOG_RECOVERY_GENERATION"
+        elif not comparison_ready:
+            comparison_exclusion = "MISSING_OBSERVED_BOUNDARY"
+        elif errors:
+            comparison_exclusion = "BOUNDARY_INCONSISTENCY"
+        else:
+            comparison_exclusion = None
+
         results.append({
             "sample_id": sample.get("sample_id"),
             "raw_sample": sample,
             "predecessor_run_found": run is not None,
             "predecessor_recorded_end": predecessor_end,
             "errors": errors,
-            "scheduler_comparison_eligible": comparison_ready and not maintenance_interrupted and not errors,
-            "scheduler_comparison_exclusion": (
-                "OPERATOR_MAINTENANCE_INTERRUPTION" if maintenance_interrupted
-                else "MISSING_OBSERVED_BOUNDARY" if not comparison_ready
-                else "BOUNDARY_INCONSISTENCY" if errors
-                else None
+            "unacknowledged_errors": unacknowledged_errors,
+            "acknowledged_invalid": acknowledged_invalid,
+            "startup_receipt_complete": bool(sample.get("boot_started_at") and sample.get("rearm_verified_at")),
+            "recovery_generation": recovery_generation,
+            "recovery_lineage_valid": recovery_lineage_valid,
+            "scheduler_comparison_eligible": (
+                comparison_ready and not maintenance_interrupted and not recovery_generation and not errors
             ),
+            "scheduler_comparison_exclusion": comparison_exclusion,
         })
     return {
         "sample_count": len(results),
         "valid": not any(item["unacknowledged_errors"] for item in results),
         "scheduler_comparison_eligible_count": sum(item["scheduler_comparison_eligible"] for item in results),
+        "watchdog_recovery_generation_count": sum(item["recovery_generation"] for item in results),
         "results": results,
         "raw_evidence_policy": "PRESERVED_WITH_EXCLUSION_NOT_DELETED_OR_REWRITTEN",
     }
