@@ -3,11 +3,11 @@
   "main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
   "current_expected_due_at": "2026-09-22T00:58:13+09:00",
   "generation_key": "DUE:2026-09-22T00:58:13+09:00",
-  "boot_started_at": null,
-  "boot_started_authority_epoch": null,
+  "boot_started_at": "2026-09-22T01:01:03+09:00",
+  "boot_started_authority_epoch": "DUE:2026-09-22T00:58:13+09:00",
   "rearm_verified_at": null,
   "verified_provisional_due_at": null,
-  "status": "AWAITING_BOOT_STARTED",
-  "last_updated_at": "2026-09-22T00:57:13+09:00",
-  "note": "Forward-only reconciliation after a concurrent stale write restored the prior 00:54:59 generation. Same clean MAIN remains authoritative and recurring; successor must write fresh generation-matched receipts."
+  "status": "BOOT_STARTED",
+  "last_updated_at": "2026-09-22T01:01:03+09:00",
+  "note": "Generation-matched BOOT_STARTED persisted before broad restore/substantive work."
 }
