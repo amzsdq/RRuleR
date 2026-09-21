@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.9",
+  "schema_version": "2.10",
   "program_id": "RRULER-PROGRAM-001",
   "status": "ACTIVE",
   "purpose": "Single machine-readable registry of control artifacts that every fresh worker must load before substantive work.",
@@ -51,11 +51,12 @@
     "INCOMPLETE_OR_INFERRED_UTILIZATION_WINDOW_MUST_NOT_BE_PROMOTED",
     "CALLER_SUPPLIED_OBSERVATION_HORIZON_MUST_NOT_EXCEED_DURABLE_TRUSTED_HORIZON",
     "STARTUP_RECEIPTS_MUST_NOT_BE_INFERRED",
+    "STARTUP_BOOT_RECEIPT_MUST_MATCH_CURRENT_GENERATION",
     "NORMAL_CONTINUATION_DEPENDS_ONLY_ON_SAME_MAIN",
     "WATCHDOG_DISABLED_STANDBY_NOT_NORMAL_DEPENDENCY",
     "SAME_MAIN_RECURRING_RRULE_IS_COLD_FALLBACK",
     "RETIRED_MAIN_CANONICAL_MUST_NEVER_REACTIVATE",
     "ALL_RETIRED_MAIN_CANONICALS_MUST_NEVER_REACTIVATE"
   ],
-  "conflict_rule": "If mandatory artifacts conflict, fail closed only for the disputed side effect and reconcile durably. The fresh CURRENT canonical is the sole normal MAIN. Current clean MAIN=6ab152b636748191a71873ba4d5ef551. Preserve its recurring schedule and shift only THIS SAME MAIN to exact END+60. Never reactivate retired MAIN canonicals 6ab14f7951848191b65e4b5d4bc979d8 or 6aaf8a993eb08191b8d0ab1d9662e4b2. Watchdog remains disabled standby."
+  "conflict_rule": "If mandatory artifacts conflict, fail closed only for the disputed side effect and reconcile durably. The fresh CURRENT canonical is the sole normal MAIN. Current clean MAIN=6ab152b636748191a71873ba4d5ef551. Preserve its recurring schedule and shift only THIS SAME MAIN to exact END+60. A BOOT_STARTED receipt counts only when its boot_started_authority_epoch matches the current generation_key. Never reactivate retired MAIN canonicals 6ab14f7951848191b65e4b5d4bc979d8 or 6aaf8a993eb08191b8d0ab1d9662e4b2. Watchdog remains disabled standby."
 }
