@@ -32,6 +32,13 @@ def _seconds(start: str | None, end: str | None) -> int | None:
 
 def _generation_kind(sample: dict) -> str:
     if (
+        sample.get("schedule_mode") == "EXACT_ONE_SHOT_SELF_UPDATE_CANARY"
+        or sample.get("validity") == "EXCLUDED_SCHEDULE_CATEGORY_CANARY"
+        or sample.get("exclusion_reason")
+        in {"SCHEDULE_CATEGORY_CANARY_REJECTED", "ONE_SHOT_CANARY_FAILURE"}
+    ):
+        return "REJECTED_ONE_SHOT_CANARY"
+    if (
         sample.get("operator_rescheduled") is True
         or sample.get("validity")
         in {"EXCLUDED_OPERATOR_RESCHEDULED", "EXCLUDED_OPERATOR_MAINTENANCE_RECOVERY"}
@@ -65,6 +72,7 @@ def _startup_gap(sample: dict) -> dict:
         "INCOMPLETE",
         "EXCLUDED_OPERATOR_RESCHEDULED",
         "EXCLUDED_HOURLY_FALLBACK_RECOVERY",
+        "EXCLUDED_SCHEDULE_CATEGORY_CANARY",
     }
     complete = all((scheduled, observed, claim, first, predecessor))
     recovery_complete = all((scheduled, observed, boot, rearm, claim, first))
@@ -134,9 +142,12 @@ def summarize(run_lines: list[str], startup: dict) -> dict:
     gaps = [_startup_gap(sample) for sample in raw_samples]
     normal = [gap for gap in gaps if gap["generation_kind"] == "NORMAL_SCHEDULER"]
     operator_rescheduled = [gap for gap in gaps if gap["generation_kind"] == "OPERATOR_RESCHEDULED"]
+    one_shot_canary = [gap for gap in gaps if gap["generation_kind"] == "REJECTED_ONE_SHOT_CANARY"]
     recovery = [
         gap for gap in gaps
-        if gap["generation_kind"] not in {"NORMAL_SCHEDULER", "OPERATOR_RESCHEDULED"}
+        if gap["generation_kind"] not in {
+            "NORMAL_SCHEDULER", "OPERATOR_RESCHEDULED", "REJECTED_ONE_SHOT_CANARY"
+        }
     ]
 
     return {
@@ -150,6 +161,7 @@ def summarize(run_lines: list[str], startup: dict) -> dict:
         "normal_scheduler_gap_samples": normal,
         "normal_scheduler_comparison_samples": [gap for gap in normal if gap["comparison_eligible"]],
         "operator_rescheduled_gap_samples": operator_rescheduled,
+        "rejected_one_shot_canary_gap_samples": one_shot_canary,
         "recovery_gap_samples": recovery,
         "unknown_policy": "MISSING_USEFUL_OR_BOUNDARY_VALUES_REMAIN_NULL_NOT_ZERO",
     }
