@@ -1,3 +1,16 @@
 {
-  "schema_version":"1.0","main_canonical_id":"6ab152b636748191a71873ba4d5ef551","current_expected_due_at":"2026-09-22T07:07:30+09:00","generation_key":"DUE:2026-09-22T07:07:30+09:00","boot_started_at":"2026-09-22T07:09:13+09:00","boot_started_authority_epoch":"DUE:2026-09-22T07:07:30+09:00","rearm_verified_at":"2026-09-22T07:09:21+09:00","verified_provisional_due_at":"2026-09-22T07:20:47+09:00","status":"REARM_VERIFIED_EXTENDED","last_updated_at":"2026-09-22T07:17:49+09:00","provider_delivery_delay_seconds":103,"provisional_extension_count":1,"provisional_extension":{"extended_at":"2026-09-22T07:17:47+09:00","previous_due_at":"2026-09-22T07:20:13+09:00","new_due_at":"2026-09-22T07:20:47+09:00","offset":"exactly 3 minutes (180 seconds) from extension reference","reason":"The 10-minute (600-second) substantive-work floor ends near the prior provisional due, so required checkpoint/final rearm handling could collide with it."},"note":"SAME MAIN recurring provisional was live-verified after one guarded extension. This is crash-insurance only; normal close still requires ACTUAL END + exactly 1 minute (60 seconds)."
+  "schema_version":"1.0",
+  "main_canonical_id":"6ab152b636748191a71873ba4d5ef551",
+  "current_expected_due_at":"2026-09-22T07:20:29+09:00",
+  "generation_key":"DUE:2026-09-22T07:20:29+09:00",
+  "boot_started_at":"2026-09-22T08:18:39+09:00",
+  "boot_started_authority_epoch":"DUE:2026-09-22T07:20:29+09:00",
+  "rearm_verified_at":"2026-09-22T08:18:47+09:00",
+  "verified_provisional_due_at":"2026-09-22T08:29:39+09:00",
+  "status":"REARM_VERIFIED",
+  "last_updated_at":"2026-09-22T08:18:47+09:00",
+  "provider_delivery_delay_seconds":3490,
+  "provider_delivery_delay_human":"58 minutes 10 seconds (3490 seconds) after the intended 07:20:29 KST due",
+  "provisional_extension_count":0,
+  "note":"SAME MAIN recurring provisional live-verified at observed wake/arm reference + exactly 11 minutes (660 seconds). The very large provider delay is recorded separately and does not change the local normal-close rule of ACTUAL END + exactly 1 minute (60 seconds)."
 }
