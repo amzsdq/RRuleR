@@ -1,6 +1,6 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 6,
+  "version": 7,
   "status": "ACTIVE",
   "purpose": "Use one same-canonical hourly RRULE as bounded cold rescue with a strict normal CONTINUE fast continuation of actual observed turn END + 60 seconds; predictive prearm remains evidence-gated.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
@@ -8,7 +8,9 @@
     "READ_MINIMUM_FENCE_CURRENT_AND_CANONICAL_AUTHORITY",
     "REJECT_OR_RECOVER_STALE_WAKE_WITHOUT_ROLLBACK",
     "RECORD_OBSERVED_SUCCESSOR_BOUNDARY",
+    "RECORD_BOOT_STARTED_BOUNDARY",
     "PROVISIONAL_ARM_AND_VERIFY",
+    "RECORD_REARM_VERIFIED_BOUNDARY",
     "RESTORE_FULL_CHECKPOINT_AND_TASK_STATE",
     "CLAIM_AUTHORITY_IF_NONCONFLICTING",
     "RECORD_AUTHORITY_CLAIM_BOUNDARY",
@@ -76,12 +78,14 @@
     "ledger": "state/SUCCESSOR_STARTUP.json",
     "required_observed_boundaries": [
       "SUCCESSOR_OBSERVED_AT",
+      "BOOT_STARTED_AT",
+      "REARM_VERIFIED_AT",
       "AUTHORITY_CLAIM_AT",
       "FIRST_DURABLE_USEFUL_AT"
     ],
     "rule": "Do not infer missing boundaries. Attribute delay to the measured segment before changing scheduler timing again.",
     "latest_valid_sample": "STARTUP-003",
-    "latest_finding": "Observed predecessor end-to-due=134s dominated the valid sample; exact-second completion-relative rearm is the next correction."
+    "latest_finding": "STARTUP-006 was invoked 73s after due but left no durable BOOT_STARTED, REARM_VERIFIED, authority claim, useful work, or self-rearm. Hourly fallback recovered in STARTUP-007; fast independent wake remains unprovisioned."
   },
   "stale_wake_fence": {
     "older_occurrence_must_not_restore_old_prompt": true,
@@ -96,5 +100,14 @@
     "result": "PASS",
     "observed_sequence": "Stage 1 woke, mutated the same canonical hourly RRULE DTSTART to actual wake +2m, persisted Stage 2 prompt, then Stage 2 executed and the same canary was disabled."
   },
-  "rollback": "Preserve the canonical and completion-relative fallback whenever an experimental cadence produces unsafe overlap, missed continuation, rollback, or an out-of-budget useful-work handoff."
+  "rollback": "Preserve the canonical and completion-relative fallback whenever an experimental cadence produces unsafe overlap, missed continuation, rollback, or an out-of-budget useful-work handoff.",
+  "startup_acknowledgement": {
+    "ledger": "state/SUCCESSOR_STARTUP.json",
+    "boot_started_semantics": "Observed immediately after minimum fence validation proves bootstrap execution entered durable control handling.",
+    "rearm_verified_semantics": "Observed only after the same canonical is enabled, recurring, and its provisional DTSTART is re-read successfully.",
+    "acknowledgement_deadline_seconds": 120,
+    "missing_ack_classification": "STARTUP_ACK_MISSING",
+    "rule": "Missing timestamps remain unknown. An invocation record alone does not prove bootstrap entry, rearm, authority, work, or process death.",
+    "recovery_limitation": "This acknowledgement makes the failure diagnosable. It does not wake a worker; fast recovery still requires an independent supported trigger."
+  }
 }
