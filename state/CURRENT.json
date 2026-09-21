@@ -6,32 +6,30 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "root_goal": "P0 sustained evidenced useful-work coverage",
   "status": "CONTINUE",
-  "current_owner": "RUN-UTIL-20260921-215434",
-  "authority_epoch": 71,
+  "current_owner": "RUN-UTIL-20260921-221537",
+  "authority_epoch": 72,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "HANDOFF_COMMITTED",
+  "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-109",
-    "state": "COMPLETE",
+    "id": "CP-UTILIZATION-110",
+    "state": "WORKING",
     "completed": [
-      "Separated normal scheduler samples from Watchdog and provisional recovery generations in turn-close summaries.",
-      "Preserved every missing recovery boundary as null rather than zero.",
-      "Added complete/incomplete Watchdog recovery fixtures; six focused summary tests passed.",
-      "Added STARTUP_ACK canonical-ID and generation-key fencing; nine startup audit tests passed."
+      "Recovered the 22:07:23 receipt-less generation through the fixed Startup Watchdog.",
+      "Persisted generation-matched BOOT_STARTED and REARM_VERIFIED for the 22:13:24 recovery generation.",
+      "Verified same MAIN canonical provisional continuation at 22:29:29 and same Watchdog one-shot at 22:32:29, both enabled."
     ],
     "evidence": [
-      "tools/summarize_turn_close.py commits a5a2742 and tests 95e507c",
-      "tools/audit_startup_boundaries.py commit f3fbb72 and tests 86293bc",
-      "actual-ledger assertions kept STARTUP-009 missing first useful as null and excluded recovery samples from normal comparison"
+      "state/STARTUP_ACK.json generation DUE:2026-09-21T22:13:24+09:00",
+      "live automation metadata re-read after both schedule mutations"
     ],
-    "observation": "Recovery generations are now diagnostically visible without contaminating normal END+60 scheduler comparisons. The malformed mixed canonical ID encountered during bootstrap now fails closed in the audit.",
-    "next_action": "Successor validates the 22:07:23 generation receipts and extends recovery observability with fresh evidence."
+    "observation": "Epoch 72 is a fixed-Watchdog pre-bootstrap recovery generation. It must remain excluded from normal scheduler comparisons while preserving each observed segment.",
+    "next_action": "Record failed normal generation and successful recovery generation in SUCCESSOR_STARTUP, then make the boundary audit validate next_sample."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T22:13:24+09:00",
+    "next_due_at": "2026-09-21T22:29:29+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -55,9 +53,9 @@
       "normal_check_offset_seconds": 180,
       "recovery_recheck_seconds": 240,
       "main_recovery_due_offset_seconds": 60,
-      "next_watchdog_due_at": "2026-09-21T22:16:24+09:00",
-      "coverage": "RECOVERY_ARMED",
-      "last_classification": "STARTUP_ACK_MISSING",
+      "next_watchdog_due_at": "2026-09-21T22:32:29+09:00",
+      "coverage": "HEALTHY_BOOTSTRAP",
+      "last_classification": "HEALTHY_BOOTSTRAP",
       "last_recovery_at": "2026-09-21T22:12:24+09:00",
       "enabled_verified": true,
       "policy_version": 3,
@@ -65,7 +63,7 @@
       "idle_distant_due_extra_slack_seconds": 120,
       "idle_distant_due_recovery_offset_seconds": 60
     },
-    "next_due_source": "WATCHDOG_STARTUP_ACK_MISSING_RECOVERY"
+    "next_due_source": "PROVISIONAL_BOOTSTRAP_REARM"
   },
   "safety": {
     "public_repo": true,
