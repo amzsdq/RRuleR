@@ -44,6 +44,18 @@ class EventRescueEvaluationTests(unittest.TestCase):
         startup["next_sample"] = {"sample_id": "S7", "successor_observed_at": "2026-09-21T20:59:00+09:00", "boot_started_at": None}
         self.assertFalse(evaluate(current, activity, ledger, startup, NOW)["emit"])
 
+    def test_boot_without_rearm_verification_becomes_rescue_reason(self):
+        current, activity, ledger, startup = base()
+        startup["next_sample"] = {
+            "sample_id": "S8",
+            "successor_observed_at": "2026-09-21T20:56:00+09:00",
+            "boot_started_at": "2026-09-21T20:57:00+09:00",
+            "rearm_verified_at": None,
+        }
+        result = evaluate(current, activity, ledger, startup, NOW)
+        self.assertTrue(result["emit"])
+        self.assertEqual(result["event_reason"], "REARM_VERIFICATION_MISSING")
+
     def test_stale_owner_is_secondary_rescue_reason(self):
         current, activity, ledger, startup = base()
         activity["last_progress_at"] = "2026-09-21T20:56:00+09:00"
