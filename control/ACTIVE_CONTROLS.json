@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.4",
+  "schema_version": "2.5",
   "program_id": "RRULER-PROGRAM-001",
   "status": "ACTIVE",
   "purpose": "Single machine-readable registry of control artifacts that every fresh worker must load before substantive work.",
@@ -52,8 +52,8 @@
     "CALLER_SUPPLIED_OBSERVATION_HORIZON_MUST_NOT_EXCEED_DURABLE_TRUSTED_HORIZON",
     "STARTUP_RECEIPTS_MUST_NOT_BE_INFERRED",
     "NORMAL_CONTINUATION_DEPENDS_ONLY_ON_SAME_MAIN",
-    "SAME_MAIN_RECURRING_RRULE_IS_COLD_FALLBACK",
-    "WATCHDOG_DISABLED_STANDBY_NOT_NORMAL_DEPENDENCY"
+    "WATCHDOG_DISABLED_STANDBY_NOT_NORMAL_DEPENDENCY",
+    "SCHEDULE_CATEGORY_CANARY_USES_SAME_MAIN_EXACT_ONE_SHOT_SELF_UPDATE"
   ],
-  "conflict_rule": "If mandatory artifacts conflict, fail closed only for the disputed side effect, reconcile durably, and continue safe useful work. Normal continuity is SAME MAIN END+60 with SAME MAIN recurring RRULE cold fallback; Watchdog is disabled standby and may not be reintroduced as a normal dependency."
+  "conflict_rule": "If mandatory artifacts conflict, fail closed only for the disputed side effect and reconcile durably. During the active schedule-category canary, normal continuity is SAME MAIN exact one-shot END+60; do not silently restore hourly RRULE. Watchdog remains disabled standby."
 }
