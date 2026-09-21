@@ -5,9 +5,9 @@
   "generation_key": "DUE:2026-09-22T00:13:08+09:00",
   "boot_started_at": "2026-09-22T00:14:46+09:00",
   "boot_started_authority_epoch": 75,
-  "rearm_verified_at": null,
-  "verified_provisional_due_at": null,
-  "status": "BOOT_STARTED",
-  "last_updated_at": "2026-09-22T00:17:08+09:00",
-  "note": "Observed the operator-rescheduled SAME MAIN generation at 00:13:08. This supersedes the stale 00:02:08 projection; delivery-to-turn-start was 98 seconds. Provisional recurring cold fallback verification is next."
+  "rearm_verified_at": "2026-09-22T00:17:48+09:00",
+  "verified_provisional_due_at": "2026-09-22T00:27:46+09:00",
+  "status": "REARM_VERIFIED",
+  "last_updated_at": "2026-09-22T00:17:48+09:00",
+  "note": "SAME MAIN recurring RRULE cold fallback was live re-read with exact provisional DTSTART 00:27:46 and enabled=true. Watchdog was not used."
 }
