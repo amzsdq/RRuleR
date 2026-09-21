@@ -1,16 +1,16 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
-  "policy_revision": 15,
+  "policy_revision": 16,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
-    "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE",
+    "mechanism": "RRULE_CUSTOM_RECURRING_24H_SLOT_COMPLETION_RELATIVE_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "canonical_reuse_required": true,
     "one_shot_conversion_forbidden": true,
     "replacement_automation_forbidden": true,
-    "rrule_frequency": "HOURLY",
+    "rrule_frequency": "DAILY",
     "timing_mode": "exact_schedule",
     "minimum_fence_before_mutation": true,
     "provisional_arm_before_full_restore_and_work": true,
@@ -23,7 +23,8 @@
     "final_checkpoint_before_close": true,
     "verify_every_mutation": true,
     "fixed_quarter_cycle_active": false,
-    "note": "Self-reliant normal path: fence -> same-canonical +780s provisional crash insurance -> work/checkpoint -> live-verified SAME MAIN END+60. The recurring hourly RRULE is the cold fallback. Watchdog is disabled standby."
+    "note": "Custom recurring category canary: SAME MAIN keeps one occurrence per hour through DAILY+24 BYHOUR while DTSTART/BYMINUTE/BYSECOND self-shift to exact END+60. Exact one-shot is rejected; Watchdog is disabled standby.",
+    "custom_rule_template": "FREQ=DAILY;BYHOUR=0..23;BYMINUTE=<DUE_MINUTE>;BYSECOND=<DUE_SECOND>"
   },
   "utilization": {
     "first_class_objective": true,
@@ -63,7 +64,7 @@
     "old_verified_future_rrule_may_act_as_recovery_opportunity": true,
     "disabled_deleted_missing_automation_self_rescued": false,
     "rollback_on_live_scheduler_regression": "RESTORE_LAST_VERIFIED_SLOWER_CADENCE_WITHOUT_REPLACING_CANONICAL",
-    "fast_shifted_wake_lost_before_bootstrap": "SAME_MAIN_NATURAL_HOURLY_RRULE_RECOVERY",
+    "fast_shifted_wake_lost_before_bootstrap": "SAME_MAIN_NATURAL_CUSTOM_RECURRING_OCCURRENCE",
     "watchdog_required_for_normal_correctness": false
   },
   "authority": {
@@ -85,7 +86,7 @@
     "disable_same_canonical_only_on_program_terminal": true
   },
   "worker_cycle": {
-    "mode": "ROLLING_CONTINUOUS_WORK_WITH_SAME_MAIN_RRULE_COLD_FALLBACK",
+    "mode": "ROLLING_CONTINUOUS_WORK_WITH_SAME_MAIN_CUSTOM_RECURRING_COLD_FALLBACK",
     "plan_before_substantive_work": true,
     "provisional_rescue_planning_horizon_minutes": 10,
     "work_packet_is_stop_timer": false,
