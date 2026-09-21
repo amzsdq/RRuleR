@@ -105,7 +105,7 @@ jobs:
           python tools/summarize_turn_close.py state/RUNS.jsonl state/SUCCESSOR_STARTUP.json >/tmp/turn-close-summary.json
           python tools/audit_startup_boundaries.py state/SUCCESSOR_STARTUP.json state/RUNS.jsonl >/tmp/startup-audit.json
           python tools/build_turn_review.py state/RUNS.jsonl state/WORK_EVIDENCE.json state/SUCCESSOR_STARTUP.json >/tmp/turn-review.json
-          python tools/audit_successor_progress.py state/SUCCESSOR_STARTUP.json --as-of 2026-09-21T20:00:00+09:00 --threshold-seconds 120 >/tmp/successor-progress-audit.json
+          python tools/audit_successor_progress.py state/SUCCESSOR_STARTUP.json --as-of "$(date -Iseconds)" --threshold-seconds 120 >/tmp/successor-progress-audit.json
           python tools/compute_completion_due.py 2026-09-21T18:51:46+09:00 60 >/tmp/completion-due.json
           CURRENT_EPOCH=$(python -c 'import json; print(json.load(open("state/CURRENT.json"))["authority_epoch"])')
           python tools/summarize_work_evidence.py state/WORK_EVIDENCE.json "$CURRENT_EPOCH" state/RUNS.jsonl >/tmp/run-summary.json
