@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build validity-aware turn review rows without inferring unknown useful/control time."""
+"""Build validity-aware turn review rows without inferring unknown time."""
 from __future__ import annotations
 
 import json
@@ -13,9 +13,17 @@ def _ts(value: str) -> datetime:
 
 
 def _run_id(observation_id: str | None) -> str | None:
-    if observation_id and observation_id.startswith("OBS-"):
-        return observation_id[4:]
-    return observation_id
+    return observation_id[4:] if observation_id and observation_id.startswith("OBS-") else observation_id
+
+
+def _progress_status(sample: dict | None) -> str:
+    if not sample or not sample.get("successor_observed_at"):
+        return "SUCCESSOR_NOT_OBSERVED"
+    if not sample.get("authority_claim_at"):
+        return "MISSING_AUTHORITY_CLAIM"
+    if not sample.get("first_durable_useful_at"):
+        return "MISSING_FIRST_USEFUL"
+    return "COMPLETE"
 
 
 def build_rows(run_lines: list[str], work_evidence: dict, startup: dict) -> list[dict]:
@@ -55,6 +63,8 @@ def build_rows(run_lines: list[str], work_evidence: dict, startup: dict) -> list
             "accepted_useful_seconds": useful,
             "useful_time_known": useful is not None,
             "observed_control_close_seconds": run.get("checkpoint_seconds"),
+            "successor_delivery_seconds": sample.get("due_to_observation_seconds") if sample else None,
+            "successor_progress_status": _progress_status(sample),
             "successor_gap_seconds": gap,
             "successor_gap_exclusion": gap_exclusion,
             "close_decision": run.get("close_decision"),
