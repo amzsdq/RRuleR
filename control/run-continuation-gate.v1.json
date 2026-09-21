@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_RUN_CONTINUATION_GATE",
-  "version": 10,
+  "version": 11,
   "status": "ACTIVE",
-  "purpose": "Allow normal CONTINUE close only after SAME MAIN custom recurring schedule is live-verified at exact END+60. Watchdog is not normal continuity.",
+  "purpose": "Allow normal CONTINUE close only after the current operator-created SAME MAIN recurring schedule is live-verified at exact END+60. Watchdog is not normal continuity.",
   "program_nonterminal_states": [
     "CONTINUE",
     "DEGRADED_CONTINUATION"
@@ -38,7 +38,7 @@
       "LATEST_CHECKPOINT_PERSISTED",
       "ACTUAL_END_OBSERVED",
       "SAME_MAIN_MUTATED_TO_EXACT_END_PLUS_60_SECONDS",
-      "LIVE_MAIN_REREAD_PROVES_SAME_CANONICAL_ENABLED_CUSTOM_RECURRING_EXACT_DSTART_AND_MATCHING_BYMINUTE_BYSECOND",
+      "LIVE_MAIN_REREAD_PROVES_SAME_CANONICAL_ENABLED_RECURRING_EXACT_DSTART",
       "DURABLE_EXPECTED_FAST_DUE_PERSISTED",
       "NON_WORKING_CURRENT_ACTIVITY_HANDOFF_PROJECTION_VALIDATED",
       "TURN_STATUS_AND_RUN_EVIDENCE_PERSISTED"
@@ -76,7 +76,8 @@
     "normal_continue_final_requires_exact_fast_main": true,
     "provisional_due_left_after_close_is_incident": "NORMAL_CLOSE_LEFT_PROVISIONAL_DUE",
     "watchdog_as_expected_successor_is_incident": "NORMAL_PATH_DEPENDED_ON_WATCHDOG",
-    "normal_path_depends_on_watchdog_forbidden": true
+    "normal_path_depends_on_watchdog_forbidden": true,
+    "retired_predecessor_reactivation_forbidden": true
   },
   "final_response_is_authoritative_side_effect": true,
   "pre_final_authorization": {
@@ -88,7 +89,7 @@
       "state/NOW.json"
     ],
     "check_immediately_before_user_visible_final": true,
-    "authorization_rule": "Honor operator pause and terminal states first. For normal CONTINUE during the custom-recurring canary, final is authorized only after the live SAME MAIN custom recurrence is verified at exact END+60 with matching DTSTART/BYMINUTE/BYSECOND and the non-WORKING close projection is consistent.",
+    "authorization_rule": "Honor operator pause and terminal states first. For normal CONTINUE, final is authorized only after the fresh CURRENT MAIN canonical is live-verified enabled with recurrence at exact END+60 and the non-WORKING close projection is consistent. A retired predecessor canonical can never satisfy the gate.",
     "if_denied": "DO_NOT_EMIT_FINAL_CONTINUE_USEFUL_WORK",
     "stale_prior_check_forbidden": true,
     "normal_status_report_does_not_authorize_final": true
@@ -105,7 +106,7 @@
       "A CONTINUE close below 600s requires a concrete documented reason and alternatives_checked; below 480s additionally requires an allowlisted short-turn exception.",
       "At elapsed >=600s, do not start a new large unit; finish only the smallest safe in-flight unit.",
       "Aim to close by ~720s; exceeding that soft ceiling requires an actual in-flight safety/atomicity reason.",
-      "Checkpoint, observe actual END, live-verify SAME MAIN custom recurring schedule at END+60 with enabled=true, exact DTSTART and matching BYMINUTE/BYSECOND, persist the exact fast due and non-WORKING handoff projection, then report."
+      "Checkpoint, observe actual END, live-verify the fresh CURRENT SAME MAIN recurring schedule at END+60 with enabled=true and exact DTSTART, persist the exact fast due and non-WORKING handoff projection, then report."
     ],
     "close_reserve_rule": "Use measured close cost only to avoid overrunning the platform safety budget. Do not use reserve as a reason to stop before 600s when another small safe unit fits. Never pad.",
     "normal_close_evidence": [
