@@ -1,18 +1,18 @@
 {
-  "schema_version": "1.0",
-  "program_id": "RRULER-PROGRAM-001",
-  "program_ref": "planning/PROGRAM.md",
-  "project_id": "P001",
-  "project_ref": "planning/projects/P001-SUSTAINED-UTILIZATION.md",
-  "work_spec_id": "WS-P001-002",
-  "work_spec_ref": "planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md",
-  "execution_status": "ACTIVE",
-  "pause_reason": null,
-  "resume_target": {
-    "step": "Verify the evidence-capture correction across subsequent bounded turns/windows. Keep WORK_EVIDENCE current; if a turn underperforms, classify the largest observed gap and implement the highest-effect correction.",
-    "selection_rule": "Retest the highest-impact correction before inventing a new intervention. Preserve unknown time as unknown and choose corrections by measured effect on P001."
+  "schema_version":"1.0",
+  "program_id":"RRULER-PROGRAM-001",
+  "program_ref":"planning/PROGRAM.md",
+  "project_id":"P001",
+  "project_ref":"planning/projects/P001-SUSTAINED-UTILIZATION.md",
+  "work_spec_id":"WS-P001-002",
+  "work_spec_ref":"planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md",
+  "execution_status":"ACTIVE",
+  "pause_reason":null,
+  "resume_target":{
+    "step":"Complete PREARM-CANARY-001: arm the same canonical predictively before epoch-60 target close, preserve single substantive authority, then measure predecessor-last-useful to successor-first-useful gap without inference.",
+    "selection_rule":"If the canary is safe and post-close gap <=42s, repeat once before promotion. On unsafe overlap, duplicate side effect, schedule rollback, or missed successor, restore normal completion-relative fallback and classify the failure before selecting another correction."
   },
-  "turn_plan_role": "TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec.",
-  "updated_at": "2026-09-21T15:55:35+09:00",
-  "resumed_by_operator_at": "2026-09-21T06:47:45.338Z"
+  "turn_plan_role":"TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec.",
+  "updated_at":"2026-09-21T17:05:32+09:00",
+  "resumed_by_operator_at":"2026-09-21T06:47:45.338Z"
 }
