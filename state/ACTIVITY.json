@@ -4,14 +4,14 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "status": "WORKING",
-  "active_run_id": "RUN-UTIL-20260921-211349",
-  "authority_epoch": 69,
-  "substantive_work_started_at": "2026-09-21T21:13:49+09:00",
-  "last_progress_at": "2026-09-21T21:16:18+09:00",
-  "last_progress_kind": "AUTHORITY_CLAIM_AFTER_WATCHDOG_RECOVERY_BOOTSTRAP",
-  "current_unit": "Complete STARTUP-009 and harden Watchdog recovery lineage audit.",
-  "next_wake_due_at": "2026-09-21T21:27:36+09:00",
+  "active_run_id": "RUN-UTIL-20260921-212747",
+  "authority_epoch": 70,
+  "substantive_work_started_at": "2026-09-21T21:27:47+09:00",
+  "last_progress_at": "2026-09-21T21:29:37+09:00",
+  "last_progress_kind": "PROVISIONAL_RESCUE_AUTHORITY_RECOVERY",
+  "current_unit": "Repair startup-boundary audit and validate Watchdog/provisional recovery lineage.",
+  "next_wake_due_at": "2026-09-21T21:41:24+09:00",
   "successor_observed": true,
   "handoff_ready": false,
-  "operator_ui_note": "Epoch 69: first fixed-Watchdog recovery generation booted and provisionally rearmed; recovery audit/test work in progress."
+  "operator_ui_note": "Epoch 70 recovered stale epoch 69 through verified provisional continuation; audit repair in progress."
 }
