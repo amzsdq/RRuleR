@@ -44,7 +44,10 @@ def audit(
         for run in (json.loads(line) for line in run_lines if line.strip())
         if run.get("observation_id")
     }
-    samples = startup.get("samples", [])
+    samples = list(startup.get("samples", []))
+    next_sample = startup.get("next_sample")
+    if isinstance(next_sample, dict):
+        samples.append(next_sample)
     samples_by_id = {sample.get("sample_id"): sample for sample in samples}
 
     def find_run(predecessor_id: str | None) -> dict | None:
