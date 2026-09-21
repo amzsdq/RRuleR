@@ -15,13 +15,16 @@
     "state": "CONTINUE",
     "completed": [
       "Observed eligible STARTUP-003 successor invocation at 18:54:48 KST.",
-      "Claimed nonconflicting authority epoch 66 after predecessor checkpoint/handoff."
+      "Claimed nonconflicting authority epoch 66 after predecessor checkpoint/handoff.",
+      "Validated predecessor RUNS and appended the first eligible operator review row.",
+      "Completed valid STARTUP-003 segmentation: last-useful->end 69s, end->due 134s, due->observation 48s, observation->claim 71s, claim->first-useful 65s."
     ],
     "evidence": [
-      "state/RUNS.jsonl@7daba51d74f994e836b0ea77f72d144053f7d837"
+      "state/RUNS.jsonl@7daba51d74f994e836b0ea77f72d144053f7d837",
+      "planning/evidence/TURN-CLOSE-V4-RETEST.md@a412c1cb9c106f088ad6af54ed26b4c8d53c39de"
     ],
-    "observation": "STARTUP-003 due-to-observation is prospectively observed as 48 seconds. Authority claim followed 71 seconds after observation; first durable useful boundary remains unknown until a substantive artifact is committed.",
-    "next_action": "Validate predecessor run, append its operator review row, record first durable useful boundary, then continue with independent CI/evidence verification."
+    "observation": "STARTUP-003 is valid and complete. End-to-due=134s is the largest individual measured continuation segment; current scheduler timing, not just delivery, is again the highest-effect correction target.",
+    "next_action": "Implement and test exact-second completion-relative rearm from observed close; continue live turn review and useful-evidence capture."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
