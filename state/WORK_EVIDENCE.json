@@ -322,6 +322,20 @@
       "qualification": "SUBSTANTIVE_ACCEPTED",
       "basis": "Implemented a fail-closed event-rescue decision engine for missing bootstrap acknowledgement, missing provisional rearm verification, and stale owners; gated emission on a verified consumer and no outstanding generation; wired the evaluator into CI and the inert rescue workflow; completed the initial three-turn evidence review. Both boundaries are observed and no wait time is counted.",
       "observed_seconds": 438
+    },
+    {
+      "record_id": "WE-20260921-E72-001",
+      "authority_epoch": 72,
+      "run_id": "RUN-UTIL-20260921-221537",
+      "start_at": "2026-09-21T22:19:35+09:00",
+      "end_at": "2026-09-21T22:23:35+09:00",
+      "start_boundary": "OBSERVED",
+      "end_boundary": "OBSERVED",
+      "kind": "recovery_evidence_and_audit_hardening",
+      "artifact": "state/SUCCESSOR_STARTUP.json@f3d9286c817e6a13344e47a8a944ae74961e9af0 + tools/audit_startup_boundaries.py@f3f0352ec866ec99a074c7360c30bcde71c52ddc + tests/test_audit_startup_boundaries.py@8575cc7e5fb6c4bb7272c91c212509b565c5e46b",
+      "qualification": "SUBSTANTIVE_ACCEPTED",
+      "basis": "Persisted the paired receipt-less normal generation and fixed-Watchdog recovery with explicit lineage and observed boundaries, then made the boundary audit include the active next_sample and added focused regression coverage. Eleven audit tests and the actual 12-sample ledger audit passed.",
+      "observed_seconds": 240
     }
   ],
   "collection": {
