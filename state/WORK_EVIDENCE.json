@@ -280,11 +280,25 @@
       "qualification": "SUBSTANTIVE_ACCEPTED",
       "basis": "Appended the second eligible turn review while preserving unknown successor claim/useful time and the separately observed 30-second delivery segment. Both boundaries were directly observed around the durable commit.",
       "observed_seconds": 49
+    },
+    {
+      "record_id": "WE-20260921-E67-002",
+      "authority_epoch": 67,
+      "run_id": "RUN-UTIL-20260921-193957",
+      "start_at": "2026-09-21T19:41:47+09:00",
+      "end_at": "2026-09-21T19:47:23+09:00",
+      "start_boundary": "OBSERVED",
+      "end_boundary": "OBSERVED",
+      "kind": "test_or_validator_added_or_hardened",
+      "artifact": "tools/audit_successor_progress.py@77d12e5893559b377bfeabbb335a64a81caa813f + tests/test_audit_successor_progress.py@a7b39564ee4213cb0f1a39ece5b2065fc4c9a7f6 + .github/workflows/validate-control-plane.yml@274e4f2e3b2a9189c2d042205c997e72f72c5e48 + tools/build_turn_review.py@8c990e52f7ae0ee162896ce647c7a3f15a114f58 + tests/test_build_turn_review.py@10ce38df9ad7cba74322c052f14e8e9336d56f27",
+      "qualification": "SUBSTANTIVE_ACCEPTED",
+      "basis": "Implemented and tested missing-successor-progress diagnostics, exposed delivery and progress separately in generated reviews, repaired malformed CI command separators, and re-fetched the committed workflow to verify integration. Both time boundaries were directly observed; no surrounding time is inferred.",
+      "observed_seconds": 336
     }
   ],
   "collection": {
     "started_at": "2026-09-21T05:03:12+09:00",
     "historical_backfill": false,
-    "latest_observed_record": "WE-20260921-E59-005"
+    "latest_observed_record": "WE-20260921-E67-002"
   }
 }
