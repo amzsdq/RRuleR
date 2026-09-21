@@ -80,3 +80,8 @@ Do not label the program COMPLETE because the initial review, one repair, or a w
 ## Initial three-turn review conclusion
 
 The first three eligible post-repair turns lasted 554s, 504s, and 498s. Accepted useful time is UNKNOWN, 368s, and 385s respectively, so the sample does not prove the P0 threshold or a utilization improvement. More importantly, the third turn's exact END+60 successor was invoked 73s after due but left no durable bootstrap acknowledgement or progress; useful work resumed only on the next hourly fallback, producing an observed 3890s predecessor-last-useful to recovery-first-useful gap. In-turn chaining is promising, but pre-bootstrap recovery is now the dominant evidenced availability failure. Continuous collection remains active; three turns are a review checkpoint, not a stop condition.
+
+
+## Epoch 75 operator-reschedule classification
+
+The normal MAIN v4 successor due at 00:02:08 KST was invoked at 00:05:12.368456 but produced no durable bootstrap receipt. The operator then explicitly rescheduled the same MAIN for 00:13:08; the resulting turn began at 00:14:46, wrote BOOT_STARTED immediately, and live-verified its recurring provisional fallback at 00:27:46 without using Watchdog. This generation is preserved as STARTUP-017 but excluded from normal END+60 and emergency-recovery comparisons. Audit and summary tools now place explicit/legacy operator-reset markers in a dedicated bucket; focused exact-code checks passed.
