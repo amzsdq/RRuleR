@@ -5,6 +5,7 @@
 - `CURRENT.json` — compact machine-readable projection of the current program/root job.
 - `HANDOFF.json` — explicit predecessor/successor coordination state for the current handoff.
 - `ACTIVITY.json` — durable operator-facing liveness heartbeat: armed/working/handoff/terminal state, active run identity, last progress, current unit, and next wake.
+- `WORK_EVIDENCE.json` — strict forward-only accepted useful-work intervals; unknown time is never inferred.
 - `RELAY_VALIDATION.json` — machine-readable acceptance ledger for the reproduced RRULE self-relay.
 - `EVENTS.jsonl` — append-oriented public-safe relay event ledger.
 - `RUNS.jsonl` — run/handoff/utilization observation ledger.
@@ -42,6 +43,21 @@ Rules:
 - never claim hidden/background work from schedule existence alone.
 
 Schema: `schemas/activity.schema.json`.
+
+## WORK_EVIDENCE.json
+
+This is the strict useful-work acceptance ledger used for P0 measurement. It is not an activity log and does not automatically infer work from commits, schedule existence, or heartbeats.
+
+Prospective capture rules:
+
+- both interval boundaries must be actually observed and timezone-aware;
+- a materially new substantive artifact must support the interval;
+- intervals may not overlap and record IDs must be unique;
+- evidence authority epochs may not move backward;
+- scheduler-only, heartbeat-only, waiting, timestamp-only, and evidence-bookkeeping-only activity is not useful work;
+- missing historical time remains unknown rather than being backfilled for a better utilization score.
+
+`tools/append_work_evidence.py` provides deterministic guarded append semantics. `tools/validate_work_evidence.py` audits the strict ledger and promotion windows. `tools/summarize_work_evidence.py` reports evidence freshness and observed totals without converting unknown time into useful or idle time.
 
 ## RELAY_VALIDATION.json
 
@@ -90,4 +106,3 @@ Use it to measure:
 - classification.
 
 Do not invent timing values that were not observed. Null is preferable to fabricated precision.
-
