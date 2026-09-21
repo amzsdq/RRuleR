@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "program_id": "RRULER-PROGRAM-001",
+  "program_ref": "planning/PROGRAM.md",
+  "project_id": "P001",
+  "project_ref": "planning/projects/P001-SUSTAINED-UTILIZATION.md",
+  "work_spec_id": "WS-P001-002",
+  "work_spec_ref": "planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md",
+  "execution_status": "PAUSED_BY_OPERATOR",
+  "pause_reason": "Explicit operator pause before planning-spine installation.",
+  "resume_target": {
+    "step": "Reconcile the stale work-evidence pipeline and produce a current durable utilization baseline before selecting the next intervention.",
+    "selection_rule": "Choose the highest-expected-effect runnable step for P001; do not continue nearby control work by inertia."
+  },
+  "turn_plan_role": "TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec.",
+  "updated_at": "2026-09-21T15:24:00+09:00"
+}
