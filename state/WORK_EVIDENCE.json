@@ -364,6 +364,20 @@
       "qualification": "SUBSTANTIVE_ACCEPTED",
       "basis": "Removed stale mandatory Watchdog coverage from active controls, made missing startup recover through the SAME MAIN natural recurring RRULE, gated Watchdog behind explicit emergency activation, aligned runtime/wake/SLO artifacts, added CI invariants, passed 24 direct semantic checks, and found zero remaining active-policy matches for the retired normal Watchdog dependency. Boundaries are directly observed; surrounding bootstrap/close time is not counted.",
       "observed_seconds": 303
+    },
+    {
+      "record_id": "WE-20260922-E75-001",
+      "authority_epoch": 75,
+      "run_id": "RUN-UTIL-20260922-001446",
+      "start_at": "2026-09-22T00:21:41+09:00",
+      "end_at": "2026-09-22T00:23:17+09:00",
+      "start_boundary": "OBSERVED",
+      "end_boundary": "OBSERVED",
+      "kind": "operator_rescheduled_startup_evidence_hardening",
+      "artifact": "tools/audit_startup_boundaries.py@d390214 + tools/summarize_turn_close.py@d7e1c52 + tests/test_audit_startup_boundaries.py@636c686 + tests/test_summarize_turn_close.py@d67e24f",
+      "qualification": "SUBSTANTIVE_ACCEPTED",
+      "basis": "Separated explicit operator-rescheduled MAIN generations from both normal END+60 scheduler samples and emergency recovery samples, preserved raw observed startup stages, added legacy marker compatibility and focused fixtures, and passed exact remote-code behavior checks. Boundaries are observed GitHub commit timestamps; no surrounding bootstrap or close time is counted.",
+      "observed_seconds": 96
     }
   ],
   "collection": {
