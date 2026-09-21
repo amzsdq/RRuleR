@@ -9,31 +9,33 @@
   "current_owner": "RUN-UTIL-20260921-221537",
   "authority_epoch": 72,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "WORKING",
+  "run_state": "HANDOFF_COMMITTED",
   "checkpoint": {
     "id": "CP-UTILIZATION-110",
-    "state": "WORKING",
+    "state": "COMPLETE",
     "completed": [
       "Recovered the 22:07:23 receipt-less generation through the fixed Startup Watchdog.",
       "Persisted generation-matched BOOT_STARTED and REARM_VERIFIED for the 22:13:24 recovery generation.",
       "Verified same MAIN canonical provisional continuation at 22:29:29 and same Watchdog one-shot at 22:32:29, both enabled.",
       "Recorded STARTUP-011 failure and STARTUP-012 fixed-Watchdog recovery with observed segment boundaries.",
-      "Updated startup boundary audit to validate next_sample; eleven focused tests and the actual 12-sample audit passed."
+      "Updated startup boundary audit to validate next_sample; eleven focused tests and the actual 12-sample audit passed.",
+      "Closed epoch 72 at a 608-second boundary with same-canonical MAIN and Watchdog live-verified."
     ],
     "evidence": [
       "state/STARTUP_ACK.json generation DUE:2026-09-21T22:13:24+09:00",
       "live automation metadata re-read after both schedule mutations",
       "state/SUCCESSOR_STARTUP.json commits 7c3b890 and f3d9286",
-      "tools/audit_startup_boundaries.py f3f0352 + tests 8575cc7; actual audit valid=true"
+      "tools/audit_startup_boundaries.py f3f0352 + tests 8575cc7; actual audit valid=true",
+      "WORK_EVIDENCE epoch72 record validated; live close MAIN 22:26:45 and Watchdog 22:29:45"
     ],
     "observation": "The fixed Watchdog recovered the receipt-less 22:07:23 normal generation. Active next_sample auditing now prevents the newest recovery generation from escaping lineage/generation validation.",
-    "next_action": "Close with exact END+60, set ACTIVITY to a non-WORKING handoff state, and let the successor evaluate recovery latency and stale close-state semantics."
+    "next_action": "Successor validates STARTUP-013 receipts and continues recovery-latency analysis; separately harden close-state projection so IDLE_DISTANT_DUE never sees a stale WORKING flag."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T22:29:29+09:00",
+    "next_due_at": "2026-09-21T22:26:45+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -57,7 +59,7 @@
       "normal_check_offset_seconds": 180,
       "recovery_recheck_seconds": 240,
       "main_recovery_due_offset_seconds": 60,
-      "next_watchdog_due_at": "2026-09-21T22:32:29+09:00",
+      "next_watchdog_due_at": "2026-09-21T22:29:45+09:00",
       "coverage": "HEALTHY_BOOTSTRAP",
       "last_classification": "HEALTHY_BOOTSTRAP",
       "last_recovery_at": "2026-09-21T22:12:24+09:00",
@@ -67,7 +69,7 @@
       "idle_distant_due_extra_slack_seconds": 120,
       "idle_distant_due_recovery_offset_seconds": 60
     },
-    "next_due_source": "PROVISIONAL_BOOTSTRAP_REARM"
+    "next_due_source": "ACTUAL_END_PLUS_60"
   },
   "safety": {
     "public_repo": true,
