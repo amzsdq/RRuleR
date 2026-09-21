@@ -1,5 +1,4 @@
 import unittest
-from copy import deepcopy
 from validate_run_records import validate
 
 class RunValidationTests(unittest.TestCase):
@@ -16,8 +15,11 @@ class RunValidationTests(unittest.TestCase):
     def test_packet_close_rejected(self):
         r=self.record(); r.update(run_ended_at='2026-09-21T10:02:00+00:00', duration_seconds=120)
         with self.assertRaises(ValueError): validate(r)
-    def test_documented_exception(self):
+    def test_old_documented_no_work_exception_rejected(self):
         r=self.record(); r.update(run_ended_at='2026-09-21T10:02:00+00:00', duration_seconds=120, close_decision='EXCEPTION', short_turn_reason='NO_SAFE_RUNNABLE_WORK_AFTER_EXPLICIT_SCAN', alternatives_checked=['Primary awaits external evidence; fallback blocked by same lease; residual task already accepted.'])
+        with self.assertRaises(ValueError): validate(r)
+    def test_platform_enforced_pre600_continue_accepted(self):
+        r=self.record(); r.update(run_ended_at='2026-09-21T10:02:00+00:00', duration_seconds=120, close_decision='EXCEPTION', short_turn_reason='PLATFORM_ENFORCED_TERMINATION', end_reason='PLATFORM_ENFORCED_TERMINATION')
         validate(r)
     def test_budget_close_before_600_rejected(self):
         r=self.record(); r.update(run_ended_at='2026-09-21T10:09:00+00:00', duration_seconds=540, close_decision='BUDGET_EXHAUSTED', close_reserve_seconds=60, alternatives_checked=['Smallest remaining task takes 90 seconds plus measured close reserve.'])
