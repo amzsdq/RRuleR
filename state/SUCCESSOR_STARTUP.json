@@ -83,28 +83,52 @@
       "exclusion_reason": "MISSING_DURABLE_SUCCESSOR_PROGRESS",
       "classification": "SUCCESSOR_INVOKED_WITHOUT_OBSERVED_AUTHORITY_OR_USEFUL_PROGRESS",
       "audit_note": "Automation history proves invocation at 19:05:35.566381 KST, but no durable authority claim or first-useful boundary was recorded. Preserve the measured 30s delivery segment and leave the remaining boundaries unknown."
+    },
+    {
+      "sample_id": "STARTUP-005",
+      "scheduled_due_at": "2026-09-21T19:37:36+09:00",
+      "successor_observed_at": "2026-09-21T19:38:45+09:00",
+      "authority_claim_at": "2026-09-21T19:39:57+09:00",
+      "first_durable_useful_at": "2026-09-21T19:41:47+09:00",
+      "due_to_observation_seconds": 69,
+      "observation_to_claim_seconds": 72,
+      "validity": "EXCLUDED_OPERATOR_RESCHEDULED",
+      "exclusion_reason": "OPERATOR_RESCHEDULED_GENERATION_NO_COMPARABLE_PREDECESSOR",
+      "classification": "OPERATOR_RESCHEDULED_WAKE_DELIVERY_ONLY",
+      "required_fields": [
+        "scheduled_due_at",
+        "successor_observed_at",
+        "authority_claim_at",
+        "first_durable_useful_at"
+      ],
+      "rule": "Use this sample for provider due-to-invocation and post-invocation startup only. Do not use it for END+60 local compliance because the schedule generation was operator-reset at 19:36:58 KST and has no comparable immediately preceding turn end.",
+      "claim_to_first_useful_seconds": 110,
+      "due_to_first_useful_seconds": 251,
+      "audit_note": "Complete delivery/startup boundaries were observed, but this generation has no comparable immediate predecessor close because the operator reset the schedule. Preserve for segment diagnostics only."
     }
   ],
   "next_sample": {
-    "sample_id": "STARTUP-005",
-    "scheduled_due_at": "2026-09-21T19:37:36+09:00",
-    "successor_observed_at": "2026-09-21T19:38:45+09:00",
-    "authority_claim_at": "2026-09-21T19:39:57+09:00",
-    "first_durable_useful_at": "2026-09-21T19:41:47+09:00",
-    "due_to_observation_seconds": 69,
-    "observation_to_claim_seconds": 72,
-    "validity": "DELIVERY_ONLY_PENDING_FIRST_USEFUL",
-    "exclusion_reason": "OPERATOR_RESCHEDULED_GENERATION_NO_COMPARABLE_PREDECESSOR",
-    "classification": "OPERATOR_RESCHEDULED_WAKE_DELIVERY_ONLY",
+    "sample_id": "STARTUP-006",
+    "predecessor_run_id": "RUN-UTIL-20260921-193957",
+    "predecessor_last_useful_at": "2026-09-21T19:47:23+09:00",
+    "predecessor_run_ended_at": "2026-09-21T19:48:15+09:00",
+    "scheduled_due_at": "2026-09-21T19:49:15+09:00",
+    "successor_observed_at": null,
+    "authority_claim_at": null,
+    "first_durable_useful_at": null,
+    "predecessor_last_useful_to_end_seconds": 52,
+    "end_to_due_seconds": 60,
     "required_fields": [
+      "predecessor_last_useful_at",
+      "predecessor_run_ended_at",
       "scheduled_due_at",
       "successor_observed_at",
       "authority_claim_at",
       "first_durable_useful_at"
     ],
-    "rule": "Use this sample for provider due-to-invocation and post-invocation startup only. Do not use it for END+60 local compliance because the schedule generation was operator-reset at 19:36:58 KST and has no comparable immediately preceding turn end.",
-    "claim_to_first_useful_seconds": 110,
-    "due_to_first_useful_seconds": 251
+    "rule": "Clean normal-close sample. Local END+60 is verified; successor must append only observed invocation, authority, and first-useful boundaries.",
+    "validity": "PENDING_SUCCESSOR",
+    "classification": "EXACT_END_PLUS_60_ARMED_AWAITING_SUCCESSOR"
   },
-  "decision_rule": "STARTUP-004 preserves a 30s provider delivery segment but lacks durable progress. STARTUP-005 operator-rescheduled wake measured due->invocation=69s, invocation->claim=72s, claim->first-useful=110s; exclude it from normal END+60 compliance. Next normal close must create a clean comparable sample."
+  "decision_rule": "STARTUP-006 is the clean comparable exact END+60 sample. Keep local end-to-due compliance separate from provider due-to-invocation and post-invocation progress."
 }
