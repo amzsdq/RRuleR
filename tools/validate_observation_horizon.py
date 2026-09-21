@@ -5,15 +5,21 @@ import os
 import sys
 import urllib.parse
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 TRUSTED_ACTION_WORKFLOWS = {".github/workflows/validate-control-plane.yml", ".github/workflows/validate-observation-horizon.yml"}
 
-def instant(value):
+def parsed_instant(value):
     dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
     if dt.tzinfo is None: raise ValueError("observation horizon timestamp lacks timezone")
-    return dt.timestamp()
+    return dt
+
+def instant(value):
+    return parsed_instant(value).timestamp()
+
+def canonical_timestamp(value):
+    return parsed_instant(value).astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 def provenance_identity(state):
     return (state.get("provenance_kind"), str(state.get("provenance_ref", "")), state.get("provenance_attempt"))
@@ -27,10 +33,11 @@ def provenance_history(state):
     return history
 
 def record_key(record):
-    return (record.get("provenance_kind"), str(record.get("provenance_ref", "")), record.get("provenance_attempt"), record.get("trusted_observed_through"))
+    timestamp = record.get("trusted_observed_through")
+    return (record.get("provenance_kind"), str(record.get("provenance_ref", "")), record.get("provenance_attempt"), canonical_timestamp(timestamp) if timestamp else None)
 
 def validate_history_merge(horizon, predecessors):
-    """Treat retirement history as an immutable set ledger and reconcile all merge parents."""
+    """Treat retirement history as an immutable semantic set ledger and reconcile all merge parents."""
     current_history = provenance_history(horizon)
     current_keys = [record_key(record) for record in current_history]
     if len(current_keys) != len(set(current_keys)):
@@ -70,7 +77,7 @@ def validate(horizon, policy, source, previous=None, previous_states=None):
         if trusted_instant < instant(previous_trusted): raise ValueError("observation horizon rollback is forbidden")
     for predecessor in predecessors:
         previous_trusted = predecessor.get("trusted_observed_through")
-        if provenance_identity(predecessor) == current_identity and previous_trusted != trusted:
+        if provenance_identity(predecessor) == current_identity and instant(previous_trusted) != trusted_instant:
             raise ValueError("same observation provenance identity cannot be repinned to a different timestamp; replace provenance explicitly")
     if predecessors:
         validate_history_merge(horizon, predecessors)
