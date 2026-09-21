@@ -7,11 +7,11 @@
   "active_run_id": "RUN-UTIL-20260922-011852",
   "authority_epoch": 79,
   "substantive_work_started_at": "2026-09-22T01:19:04+09:00",
-  "last_progress_at": "2026-09-22T01:22:00+09:00",
-  "last_progress_kind": "POLICY_SYNC_HARD_FLOOR_RECONCILIATION",
-  "current_unit": "Fresh-policy sync and 600-second hard-floor reconciliation; latest CI validation pending while active drift scan continues.",
-  "next_wake_due_at": "2026-09-22T01:33:00+09:00",
+  "last_progress_at": "2026-09-22T01:28:27+09:00",
+  "last_progress_kind": "SHORT_ROLLING_PROVISIONAL_POLICY_FIX",
+  "current_unit": "Apply operator-verified short rolling SAME-MAIN provisional scheduling; retire +780s long provisional while preserving 600s work floor and END+60 normal close.",
+  "next_wake_due_at": "2026-09-22T01:30:15+09:00",
   "successor_observed": false,
   "handoff_ready": false,
-  "operator_ui_note": "v5.2 wake active; SAME MAIN provisional recurring crash-insurance verified. Normal voluntary CONTINUE close before 600 seconds is forbidden."
+  "operator_ui_note": "v5.3 short rolling provisional active: SAME MAIN near due NOW+120s, refresh at <=45s; normal close remains exact END+60."
 }
