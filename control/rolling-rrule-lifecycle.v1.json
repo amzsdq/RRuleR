@@ -1,6 +1,6 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 5,
+  "version": 6,
   "status": "ACTIVE",
   "purpose": "Use one same-canonical hourly RRULE as bounded cold rescue with a strict normal CONTINUE fast continuation of actual observed turn END + 60 seconds; predictive prearm remains evidence-gated.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
@@ -26,7 +26,9 @@
     "fixed_quarter_cycle_required": false,
     "exact_second_final_rearm_required": true,
     "normal_continue_due_rule": "ACTUAL_OBSERVED_TURN_END_PLUS_EXACTLY_60_SECONDS",
-    "normal_continue_offset_is_default_invariant": true
+    "normal_continue_offset_is_default_invariant": true,
+    "target_turn_elapsed_seconds": 600,
+    "normal_soft_ceiling_seconds": 720
   },
   "provisional_arm": {
     "when": "Immediately after minimum stale-wake/fence/authority validation and before full restore or substantive work.",
@@ -36,9 +38,12 @@
     "mutation_failure": "Retry once when safe. If an older verified future continuation remains alive, enter DEGRADED_CONTINUATION and continue only within its safety envelope; otherwise fail closed before substantive side effects."
   },
   "work": {
-    "rule": "Perform sustained useful authorized work. Ten minutes is the bounded planning target.",
+    "rule": "Perform sustained useful authorized work by chaining bounded units. If a unit completes before 600 elapsed seconds, start the next clear low-risk checkpointable unit or a smaller decomposed slice. At >=600s, do not start a new large unit; close after the smallest safe in-flight boundary. Normal soft ceiling is ~720s.",
     "checkpoint_rule": "Persist enough durable progress that a cold successor can resume without chat context.",
-    "collision_rule": "If useful work remains and provisional due approaches too closely, extend the provisional DTSTART before collision, then verify."
+    "collision_rule": "If useful work remains and provisional due approaches too closely, extend the provisional DTSTART before collision, then verify.",
+    "unit_chaining_required_before_target": true,
+    "new_large_unit_forbidden_after_target": true,
+    "soft_ceiling_seconds": 720
   },
   "normal_final_rearm": {
     "order": [
