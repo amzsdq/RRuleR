@@ -7,6 +7,7 @@ from pathlib import Path
 
 ENFORCE_FROM = datetime.fromisoformat('2026-09-21T16:10:25+00:00')
 PRE600_CONTINUE_EXCEPTIONS = {'PLATFORM_ENFORCED_TERMINATION'}
+NORMAL_CLOSE_OFFSET_SECONDS = 60  # exactly 1 minute (60 seconds)
 VALID_CONTINUE_END_REASONS = {
     'VERIFIED_SAME_CANONICAL_CONTINUATION',
     'VERIFIED_SAME_CANONICAL_EXACT_ONE_SHOT_CONTINUATION',
@@ -62,7 +63,8 @@ def validate(record):
         if record.get(key) is None:
             raise ValueError('missing ' + key)
     duration = record['duration_seconds']
-    actual = (timestamp(record['run_ended_at']) - start).total_seconds()
+    ended = timestamp(record['run_ended_at'])
+    actual = (ended - start).total_seconds()
     if type(duration) is not int or duration < 0 or abs(duration - actual) >= 1:
         raise ValueError('duration does not match observed boundaries')
     outcome = record['turn_outcome']
@@ -75,11 +77,18 @@ def validate(record):
             raise ValueError('CONTINUE lacks valid end reason')
         if duration < 600:
             if record.get('short_turn_reason') not in PRE600_CONTINUE_EXCEPTIONS or record['close_decision'] != 'EXCEPTION' or record['end_reason'] != 'PLATFORM_ENFORCED_TERMINATION':
-                raise ValueError('voluntary normal CONTINUE before 600s is forbidden')
+                raise ValueError('voluntary normal CONTINUE before 10 minutes (600 seconds) is forbidden')
         if record['close_decision'] == 'BUDGET_EXHAUSTED' and duration < 600:
-            raise ValueError('budget exhaustion cannot authorize normal close before 600s')
+            raise ValueError('budget exhaustion cannot authorize normal close before 10 minutes (600 seconds)')
         if record['end_reason'] == 'COMMITTED_SUCCESSOR_HANDOFF':
             timestamp(record['successor_observed_at'])
+        if record['end_reason'] == 'VERIFIED_SAME_CANONICAL_CONTINUATION':
+            due = timestamp(record['verified_next_fast_due_at'])
+            offset = record.get('normal_close_offset_seconds')
+            if type(offset) is not int or offset != NORMAL_CLOSE_OFFSET_SECONDS:
+                raise ValueError('normal close offset must be exactly 1 minute (60 seconds)')
+            if int((due - ended).total_seconds()) != NORMAL_CLOSE_OFFSET_SECONDS:
+                raise ValueError('verified fast due must equal ACTUAL END + exactly 1 minute (60 seconds)')
     if outcome == 'COMPLETE' and record['program_status_at_end'] != 'PROGRAM_COMPLETE':
         raise ValueError('local completion is not program completion')
     useful = record.get('productive_substantive_seconds')
