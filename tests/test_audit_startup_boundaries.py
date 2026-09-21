@@ -95,3 +95,24 @@ def test_startup_ack_accepts_matching_canonical_and_generation():
     result = audit({"samples": []}, [], ack, expected)
     assert result["valid"] is True
     assert result["startup_ack_audit"]["valid"] is True
+
+
+def test_audit_includes_next_sample_and_validates_recovery_lineage():
+    failed = {"sample_id":"S0","scheduled_due_at":"2026-09-21T10:00:00+00:00","successor_observed_at":"2026-09-21T10:01:00+00:00","exclusion_reason":"STARTUP_ACK_MISSING","validity":"INCOMPLETE"}
+    recovered = {"sample_id":"S1","recovery_of_sample_id":"S0","recovery_kind":"FIXED_WATCHDOG_PREBOOTSTRAP","scheduled_due_at":"2026-09-21T10:05:00+00:00","generation_key":"DUE:2026-09-21T10:05:00+00:00","successor_observed_at":"2026-09-21T10:05:20+00:00","boot_started_at":"2026-09-21T10:05:30+00:00","rearm_verified_at":"2026-09-21T10:05:40+00:00","authority_claim_at":"2026-09-21T10:05:50+00:00","first_durable_useful_at":"2026-09-21T10:06:00+00:00"}
+    out = audit({"samples":[failed],"next_sample":recovered}, [])
+    assert out["valid"] is True
+    assert out["sample_count"] == 2
+    assert out["watchdog_recovery_generation_count"] == 1
+    result = out["results"][1]
+    assert result["sample_id"] == "S1"
+    assert result["recovery_lineage_valid"] is True
+    assert result["scheduler_comparison_eligible"] is False
+
+
+def test_next_sample_generation_error_fails_audit():
+    next_sample = {"sample_id":"NEXT","scheduled_due_at":"2026-09-21T10:05:00+00:00","generation_key":"DUE:2026-09-21T10:06:00+00:00","successor_observed_at":"2026-09-21T10:05:20+00:00"}
+    out = audit({"samples":[],"next_sample":next_sample}, [])
+    assert out["valid"] is False
+    assert out["sample_count"] == 1
+    assert out["results"][0]["errors"] == ["GENERATION_KEY_DUE_MISMATCH"]
