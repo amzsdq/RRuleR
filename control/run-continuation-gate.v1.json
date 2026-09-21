@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_RUN_CONTINUATION_GATE",
-  "version": 7,
+  "version": 8,
   "status": "ACTIVE",
-  "purpose": "Keep non-terminal owners working until bounded close, then allow normal close only after SAME MAIN is live-verified at actual END+60. The SAME MAIN recurring RRULE is the cold fallback; Watchdog is not required for normal continuity.",
+  "purpose": "During the schedule-category isolation canary, allow normal close only after SAME MAIN is live-verified as an exact END+60 one-shot. RRULE is intentionally absent; Watchdog is not normal continuity.",
   "program_nonterminal_states": [
     "CONTINUE",
     "DEGRADED_CONTINUATION"
@@ -38,7 +38,7 @@
       "LATEST_CHECKPOINT_PERSISTED",
       "ACTUAL_END_OBSERVED",
       "SAME_MAIN_MUTATED_TO_EXACT_END_PLUS_60_SECONDS",
-      "LIVE_MAIN_REREAD_PROVES_SAME_CANONICAL_ENABLED_RECURRING_EXACT_DSTART",
+      "LIVE_MAIN_REREAD_PROVES_SAME_CANONICAL_ENABLED_EXACT_ONE_SHOT_DSTART_NO_RRULE",
       "DURABLE_EXPECTED_FAST_DUE_PERSISTED",
       "NON_WORKING_CURRENT_ACTIVITY_HANDOFF_PROJECTION_VALIDATED",
       "TURN_STATUS_AND_RUN_EVIDENCE_PERSISTED"
@@ -88,7 +88,7 @@
       "state/NOW.json"
     ],
     "check_immediately_before_user_visible_final": true,
-    "authorization_rule": "Honor operator pause and terminal states first. For normal CONTINUE, final is authorized only after the live SAME MAIN exact END+60 continuation and consistent non-WORKING close projection are freshly verified. Watchdog state is irrelevant to normal close.",
+    "authorization_rule": "Honor operator pause and terminal states first. For normal CONTINUE during the one-shot canary, final is authorized only after the live SAME MAIN exact END+60 one-shot continuation and consistent non-WORKING close projection are freshly verified.",
     "if_denied": "DO_NOT_EMIT_FINAL_CONTINUE_USEFUL_WORK",
     "stale_prior_check_forbidden": true,
     "normal_status_report_does_not_authorize_final": true
@@ -105,7 +105,7 @@
       "A CONTINUE close below 600s requires a concrete documented reason and alternatives_checked; below 480s additionally requires an allowlisted short-turn exception.",
       "At elapsed >=600s, do not start a new large unit; finish only the smallest safe in-flight unit.",
       "Aim to close by ~720s; exceeding that soft ceiling requires an actual in-flight safety/atomicity reason.",
-      "Checkpoint, observe actual END, live-verify SAME MAIN at exact END+60, persist the exact fast due and non-WORKING handoff projection, then report. Provisional crash insurance cannot authorize normal close; Watchdog is disabled standby and irrelevant to normal close."
+      "Checkpoint, observe actual END, live-verify SAME MAIN exact one-shot at END+60 with enabled=true and no RRULE, persist the exact fast due and non-WORKING handoff projection, then report."
     ],
     "close_reserve_rule": "Use measured close cost only to avoid overrunning the platform safety budget. Do not use reserve as a reason to stop before 600s when another small safe unit fits. Never pad.",
     "normal_close_evidence": [
