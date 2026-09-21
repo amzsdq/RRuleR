@@ -9,9 +9,9 @@
   "current_owner": "RUN-UTIL-20260921-185559",
   "authority_epoch": 66,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "WORKING",
+  "run_state": "CHECKPOINTED",
   "checkpoint": {
-    "id": "CP-UTILIZATION-100",
+    "id": "CP-UTILIZATION-101",
     "state": "CONTINUE",
     "completed": [
       "Observed eligible STARTUP-003 successor invocation at 18:54:48 KST.",
@@ -20,7 +20,9 @@
       "Completed valid STARTUP-003 segmentation: last-useful->end 69s, end->due 134s, due->observation 48s, observation->claim 71s, claim->first-useful 65s.",
       "Implemented exact-second completion-relative due computation and promoted second precision to a lifecycle/CI invariant.",
       "Implemented validity-aware review row generation with UNKNOWN and exclusion preservation.",
-      "Detected that the earlier CI integration commit was a no-op, repaired the actual workflow blob, and corrected the durable review."
+      "Detected that the earlier CI integration commit was a no-op, repaired the actual workflow blob, and corrected the durable review.",
+      "Validated 368 seconds of strict accepted useful intervals without overlap or duplicate IDs.",
+      "Applied exact-second final rearm from observed close reference 19:04:06 + 60s = 19:05:06 KST."
     ],
     "evidence": [
       "state/RUNS.jsonl@7daba51d74f994e836b0ea77f72d144053f7d837",
@@ -32,16 +34,17 @@
       "tools/build_turn_review.py@7aea3abc8e91fbe606baae9a9bf89c6280c689f4",
       "tests/test_build_turn_review.py@4d7b32e454ff5150194e34fe9f5681d308b8bcb3",
       ".github/workflows/validate-control-plane.yml@19d7f002fc4b8b22bd962deb3bb7ab07de301b5f",
-      "planning/evidence/TURN-CLOSE-V4-RETEST.md@2ad94829147d0d1accc9aaabda8fe428a8cb0280"
+      "planning/evidence/TURN-CLOSE-V4-RETEST.md@2ad94829147d0d1accc9aaabda8fe428a8cb0280",
+      "state/WORK_EVIDENCE.json@c0a04fada975ec4f0033629eb6bed67b7099efc7"
     ],
     "observation": "Current turn has 16+126+226=368 strict accepted useful seconds through 19:02:56. Valid STARTUP-003 identified end-to-due timing as the highest-impact correction; exact-second rearm is implemented and must be exercised at this close.",
-    "next_action": "At bounded close compute exact due from observed close+60s, verify same canonical, persist run and second eligible review for the next successor."
+    "next_action": "Successor completes STARTUP-004 and reviews this second eligible closed turn; continue accumulating samples under the continuous relay directive."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T19:08:00+09:00",
+    "next_due_at": "2026-09-21T19:05:06+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
