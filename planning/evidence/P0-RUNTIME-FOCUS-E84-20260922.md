@@ -28,6 +28,7 @@ Epoch 83 observed turn elapsed was `10 minutes 16 seconds (616 seconds)`, but bo
 
 ## Completed bounded units
 1. `08:18:39–08:20:56 KST` — `2 minutes 17 seconds (137 seconds)`: generation-matched BOOT_STARTED/REARM_VERIFIED persisted; SAME MAIN provisional live-verified at `08:29:39 KST`; epoch 84 classified as a missed fast-shift followed by natural-hourly cold fallback; scheduler/startup ledgers and P0 scorecard updated without conflating the `3490-second` provider-execution gap with the local `60-second` rearm rule.
+2. `08:20:57–08:22:24 KST` — `1 minute 27 seconds (87 seconds)`: hardened `audit_startup_boundaries.py` so natural-hourly cold-fallback generations are explicitly excluded from normal fast-scheduler comparison; added a focused regression proving a `3490-second` missed-fast-shift recovery cannot be counted as a successful fast-delivery sample. Integrated control-plane CI run `35667227451` passed.
 
 ## Next bounded work
 Audit current schedule/runtime evidence for the smallest deterministic way to prevent a live-verified local rearm from being mistaken for a successfully delivered fast successor. Prefer observability/verification hardening over changing timing defaults. Continue bounded useful work until the `10-minute (600-second)` normal floor is met, then close only after SAME MAIN exact `ACTUAL END + 1 minute (60 seconds)` live verification.
