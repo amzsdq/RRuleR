@@ -1,229 +1,73 @@
 #!/usr/bin/env python3
 """Audit observed successor-startup boundaries without altering raw evidence."""
 from __future__ import annotations
-
-import json
-import sys
+import json, sys
 from datetime import datetime
 from pathlib import Path
-
-MAINTENANCE_EXCLUSIONS = {"OPERATOR_MAINTENANCE_INTERRUPTION", "MAINTENANCE_PAUSE"}
-OPERATOR_RESCHEDULE_EXCLUSIONS = {
-    "OPERATOR_RESCHEDULED_GENERATION",
-    "EXPLICIT_OPERATOR_RESCHEDULE",
-    "OPERATOR_SCHEDULE_RESET",
-}
-ONE_SHOT_CANARY_EXCLUSIONS = {
-    "SCHEDULE_CATEGORY_CANARY_REJECTED",
-    "ONE_SHOT_CANARY_FAILURE",
-}
-
-
-def _ts(value: str) -> datetime:
-    parsed = datetime.fromisoformat(value)
-    if parsed.tzinfo is None:
-        raise ValueError("timestamp must include timezone")
+MAINTENANCE_EXCLUSIONS={"OPERATOR_MAINTENANCE_INTERRUPTION","MAINTENANCE_PAUSE"}
+OPERATOR_RESCHEDULE_EXCLUSIONS={"OPERATOR_RESCHEDULED_GENERATION","EXPLICIT_OPERATOR_RESCHEDULE","OPERATOR_SCHEDULE_RESET"}
+ONE_SHOT_CANARY_EXCLUSIONS={"SCHEDULE_CATEGORY_CANARY_REJECTED","ONE_SHOT_CANARY_FAILURE"}
+def _ts(value:str)->datetime:
+    parsed=datetime.fromisoformat(value)
+    if parsed.tzinfo is None: raise ValueError("timestamp must include timezone")
     return parsed
-
-
-def audit_startup_ack(ack: dict, expected_main_canonical_id: str) -> dict:
-    errors = []
-    if ack.get("main_canonical_id") != expected_main_canonical_id:
-        errors.append("STARTUP_ACK_MAIN_CANONICAL_ID_MISMATCH")
-    due = ack.get("current_expected_due_at")
-    generation_key = ack.get("generation_key")
-    if due and generation_key and generation_key != f"DUE:{due}":
-        errors.append("STARTUP_ACK_GENERATION_KEY_DUE_MISMATCH")
-    boot_started = ack.get("boot_started_at")
-    boot_epoch = ack.get("boot_started_authority_epoch")
-    rearm_verified = ack.get("rearm_verified_at")
-    provisional_due = ack.get("verified_provisional_due_at")
-    status = ack.get("status")
-    if boot_started and generation_key and boot_epoch != generation_key:
-        errors.append("STARTUP_ACK_BOOT_EPOCH_GENERATION_MISMATCH")
-    if rearm_verified and not boot_started:
-        errors.append("STARTUP_ACK_REARM_WITHOUT_BOOT")
-    if status == "REARM_VERIFIED":
-        if not boot_started:
-            errors.append("STARTUP_ACK_REARM_STATUS_WITHOUT_BOOT")
-        if not rearm_verified:
-            errors.append("STARTUP_ACK_REARM_STATUS_WITHOUT_VERIFIED_AT")
-        if not provisional_due:
-            errors.append("STARTUP_ACK_REARM_STATUS_WITHOUT_PROVISIONAL_DUE")
-    if boot_started and rearm_verified and _ts(rearm_verified) < _ts(boot_started):
-        errors.append("STARTUP_ACK_REARM_BEFORE_BOOT")
-    if rearm_verified and provisional_due and _ts(provisional_due) <= _ts(rearm_verified):
-        errors.append("STARTUP_ACK_PROVISIONAL_DUE_NOT_FUTURE")
-    return {
-        "valid": not errors,
-        "errors": errors,
-        "observed_main_canonical_id": ack.get("main_canonical_id"),
-        "expected_main_canonical_id": expected_main_canonical_id,
-        "generation_key": generation_key,
-        "boot_started_at": boot_started,
-        "boot_started_authority_epoch": boot_epoch,
-        "rearm_verified_at": rearm_verified,
-        "verified_provisional_due_at": provisional_due,
-        "status": status,
-    }
-
-
-def audit(
-    startup: dict,
-    run_lines: list[str],
-    startup_ack: dict | None = None,
-    expected_main_canonical_id: str | None = None,
-) -> dict:
-    runs = {
-        run.get("observation_id"): run
-        for run in (json.loads(line) for line in run_lines if line.strip())
-        if run.get("observation_id")
-    }
-    samples = list(startup.get("samples", []))
-    next_sample = startup.get("next_sample")
-    if isinstance(next_sample, dict):
-        samples.append(next_sample)
-    samples_by_id = {sample.get("sample_id"): sample for sample in samples}
-
-    def find_run(predecessor_id: str | None) -> dict | None:
-        if not predecessor_id:
-            return None
-        return runs.get(predecessor_id) or runs.get(f"OBS-{predecessor_id}")
-
-    results = []
+def audit_startup_ack(ack:dict,expected_main_canonical_id:str)->dict:
+    errors=[]
+    if ack.get("main_canonical_id")!=expected_main_canonical_id: errors.append("STARTUP_ACK_MAIN_CANONICAL_ID_MISMATCH")
+    due=ack.get("current_expected_due_at"); generation_key=ack.get("generation_key")
+    if due and generation_key and generation_key!=f"DUE:{due}": errors.append("STARTUP_ACK_GENERATION_KEY_DUE_MISMATCH")
+    boot_started=ack.get("boot_started_at"); boot_epoch=ack.get("boot_started_authority_epoch"); rearm_verified=ack.get("rearm_verified_at"); provisional_due=ack.get("verified_provisional_due_at"); status=ack.get("status")
+    if boot_started and generation_key and boot_epoch!=generation_key: errors.append("STARTUP_ACK_BOOT_EPOCH_GENERATION_MISMATCH")
+    if rearm_verified and not boot_started: errors.append("STARTUP_ACK_REARM_WITHOUT_BOOT")
+    if status=="REARM_VERIFIED":
+        if not boot_started: errors.append("STARTUP_ACK_REARM_STATUS_WITHOUT_BOOT")
+        if not rearm_verified: errors.append("STARTUP_ACK_REARM_STATUS_WITHOUT_VERIFIED_AT")
+        if not provisional_due: errors.append("STARTUP_ACK_REARM_STATUS_WITHOUT_PROVISIONAL_DUE")
+    if boot_started and rearm_verified and _ts(rearm_verified)<_ts(boot_started): errors.append("STARTUP_ACK_REARM_BEFORE_BOOT")
+    if rearm_verified and provisional_due and _ts(provisional_due)<=_ts(rearm_verified): errors.append("STARTUP_ACK_PROVISIONAL_DUE_NOT_FUTURE")
+    return {"valid":not errors,"errors":errors,"observed_main_canonical_id":ack.get("main_canonical_id"),"expected_main_canonical_id":expected_main_canonical_id,"generation_key":generation_key,"boot_started_at":boot_started,"boot_started_authority_epoch":boot_epoch,"rearm_verified_at":rearm_verified,"verified_provisional_due_at":provisional_due,"status":status}
+def audit(startup:dict,run_lines:list[str],startup_ack:dict|None=None,expected_main_canonical_id:str|None=None)->dict:
+    runs={run.get("observation_id"):run for run in (json.loads(line) for line in run_lines if line.strip()) if run.get("observation_id")}
+    samples=list(startup.get("samples",[])); next_sample=startup.get("next_sample")
+    if isinstance(next_sample,dict): samples.append(next_sample)
+    samples_by_id={s.get("sample_id"):s for s in samples}
+    def find_run(pid): return runs.get(pid) or runs.get(f"OBS-{pid}") if pid else None
+    results=[]
     for sample in samples:
-        errors = []
-        predecessor_id = sample.get("predecessor_run_id")
-        run = find_run(predecessor_id)
-        predecessor_end = run.get("run_ended_at") if run else None
-        last_useful = sample.get("predecessor_last_useful_at")
-        if predecessor_end and last_useful and _ts(last_useful) > _ts(predecessor_end):
-            errors.append("PREDECESSOR_LAST_USEFUL_AFTER_RECORDED_END")
-
-        ordered = [
-            ("SUCCESSOR_AFTER_DUE", sample.get("scheduled_due_at"), sample.get("successor_observed_at")),
-            ("BOOT_BEFORE_SUCCESSOR_OBSERVATION", sample.get("successor_observed_at"), sample.get("boot_started_at")),
-            ("REARM_BEFORE_BOOT", sample.get("boot_started_at"), sample.get("rearm_verified_at")),
-            ("AUTHORITY_BEFORE_REARM", sample.get("rearm_verified_at"), sample.get("authority_claim_at")),
-            ("FIRST_USEFUL_BEFORE_AUTHORITY", sample.get("authority_claim_at"), sample.get("first_durable_useful_at")),
-        ]
-        for code, earlier, later in ordered[1:]:
-            if earlier and later and _ts(later) < _ts(earlier):
-                errors.append(code)
-
-        due = sample.get("scheduled_due_at")
-        generation_key = sample.get("generation_key")
-        if due and generation_key and generation_key != f"DUE:{due}":
-            errors.append("GENERATION_KEY_DUE_MISMATCH")
-
-        recovery_of = sample.get("recovery_of_sample_id")
-        recovery_source = samples_by_id.get(recovery_of) if recovery_of else None
-        recovery_generation = recovery_of is not None
-        recovery_kind = sample.get("recovery_kind")
+        errors=[]; pid=sample.get("predecessor_run_id"); run=find_run(pid); predecessor_end=run.get("run_ended_at") if run else None; last_useful=sample.get("predecessor_last_useful_at")
+        if predecessor_end and last_useful and _ts(last_useful)>_ts(predecessor_end): errors.append("PREDECESSOR_LAST_USEFUL_AFTER_RECORDED_END")
+        ordered=[("BOOT_BEFORE_SUCCESSOR_OBSERVATION",sample.get("successor_observed_at"),sample.get("boot_started_at")),("REARM_BEFORE_BOOT",sample.get("boot_started_at"),sample.get("rearm_verified_at")),("AUTHORITY_BEFORE_REARM",sample.get("rearm_verified_at"),sample.get("authority_claim_at")),("FIRST_USEFUL_BEFORE_AUTHORITY",sample.get("authority_claim_at"),sample.get("first_durable_useful_at"))]
+        for code,earlier,later in ordered:
+            if earlier and later and _ts(later)<_ts(earlier): errors.append(code)
+        due=sample.get("scheduled_due_at"); generation_key=sample.get("generation_key")
+        if due and generation_key and generation_key!=f"DUE:{due}": errors.append("GENERATION_KEY_DUE_MISMATCH")
+        recovery_of=sample.get("recovery_of_sample_id"); recovery_source=samples_by_id.get(recovery_of) if recovery_of else None; recovery_generation=recovery_of is not None; recovery_kind=sample.get("recovery_kind")
         if recovery_generation and recovery_kind is None and recovery_source:
-            if recovery_source.get("exclusion_reason") == "STARTUP_ACK_MISSING":
-                recovery_kind = "FIXED_WATCHDOG_PREBOOTSTRAP"
-            elif recovery_source.get("exclusion_reason") == "MISSING_DURABLE_FIRST_USEFUL_AFTER_VERIFIED_BOOTSTRAP":
-                recovery_kind = "PROVISIONAL_COLD_RESCUE"
-        recovery_lineage_valid = None
+            if recovery_source.get("exclusion_reason")=="STARTUP_ACK_MISSING": recovery_kind="FIXED_WATCHDOG_PREBOOTSTRAP"
+            elif recovery_source.get("exclusion_reason")=="MISSING_DURABLE_FIRST_USEFUL_AFTER_VERIFIED_BOOTSTRAP": recovery_kind="PROVISIONAL_COLD_RESCUE"
+        recovery_lineage_valid=None
         if recovery_generation:
-            expected_source_exclusion = {
-                "FIXED_WATCHDOG_PREBOOTSTRAP": "STARTUP_ACK_MISSING",
-                "PROVISIONAL_COLD_RESCUE": "MISSING_DURABLE_FIRST_USEFUL_AFTER_VERIFIED_BOOTSTRAP",
-            }.get(recovery_kind)
-            recovery_lineage_valid = bool(
-                recovery_source
-                and expected_source_exclusion
-                and recovery_source.get("exclusion_reason") == expected_source_exclusion
-            )
-            if not recovery_source:
-                errors.append("RECOVERY_SOURCE_SAMPLE_MISSING")
-            elif expected_source_exclusion is None:
-                errors.append("RECOVERY_KIND_UNKNOWN")
-            elif recovery_source.get("exclusion_reason") != expected_source_exclusion:
-                errors.append("RECOVERY_SOURCE_CLASS_MISMATCH")
-
-        exclusion = sample.get("exclusion_reason")
-        maintenance_interrupted = (
-            sample.get("maintenance_interrupted") is True
-            or exclusion in MAINTENANCE_EXCLUSIONS
-        )
-        rejected_one_shot_canary = (
-            sample.get("schedule_mode") == "EXACT_ONE_SHOT_SELF_UPDATE_CANARY"
-            or exclusion in ONE_SHOT_CANARY_EXCLUSIONS
-            or sample.get("validity") == "EXCLUDED_SCHEDULE_CATEGORY_CANARY"
-        )
-        operator_rescheduled = (
-            sample.get("operator_rescheduled") is True
-            or exclusion in OPERATOR_RESCHEDULE_EXCLUSIONS
-            or sample.get("validity")
-            in {"EXCLUDED_OPERATOR_RESCHEDULED", "EXCLUDED_OPERATOR_MAINTENANCE_RECOVERY"}
-        )
-        comparison_ready = bool(due and sample.get("successor_observed_at"))
-        acknowledged_invalid = (
-            sample.get("validity") == "INVALID"
-            and exclusion == "BOUNDARY_INCONSISTENCY"
-        )
-        unacknowledged_errors = [] if acknowledged_invalid else list(errors)
-
-        if maintenance_interrupted:
-            comparison_exclusion = "OPERATOR_MAINTENANCE_INTERRUPTION"
-        elif rejected_one_shot_canary:
-            comparison_exclusion = "SCHEDULE_CATEGORY_CANARY_REJECTED"
-        elif operator_rescheduled:
-            comparison_exclusion = "OPERATOR_RESCHEDULED_GENERATION"
-        elif recovery_generation:
-            comparison_exclusion = f"{recovery_kind or 'UNKNOWN'}_GENERATION"
-        elif not comparison_ready:
-            comparison_exclusion = "MISSING_OBSERVED_BOUNDARY"
-        elif errors:
-            comparison_exclusion = "BOUNDARY_INCONSISTENCY"
-        else:
-            comparison_exclusion = None
-
-        results.append({
-            "sample_id": sample.get("sample_id"),
-            "raw_sample": sample,
-            "errors": errors,
-            "acknowledged_invalid": acknowledged_invalid,
-            "startup_receipt_complete": bool(sample.get("boot_started_at") and sample.get("rearm_verified_at")),
-            "recovery_kind": recovery_kind,
-            "recovery_lineage_valid": recovery_lineage_valid,
-            "scheduler_comparison_eligible": comparison_exclusion is None,
-            "scheduler_comparison_exclusion": comparison_exclusion,
-        })
-
-    startup_ack_audit = None
-    if startup_ack is not None and expected_main_canonical_id is not None:
-        startup_ack_audit = audit_startup_ack(startup_ack, expected_main_canonical_id)
-
-    all_errors = [error for result in results for error in ([] if result["acknowledged_invalid"] else result["errors"])]
-    if startup_ack_audit and not startup_ack_audit["valid"]:
-        all_errors.extend(startup_ack_audit["errors"])
-    return {
-        "valid": not all_errors,
-        "results": results,
-        "scheduler_comparison_eligible_count": sum(r["scheduler_comparison_eligible"] for r in results),
-        "watchdog_recovery_generation_count": sum(r["recovery_kind"] == "FIXED_WATCHDOG_PREBOOTSTRAP" for r in results),
-        "provisional_cold_rescue_generation_count": sum(r["recovery_kind"] == "PROVISIONAL_COLD_RESCUE" for r in results),
-        "startup_ack_audit": startup_ack_audit,
-    }
-
-
-def main() -> int:
-    root = Path(__file__).resolve().parents[1]
-    startup = json.loads((root / "state" / "SUCCESSOR_STARTUP.json").read_text())
-    run_lines = (root / "state" / "RUNS.jsonl").read_text().splitlines()
-    ack_path = root / "state" / "STARTUP_ACK.json"
-    current_path = root / "state" / "CURRENT.json"
-    ack = json.loads(ack_path.read_text()) if ack_path.exists() else None
-    expected = None
-    if current_path.exists():
-        expected = json.loads(current_path.read_text()).get("canonical_automation_id")
-    result = audit(startup, run_lines, ack, expected)
-    print(json.dumps(result, indent=2, sort_keys=True))
-    return 0 if result["valid"] else 1
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+            expected_source_exclusion={"FIXED_WATCHDOG_PREBOOTSTRAP":"STARTUP_ACK_MISSING","PROVISIONAL_COLD_RESCUE":"MISSING_DURABLE_FIRST_USEFUL_AFTER_VERIFIED_BOOTSTRAP"}.get(recovery_kind)
+            recovery_lineage_valid=bool(recovery_source and expected_source_exclusion and recovery_source.get("exclusion_reason")==expected_source_exclusion)
+            if not recovery_source: errors.append("RECOVERY_SOURCE_SAMPLE_MISSING")
+            elif expected_source_exclusion is None: errors.append("RECOVERY_KIND_UNKNOWN")
+            elif recovery_source.get("exclusion_reason")!=expected_source_exclusion: errors.append("RECOVERY_SOURCE_CLASS_MISMATCH")
+        exclusion=sample.get("exclusion_reason"); maintenance=sample.get("maintenance_interrupted") is True or exclusion in MAINTENANCE_EXCLUSIONS
+        rejected=sample.get("schedule_mode")=="EXACT_ONE_SHOT_SELF_UPDATE_CANARY" or exclusion in ONE_SHOT_CANARY_EXCLUSIONS or sample.get("validity")=="EXCLUDED_SCHEDULE_CATEGORY_CANARY"
+        operator=sample.get("operator_rescheduled") is True or exclusion in OPERATOR_RESCHEDULE_EXCLUSIONS or sample.get("validity") in {"EXCLUDED_OPERATOR_RESCHEDULED","EXCLUDED_OPERATOR_MAINTENANCE_RECOVERY"}
+        comparison_ready=bool(due and sample.get("successor_observed_at")); acknowledged=sample.get("validity")=="INVALID" and exclusion=="BOUNDARY_INCONSISTENCY"
+        if maintenance: comparison_exclusion="OPERATOR_MAINTENANCE_INTERRUPTION"
+        elif rejected: comparison_exclusion="SCHEDULE_CATEGORY_CANARY_REJECTED"
+        elif operator: comparison_exclusion="OPERATOR_RESCHEDULED_GENERATION"
+        elif recovery_generation: comparison_exclusion=f"{recovery_kind or 'UNKNOWN'}_GENERATION"
+        elif not comparison_ready: comparison_exclusion="MISSING_OBSERVED_BOUNDARY"
+        elif errors: comparison_exclusion="BOUNDARY_INCONSISTENCY"
+        else: comparison_exclusion=None
+        results.append({"sample_id":sample.get("sample_id"),"raw_sample":sample,"errors":errors,"acknowledged_invalid":acknowledged,"startup_receipt_complete":bool(sample.get("boot_started_at") and sample.get("rearm_verified_at")),"recovery_kind":recovery_kind,"recovery_lineage_valid":recovery_lineage_valid,"scheduler_comparison_eligible":comparison_exclusion is None,"scheduler_comparison_exclusion":comparison_exclusion,"operator_rescheduled":operator,"rejected_one_shot_canary":rejected})
+    ack_audit=audit_startup_ack(startup_ack,expected_main_canonical_id) if startup_ack is not None and expected_main_canonical_id is not None else None
+    all_errors=[e for r in results for e in ([] if r["acknowledged_invalid"] else r["errors"])]
+    if ack_audit and not ack_audit["valid"]: all_errors.extend(ack_audit["errors"])
+    return {"valid":not all_errors,"sample_count":len(results),"results":results,"scheduler_comparison_eligible_count":sum(r["scheduler_comparison_eligible"] for r in results),"watchdog_recovery_generation_count":sum(r["recovery_kind"]=="FIXED_WATCHDOG_PREBOOTSTRAP" for r in results),"provisional_cold_rescue_generation_count":sum(r["recovery_kind"]=="PROVISIONAL_COLD_RESCUE" for r in results),"operator_rescheduled_generation_count":sum(r["operator_rescheduled"] for r in results),"rejected_one_shot_canary_count":sum(r["rejected_one_shot_canary"] for r in results),"startup_ack_audit":ack_audit}
+def main()->int:
+    root=Path(__file__).resolve().parents[1]; startup=json.loads((root/"state"/"SUCCESSOR_STARTUP.json").read_text()); run_lines=(root/"state"/"RUNS.jsonl").read_text().splitlines(); ack_path=root/"state"/"STARTUP_ACK.json"; current_path=root/"state"/"CURRENT.json"; ack=json.loads(ack_path.read_text()) if ack_path.exists() else None; expected=json.loads(current_path.read_text()).get("canonical_automation_id") if current_path.exists() else None; result=audit(startup,run_lines,ack,expected); print(json.dumps(result,indent=2,sort_keys=True)); return 0 if result["valid"] else 1
+if __name__=="__main__": sys.exit(main())
