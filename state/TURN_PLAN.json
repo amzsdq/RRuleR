@@ -2,39 +2,35 @@
   "schema_version": "1.1",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "authority_epoch": 72,
-  "run_id": "RUN-UTIL-20260921-221537",
-  "status": "COMPLETED",
-  "phase": "WATCHDOG_RECOVERY_OBSERVABILITY",
-  "objective_id": "WS-P001-002-RECOVERY-LIVE-EVIDENCE",
-  "objective": "Persist the live 22:07:23 startup failure and 22:13:24 fixed-Watchdog recovery as separate generations, and ensure the audit covers the active next_sample.",
+  "authority_epoch": 73,
+  "run_id": "RUN-UTIL-20260921-223441",
+  "status": "IN_PROGRESS",
+  "phase": "IDLE_DISTANT_DUE_SAFETY",
+  "objective_id": "WS-P001-002-CLOSE-STATE-PROJECTION",
+  "objective": "Make normal close publish an unambiguous non-WORKING durable projection so the Watchdog can distinguish idle distant schedules from active provisional rescue coverage.",
   "expected_useful_seconds": 600,
   "acceptance_criteria": [
-    "Failed normal generation retains missing bootstrap/useful boundaries as null.",
-    "Recovery generation has explicit lineage and is excluded from normal scheduler comparison.",
-    "Audit validates next_sample instead of silently ignoring the newest live generation.",
-    "Focused tests and actual-ledger audit pass."
+    "Lifecycle defines one ordered close-state projection after continuation verification.",
+    "Closed/HANDOFF_READY activity cannot retain an active run id.",
+    "A validator rejects contradictory CURRENT/ACTIVITY/HANDOFF close projections.",
+    "Focused tests and current state validation pass."
   ],
   "checkpointable_substeps": [
-    "Claim epoch 72 after verified recovery bootstrap.",
-    "Append failed and recovery generations to SUCCESSOR_STARTUP.",
-    "Update audit to include next_sample and add regression coverage.",
-    "Run focused and actual-ledger validation.",
-    "Close with exact END+60 MAIN and enabled Watchdog."
+    "Claim epoch 73 after verified recovery bootstrap.",
+    "Specify the close-state projection in lifecycle and AGENTS guidance.",
+    "Implement a small validator with contradictory/valid fixtures.",
+    "Run focused tests and validate live state.",
+    "Close at >=600s with exact END+60 MAIN and enabled Watchdog."
   ],
-  "current_substep": 5,
-  "handoff_boundary": "Epoch 72 completed; same MAIN due 22:26:45 and Watchdog due 22:29:45 verified enabled.",
-  "early_finish_fallback": "Add exact paired-generation summary assertions or repair stale ACTIVITY close semantics.",
+  "current_substep": 2,
+  "handoff_boundary": "Epoch 73 active after fixed-Watchdog recovery and verified provisional protection.",
+  "early_finish_fallback": "Add paired-generation evidence for the 22:26:45 failure and 22:34:20 recovery.",
   "created_for_next_wake": false,
-  "started_at": "2026-09-21T22:15:37+09:00",
-  "last_progress_at": "2026-09-21T22:25:45+09:00",
+  "started_at": "2026-09-21T22:34:41+09:00",
+  "last_progress_at": "2026-09-21T22:36:46+09:00",
   "progress_evidence": [
-    "BOOT_STARTED 22:16:29 for DUE:2026-09-21T22:13:24+09:00",
-    "REARM_VERIFIED 22:17:18; MAIN due 22:29:29 enabled",
-    "Watchdog due 22:32:29 enabled and exact one-shot",
-    "STARTUP-011/012 paired evidence committed; first useful boundary 22:21:10.",
-    "11 focused startup audit tests passed; actual ledger valid with 12 samples and 3 recovery generations.",
-    "WORK_EVIDENCE validation passed for epoch 72 record.",
-    "Normal close live verification: MAIN END+60 due 22:26:45; Watchdog exact one-shot 22:29:45; both same canonical and enabled."
+    "BOOT_STARTED 22:35:28 for DUE:2026-09-21T22:34:20+09:00",
+    "REARM_VERIFIED 22:35:59; MAIN due 22:48:28 enabled",
+    "Watchdog due 22:51:28 enabled and exact one-shot"
   ]
 }
