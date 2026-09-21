@@ -3,15 +3,15 @@
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
   "handoff_state": "COMMITTED",
-  "handoff_mode": "NORMAL_COMPLETION_RELATIVE",
+  "handoff_mode": "NORMAL_MAIN_FAST_PATH_OPERATOR_RECOVERY",
   "predecessor_run_id": "RUN-UTIL-20260921-223441",
   "predecessor_authority_epoch": 73,
   "successor_run_id": null,
-  "successor_expected_at": "2026-09-21T22:47:28+09:00",
+  "successor_expected_at": "2026-09-21T23:10:59+09:00",
   "successor_observed_at": null,
   "predecessor_last_progress_at": "2026-09-21T22:45:51+09:00",
-  "recovery_basis": "Normal bounded close after fixed-Watchdog recovery. Same MAIN and Watchdog schedules were live-verified enabled at END+60 and MAIN due+180.",
+  "recovery_basis": "Operator-directed recovery after the prior END+60 MAIN invocation produced no BOOT_STARTED receipt. Same MAIN is rearmed to now+60; Watchdog remains emergency-only.",
   "active_unit": "Continue WS-P001-002 from validated close-state projection and recovery ledger.",
   "checkpoint_id": "CP-UTILIZATION-111",
-  "next_action": "Successor must claim only after generation-matched BOOT_STARTED and REARM_VERIFIED."
+  "next_action": "Successor must persist generation-matched BOOT_STARTED and REARM_VERIFIED, then work normally; normal close must live-verify END+60 MAIN before final."
 }
