@@ -1,6 +1,6 @@
 {
   "policy_id": "RRULER_STARTUP_WATCHDOG",
-  "version": 1,
+  "version": 2,
   "status": "ACTIVE",
   "purpose": "Close the pre-bootstrap availability gap that the MAIN worker's own provisional rearm cannot cover.",
   "role": "LIVENESS_AND_PREBOOTSTRAP_RECOVERY_ONLY",
@@ -14,7 +14,9 @@
     "startup_grace_seconds": 180,
     "recovery_recheck_seconds": 240,
     "main_recovery_due_offset_seconds": 60,
-    "rationale": "Allow ordinary provider delivery jitter while bounding a missing-bootstrap hole far below the hourly RRULE fallback."
+    "rationale": "Allow ordinary provider delivery jitter while bounding a missing-bootstrap hole far below the hourly RRULE fallback.",
+    "enabled_rearm_required": true,
+    "enabled_verification_required": true
   },
   "startup_receipts": {
     "path": "state/STARTUP_ACK.json",
@@ -35,33 +37,41 @@
   "actions": {
     "HEALTHY_BOOTSTRAP": [
       "DO_NOT_MUTATE_MAIN",
-      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_FRESH_MAIN_EXPECTED_DUE_PLUS_180S"
+      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_FRESH_MAIN_EXPECTED_DUE_PLUS_180S",
+      "SET_SAME_WATCHDOG_IS_ENABLED_TRUE",
+      "VERIFY_SAME_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE"
     ],
     "STARTUP_ACK_MISSING": [
       "REARM_SAME_MAIN_CANONICAL_TO_NOW_PLUS_60S",
       "VERIFY_MAIN_ENABLED_AND_DUE",
       "PERSIST_WATCHDOG_RECOVERY",
-      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S"
+      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S",
+      "SET_SAME_WATCHDOG_IS_ENABLED_TRUE",
+      "VERIFY_SAME_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE"
     ],
     "BOOTSTRAP_REARM_MISSING": [
       "REARM_SAME_MAIN_CANONICAL_TO_NOW_PLUS_60S_WHEN_FENCE_PERMITS",
       "VERIFY_MAIN_ENABLED_AND_DUE",
       "PERSIST_WATCHDOG_RECOVERY",
-      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S"
+      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S",
+      "SET_SAME_WATCHDOG_IS_ENABLED_TRUE",
+      "VERIFY_SAME_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE"
     ],
     "WATCHDOG_AMBIGUOUS": [
       "FAIL_CLOSED_ON_MAIN_MUTATION",
       "PERSIST_AMBIGUITY",
-      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S"
+      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S",
+      "SET_SAME_WATCHDOG_IS_ENABLED_TRUE",
+      "VERIFY_SAME_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE"
     ]
   },
   "main_sync_contract": {
-    "normal_close": "After MAIN verifies its own END+60 successor and persists the fresh expected due, MAIN must pull the SAME Watchdog one-shot to MAIN expected_due +180s and persist the Watchdog due.",
+    "normal_close": "After MAIN verifies its own END+60 successor and persists the fresh expected due, MAIN must pull the SAME Watchdog one-shot to MAIN expected_due +180s, explicitly set is_enabled=true, re-read live Watchdog metadata, and verify same canonical + enabled + exact due.",
     "failure_semantics": "Watchdog sync failure does not invalidate an already verified MAIN continuation, but must be recorded as DEGRADED_WATCHDOG_COVERAGE and retried once when safe.",
     "pause_terminal": "Explicit operator PAUSED/STOP or durable program terminal prevents Watchdog from waking MAIN."
   },
   "prompt_sync_contract": {
-    "rule": "GitHub policy is authoritative. Each Watchdog wake applies fresh policy first. If the embedded stable kernel materially differs, update the SAME Watchdog prompt in that run. MAIN prompt must carry the same startup-receipt and Watchdog-sync kernel.",
+    "rule": "GitHub policy is authoritative. Each Watchdog wake applies fresh policy first. If the embedded stable kernel materially differs, update the SAME Watchdog prompt in that run. MAIN prompt must carry the same startup-receipt, Watchdog-sync, explicit is_enabled=true, and post-update verification kernel.",
     "replacement_forbidden": true,
     "rrule_for_watchdog_forbidden": true
   },
@@ -71,5 +81,11 @@
     "replacement_main_forbidden": true,
     "replacement_watchdog_forbidden": true,
     "stale_generation_rollback_forbidden": true
+  },
+  "self_rearm_contract": {
+    "invariant": "Every nonterminal Watchdog one-shot rearm MUST mutate THIS SAME Watchdog canonical with is_enabled=true and then re-read live automation metadata.",
+    "success_condition": "same canonical id + is_enabled=true + exact one-shot intended due are all verified",
+    "failure_condition": "schedule changed but enabled=false, due mismatch, or canonical mismatch; treat as failed continuation and retry once when safe",
+    "reason": "A fired one-shot may be disabled by the scheduler; changing only DTSTART is not sufficient continuation proof."
   }
 }
