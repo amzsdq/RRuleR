@@ -294,11 +294,25 @@
       "qualification": "SUBSTANTIVE_ACCEPTED",
       "basis": "Implemented and tested missing-successor-progress diagnostics, exposed delivery and progress separately in generated reviews, repaired malformed CI command separators, and re-fetched the committed workflow to verify integration. Both time boundaries were directly observed; no surrounding time is inferred.",
       "observed_seconds": 336
+    },
+    {
+      "record_id": "WE-20260921-E68-001",
+      "authority_epoch": 68,
+      "run_id": "RUN-UTIL-20260921-204946",
+      "start_at": "2026-09-21T20:50:15+09:00",
+      "end_at": "2026-09-21T20:52:13+09:00",
+      "start_boundary": "OBSERVED",
+      "end_boundary": "OBSERVED",
+      "kind": "test_or_validator_added_or_hardened",
+      "artifact": "tools/audit_successor_progress.py@a0be8d6287796440b8aa54e9b05b598e0c92768b + tests/test_audit_successor_progress.py@c29afff2091224b69d43e6e53a06a3367d2a7b25 + control/handoff-recovery.v1.json@d81c6f3dd1da972222b32ba2fe06a472d655880d + control/rolling-rrule-lifecycle.v1.json@590b8a1ee5cb16f5b077ed68475ea0a47916a7ad",
+      "qualification": "SUBSTANTIVE_ACCEPTED",
+      "basis": "Added forward-only BOOT_STARTED and REARM_VERIFIED semantics, a distinct STARTUP_ACK_MISSING recovery class that does not pretend detection is recovery, and eight focused regression tests. Boundaries are observed authority claim and durable commit completion.",
+      "observed_seconds": 118
     }
   ],
   "collection": {
     "started_at": "2026-09-21T05:03:12+09:00",
     "historical_backfill": false,
-    "latest_observed_record": "WE-20260921-E67-002"
+    "latest_observed_record": "WE-20260921-E68-001"
   }
 }
