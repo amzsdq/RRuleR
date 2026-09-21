@@ -169,4 +169,4 @@ During the v5.5 canary, operator-visible progress messages are mandatory observa
 
 ## Time-unit safety
 
-Never use bare numeric timing deltas in human-readable control text. Write `1 minute (60 seconds)`, not `+60`; `3 minutes (180 seconds)`, not `NOW+180`; `10 minutes (600 seconds)`, not `600 floor`; and `11 minutes (660 seconds)`, not `+660`. Machine fields ending in `_seconds` are seconds by schema. `RRULE:FREQ=HOURLY` describes recurrence only and must never be used to reinterpret an explicit second offset.
+Never use a bare numeric timing delta in human-readable control text. Always use fully explicit forms such as `1 minute (60 seconds)`, `3 minutes (180 seconds)`, `10 minutes (600 seconds)`, and `11 minutes (660 seconds)`. Machine fields ending in `_seconds` are seconds by schema. `RRULE:FREQ=HOURLY` describes recurrence only and must never be used to reinterpret an explicit second offset.
