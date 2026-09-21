@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.6",
+  "schema_version": "2.7",
   "program_id": "RRULER-PROGRAM-001",
   "status": "ACTIVE",
   "purpose": "Single machine-readable registry of control artifacts that every fresh worker must load before substantive work.",
@@ -53,7 +53,7 @@
     "STARTUP_RECEIPTS_MUST_NOT_BE_INFERRED",
     "NORMAL_CONTINUATION_DEPENDS_ONLY_ON_SAME_MAIN",
     "WATCHDOG_DISABLED_STANDBY_NOT_NORMAL_DEPENDENCY",
-    "SAME_MAIN_RECURRING_RRULE_IS_COLD_FALLBACK"
+    "SAME_MAIN_CUSTOM_RECURRING_SCHEDULE_IS_COLD_FALLBACK"
   ],
-  "conflict_rule": "If mandatory artifacts conflict, fail closed only for the disputed side effect and reconcile durably. Normal continuity is SAME MAIN recurring RRULE shifted to exact END+60. Exact one-shot self-update canary is rejected. Watchdog remains disabled standby."
+  "conflict_rule": "If mandatory artifacts conflict, fail closed only for the disputed side effect and reconcile durably. During the active custom-recurring canary, normal continuity is SAME MAIN FREQ=DAILY with all 24 BYHOUR values, self-shifted to exact END+60 by DTSTART/BYMINUTE/BYSECOND. Do not silently restore simple FREQ=HOURLY. Watchdog remains disabled standby."
 }
