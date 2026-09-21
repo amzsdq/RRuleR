@@ -4,7 +4,7 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "authority_epoch": 66,
   "run_id": "RUN-UTIL-20260921-185559",
-  "status": "ACTIVE",
+  "status": "CHECKPOINTED",
   "phase": "TURN_CLOSE_V4_LIVE_RETEST_2",
   "objective_id": "WS-P001-002-TURN-CLOSE-V4-RETEST",
   "objective": "Validate and review the first eligible post-repair turn, complete STARTUP-003 prospectively, and advance the multi-turn live retest without inferring useful time.",
@@ -23,7 +23,7 @@
     "Use remaining budget on the next unaccepted live-retest evidence item."
   ],
   "current_substep": 4,
-  "handoff_boundary": "368 strict useful seconds accepted; exact-second final rearm and durable close remain.",
+  "handoff_boundary": "Second eligible live turn closed with 368 strict useful seconds and exact-second +60s continuation.",
   "early_finish_fallback": "Extend reporting tests to generate validity-aware operator review rows from durable ledgers, then integrate into CI.",
   "created_for_next_wake": false,
   "started_at": "2026-09-21T18:55:59+09:00",
