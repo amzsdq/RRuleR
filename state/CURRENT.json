@@ -17,14 +17,19 @@
       "Observed eligible STARTUP-003 successor invocation at 18:54:48 KST.",
       "Claimed nonconflicting authority epoch 66 after predecessor checkpoint/handoff.",
       "Validated predecessor RUNS and appended the first eligible operator review row.",
-      "Completed valid STARTUP-003 segmentation: last-useful->end 69s, end->due 134s, due->observation 48s, observation->claim 71s, claim->first-useful 65s."
+      "Completed valid STARTUP-003 segmentation: last-useful->end 69s, end->due 134s, due->observation 48s, observation->claim 71s, claim->first-useful 65s.",
+      "Implemented exact-second completion-relative due computation and promoted second precision to a lifecycle/CI invariant."
     ],
     "evidence": [
       "state/RUNS.jsonl@7daba51d74f994e836b0ea77f72d144053f7d837",
-      "planning/evidence/TURN-CLOSE-V4-RETEST.md@a412c1cb9c106f088ad6af54ed26b4c8d53c39de"
+      "planning/evidence/TURN-CLOSE-V4-RETEST.md@a412c1cb9c106f088ad6af54ed26b4c8d53c39de",
+      "tools/compute_completion_due.py@07ab6260da1eec2a0f16ba02b1aa1cf0753e4257",
+      "tests/test_compute_completion_due.py@7b9e8774d5f27e3abdd37e7e73f9801410604e39",
+      "control/rolling-rrule-lifecycle.v1.json@5796f3a8d285bd494d2be433f271254a621974f0",
+      ".github/workflows/validate-control-plane.yml@5dc85e60026576180d12a892b42a0190e2f881f9"
     ],
     "observation": "STARTUP-003 is valid and complete. End-to-due=134s is the largest individual measured continuation segment; current scheduler timing, not just delivery, is again the highest-effect correction target.",
-    "next_action": "Implement and test exact-second completion-relative rearm from observed close; continue live turn review and useful-evidence capture."
+    "next_action": "Run repository-data validators, inspect CI evidence if available, then continue with validity-aware review generation or the next live-retast correction."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
