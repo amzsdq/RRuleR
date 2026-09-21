@@ -61,7 +61,9 @@ jobs:
           assert util['voluntary_idle_while_useful_work_exists_forbidden'] is True
           assert util['checkpoint_is_yield_condition'] is False
           assert util['root_completion_is_yield_condition'] is False
-          assert util['after_each_work_unit']=='SELECT_NEXT_SAFE_USEFUL_UNIT_UNTIL_NATURAL_CLOSE_OR_SAFETY_BOUNDARY'
+          assert util['after_each_work_unit']=='BEFORE_600S_SELECT_NEXT_SAFE_USEFUL_UNIT_OR_DECOMPOSE; AT_OR_AFTER_600S_FINISH_SMALLEST_SAFE_IN_FLIGHT_UNIT_AND_CLOSE'
+          assert util['minimum_normal_continue_elapsed_seconds']==600
+          assert util['pre_600_voluntary_normal_continue_close_forbidden'] is True
           assert current['continuation']['run_continuation_gate_policy']=='control/run-continuation-gate.v1.json'
           assert current['continuation']['minimum_continue_work_seconds']==600
           assert utilization['execution_envelope']['minimum_continue_turn_seconds']==600
