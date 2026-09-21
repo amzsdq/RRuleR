@@ -9,28 +9,34 @@
   "current_owner": "RUN-UTIL-20260922-001446",
   "authority_epoch": 75,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "WORKING",
+  "run_state": "HANDOFF_COMMITTED",
   "checkpoint": {
     "id": "CP-UTILIZATION-113",
-    "state": "IN_PROGRESS",
+    "state": "COMPLETE",
     "completed": [
-      "Observed operator-rescheduled SAME MAIN generation due 2026-09-22T00:13:08+09:00 at turn start 00:14:46.",
-      "Persisted generation-matched BOOT_STARTED.",
-      "Live-verified SAME MAIN recurring provisional RRULE at 2026-09-22T00:27:46+09:00 and persisted REARM_VERIFIED.",
-      "Claimed authority epoch 75 without Watchdog."
+      "Observed operator-rescheduled SAME MAIN generation due 00:13:08 at turn start 00:14:46; persisted BOOT_STARTED.",
+      "Verified in-flight continuation and claimed epoch 75 without Watchdog.",
+      "Recorded failed normal STARTUP-016 and current operator-rescheduled STARTUP-017 without inventing missing boundaries.",
+      "Separated current and legacy operator-reset generations from normal scheduler and emergency-recovery comparisons.",
+      "Passed exact remote-code behavior checks for two operator-reschedule classifications.",
+      "Reconciled concurrent v4.1 schedule-category canary and live-verified SAME MAIN exact one-shot at END+60=00:25:53 with enabled=true and no RRULE."
     ],
     "evidence": [
-      "state/STARTUP_ACK.json@daac2d0",
-      "live SAME MAIN metadata: enabled recurring DTSTART 2026-09-22T00:27:46+09:00"
+      "state/SUCCESSOR_STARTUP.json@da63f14",
+      "state/WORK_EVIDENCE.json@2139e0c",
+      "tools/audit_startup_boundaries.py@d390214",
+      "tools/summarize_turn_close.py@d7e1c52",
+      "focused exact-code checks: PASS",
+      "live SAME MAIN metadata: enabled exact one-shot DTSTART 2026-09-22T00:25:53+09:00, no RRULE"
     ],
-    "observation": "The operator-rescheduled 00:13:08 generation supersedes stale 00:02:08 durable projections. Delivery-to-turn-start was 98 seconds.",
-    "next_action": "Harden startup audit/summary semantics for operator-rescheduled generations, preserve raw boundaries, and exclude them from normal scheduler comparison."
+    "observation": "Epoch 75 closed after 607 elapsed seconds with 96 artifact-backed useful seconds. A concurrent fresh policy change switched the continuation experiment from recurring RRULE to exact one-shot; close reconciled forward rather than restoring stale v4.0 semantics.",
+    "next_action": "Observe the 00:25:53 exact one-shot canary wake and preserve BOOT_STARTED/REARM_VERIFIED boundaries separately."
   },
   "continuation": {
-    "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
+    "mechanism": "EXACT_ONE_SHOT_SELF_UPDATE_CATEGORY_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
-    "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-22T00:27:46+09:00",
+    "rrule_frequency": null,
+    "next_due_at": "2026-09-22T00:25:53+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -56,8 +62,8 @@
       "enabled_verified": false,
       "policy_version": 6
     },
-    "next_due_source": "VERIFIED_IN_FLIGHT_PROVISIONAL_CRASH_INSURANCE",
-    "cold_fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE"
+    "next_due_source": "VERIFIED_NORMAL_END_PLUS_60_EXACT_ONE_SHOT",
+    "cold_fallback": "NONE_DURING_ACTIVE_ONE_SHOT_CATEGORY_CANARY"
   },
   "safety": {
     "public_repo": true,
