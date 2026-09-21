@@ -12,19 +12,27 @@
   "run_state": "WORKING",
   "checkpoint": {
     "id": "CP-UTILIZATION-112",
-    "state": "IN_PROGRESS",
+    "state": "COMPLETE",
     "completed": [
       "Persisted generation-matched BOOT_STARTED for DUE:2026-09-21T23:52:00+09:00.",
       "Live-verified SAME MAIN recurring provisional RRULE at 2026-09-22T00:03:45+09:00 and persisted REARM_VERIFIED.",
-      "Claimed authority epoch 74 for MAIN self-reliant policy alignment."
+      "Claimed authority epoch 74 for MAIN self-reliant policy alignment.",
+      "Removed stale mandatory Watchdog dependency from active controls, recovery policy, runtime policy, wake architecture, and recovery SLO.",
+      "Added control-plane CI assertions for SAME MAIN self-reliance and disabled Watchdog standby.",
+      "Passed 24 direct semantic consistency checks and zero-match stale dependency searches."
     ],
     "evidence": [
       "state/STARTUP_ACK.json@be3b752",
       "state/TURN_PLAN.json@a09e90d",
-      "live SAME MAIN metadata: enabled recurring DTSTART 2026-09-22T00:03:45+09:00"
+      "live SAME MAIN metadata: enabled recurring DTSTART 2026-09-22T00:03:45+09:00",
+      "control/ACTIVE_CONTROLS.json@4a893090",
+      "control/handoff-recovery.v1.json@6bc5790",
+      ".github/workflows/validate-control-plane.yml@86ca3f5",
+      "state/WAKE_ARCHITECTURE.json@4324c2f",
+      "state/WORK_EVIDENCE.json#WE-20260921-E74-001"
     ],
     "observation": "MAIN v4 bootstrapped before its scheduled due and secured its own recurring crash-insurance fallback. Watchdog remains disabled standby and is not part of normal continuity.",
-    "next_action": "Reconcile active control and lifecycle artifacts so normal close depends only on SAME MAIN END+60; then add deterministic consistency checks and close through the fast-rearm hard gate."
+    "next_action": "Observe actual END, live-rearm SAME MAIN to exact END+60, persist the non-WORKING close projection, and validate before final."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
