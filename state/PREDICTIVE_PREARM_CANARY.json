@@ -7,6 +7,7 @@
   "p0_gap_budget_seconds":42.9,
   "cold_rescue_offset_seconds":780,
   "candidate_predictive_lead_seconds":30,
+  "feasibility_prediction":{"known_scheduler_delay_sample_seconds_approx":64,"candidate_lead_seconds":30,"predicted_post_close_gap_seconds_if_delay_repeats":34,"within_p0_gap_budget":true,"interpretation":"This is a hypothesis, not evidence. If the prior ~64s delivery delay repeats, a due boundary 30s before close would place successor observation about 34s after close, inside the ~42.9s average gap budget. Actual observed boundaries decide the canary."},
   "safety_policy_ref":"control/handoff-recovery.v1.json#/recovery_classes/PREDICTIVE_PREARM_OVERLAP",
   "lifecycle_policy_ref":"control/rolling-rrule-lifecycle.v1.json#/predictive_prearm_canary",
   "samples":[],
