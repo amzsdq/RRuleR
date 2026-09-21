@@ -46,7 +46,7 @@
     "provisional_extension_offset_seconds": 180,
     "routine_short_rolling_refresh_forbidden": true,
     "retired_provisional_rescue_offset_seconds": 780,
-    "rule": "For a normal ~600s nonterminal CONTINUE turn, arm SAME MAIN once at observed wake/arm reference +660s and normally do not mutate it mid-turn. Extend once before collision only if useful authorized work or close handling clearly threatens that due. Normal close shifts SAME MAIN to exact END+60. If that occurrence is lost before bootstrap, the SAME MAIN recurring RRULE supplies the natural hourly cold fallback. Watchdog is not required."
+    "rule": "For a normal 10 minutes (600 seconds) nonterminal CONTINUE turn, arm SAME MAIN once at observed wake/arm reference + exactly 11 minutes (660 seconds) and normally do not mutate it mid-turn. Extend once before collision only if useful authorized work or close handling clearly threatens that due. Normal close shifts SAME MAIN to ACTUAL END + exactly 1 minute (60 seconds). If that occurrence is lost before bootstrap, the SAME MAIN recurring RRULE supplies the natural hourly cold fallback. Watchdog is not required."
   },
   "startup_receipt_generation_fence": {
     "required": true,
@@ -89,8 +89,8 @@
     ]
   },
   "rolling_recovery": {
-    "startup": "minimum fence, persist generation-matched BOOT_STARTED, arm and verify SAME MAIN +660s provisional, then classify normal vs predictive vs recovery before substantive authority",
-    "normal_close": "checkpoint then live-verify SAME MAIN END+60; do not arm Watchdog",
+    "startup": "minimum fence, persist generation-matched BOOT_STARTED, arm and verify SAME MAIN + exactly 11 minutes (660 seconds) provisional, then classify normal vs predictive vs recovery before substantive authority",
+    "normal_close": "checkpoint then live-verify SAME MAIN ACTUAL END + exactly 1 minute (60 seconds); do not arm Watchdog",
     "mutation_failure": "retry once when safe; if older verified future continuation survives, classify DEGRADED_CONTINUATION within its safety envelope; otherwise fail closed before conflicting substantive side effects",
     "stale_occurrence": "classify a natural SAME MAIN recurrence after missing bootstrap as MAIN_COLD_FALLBACK_RECOVERY; recover forward without replacing the canonical"
   },
@@ -102,6 +102,6 @@
   "design_reference": "docs/RUNTIME_CONTINUITY_ARCHITECTURE.md",
   "time_unit_safety": {
     "required": true,
-    "rule": "Human-readable timing must include explicit units; critical relay timings include both human unit and exact seconds. Bare END+60/NOW+180/+660 forms are forbidden."
+    "rule": "Human-readable timing must include explicit units; critical relay timings include both the human unit and exact seconds. Bare numeric timing arithmetic without a seconds/minutes/hours unit is forbidden."
   }
 }
