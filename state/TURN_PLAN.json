@@ -23,15 +23,17 @@
     "Search for stale normal-path Watchdog requirements and reconcile material conflicts.",
     "Checkpoint and close with live-verified SAME MAIN END+60."
   ],
-  "current_substep": 3,
+  "current_substep": 4,
   "handoff_boundary": null,
   "early_finish_fallback": "Add a deterministic policy-consistency check that rejects normal-close Watchdog requirements.",
   "created_for_next_wake": false,
   "started_at": "2026-09-21T23:50:45+09:00",
-  "last_progress_at": "2026-09-21T23:57:30+09:00",
+  "last_progress_at": "2026-09-21T23:59:15+09:00",
   "progress_evidence": [
     "BOOT_STARTED 23:50:45 for DUE:2026-09-21T23:52:00+09:00",
     "REARM_VERIFIED 23:51:45.997376; SAME MAIN recurring provisional due 00:03:45 enabled",
-    "Claimed epoch 74 and found stale independent-Watchdog dependency in ACTIVE_CONTROLS/handoff recovery/CI."
+    "Claimed epoch 74 and found stale independent-Watchdog dependency in ACTIVE_CONTROLS/handoff recovery/CI.",
+    "Aligned ACTIVE_CONTROLS, relay/recovery/runtime policies and CI to SAME MAIN fast shift + natural recurring cold fallback.",
+    "Updated wake architecture and recovery SLO so Watchdog is disabled break-glass standby, not a correctness dependency."
   ]
 }
