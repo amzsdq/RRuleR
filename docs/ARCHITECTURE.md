@@ -6,7 +6,8 @@
 |---|---|---|
 | GitHub repository | durable state, checkpoints, policy, evidence, work history | Yes |
 | ChatGPT scheduled session | reasoning and substantive work | No |
-| ChatGPT automation | wake/continuation trigger | No |
+| ChatGPT MAIN automation | primary wake/continuation trigger | No |
+| ChatGPT Startup Watchdog | independent pre-bootstrap liveness/rearm trigger; no substantive authority | No |
 | GitHub Actions | deterministic checks/reconciliation | Only for facts they verify |
 | Chat STATUS output | human-visible handoff receipt | No |
 
@@ -99,3 +100,21 @@ High utilization never authorizes:
 - unsafe overlap.
 
 The target is **high utilization subject to correctness invariants**, not activity for its own sake.
+
+## Two-stage continuation protection
+
+RRuleR separates failures by whether MAIN has already protected itself:
+
+```text
+MAIN expected due
+  -> independent one-shot Startup Watchdog protects pre-bootstrap gap
+  -> BOOT_STARTED
+  -> MAIN provisional rearm verified
+  -> REARM_VERIFIED
+  -> existing provisional continuation protects in-turn failure
+  -> normal close: MAIN END+60 and Watchdog MAIN_due+3m
+```
+
+The Watchdog is intentionally not a Worker/Foreman. It reads fresh durable state, detects missing startup/rearm receipts, and can only rearm the same MAIN canonical when fresh fencing permits. It never performs program work and never creates a replacement actor.
+
+Reservation prompts embed only the stable survival kernel. `control/startup-watchdog.v1.json` is authoritative; MAIN and Watchdog prompts must resynchronize their embedded kernel when GitHub changes materially.
