@@ -1,6 +1,6 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 9,
+  "version": 10,
   "status": "ACTIVE",
   "purpose": "Use one same-canonical hourly RRULE as bounded cold rescue with a strict normal CONTINUE fast continuation of actual observed turn END + 60 seconds; predictive prearm remains evidence-gated.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
@@ -59,6 +59,8 @@
       "SET_FIXED_STARTUP_WATCHDOG_IS_ENABLED_TRUE",
       "VERIFY_WATCHDOG_SAME_CANONICAL_ENABLED_ONE_SHOT_AND_DUE",
       "PERSIST_WATCHDOG_DUE",
+      "PERSIST_NON_WORKING_CLOSE_PROJECTION",
+      "VALIDATE_CURRENT_ACTIVITY_HANDOFF_PROJECTION",
       "RETURN"
     ],
     "due": "actual observed turn END timestamp + exactly 60 seconds, preserving seconds exactly; minute rounding is forbidden",
@@ -70,7 +72,33 @@
     "delivery_jitter_rule": "Measure scheduled-due -> actual invocation separately. Do not hide provider delivery latency by lengthening the local completion-relative offset.",
     "watchdog_sync_failure": "Retry once when safe. Preserve already-verified MAIN continuation, record DEGRADED_WATCHDOG_COVERAGE, and do not claim pre-bootstrap protection until Watchdog is verified.",
     "watchdog_reenable_rule": "MAIN must explicitly set the fixed Watchdog is_enabled=true on every one-shot reschedule. Schedule-only mutation is insufficient because a fired one-shot may remain disabled.",
-    "watchdog_verification_rule": "After Watchdog mutation, re-read live metadata and require same Watchdog canonical id, is_enabled=true, one-shot schedule, and exact intended due."
+    "watchdog_verification_rule": "After Watchdog mutation, re-read live metadata and require same Watchdog canonical id, is_enabled=true, one-shot schedule, and exact intended due.",
+    "close_state_projection": {
+      "purpose": "Give the Startup Watchdog durable positive proof that the predecessor is no longer substantively active, without inferring idle from silence.",
+      "after": "Only after MAIN and Watchdog continuations are both live-verified and their exact due values are known.",
+      "current": {
+        "run_state": "HANDOFF_COMMITTED",
+        "owner_rule": "Retain the just-closed predecessor run as current_owner until successor authority advances.",
+        "authority_epoch_rule": "Retain the closed predecessor epoch."
+      },
+      "activity": {
+        "status": "HANDOFF_READY",
+        "active_run_id": null,
+        "handoff_ready": true,
+        "next_wake_due_rule": "Exactly equal CURRENT.continuation.next_due_at"
+      },
+      "handoff": {
+        "handoff_state": "COMMITTED",
+        "predecessor_rule": "Match CURRENT.current_owner and authority_epoch",
+        "successor_expected_rule": "Exactly equal CURRENT.continuation.next_due_at"
+      },
+      "forbidden": [
+        "HANDOFF_COMMITTED CURRENT with WORKING ACTIVITY",
+        "HANDOFF_READY ACTIVITY with non-null active_run_id",
+        "different expected due across CURRENT, ACTIVITY, and HANDOFF"
+      ],
+      "validator": "tools/validate_close_projection.py"
+    }
   },
   "predictive_prearm_canary": {
     "experiment_id": "UTIL-EXP-018",
