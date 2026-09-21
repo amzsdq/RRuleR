@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0",
   "main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
-  "current_expected_due_at": "2026-09-22T01:38:00+09:00",
-  "generation_key": "DUE:2026-09-22T01:38:00+09:00",
-  "boot_started_at": "2026-09-22T01:37:17+09:00",
-  "boot_started_authority_epoch": "DUE:2026-09-22T01:38:00+09:00",
-  "rearm_verified_at": "2026-09-22T01:37:29+09:00",
-  "verified_provisional_due_at": "2026-09-22T01:48:17+09:00",
-  "status": "REARM_VERIFIED",
-  "last_updated_at": "2026-09-22T01:37:29+09:00",
-  "provider_delivery_delay_seconds": null,
-  "note": "v5.4 adaptive provisional verified on SAME authoritative MAIN: enabled=true, recurring FREQ=HOURLY, provisional DTSTART=01:48:17 KST (= observed bootstrap reference 01:37:17 +660s). Retired predecessors remain disabled."
+  "current_expected_due_at": "2026-09-22T02:04:10+09:00",
+  "generation_key": "DUE:2026-09-22T02:04:10+09:00",
+  "boot_started_at": "2026-09-22T02:07:11+09:00",
+  "boot_started_authority_epoch": "DUE:2026-09-22T02:04:10+09:00",
+  "rearm_verified_at": null,
+  "verified_provisional_due_at": null,
+  "status": "BOOT_STARTED",
+  "last_updated_at": "2026-09-22T02:07:11+09:00",
+  "provider_delivery_delay_seconds": 181,
+  "note": "Current MAIN wake entered from fresh durable state; startup acknowledgement recorded before substantive work."
 }
