@@ -4,7 +4,7 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "authority_epoch": 67,
   "run_id": "RUN-UTIL-20260921-193957",
-  "status": "ACTIVE",
+  "status": "CHECKPOINTED",
   "phase": "TURN_CLOSE_V4_CONTINUOUS_RETEST",
   "objective_id": "WS-P001-002-TURN-CLOSE-V4-RETEST",
   "objective": "Review the second eligible closed turn, preserve the incomplete STARTUP-004 evidence, and harden detection of invoked successors that leave no durable claim/useful progress.",
@@ -23,9 +23,9 @@
     "Validate current ledgers and close with exact END+60."
   ],
   "current_substep": 4,
-  "handoff_boundary": "Diagnostics and CI integration complete; exact END+60 close remains.",
+  "handoff_boundary": "All epoch-67 acceptance criteria completed; STARTUP-006 exact END+60 successor is armed.",
   "early_finish_fallback": "Extend turn review tooling to surface incomplete successor samples and missing-claim/useful aging without treating them as scheduler delivery failures.",
-  "created_for_next_wake": false,
+  "created_for_next_wake": true,
   "started_at": "2026-09-21T19:39:57+09:00",
   "last_progress_at": "2026-09-21T19:47:23+09:00",
   "progress_evidence": [
