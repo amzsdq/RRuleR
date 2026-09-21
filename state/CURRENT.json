@@ -6,42 +6,30 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "root_goal": "P0 sustained evidenced useful-work coverage",
   "status": "CONTINUE",
-  "current_owner": "RUN-UTIL-20260921-193957",
-  "authority_epoch": 67,
+  "current_owner": "RUN-UTIL-20260921-204946",
+  "authority_epoch": 68,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "CHECKPOINTED",
+  "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-103",
+    "id": "CP-UTILIZATION-104",
     "state": "CONTINUE",
     "completed": [
-      "Reconciled stale STARTUP-004 using observed automation invocation at 19:05:35.566381 KST without inventing claim/useful progress.",
-      "Separated operator-rescheduled 19:37:36 generation from normal END+60 compliance.",
-      "Claimed nonconflicting authority epoch 67 and provisionally armed same-canonical continuation.",
-      "Appended the second eligible live review with STARTUP-004 delivery separated from missing durable progress.",
-      "Recorded STARTUP-005 first durable useful boundary without treating the operator-rescheduled generation as END+60 evidence.",
-      "Added a machine-readable successor durable-progress audit with five focused regression tests.",
-      "Extended turn-review output to preserve provider delivery while exposing missing authority/first-useful status.",
-      "Repaired 12 literal backslash-n separators in the control-plane workflow and verified none remain.",
-      "Verified nine focused tests locally; external Actions result is not yet published."
+      "Reconciled STARTUP-006 with observed automation invocation at 19:50:28.457228 KST; no durable bootstrap/claim/useful progress exists for that invocation.",
+      "Preserved the hourly fallback occurrence and advanced the same canonical provisional due to 21:02:29 KST without schedule rollback.",
+      "Claimed nonconflicting authority epoch 68."
     ],
     "evidence": [
-      "automation last_run_time=2026-09-21T10:05:35.566381+00:00",
-      "automation updated_at=2026-09-21T10:36:58.386521+00:00",
-      "planning/evidence/TURN-CLOSE-V4-RETEST.md@1cb12a07b0e98257d08b78273b2da6bde7581484",
-      "tools/audit_successor_progress.py@77d12e5893559b377bfeabbb335a64a81caa813f",
-      "tests/test_audit_successor_progress.py@a7b39564ee4213cb0f1a39ece5b2065fc4c9a7f6",
-      ".github/workflows/validate-control-plane.yml@274e4f2e3b2a9189c2d042205c997e72f72c5e48",
-      "tools/build_turn_review.py@8c990e52f7ae0ee162896ce647c7a3f15a114f58",
-      "tests/test_build_turn_review.py@10ce38df9ad7cba74322c052f14e8e9336d56f27"
+      "automation last_run_time=2026-09-21T10:50:28.457228+00:00",
+      "same canonical provisional DTSTART=20260921T210229"
     ],
-    "observation": "Epoch 67 completed 498 elapsed seconds with 385 strict accepted useful seconds. STARTUP-004 delivery remains measured at 30s while missing progress stays UNKNOWN. Exact local END+60 was armed and verified for STARTUP-006.",
-    "next_action": "Successor records STARTUP-006 actual invocation, authority claim, and first durable useful boundary; append the third eligible review and compare three turns without imputing unknown time."
+    "observation": "STARTUP-006 proves END+60 local scheduling and 73s provider delivery, but the invoked occurrence left no BOOT_STARTED, REARM_VERIFIED, authority claim, or useful progress. The current hourly fallback wake is STARTUP-007 and is not a normal END+60 sample.",
+    "next_action": "Implement durable BOOT_STARTED/REARM_VERIFIED boundaries and STARTUP_ACK_MISSING recovery classification; evaluate executable independent wake transport separately from observability."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T19:49:15+09:00",
+    "next_due_at": "2026-09-21T21:02:29+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
