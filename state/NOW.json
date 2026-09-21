@@ -9,11 +9,11 @@
   "execution_status": "ACTIVE",
   "pause_reason": null,
   "resume_target": {
-    "step": "Execute planning/evidence/TURN-CLOSE-V4-RETEST.md within WS-P001-002; use concrete runnable primary/fallback/residual items and the unified v4 close decision.",
-    "selection_rule": "First reconcile operator-maintenance interruption without inventing successor timestamps. Keep existing authority fences, skip completed work, and collect three prospective valid turns before claiming utilization improvement."
+    "step": "Continue WS-P001-002 prospective utilization work under v5.2 fresh-policy sync and the 600-second normal CONTINUE voluntary hard floor. Observe integrated CI, then resume prospective utilization evidence/corrective experiments without reintroducing pre-600 close exceptions.",
+    "selection_rule": "Read fresh ACTIVE_CONTROLS each wake. Before 600 observed elapsed seconds, chain/decompose the next safe authorized unit; CI pending or local packet completion is not a close condition. At/after 600 seconds, finish the smallest safe in-flight unit and close through SAME MAIN exact END+60. Preserve historical pre-hard-floor run evidence without retroactive rewriting."
   },
-  "turn_plan_role": "TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec.",
-  "updated_at": "2026-09-21T09:40:32.149Z",
+  "turn_plan_role": "TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec and fresh ACTIVE_CONTROLS.",
+  "updated_at": "2026-09-22T01:25:00+09:00",
   "resumed_by_operator_at": "2026-09-21T09:40:32.149Z",
-  "maintenance_repair_ref": "planning/evidence/TURN-CLOSE-V4-RETEST.md"
+  "maintenance_repair_ref": "planning/evidence/MAIN-V5.2-POLICY-SYNC-ROLLBACK.md"
 }
