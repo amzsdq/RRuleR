@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_OBSERVATION_HORIZON",
-  "version": 4,
+  "version": 5,
   "status": "ACTIVE",
-  "purpose": "Separate trusted observation horizon provenance from useful-work evidence endpoints so valid trailing gaps remain measurable without allowing caller-invented, author-controlled, or run-attempt-ambiguous horizons.",
+  "purpose": "Separate trusted observation horizon provenance from useful-work evidence endpoints so valid trailing gaps remain measurable without allowing caller-invented, author-controlled, run-attempt-ambiguous, or historically recycled horizons.",
   "authoritative_state": "state/OBSERVATION_HORIZON.json",
   "rules": {
     "horizon_is_not_useful_work": true,
@@ -16,9 +16,12 @@
     "author_controlled_commit_timestamps_are_not_external_observation": true,
     "actions_provenance_must_bind_run_attempt": true,
     "actions_attempt_endpoint_is_authoritative_for_bound_attempt_identity": true,
-    "actions_attempt_updated_at_contractual_immutability_is_not_assumed": true
+    "actions_attempt_updated_at_contractual_immutability_is_not_assumed": true,
+    "provenance_history_append_only": true,
+    "provenance_replacement_must_retire_predecessor_exactly_once": true,
+    "retired_provenance_identity_reuse_forbidden": true
   },
   "accepted_provenance_kinds": ["GITHUB_ACTIONS_OBSERVED_TIMESTAMP"],
   "rejected_provenance_kinds": ["GITHUB_COMMIT_COMMITTER_TIMESTAMP", "CALLER_SUPPLIED_ONLY", "INFERRED_FROM_USEFUL_EVIDENCE", "LOCAL_UNPERSISTED_CLOCK"],
-  "fail_closed": "Reject promotion beyond the durable trusted horizon. Git commit timestamps cannot establish the boundary. Actions provenance MUST bind both run id and run attempt, and validation MUST fetch the attempt-specific endpoint so a later re-run of the same run id cannot substitute a different attempt. The attempt-specific endpoint is authoritative for attempt identity and observed API state; policy MUST NOT claim GitHub contractually guarantees post-completion immutability of its updated_at field unless such a guarantee is separately established."
+  "fail_closed": "Reject promotion beyond the durable trusted horizon. Git commit timestamps cannot establish the boundary. Actions provenance MUST bind both run id and run attempt, and validation MUST fetch the attempt-specific endpoint so a later re-run of the same run id cannot substitute a different attempt. Same-identity timestamp repinning is forbidden. On provenance replacement, the exact predecessor identity and timestamp MUST be appended to durable provenance_history; history cannot shrink or mutate, and any retired identity is permanently ineligible for reuse. The attempt-specific endpoint is authoritative for attempt identity and observed API state; policy MUST NOT claim GitHub contractually guarantees post-completion immutability of its updated_at field unless such a guarantee is separately established."
 }
