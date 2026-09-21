@@ -9,25 +9,23 @@
   "current_owner": "RUN-UTIL-20260921-215434",
   "authority_epoch": 71,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "WORKING",
+  "run_state": "CLOSING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-108",
-    "state": "WORKING",
+    "id": "CP-UTILIZATION-109",
+    "state": "COMPLETE_PENDING_CONTINUATION",
     "completed": [
-      "Recovered the 21:41:24 STARTUP_ACK_MISSING generation by reusing the same MAIN canonical.",
-      "Corrected malformed STARTUP_ACK canonical identity before authority claim.",
-      "Recorded BOOT_STARTED=21:55:37 and REARM_VERIFIED=21:56:12 for recovery generation.",
-      "Verified MAIN provisional continuation at 22:09:11 and Watchdog one-shot at 22:12:11, both enabled."
+      "Separated normal scheduler samples from Watchdog and provisional recovery generations in turn-close summaries.",
+      "Preserved every missing recovery boundary as null rather than zero.",
+      "Added complete/incomplete Watchdog recovery fixtures; six focused summary tests passed.",
+      "Added STARTUP_ACK canonical-ID and generation-key fencing; nine startup audit tests passed."
     ],
     "evidence": [
-      "watchdog recovery MAIN due=2026-09-21T21:54:52+09:00",
-      "BOOT_STARTED=2026-09-21T21:55:37+09:00",
-      "REARM_VERIFIED=2026-09-21T21:56:12+09:00",
-      "live MAIN DTSTART=20260921T130911Z RRULE:FREQ=HOURLY enabled=true",
-      "live Watchdog DTSTART=20260921T221211 Asia/Seoul one-shot enabled=true"
+      "tools/summarize_turn_close.py commits a5a2742 and tests 95e507c",
+      "tools/audit_startup_boundaries.py commit f3fbb72 and tests 86293bc",
+      "actual-ledger assertions kept STARTUP-009 missing first useful as null and excluded recovery samples from normal comparison"
     ],
-    "observation": "The fixed Watchdog recovered a second missing-bootstrap MAIN generation and the successor reached verified bootstrap protection without creating replacement canonicals.",
-    "next_action": "Add recovery-segment reporting to summarize_turn_close and focused tests while preserving unknown boundaries."
+    "observation": "Recovery generations are now diagnostically visible without contaminating normal END+60 scheduler comparisons. The malformed mixed canonical ID encountered during bootstrap now fails closed in the audit.",
+    "next_action": "Close epoch 71 with exact END+60 MAIN continuation and same Watchdog due +180 seconds, both enabled and verified."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
