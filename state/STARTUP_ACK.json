@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
   "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "current_expected_due_at": "2026-09-21T21:01:19+09:00",
-  "generation_key": "DUE:2026-09-21T21:01:19+09:00",
+  "current_expected_due_at": "2026-09-21T21:11:09+09:00",
+  "generation_key": "DUE:2026-09-21T21:11:09+09:00",
   "boot_started_at": null,
   "boot_started_authority_epoch": null,
   "rearm_verified_at": null,
   "verified_provisional_due_at": null,
-  "status": "AWAITING_BOOT",
-  "last_updated_at": "2026-09-21T21:01:01+09:00",
-  "note": "Prospective STARTUP-008 receipt surface synchronized to exact epoch-68 END+60. Missing receipts remain null."
+  "status": "AWAITING_RECOVERY_BOOT",
+  "last_updated_at": "2026-09-21T21:10:09+09:00",
+  "note": "Startup Watchdog recovery generation after STARTUP-008 exceeded startup grace without generation-matched BOOT_STARTED or REARM_VERIFIED; receipts remain null until observed."
 }
