@@ -9,7 +9,7 @@
   "current_owner": "RUN-UTIL-20260921-235045",
   "authority_epoch": 74,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "WORKING",
+  "run_state": "HANDOFF_COMMITTED",
   "checkpoint": {
     "id": "CP-UTILIZATION-112",
     "state": "COMPLETE",
@@ -31,14 +31,14 @@
       "state/WAKE_ARCHITECTURE.json@4324c2f",
       "state/WORK_EVIDENCE.json#WE-20260921-E74-001"
     ],
-    "observation": "MAIN v4 bootstrapped before its scheduled due and secured its own recurring crash-insurance fallback. Watchdog remains disabled standby and is not part of normal continuity.",
-    "next_action": "Observe actual END, live-rearm SAME MAIN to exact END+60, persist the non-WORKING close projection, and validate before final."
+    "observation": "Epoch 74 completed the MAIN self-reliance alignment. Watchdog is disabled standby; normal close live-verified SAME MAIN recurring RRULE at exact END+60.",
+    "next_action": "Await generation-matched BOOT_STARTED for DUE:2026-09-22T00:02:08+09:00; the successor must provisional-arm SAME MAIN, work, and close through the same hard gate."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-22T00:03:45+09:00",
+    "next_due_at": "2026-09-22T00:02:08+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -62,9 +62,9 @@
       "coverage": "NOT_REQUIRED_FOR_NORMAL_CONTINUITY",
       "next_watchdog_due_at": null,
       "enabled_verified": false,
-      "policy_version": 5
+      "policy_version": 6
     },
-    "next_due_source": "MAIN_V4_PROVISIONAL_CRASH_INSURANCE",
+    "next_due_source": "VERIFIED_NORMAL_END_PLUS_60_SECONDS",
     "cold_fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE"
   },
   "safety": {
