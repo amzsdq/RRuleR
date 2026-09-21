@@ -6,7 +6,8 @@
 - `HANDOFF.json` — explicit predecessor/successor coordination state for the current handoff.
 - `ACTIVITY.json` — durable operator-facing liveness heartbeat: armed/working/handoff/terminal state, active run identity, last progress, current unit, and next wake.
 - `WORK_EVIDENCE.json` — strict forward-only accepted useful-work intervals; unknown time is never inferred.
-- `PREDICTIVE_PREARM_CANARY.json` — active UTIL-EXP-018 canary state and measured cross-turn latency samples.
+- `SUCCESSOR_STARTUP.json` — prospective scheduler-due, invocation-observation, authority-claim, and first-useful boundaries for startup-loss attribution.
+- `PREDICTIVE_PREARM_CANARY.json` — historical UTIL-EXP-018 canary result; do not mistake its failed sample for the active UTIL-EXP-019 startup experiment.
 - `RELAY_VALIDATION.json` — machine-readable acceptance ledger for the reproduced RRULE self-relay.
 - `EVENTS.jsonl` — append-oriented public-safe relay event ledger.
 - `RUNS.jsonl` — run/handoff/utilization observation ledger.
@@ -36,19 +37,17 @@ Prospective capture rules:
 - scheduler-only, heartbeat-only, waiting, timestamp-only, and evidence-bookkeeping-only activity is not useful work;
 - missing historical time remains unknown.
 
-`tools/append_work_evidence.py` provides guarded append semantics. `tools/validate_work_evidence.py` audits the ledger/promotion windows. `tools/summarize_work_evidence.py` reports freshness/totals without converting unknown time.
+`tools/append_work_evidence.py` provides guarded append semantics. `tools/validate_work_evidence.py` audits the ledger/promotion windows. `tools/summarize_work_evidence.py` reports freshness/totals and bounded-run short-turn diagnostics without converting unknown time.
 
 When the available connector surface cannot safely append the monolithic one-line ledger without rewriting unrelated history, an observed candidate may be persisted under `state/evidence-pending/`. Pending evidence is **not** P0-accepted evidence and must be ignored by promotion until validated and canonically appended. This preserves observed boundaries without falsely claiming acceptance.
 
+## SUCCESSOR_STARTUP.json
+
+This is the active prospective measurement surface for `UTIL-EXP-019`. Keep four boundaries separate: scheduled due, actual successor observation, nonconflicting authority claim, and first durable useful mutation. Missing boundaries remain unknown. Optimize the largest measured avoidable segment rather than attributing all cross-turn loss to scheduler timing or all loss to worker startup.
+
 ## PREDICTIVE_PREARM_CANARY.json
 
-This is the durable measurement surface for `UTIL-EXP-018`.
-
-Purpose: determine whether arming the same canonical successor before predecessor close can hide scheduler delivery latency under still-useful predecessor work while preserving one substantive authority owner.
-
-Required sample evidence includes predictive due, actual successor observation, predecessor last useful boundary, successor first useful boundary, derived post-close gap, overlap/fence result, duplicate-side-effect result, and schedule-rollback result.
-
-An early successor may fence/read/observe but cannot claim conflicting substantive authority while the predecessor is fresh. Promotion requires the documented safe-sample threshold and then a valid fixed 900-second utilization window. Schema: `schemas/predictive-prearm-canary.schema.json`.
+This preserves the `UTIL-EXP-018` result. Its first canary failed because predecessor-last-useful to successor-first-useful was 3514 seconds. It remains historical evidence and a rollback constraint, not the current experiment state. Any later guarded timing retry must be justified by new evidence such as `SUCCESSOR_STARTUP.json` and must preserve single substantive authority.
 
 ## RELAY_VALIDATION.json
 
@@ -65,5 +64,7 @@ Each non-empty line follows `schemas/relay-event.schema.json`. Do not rewrite hi
 Each non-empty line follows `schemas/run-observation.schema.json`.
 
 Every bounded execution turn should durably record actual `run_started_at`, actual `run_ended_at`, derived `duration_seconds`, and `turn_outcome: CONTINUE | COMPLETE | BLOCKED | PAUSED`, plus detailed classification/evidence fields as applicable.
+
+A normal `CONTINUE` turn has an 8-minute minimum floor. A `CONTINUE` run below 480 seconds is an exception and must include an allowlisted `short_turn_reason` plus non-empty `alternatives_checked`; otherwise it is a utilization-policy failure. `tools/summarize_work_evidence.py ... state/RUNS.jsonl` exposes this diagnostically, and the run-observation schema enforces the fields for new records.
 
 `COMPLETE` is reserved for durable program terminal state. Missing timing values remain null rather than fabricated.
