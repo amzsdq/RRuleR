@@ -8,19 +8,16 @@ import urllib.request
 from datetime import datetime
 from pathlib import Path
 
-
 TRUSTED_ACTION_WORKFLOWS = {
     ".github/workflows/validate-control-plane.yml",
     ".github/workflows/validate-observation-horizon.yml",
 }
-
 
 def instant(value):
     dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
     if dt.tzinfo is None:
         raise ValueError("observation horizon timestamp lacks timezone")
     return dt.timestamp()
-
 
 def validate(horizon, policy, source, previous=None, previous_states=None):
     kind = horizon.get("provenance_kind")
@@ -43,20 +40,21 @@ def validate(horizon, policy, source, previous=None, previous_states=None):
     if kind == "GITHUB_ACTIONS_OBSERVED_TIMESTAMP":
         if not ref.isdigit():
             raise ValueError("GitHub Actions provenance ref must be a run id")
+        expected_attempt = horizon.get("provenance_attempt")
+        if not isinstance(expected_attempt, int) or expected_attempt < 1:
+            raise ValueError("GitHub Actions provenance must bind an immutable run attempt")
+        if source.get("run_attempt") != expected_attempt:
+            raise ValueError("observation horizon Actions provenance attempt mismatch")
         if source.get("status") != "completed" or source.get("conclusion") != "success":
             raise ValueError("observation horizon Actions provenance is not successful/completed")
         authoritative = source.get("updated_at")
-    elif kind == "GITHUB_COMMIT_COMMITTER_TIMESTAMP":
-        authoritative = source.get("commit", {}).get("committer", {}).get("date")
     else:
         raise ValueError("accepted provenance kind has no verifier")
     if not authoritative or trusted_instant != instant(authoritative):
         raise ValueError("trusted_observed_through does not match authoritative provenance timestamp")
     return True
 
-
 def validate_actions_causality(source, compare_result, current_sha):
-    """Require Actions provenance to come from a trusted push workflow on current ancestry."""
     if source.get("event") != "push" or source.get("head_branch") != "main":
         raise ValueError("observation horizon Actions provenance is not a trusted main push")
     if source.get("path") not in TRUSTED_ACTION_WORKFLOWS:
@@ -75,7 +73,6 @@ def validate_actions_causality(source, compare_result, current_sha):
         raise ValueError("observation horizon Actions provenance ancestry is inconsistent")
     return True
 
-
 def api(repo, token, path):
     req = urllib.request.Request(
         f"https://api.github.com/repos/{repo}/{path}",
@@ -84,7 +81,6 @@ def api(repo, token, path):
     with urllib.request.urlopen(req) as response:
         return json.load(response)
 
-
 def load_predecessor_states(previous_paths):
     states = []
     for path in previous_paths:
@@ -92,7 +88,6 @@ def load_predecessor_states(previous_paths):
             raise ValueError(f"explicit predecessor observation horizon file missing: {path}")
         states.append(json.loads(path.read_text()))
     return states
-
 
 def main():
     horizon_path = Path(sys.argv[1] if len(sys.argv) > 1 else "state/OBSERVATION_HORIZON.json")
@@ -105,18 +100,20 @@ def main():
     ref = str(horizon.get("provenance_ref", ""))
     repo = os.environ["REPO"]
     token = os.environ["GH_TOKEN"]
-    path = f"actions/runs/{ref}" if kind == "GITHUB_ACTIONS_OBSERVED_TIMESTAMP" else f"commits/{ref}"
-    source = api(repo, token, path)
+    if kind != "GITHUB_ACTIONS_OBSERVED_TIMESTAMP":
+        raise ValueError("accepted provenance kind has no verifier")
+    attempt = horizon.get("provenance_attempt")
+    if not isinstance(attempt, int) or attempt < 1:
+        raise ValueError("GitHub Actions provenance must bind an immutable run attempt")
+    source = api(repo, token, f"actions/runs/{ref}/attempts/{attempt}")
     validate(horizon, policy, source, previous_states=previous_states)
-    if kind == "GITHUB_ACTIONS_OBSERVED_TIMESTAMP":
-        current_sha = os.environ.get("GITHUB_SHA")
-        if not current_sha:
-            raise ValueError("GITHUB_SHA is required for Actions provenance causality")
-        source_sha = source.get("head_sha", "")
-        compare_path = "compare/" + urllib.parse.quote(source_sha, safe="") + "..." + urllib.parse.quote(current_sha, safe="")
-        validate_actions_causality(source, api(repo, token, compare_path), current_sha)
-    print(f"observation horizon provenance valid: {kind}:{ref}; predecessors={len(previous_states)}")
-
+    current_sha = os.environ.get("GITHUB_SHA")
+    if not current_sha:
+        raise ValueError("GITHUB_SHA is required for Actions provenance causality")
+    source_sha = source.get("head_sha", "")
+    compare_path = "compare/" + urllib.parse.quote(source_sha, safe="") + "..." + urllib.parse.quote(current_sha, safe="")
+    validate_actions_causality(source, api(repo, token, compare_path), current_sha)
+    print(f"observation horizon provenance valid: {kind}:{ref}:attempt:{attempt}; predecessors={len(previous_states)}")
 
 if __name__ == "__main__":
     main()
