@@ -9,7 +9,7 @@ Continuation survival is high, but useful-work occupancy must meet a SaaS-grade 
 
 ## Outcome
 
-Make bounded wakes spend most eligible wall-clock time on substantive authorized work and make normal cross-turn continuation exact. The active operator-locked P0 is two-part: **P0-A** sustain at least 10 minutes (10 minutes (600 observed elapsed seconds)) on a normal nonterminal `CONTINUE` turn unless a truthful early-exit exception applies; **P0-B** rearm the SAME enabled recurring MAIN at ACTUAL END + exactly 1 minute (60 seconds), live-verify the exact `DTSTART`, and measure provider delivery/startup delay separately.
+Make bounded wakes spend most eligible wall-clock time on substantive authorized work and make normal cross-turn continuation exact. The active operator-locked P0 is two-part: **P0-A** sustain at least 10 minutes (600 observed elapsed seconds) on a normal nonterminal `CONTINUE` turn unless a truthful early-exit exception applies; **P0-B** rearm the SAME enabled recurring MAIN at ACTUAL END + exactly 1 minute (60 seconds), live-verify the exact `DTSTART`, and measure provider delivery/startup delay separately.
 
 ## Scope
 
@@ -78,7 +78,7 @@ Predictive prearm is rolled back; completion-relative same-canonical continuatio
 
 ### v5.4 provisional-horizon correction
 
-A live operator mutation proved that the SAME MAIN scheduler accepts an earlier recurring `DTSTART`; the long wait was not a platform minimum. The active policy itself had been arming the in-flight crash-insurance due at `target 10 minutes (600 seconds) + 3 minutes (180 seconds) safety = 13 minutes (780 seconds)`, which made a normal ~10-minute turn look like it needed a ~13-minute successor horizon.
+A live operator mutation proved that the SAME MAIN scheduler accepts an earlier recurring `DTSTART`; the long wait was not a platform minimum. The active policy itself had been arming the in-flight crash-insurance due at `target 10 minutes (600 seconds) + 3 minutes (180 seconds) safety = 13 minutes (780 seconds)`, which made a normal 10-minute (600-second) turn look like it needed a 13-minute (780-second) successor horizon.
 
 The first attempted correction, routine `NOW + 2 minutes (120 seconds)` short rolling refresh, is **rejected as the normal strategy** because prior controlled A/B evidence showed an overlapping duplicate invocation under repeated short rolling. The selected v5.4 correction is therefore workload-relative rather than aggressively rolling:
 
@@ -94,7 +94,7 @@ The 01:38 generation is the first live v5.4 verification turn. It durably wrote 
 
 ## Exact resume step
 
-Continue `UTIL-EXP-019` with five observed boundaries: invocation, `BOOT_STARTED`, provisional `REARM_VERIFIED`, authority claim, and first durable useful work. Treat the 01:38 v5.4 generation as a prospective provisional-horizon sample, but do not promote it until the turn closes normally at >=10 minutes (600 seconds) and the SAME MAIN exact `ACTUAL END + 1 minute (60 seconds)` due is live-verified and projected consistently to CURRENT/ACTIVITY/HANDOFF. Preserve missing boundaries as unknown; do not infer scheduler or useful-work success from invocation metadata alone.
+Continue `UTIL-EXP-019` with five observed boundaries: invocation, `BOOT_STARTED`, provisional `REARM_VERIFIED`, authority claim, and first durable useful work. Treat the 01:38 v5.4 generation as a prospective provisional-horizon sample, but do not promote it until the turn closes normally at at least 10 minutes (600 seconds) and the SAME MAIN exact `ACTUAL END + 1 minute (60 seconds)` due is live-verified and projected consistently to CURRENT/ACTIVITY/HANDOFF. Preserve missing boundaries as unknown; do not infer scheduler or useful-work success from invocation metadata alone.
 
 ## Decision rule
 
@@ -102,7 +102,7 @@ Any rule/control/process change is valid if its net expected contribution to P00
 
 ## Chained-turn execution policy
 
-Normal nonterminal `CONTINUE` has a **10-minute (600-second) voluntary hard floor**, not an 8-minute floor or a soft 10-minute target.
+Normal nonterminal `CONTINUE` has a **10-minute (600-second) voluntary hard floor**, not an 8-minute (480-second) floor or a soft 10-minute (600-second) target.
 
 - Before 10 minutes (600 observed elapsed seconds), if a bounded unit completes, immediately execute the next clear low-risk checkpointable authorized unit from this work spec/project.
 - If the next obvious unit is too large, decompose it and execute a smaller safe slice. If it is waiting on CI/external evidence, choose an independent fallback/residual authorized unit.
