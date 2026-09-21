@@ -8,10 +8,10 @@
   "authority_epoch": 73,
   "substantive_work_started_at": "2026-09-21T22:36:46+09:00",
   "last_progress_at": "2026-09-21T22:45:51+09:00",
-  "last_progress_kind": "OPERATOR_FAST_PATH_RECOVERY_REARM",
-  "current_unit": "Await generation-matched MAIN bootstrap on the normal fast path.",
-  "next_wake_due_at": "2026-09-21T23:10:59+09:00",
+  "last_progress_kind": "OPERATOR_NORMAL_MAIN_FAST_RETRY",
+  "current_unit": "Await generation-matched MAIN bootstrap on retried normal path.",
+  "next_wake_due_at": "2026-09-21T23:14:40+09:00",
   "successor_observed": false,
   "handoff_ready": true,
-  "operator_ui_note": "No substantive owner is active. MAIN is operator-rearmed for 23:10:59; Watchdog is emergency-only at 23:13:59."
+  "operator_ui_note": "No substantive owner active. SAME MAIN retried for 23:14:40; Watchdog emergency-only at 23:17:40."
 }
