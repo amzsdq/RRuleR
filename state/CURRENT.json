@@ -30,13 +30,13 @@
       "live SAME MAIN enabled recurring FREQ=HOURLY DTSTART 2026-09-22T01:50:05+09:00"
     ],
     "observation": "The long visible continuation gap was policy-induced rather than a scheduler minimum. The repaired v5.4 path retained crash insurance without the former +780s horizon and completed normal close on the SAME recurring MAIN at exact END+60.",
-    "next_action": "On the 01:50:05 generation, persist fresh generation-matched BOOT_STARTED/REARM_VERIFIED and continue prospective P001 utilization/startup-boundary measurement under the synchronized +660s policy."
+    "next_action": "Operator restarted MAIN for the v5.5 durable-unit chat-trace canary. Expected wake 02:01:20 KST. On wake: fresh BOOT_STARTED -> SAME MAIN provisional live verify -> schedule trace -> durably evidenced bounded units with one completion trace each and same-wake continuation -> >=600s -> exact END+60 live verify -> final due trace."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_COMPLETION_RELATIVE_MAIN",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-22T01:50:05+09:00",
+    "next_due_at": "2026-09-22T02:01:20+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 600,
     "provisional_safety_margin_seconds": 60,
@@ -61,13 +61,16 @@
       "enabled_verified": false,
       "policy_version": 8
     },
-    "next_due_source": "V5_4_EXACT_END_PLUS_60_LIVE_VERIFIED",
+    "next_due_source": "OPERATOR_RESTART_V5_5_CHAT_TRACE_CANARY",
     "cold_fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE",
     "provisional_extension_guard_seconds": 90,
     "provisional_extension_offset_seconds": 180,
-    "provisional_extension_count_this_turn": 1,
+    "provisional_extension_count_this_turn": 0,
     "actual_end_at": "2026-09-22T01:49:05+09:00",
-    "verified_next_fast_due_at": "2026-09-22T01:50:05+09:00"
+    "verified_next_fast_due_at": "2026-09-22T01:50:05+09:00",
+    "chat_trace_policy": "DURABLE_UNIT_CHAT_TRACE_CANARY_V5_5",
+    "chat_trace_requires_persisted_unit_duration_and_work_evidence": true,
+    "progress_trace_is_close_authority": false
   },
   "safety": {
     "public_repo": true,
