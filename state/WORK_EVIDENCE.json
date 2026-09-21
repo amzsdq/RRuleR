@@ -308,11 +308,25 @@
       "qualification": "SUBSTANTIVE_ACCEPTED",
       "basis": "Added forward-only BOOT_STARTED and REARM_VERIFIED semantics, a distinct STARTUP_ACK_MISSING recovery class that does not pretend detection is recovery, and eight focused regression tests. Boundaries are observed authority claim and durable commit completion.",
       "observed_seconds": 118
+    },
+    {
+      "record_id": "WE-20260921-E68-002",
+      "authority_epoch": 68,
+      "run_id": "RUN-UTIL-20260921-204946",
+      "start_at": "2026-09-21T20:52:13+09:00",
+      "end_at": "2026-09-21T20:59:31+09:00",
+      "start_boundary": "OBSERVED",
+      "end_boundary": "OBSERVED",
+      "kind": "recovery_path_implementation_and_review",
+      "artifact": "tools/evaluate_event_rescue.py@ceafec60ecfb665957b46ac1e80e195cbd724b83 + tests/test_evaluate_event_rescue.py@b626fa64b43f3878faed92a6dd61aea386b72084 + .github/workflows/event-wake-rescue-pulse.yml@641a66d68d51e6b26f3c8e05bf2ce77c798e2291 + control/event-wake-candidate.v1.json@2dd171461be46b3261945c69c55ef4a3e648b7a8 + planning/evidence/TURN-CLOSE-V4-RETEST.md@fc34b285ce7e22d57d7618050115394b25e13aa0",
+      "qualification": "SUBSTANTIVE_ACCEPTED",
+      "basis": "Implemented a fail-closed event-rescue decision engine for missing bootstrap acknowledgement, missing provisional rearm verification, and stale owners; gated emission on a verified consumer and no outstanding generation; wired the evaluator into CI and the inert rescue workflow; completed the initial three-turn evidence review. Both boundaries are observed and no wait time is counted.",
+      "observed_seconds": 438
     }
   ],
   "collection": {
     "started_at": "2026-09-21T05:03:12+09:00",
     "historical_backfill": false,
-    "latest_observed_record": "WE-20260921-E68-001"
+    "latest_observed_record": "WE-20260921-E68-002"
   }
 }
