@@ -1,8 +1,8 @@
 {
-  "schema_version": "1.8",
+  "schema_version": "1.9",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "status": "V5_4_ADAPTIVE_PROVISIONAL_LIVE_SAMPLE_ACTIVE",
+  "status": "V5_5_DURABLE_UNIT_CHAT_TRACE_CANARY_READY",
   "target": {
     "acceptance_window_seconds": 900,
     "required_useful_seconds": 840,
@@ -22,7 +22,10 @@
     "provisional_extension_guard_seconds": 90,
     "provisional_extension_offset_seconds": 180,
     "short_rolling_120_seconds_retired_as_default": true,
-    "normal_midturn_schedule_mutation": false
+    "normal_midturn_schedule_mutation": false,
+    "durable_unit_chat_trace_enabled": true,
+    "unit_trace_requires_persisted_observed_duration_and_work_evidence": true,
+    "progress_trace_is_never_close_authority": true
   },
   "measurement": {
     "continuous_progress_evidence_required": true,
@@ -46,26 +49,23 @@
     "rule": "Preserve raw historical samples; classify current v5.4 generation prospectively only from observed boundaries. Invocation metadata alone is not BOOT_STARTED or first useful work."
   },
   "active_retest": {
-    "experiment_id": "UTIL-EXP-019-V5.4-PROVISIONAL",
-    "run_id": "RUN-UTIL-20260922-013717",
-    "scheduled_due_at": "2026-09-22T01:38:00+09:00",
-    "boot_started_at": "2026-09-22T01:37:17+09:00",
-    "rearm_verified_at": "2026-09-22T01:37:29+09:00",
-    "verified_provisional_due_at": "2026-09-22T01:48:17+09:00",
-    "purpose": "Verify workload-relative +660s crash insurance plus exact END+60 normal close without routine short rolling or retired +780s horizon.",
-    "promotion_rule": "Do not promote from bootstrap/provisional success alone. Require >=600s normal turn close, live SAME MAIN exact END+60 verification, consistent close projection, and no duplicate substantive side effect or schedule rollback."
+    "experiment_id": "UTIL-EXP-020-V5.5-UNIT-CHAT-TRACE",
+    "run_id": null,
+    "purpose": "Verify that the operator can directly observe real same-wake work cadence: provisional schedule trace first, then one trace per durably persisted bounded substantive unit, continued work after each trace, and final exact END+60 next-due trace.",
+    "success_signal": "A normal >=600s CONTINUE wake shows verified provisional schedule trace; >=2 genuine durably persisted bounded-unit completion traces when workload permits; no trace-induced early close; SAME MAIN exact END+60 close trace; no duplicate substantive overlap.",
+    "failure_signal": "Any completion trace without durable unit duration/work evidence, any trace treated as a close boundary, or failure to continue safe authorized work before 600s."
   },
   "valid_completed_windows_rolling": [],
   "rolling_mean_observed_useful_seconds": null,
   "goal_reached": false,
   "latest_diagnosis": {
-    "cause_class": "PROVISIONAL_HORIZON_POLICY_MISMATCH_REPAIRED_PENDING_LIVE_CLOSE",
-    "evidence": "Manual near-due mutation proved the scheduler accepts earlier DTSTART. The former +780s policy caused the long visible wait; repeated +2m rolling is rejected by prior overlap evidence. Fresh v5.4 bootstrap live-verified SAME MAIN at +660s, and policy drift in CI, runtime-continuity, and scheduler-fence has been reconciled. Integrated control-plane validation passes after reconciliation.",
-    "implication": "Keep one workload-relative +660s provisional for a normal ~600s turn, no routine mid-turn mutation, exact END+60 at close, and keep policy-enforcing CI surfaces synchronized with active controls."
+    "cause_class": "OBSERVABILITY_GAP_UNDER_TEST",
+    "evidence": "Self-update capability and exact END+60 scheduling are proven live; operator still lacks direct per-unit same-wake visibility. V5.5 adds chat traces bound strictly to durable unit completion evidence.",
+    "implication": "Use chat traces to test whether the MAIN is continuously chaining real work rather than returning early. Do not infer useful work from elapsed time or prose alone."
   },
   "next_corrective_experiment": {
-    "experiment_id": "UTIL-EXP-019-V5.4-CLOSE",
-    "hypothesis": "One +660s provisional can cover a >=600s normal turn with less visible dead horizon than +780s and without the collision risk of repeated +120s rolling.",
-    "success_signal": "Current run reaches >=600 observed elapsed seconds, closes on SAME MAIN exact END+60, and subsequent generation boots without duplicate substantive overlap."
+    "experiment_id": "UTIL-EXP-020-V5.5-UNIT-CHAT-TRACE",
+    "hypothesis": "Binding each progress message to durable unit completion evidence will make premature return and idle gaps directly observable without changing scheduler authority.",
+    "success_signal": "Same-wake trace sequence demonstrates schedule arm -> multiple durably evidenced units -> exact END+60 close."
   }
 }
