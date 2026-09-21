@@ -16,14 +16,17 @@
     "completed": [
       "Reconciled stale STARTUP-004 using observed automation invocation at 19:05:35.566381 KST without inventing claim/useful progress.",
       "Separated operator-rescheduled 19:37:36 generation from normal END+60 compliance.",
-      "Claimed nonconflicting authority epoch 67 and provisionally armed same-canonical continuation."
+      "Claimed nonconflicting authority epoch 67 and provisionally armed same-canonical continuation.",
+      "Appended the second eligible live review with STARTUP-004 delivery separated from missing durable progress.",
+      "Recorded STARTUP-005 first durable useful boundary without treating the operator-rescheduled generation as END+60 evidence."
     ],
     "evidence": [
       "automation last_run_time=2026-09-21T10:05:35.566381+00:00",
-      "automation updated_at=2026-09-21T10:36:58.386521+00:00"
+      "automation updated_at=2026-09-21T10:36:58.386521+00:00",
+      "planning/evidence/TURN-CLOSE-V4-RETEST.md@1cb12a07b0e98257d08b78273b2da6bde7581484"
     ],
     "observation": "STARTUP-004 provider delivery was about 30s but subsequent durable progress is unknown. Current operator-rescheduled wake delivery was 69s; it is not a comparable END+60 sample.",
-    "next_action": "Commit first substantive review artifact, complete STARTUP-005 post-invocation boundary, then review the second eligible closed turn and harden missing-successor detection."
+    "next_action": "Implement missing successor durable-progress diagnostic and focused tests, integrate into CI, then validate ledgers."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
