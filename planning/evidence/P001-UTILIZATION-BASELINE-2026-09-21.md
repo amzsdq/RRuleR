@@ -25,9 +25,9 @@ The ledger then had no accepted records for epochs 44-58. This does **not** prov
 
 The resumed turn began at the automation-observed boundary `2026-09-21T15:49:58+09:00`.
 
-`WE-20260921-E59-001` records an observed substantive interval through `15:51:55+09:00`, totaling **117 seconds**. The interval produced the work-spec activation/diagnosis, deterministic evidence append helper, focused tests, integrated-CI wiring, and bootstrap capture rule.
+Prospective epoch-59 records now cover four adjacent observed substantive intervals through `15:57:58+09:00`: **117 + 164 + 100 + 99 = 480 observed useful seconds**. No time after that boundary is included in this figure.
 
-This is proof that prospective capture is working again. It is **not yet** a completed 900-second P0 window and must not be promoted as one.
+This proves prospective capture is working again and that the resumed turn sustained materially more work than the historical tiny-packet pattern. It is still **not** a completed 900-second P0 window and must not be promoted as one.
 
 ## Ranked causes of under-utilization / unprovable utilization
 
@@ -41,13 +41,14 @@ Correction applied in epoch 59:
 - `tools/append_work_evidence.py`;
 - `tests/test_append_work_evidence.py`;
 - integrated CI coverage;
-- explicit forward-capture bootstrap rule.
+- explicit forward-capture bootstrap rule;
+- `state/WORK_EVIDENCE.json` added to mandatory wake state.
 
 ### 2. Turns historically ended after small local packets — high execution impact
 
-The pre-resume strict ledger itself contains many very short accepted intervals (14s, 18s, 31s, 33s, 47s, 49s, 57s, 67s, 76s) and one 190s interval. These durations do not by themselves equal full-turn duration, but they are consistent with the previously observed pattern of committing one bounded change and then failing to establish sustained evidence across most of a 600-second useful-work target.
+The pre-resume strict ledger contains many very short accepted intervals (14s, 18s, 31s, 33s, 47s, 49s, 57s, 67s, 76s) and one 190s interval. These durations do not by themselves equal full-turn duration, but they are consistent with the previously observed pattern of committing one bounded change and then failing to establish sustained evidence across most of a 600-second useful-work target.
 
-Correction already introduced at the runtime level: 10-minute bounded work target, no local-completion self-stop, and a related fallback unit. Epoch 59 must test whether this changes actual sustained occupancy rather than assuming the rule works.
+Epoch 59 is the first prospective retest under the new bounded-turn protocol and has already accumulated 480 adjacent observed useful seconds through 15:57:58 KST.
 
 ### 3. Strategy drift toward nearby control-plane work — medium/high opportunity cost
 
@@ -55,13 +56,19 @@ Before the planning spine, the next packet remained continuation-policy workflow
 
 Correction applied: `PROGRAM -> PROJECT -> WORK SPEC -> NOW -> TURN_PLAN`, with WS-P001-002 now authoritative.
 
-### 4. Scheduler/continuation gaps — still relevant, but not currently proven dominant
+### 4. Bounded-turn close semantics contradicted the rolling lifecycle — corrected in epoch 59
+
+The rolling lifecycle/hardcoded protocol requires a bounded turn to checkpoint, verify a future same-canonical continuation, and return. The previous continuation gate only allowed a nonterminal run to end after a successor had already been observed/committed, which conflicts with a clean 10-minute bounded-turn model and can force unnecessary overlap or indefinite ownership.
+
+Correction applied: gate v3 adds `VERIFIED_SAME_CANONICAL_CONTINUATION` as a **run-end-only** reason after explicit bounded-close requirements; it does not permit program completion. Dedicated continuation-policy CI and integrated control-plane CI both passed for the change.
+
+### 5. Scheduler/continuation gaps — still relevant, but not currently proven dominant
 
 Continuation survival is strong and the rolling same-canonical lifecycle already targets a completion-relative fast wake. Current evidence does not justify treating scheduler timing as the dominant remaining utilization loss ahead of execution occupancy/evidence freshness.
 
 ## Baseline conclusion
 
-The first intervention should remain **prospective evidence freshness + sustained-turn execution**, not another scheduler/control redesign. The next valid turns should answer two questions with direct evidence:
+The first intervention remains **prospective evidence freshness + sustained-turn execution**, not another scheduler redesign. Subsequent valid turns should answer two questions with direct evidence:
 
 1. Does a resumed worker sustain useful work for most of its 600-second target rather than stopping after a small packet?
 2. Does every qualifying turn keep `WORK_EVIDENCE` current without fabricating unknown time?
