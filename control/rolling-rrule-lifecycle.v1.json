@@ -7,16 +7,17 @@
   "startup_order": [
     "READ_MINIMUM_FENCE_CURRENT_AND_CANONICAL_AUTHORITY",
     "REJECT_OR_RECOVER_STALE_WAKE_WITHOUT_ROLLBACK",
+    "PERSIST_GENERATION_MATCHED_BOOT_STARTED_RECEIPT",
     "RECORD_OBSERVED_SUCCESSOR_BOUNDARY",
-    "RECORD_BOOT_STARTED_BOUNDARY",
     "PROVISIONAL_ARM_AND_VERIFY",
-    "RECORD_REARM_VERIFIED_BOUNDARY",
+    "PERSIST_GENERATION_MATCHED_REARM_VERIFIED_RECEIPT",
     "RESTORE_FULL_CHECKPOINT_AND_TASK_STATE",
     "CLAIM_AUTHORITY_IF_NONCONFLICTING",
     "RECORD_AUTHORITY_CLAIM_BOUNDARY",
     "WORK_AND_CHECKPOINT",
     "RECORD_FIRST_DURABLE_USEFUL_BOUNDARY",
     "FINAL_REARM_AND_VERIFY",
+    "SYNC_STARTUP_WATCHDOG_TO_MAIN_DUE_PLUS_180S",
     "RETURN"
   ],
   "timing": {
@@ -54,6 +55,9 @@
       "MUTATE_SAME_CANONICAL_DSTART",
       "VERIFY_SAME_CANONICAL_ENABLED_RRULE_AND_DSTART",
       "PERSIST_EXPECTED_DUE",
+      "UPDATE_FIXED_STARTUP_WATCHDOG_ONE_SHOT_TO_MAIN_DUE_PLUS_180S",
+      "VERIFY_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE",
+      "PERSIST_WATCHDOG_DUE",
       "RETURN"
     ],
     "due": "actual observed turn END timestamp + exactly 60 seconds, preserving seconds exactly; minute rounding is forbidden",
@@ -62,7 +66,8 @@
     "computation_tool": "tools/compute_completion_due.py",
     "precision_rule": "Pass local_dtstart with YYYYMMDDTHHMMSS under the canonical timezone. Do not truncate or round seconds.",
     "exception_rule": "Any delay other than +60 seconds on a normal CONTINUE close requires a fresh durable platform/safety/task constraint and an explicit exception_reason recorded with the run. Do not add extra local slack merely because scheduler delivery itself may be late.",
-    "delivery_jitter_rule": "Measure scheduled-due -> actual invocation separately. Do not hide provider delivery latency by lengthening the local completion-relative offset."
+    "delivery_jitter_rule": "Measure scheduled-due -> actual invocation separately. Do not hide provider delivery latency by lengthening the local completion-relative offset.",
+    "watchdog_sync_failure": "Retry once when safe. Preserve already-verified MAIN continuation, record DEGRADED_WATCHDOG_COVERAGE, and do not claim pre-bootstrap protection until Watchdog is verified."
   },
   "predictive_prearm_canary": {
     "experiment_id": "UTIL-EXP-018",
@@ -109,5 +114,15 @@
     "missing_ack_classification": "STARTUP_ACK_MISSING",
     "rule": "Missing timestamps remain unknown. An invocation record alone does not prove bootstrap entry, rearm, authority, work, or process death.",
     "recovery_limitation": "This acknowledgement makes the failure diagnosable. It does not wake a worker; fast recovery still requires an independent supported trigger."
+  },
+  "startup_watchdog": {
+    "policy_ref": "control/startup-watchdog.v1.json",
+    "ack_ref": "state/STARTUP_ACK.json",
+    "state_ref": "state/WATCHDOG.json",
+    "protection_boundary": "Independent Watchdog protects missing bootstrap before MAIN provisional arm; provisional arm protects failures after bootstrap rearm verification.",
+    "normal_watchdog_due_offset_seconds": 180,
+    "recovery_main_offset_seconds": 60,
+    "recovery_recheck_seconds": 240,
+    "receipt_inference_forbidden": true
   }
 }
