@@ -9,10 +9,10 @@
   "execution_status": "ACTIVE",
   "pause_reason": null,
   "resume_target": {
-    "step": "Reconcile the stale work-evidence pipeline and produce a current durable utilization baseline before selecting the next intervention.",
-    "selection_rule": "Choose the highest-expected-effect runnable step for P001; do not continue nearby control work by inertia."
+    "step": "Verify the evidence-capture correction across subsequent bounded turns/windows. Keep WORK_EVIDENCE current; if a turn underperforms, classify the largest observed gap and implement the highest-effect correction.",
+    "selection_rule": "Retest the highest-impact correction before inventing a new intervention. Preserve unknown time as unknown and choose corrections by measured effect on P001."
   },
   "turn_plan_role": "TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec.",
-  "updated_at": "2026-09-21T15:24:00+09:00",
+  "updated_at": "2026-09-21T15:55:35+09:00",
   "resumed_by_operator_at": "2026-09-21T06:47:45.338Z"
 }
