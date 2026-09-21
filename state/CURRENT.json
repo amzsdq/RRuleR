@@ -61,7 +61,11 @@
       "coverage": "HEALTHY_BOOTSTRAP",
       "last_classification": "HEALTHY_BOOTSTRAP",
       "last_recovery_at": "2026-09-21T21:53:52+09:00",
-      "enabled_verified": true
+      "enabled_verified": true,
+      "policy_version": 3,
+      "idle_distant_due_enabled": true,
+      "idle_distant_due_extra_slack_seconds": 120,
+      "idle_distant_due_recovery_offset_seconds": 60
     },
     "next_due_source": "EPOCH_71_VERIFIED_PROVISIONAL_ARM"
   },
