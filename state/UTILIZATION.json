@@ -1,71 +1,12 @@
 {
-  "schema_version": "1.9",
-  "program_id": "RRULER-PROGRAM-001",
-  "root_job_id": "RRULER-UTILIZATION-003",
-  "status": "V5_5_DURABLE_UNIT_CHAT_TRACE_CANARY_READY",
-  "target": {
-    "acceptance_window_seconds": 900,
-    "required_useful_seconds": 840,
-    "minimum_valid_completed_windows": 3,
-    "pass_rule": "THREE_CONSECUTIVE_VALID_ACCEPTED_FIXED_WINDOWS_WITH_SELECTED_ROLLING_MEAN_GTE_840",
-    "maximum_unexplained_internal_progress_gap_seconds_for_acceptance": 120
-  },
-  "execution_envelope": {
-    "bounded_turn_target_useful_seconds": 600,
-    "minimum_continue_turn_seconds": 600,
-    "verified_fallback_final_rearm_offset_seconds": 60,
-    "p0_max_average_non_useful_gap_seconds_for_600s_turn": 42.9,
-    "distinction": "The 600-second bounded execution turn is not the 900-second P0 acceptance window.",
-    "normal_continue_pre600_voluntary_close_forbidden": true,
-    "long_provisional_780_seconds_retired": true,
-    "provisional_offset_seconds": 660,
-    "provisional_extension_guard_seconds": 90,
-    "provisional_extension_offset_seconds": 180,
-    "short_rolling_120_seconds_retired_as_default": true,
-    "normal_midturn_schedule_mutation": false,
-    "durable_unit_chat_trace_enabled": true,
-    "unit_trace_requires_persisted_observed_duration_and_work_evidence": true,
-    "progress_trace_is_never_close_authority": true
-  },
-  "measurement": {
-    "continuous_progress_evidence_required": true,
-    "missing_boundary_policy": "MARK_UNKNOWN_DO_NOT_INFER",
-    "scheduler_and_startup_separate": true,
-    "fixed_window_policy_ref": "control/rolling-window-promotion.v1.json",
-    "pending_evidence_is_not_accepted": true,
-    "trusted_observation_horizon_ref": "state/OBSERVATION_HORIZON.json"
-  },
-  "latest_completed_bounded_turn": {
-    "run_id": "RUN-UTIL-20260921-154958",
-    "authority_epoch": 59,
-    "wall_seconds": 626,
-    "strict_productive_seconds": 557,
-    "strict_wall_coverage_ratio": 0.8898,
-    "target_600_coverage_ratio": 0.9283,
-    "classification": "PROMISING_SINGLE_TURN_NOT_P0_WINDOW"
-  },
-  "startup_measurement": {
-    "ledger": "state/SUCCESSOR_STARTUP.json",
-    "rule": "Preserve raw historical samples; classify current v5.4 generation prospectively only from observed boundaries. Invocation metadata alone is not BOOT_STARTED or first useful work."
-  },
-  "active_retest": {
-    "experiment_id": "UTIL-EXP-020-V5.5-UNIT-CHAT-TRACE",
-    "run_id": null,
-    "purpose": "Verify that the operator can directly observe real same-wake work cadence: provisional schedule trace first, then one trace per durably persisted bounded substantive unit, continued work after each trace, and final exact END+60 next-due trace.",
-    "success_signal": "A normal >=600s CONTINUE wake shows verified provisional schedule trace; >=2 genuine durably persisted bounded-unit completion traces when workload permits; no trace-induced early close; SAME MAIN exact END+60 close trace; no duplicate substantive overlap.",
-    "failure_signal": "Any completion trace without durable unit duration/work evidence, any trace treated as a close boundary, or failure to continue safe authorized work before 600s."
-  },
-  "valid_completed_windows_rolling": [],
-  "rolling_mean_observed_useful_seconds": null,
-  "goal_reached": false,
-  "latest_diagnosis": {
-    "cause_class": "OBSERVABILITY_GAP_UNDER_TEST",
-    "evidence": "Self-update capability and exact END+60 scheduling are proven live; operator still lacks direct per-unit same-wake visibility. V5.5 adds chat traces bound strictly to durable unit completion evidence.",
-    "implication": "Use chat traces to test whether the MAIN is continuously chaining real work rather than returning early. Do not infer useful work from elapsed time or prose alone."
-  },
-  "next_corrective_experiment": {
-    "experiment_id": "UTIL-EXP-020-V5.5-UNIT-CHAT-TRACE",
-    "hypothesis": "Binding each progress message to durable unit completion evidence will make premature return and idle gaps directly observable without changing scheduler authority.",
-    "success_signal": "Same-wake trace sequence demonstrates schedule arm -> multiple durably evidenced units -> exact END+60 close."
-  }
+  "schema_version":"1.9","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","status":"V5_5_DURABLE_UNIT_CHAT_TRACE_CANARY_ACTIVE",
+  "target":{"acceptance_window_seconds":900,"required_useful_seconds":840,"minimum_valid_completed_windows":3,"pass_rule":"THREE_CONSECUTIVE_VALID_ACCEPTED_FIXED_WINDOWS_WITH_SELECTED_ROLLING_MEAN_GTE_840","maximum_unexplained_internal_progress_gap_seconds_for_acceptance":120},
+  "execution_envelope":{"bounded_turn_target_useful_seconds":600,"minimum_continue_turn_seconds":600,"verified_fallback_final_rearm_offset_seconds":60,"p0_max_average_non_useful_gap_seconds_for_600s_turn":42.9,"distinction":"The 600-second bounded execution turn is not the 900-second P0 acceptance window.","normal_continue_pre600_voluntary_close_forbidden":true,"long_provisional_780_seconds_retired":true,"provisional_offset_seconds":660,"provisional_extension_guard_seconds":90,"provisional_extension_offset_seconds":180,"short_rolling_120_seconds_retired_as_default":true,"normal_midturn_schedule_mutation":false,"durable_unit_chat_trace_enabled":true,"unit_trace_requires_persisted_observed_duration_and_work_evidence":true,"progress_trace_is_never_close_authority":true},
+  "measurement":{"continuous_progress_evidence_required":true,"missing_boundary_policy":"MARK_UNKNOWN_DO_NOT_INFER","scheduler_and_startup_separate":true,"fixed_window_policy_ref":"control/rolling-window-promotion.v1.json","pending_evidence_is_not_accepted":true,"trusted_observation_horizon_ref":"state/OBSERVATION_HORIZON.json"},
+  "latest_completed_bounded_turn":{"run_id":"RUN-UTIL-20260921-154958","authority_epoch":59,"wall_seconds":626,"strict_productive_seconds":557,"strict_wall_coverage_ratio":0.8898,"target_600_coverage_ratio":0.9283,"classification":"PROMISING_SINGLE_TURN_NOT_P0_WINDOW"},
+  "startup_measurement":{"ledger":"state/SUCCESSOR_STARTUP.json","rule":"Preserve raw historical samples; classify current v5.5 generation prospectively only from observed boundaries. Invocation metadata alone is not BOOT_STARTED or first useful work."},
+  "active_retest":{"experiment_id":"UTIL-EXP-020-V5.5-UNIT-CHAT-TRACE","run_id":"RUN-UTIL-20260922-020711","purpose":"Verify direct same-wake work cadence: verified provisional schedule trace, one trace per durably persisted bounded substantive unit, continued work after each trace, and final exact END+60 due trace.","success_signal":"Normal >=600s CONTINUE wake shows verified provisional schedule trace; multiple genuine durably persisted bounded-unit traces; no trace-induced early close; SAME MAIN exact END+60 close trace; no duplicate substantive overlap.","failure_signal":"Any completion trace without durable unit duration/work evidence, any trace treated as a close boundary, or failure to continue safe authorized work before 600s.","observed_provider_delivery_delay_seconds":181,"verified_provisional_due_at":"2026-09-22T02:18:11+09:00","durable_units_completed_so_far":7},
+  "valid_completed_windows_rolling":[],"rolling_mean_observed_useful_seconds":null,"goal_reached":false,
+  "latest_diagnosis":{"cause_class":"OBSERVABILITY_GAP_UNDER_ACTIVE_TEST","evidence":"The v5.5 wake has durable startup receipts and multiple bounded material changes; enforcement mirrors discovered stale 480s, +780s, and Watchdog observability text and are being reconciled forward.","implication":"Continue using evidence-bound traces to expose real cadence; do not infer useful work from elapsed time or prose alone."},
+  "next_corrective_experiment":{"experiment_id":"UTIL-EXP-020-V5.5-UNIT-CHAT-TRACE","hypothesis":"Binding each progress message to durable unit completion evidence will make premature return and idle gaps directly observable without changing scheduler authority.","success_signal":"Same-wake trace sequence demonstrates schedule arm -> multiple durably evidenced units -> exact END+60 close."}
 }
