@@ -9,10 +9,10 @@
   "execution_status": "PAUSED",
   "pause_reason": "Operator-authorized maintenance: stop new work and self-rearm; checkpoint current safe unit only. Resume only after maintenance hold is cleared.",
   "resume_target": {
-    "step": "Use STARTUP-002 as new evidence to prepare and run the next guarded scheduler-timing experiment, measuring every boundary prospectively.",
-    "selection_rule": "Target the measured 155-second scheduler delivery segment; preserve single substantive authority and completion-relative fallback, and do not promote predictive timing from one sample."
+    "step": "Execute planning/evidence/TURN-CLOSE-V4-RETEST.md within WS-P001-002; use concrete runnable primary/fallback/residual items and the unified v4 close decision.",
+    "selection_rule": "First reconcile operator-maintenance interruption without inventing successor timestamps. Keep existing authority fences, skip completed work, and collect three prospective valid turns before claiming utilization improvement."
   },
   "turn_plan_role": "TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec.",
-  "updated_at": "2026-09-21T09:34:54.659Z",
+  "updated_at": "2026-09-21T09:40:19.050Z",
   "resumed_by_operator_at": "2026-09-21T06:47:45.338Z"
 }
