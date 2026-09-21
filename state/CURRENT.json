@@ -9,10 +9,10 @@
   "current_owner": "RUN-UTIL-20260921-215434",
   "authority_epoch": 71,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "CLOSING",
+  "run_state": "HANDOFF_COMMITTED",
   "checkpoint": {
     "id": "CP-UTILIZATION-109",
-    "state": "COMPLETE_PENDING_CONTINUATION",
+    "state": "COMPLETE",
     "completed": [
       "Separated normal scheduler samples from Watchdog and provisional recovery generations in turn-close summaries.",
       "Preserved every missing recovery boundary as null rather than zero.",
@@ -25,13 +25,13 @@
       "actual-ledger assertions kept STARTUP-009 missing first useful as null and excluded recovery samples from normal comparison"
     ],
     "observation": "Recovery generations are now diagnostically visible without contaminating normal END+60 scheduler comparisons. The malformed mixed canonical ID encountered during bootstrap now fails closed in the audit.",
-    "next_action": "Close epoch 71 with exact END+60 MAIN continuation and same Watchdog due +180 seconds, both enabled and verified."
+    "next_action": "Successor validates the 22:07:23 generation receipts and extends recovery observability with fresh evidence."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T22:09:11+09:00",
+    "next_due_at": "2026-09-21T22:07:23+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -55,8 +55,8 @@
       "normal_check_offset_seconds": 180,
       "recovery_recheck_seconds": 240,
       "main_recovery_due_offset_seconds": 60,
-      "next_watchdog_due_at": "2026-09-21T22:12:11+09:00",
-      "coverage": "HEALTHY_BOOTSTRAP",
+      "next_watchdog_due_at": "2026-09-21T22:10:23+09:00",
+      "coverage": "ARMED",
       "last_classification": "HEALTHY_BOOTSTRAP",
       "last_recovery_at": "2026-09-21T21:53:52+09:00",
       "enabled_verified": true,
@@ -65,7 +65,7 @@
       "idle_distant_due_extra_slack_seconds": 120,
       "idle_distant_due_recovery_offset_seconds": 60
     },
-    "next_due_source": "EPOCH_71_VERIFIED_PROVISIONAL_ARM"
+    "next_due_source": "EPOCH_71_ACTUAL_END_PLUS_60_VERIFIED"
   },
   "safety": {
     "public_repo": true,
