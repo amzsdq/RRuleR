@@ -3,15 +3,15 @@
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
   "canonical_automation_id": "6ab152b636748191a71873ba4d5ef551",
-  "status": "WORKING",
+  "status": "HANDOFF_COMMITTED",
   "active_run_id": "RUN-UTIL-20260922-013717",
   "authority_epoch": 80,
   "substantive_work_started_at": "2026-09-22T01:37:40+09:00",
-  "last_progress_at": "2026-09-22T01:48:24+09:00",
-  "last_progress_kind": "V5_4_GUARDED_EXTENSION_AND_CONTROL_PLANE_PASS",
-  "current_unit": "Finish v5.4 live verification after >=600s and close SAME MAIN at exact observed END+60.",
-  "next_wake_due_at": "2026-09-22T01:50:17+09:00",
-  "successor_observed": true,
-  "handoff_ready": false,
-  "operator_ui_note": "v5.4 live turn passed 600s floor. SAME MAIN was extended once from 01:48:17 to 01:50:17 inside the 90s guard; integrated control-plane validation passed on the extended projection. Preparing exact END+60 normal close."
+  "last_progress_at": "2026-09-22T01:49:05+09:00",
+  "last_progress_kind": "V5_4_EXACT_END_PLUS_60_CLOSE",
+  "current_unit": "V5.4 adaptive provisional live verification closed; next generation continues P001 prospective utilization measurement.",
+  "next_wake_due_at": "2026-09-22T01:50:05+09:00",
+  "successor_observed": false,
+  "handoff_ready": true,
+  "operator_ui_note": "Normal close verified on SAME MAIN: END 01:49:05 KST, next due exactly 01:50:05 KST, recurring FREQ=HOURLY preserved, enabled=true."
 }
