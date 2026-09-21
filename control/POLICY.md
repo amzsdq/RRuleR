@@ -39,51 +39,40 @@ After continuation is verified, obtain/confirm authority, persist WORKING activi
 
 ## Active scheduler policy
 
-The active mechanism is one same-canonical hourly RRULE under the rolling lifecycle. The verified normal path is completion-relative END+60 rearm with the natural hourly recurrence as cold fallback. `UTIL-EXP-018` predictive prearm is rolled back and is historical evidence, not active authority.
+The active mechanism is one same-canonical hourly RRULE under the rolling lifecycle. For a normal ~600-second nonterminal turn, arm the SAME MAIN once at observed wake/arm reference +660 seconds, normally leave it untouched during work, and replace it at normal close with exact observed END+60. Extend the SAME MAIN once before collision only when useful authorized work or required close handling clearly threatens the verified provisional due. The natural hourly recurrence is the built-in cold fallback. Repeated +2-minute rolling refresh and the former +780-second provisional are retired normal strategies. `UTIL-EXP-018` predictive prearm is rolled back and is historical evidence, not active authority.
 
 Startup order:
 
 ```text
 FRESH DURABLE STATE
  -> STALE-WAKE / GENERATION FENCE
- -> CLASSIFY NORMAL VS PREDICTIVE VS RECOVERY
- -> PRESERVE NEWEST VERIFIED SAME-CANONICAL CONTINUATION
- -> PROVISIONAL COLD-RESCUE ARM + VERIFY WHEN SAFE
+ -> PERSIST GENERATION-MATCHED BOOT_STARTED
+ -> PROVISIONAL SAME MAIN +660s ARM + LIVE VERIFY
+ -> PERSIST REARM_VERIFIED
  -> AUTHORITY / ACTIVITY RECONCILIATION
  -> USEFUL WORK
 ```
 
-Normal fallback close:
+Normal close:
 
 ```text
 LATEST CHECKPOINT
- -> FINAL REARM SAME CANONICAL TO COMPLETION-RELATIVE FAST CONTINUATION
- -> VERIFY ENABLED + FUTURE DUE
- -> PERSIST VERIFIED DUE
+ -> OBSERVE ACTUAL END
+ -> SHIFT SAME MAIN RECURRING DTSTART TO END+60 EXACTLY
+ -> LIVE VERIFY SAME CANONICAL + ENABLED + RECURRENCE + EXACT DTSTART
+ -> PERSIST IDENTICAL FAST DUE TO CURRENT / ACTIVITY / HANDOFF
+ -> VALIDATE NON-WORKING CLOSE PROJECTION
 ```
 
-Historical predictive-prearm canary path (rolled back; not active authority):
+Historical predictive-prearm and short-rolling canaries remain evidence only. They may not restore retired scheduler values or dual substantive authority.
 
-```text
-+780s PROVISIONAL COLD RESCUE REMAINS INTACT
- -> NEAR TARGET CLOSE, ARM SAME CANONICAL BEFORE CLOSE
- -> PREDECESSOR CONTINUES USEFUL WORK
- -> EARLY SUCCESSOR FENCES / OBSERVES ONLY WHILE PREDECESSOR IS FRESH+CONFLICTING
- -> SUBSTANTIVE AUTHORITY TRANSFERS ONLY AFTER SAFE DURABLE CLOSE/TRANSFER
- -> MEASURE LAST-PREDECESSOR-USEFUL TO FIRST-SUCCESSOR-USEFUL GAP
-```
-
-The canary exists because 840/900 requires 93.33% useful coverage, while a 600-second turn plus a nominal 60-second post-close gap has only a 90.91% idealized ceiling before scheduler jitter/startup. The canary attempts to hide scheduler latency under predecessor useful work; it does not weaken the P0 target.
-
-The provisional rescue horizon and fallback final-close offset are tunables declared by active machine controls; they are not utilization acceptance thresholds. Never create a replacement canonical merely to continue this actor and never convert the canonical to one-shot for normal continuation.
+The provisional rescue horizon and final-close offset are operational safety parameters, not utilization acceptance thresholds. Never create a replacement canonical merely to continue this actor and never convert the canonical to one-shot for normal continuation.
 
 Fixed quarter-hour BYMINUTE rotation and predecessor/successor quarter-cycle choreography are retired scheduler semantics. Historical evidence remains history, not active instruction.
 
 ## Handoff and recovery
 
-A future wake existing by itself does not authorize a healthy current owner to stop. During predictive prearm, a successor may arrive while the predecessor is still fresh; that successor must not claim conflicting substantive authority or replay side effects. It may fence/read/observe until fresh durable state proves a safe transfer/close boundary.
-
-If a wake is stale relative to the newest verified schedule generation, recover forward. Do not restore an older DTSTART, prompt, title, authority epoch, or checkpoint. Ambiguous irreversible side effects must reconcile before replay.
+A future wake existing by itself does not authorize a healthy current owner to stop. If a wake is stale relative to the newest verified schedule generation, recover forward. Do not restore an older DTSTART, prompt, title, authority epoch, or checkpoint. Ambiguous irreversible side effects must reconcile before replay.
 
 ## Primary turn objective
 
@@ -114,7 +103,7 @@ Do not repeat a failed intervention without new evidence.
 
 ## Runtime-safe continuity
 
-Keep work checkpointable. As runtime exposure grows, prefer smaller safe units rather than voluntarily idling. A cold-rescue wake is a safety mechanism, not authority for a healthy owner to terminate. Predictive prearm is latency hiding, not permission to stop early.
+Keep work checkpointable. As runtime exposure grows, prefer smaller safe units rather than voluntarily idling. A cold-rescue wake is a safety mechanism, not authority for a healthy owner to terminate. Watchdog remains disabled break-glass standby and is not a normal correctness dependency.
 
 ## Program goals and autonomous R&D authority
 
@@ -131,7 +120,6 @@ RRuleR is public-safe durable state. Never persist credentials, cookies, private
 ## Pre-final authorization gate
 
 Immediately before any normal user-visible final response, freshly read `state/CURRENT.json`, `state/HANDOFF.json`, and `control/run-continuation-gate.v1.json`. If the program is non-terminal and no allowlisted run-end condition exists, final response and voluntary run end are forbidden; select and execute the next useful admissible unit instead.
-
 
 ## Durable unit chat trace canary
 
