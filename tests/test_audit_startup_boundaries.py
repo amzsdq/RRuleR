@@ -52,3 +52,17 @@ def test_complete_consistent_sample_is_eligible():
     out = audit(startup, runs)
     assert out["valid"] is True
     assert out["scheduler_comparison_eligible_count"] == 1
+
+
+def test_matches_observation_prefix_to_predecessor_run_id():
+    runs = ['{"observation_id":"OBS-RUN-UTIL-1","run_started_at":"2026-09-21T10:00:00+00:00","run_ended_at":"2026-09-21T10:10:00+00:00"}']
+    startup = {"samples":[{
+        "sample_id":"PREFIX",
+        "predecessor_run_id":"RUN-UTIL-1",
+        "predecessor_last_useful_at":"2026-09-21T10:10:01+00:00",
+        "scheduled_due_at":"2026-09-21T10:09:00+00:00",
+        "successor_observed_at":"2026-09-21T10:10:30+00:00",
+    }]}
+    result = audit(startup, runs)["results"][0]
+    assert result["predecessor_run_found"] is True
+    assert result["errors"] == ["PREDECESSOR_LAST_USEFUL_AFTER_RECORDED_END"]
