@@ -86,12 +86,13 @@ Any rule/control/process change is valid if its net expected contribution to P00
 
 ## Chained-turn execution policy
 
-The primary utilization rule is now work-unit chaining rather than merely satisfying an 8-minute floor.
+Normal nonterminal `CONTINUE` has a **600-second voluntary hard floor**, not an 8-minute floor or a soft 10-minute target.
 
-- If a bounded unit completes before 10 elapsed minutes, immediately execute the next clear, low-risk, checkpointable authorized unit from this work spec/project when it fits the remaining platform safety budget.
-- If the next obvious unit is too large, decompose it and execute a smaller safe slice when possible.
-- At 10 elapsed minutes or later, do not start a new large unit; finish only the smallest safe in-flight unit, checkpoint, and hand off.
-- Normal turns should usually close between 10 and about 12 minutes. Going beyond ~12 minutes requires a genuine in-flight safety/atomicity reason.
-- A CONTINUE close below 10 minutes must record why no safe next unit could be started; below 8 minutes remains a high-severity utilization failure unless an allowlisted exception applies.
+- Before 600 observed elapsed seconds, if a bounded unit completes, immediately execute the next clear low-risk checkpointable authorized unit from this work spec/project.
+- If the next obvious unit is too large, decompose it and execute a smaller safe slice. If it is waiting on CI/external evidence, choose an independent fallback/residual authorized unit.
+- CI pending, packet/substep/checkpoint completion, secured continuation, or `nothing obvious` do not authorize a voluntary pre-600s normal `CONTINUE` close.
+- Earlier end is reserved for explicit operator STOP/PAUSE, durable program terminal state, a genuine BLOCKED/fail-closed authority or safety condition with no safe authorized work, or platform-enforced termination; record the corresponding status/reason rather than normal CONTINUE.
+- At 600 elapsed seconds or later, do not start a new large unit; finish only the smallest safe in-flight unit, checkpoint, and hand off.
+- Normal turns should usually close between 600 and about 720 elapsed seconds. Going beyond ~720 seconds requires a genuine in-flight safety/atomicity reason.
 
-This policy is intended to increase useful work by pulling forward already-authorized next work, not by padding, splitting trivial changes, or inventing activity.
+This policy increases useful work by pulling forward already-authorized work. It does not authorize padding, splitting trivial changes, fabricating activity, or fabricating timestamps.
