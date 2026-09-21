@@ -54,7 +54,7 @@ def audit(startup: dict, run_lines: list[str]) -> dict:
         })
     return {
         "sample_count": len(results),
-        "valid": not any(item["errors"] for item in results),
+        "valid": not any(item["unacknowledged_errors"] for item in results),
         "scheduler_comparison_eligible_count": sum(item["scheduler_comparison_eligible"] for item in results),
         "results": results,
         "raw_evidence_policy": "PRESERVED_WITH_EXCLUSION_NOT_DELETED_OR_REWRITTEN",
