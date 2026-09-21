@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_RUN_CONTINUATION_GATE",
-  "version": 5,
+  "version": 6,
   "status": "ACTIVE",
-  "purpose": "Keep non-terminal owners doing useful work by chaining bounded work units until the 10-minute target, then close at the next safe boundary with a verified same-canonical continuation.",
+  "purpose": "Keep non-terminal owners doing useful work until the bounded close point, then allow normal close only after the SAME MAIN is live-verified at actual END + exactly 60 seconds. Provisional crash insurance and Watchdog recovery never substitute for the normal successor.",
   "program_nonterminal_states": [
     "CONTINUE",
     "DEGRADED_CONTINUATION"
@@ -36,12 +36,17 @@
     "required_before_verified_continuation_end": [
       "TIME_BOUNDARY_REACHED_OR_DOCUMENTED_EXCEPTION_AFTER_RUNNABLE_SCAN",
       "LATEST_CHECKPOINT_PERSISTED",
-      "SAME_CANONICAL_FUTURE_CONTINUATION_MUTATED_AND_VERIFIED",
-      "DURABLE_EXPECTED_DUE_PERSISTED",
+      "ACTUAL_END_OBSERVED",
+      "SAME_MAIN_MUTATED_TO_EXACT_END_PLUS_60_SECONDS",
+      "LIVE_MAIN_REREAD_PROVES_SAME_CANONICAL_ENABLED_RECURRING_EXACT_DSTART",
+      "DURABLE_EXPECTED_FAST_DUE_PERSISTED",
+      "NON_WORKING_CURRENT_ACTIVITY_HANDOFF_PROJECTION_VALIDATED",
       "TURN_STATUS_AND_RUN_EVIDENCE_PERSISTED"
     ],
     "local_success_alone_never_satisfies_rule": true,
-    "future_wake_without_same_canonical_verification_never_satisfies_rule": true
+    "future_wake_without_same_canonical_verification_never_satisfies_rule": true,
+    "provisional_continuation_never_satisfies_normal_close": true,
+    "watchdog_coverage_never_satisfies_normal_close": true
   },
   "nonterminal_no_handoff_rule": {
     "final_response": "FORBIDDEN",
@@ -67,7 +72,10 @@
     "final_without_fresh_pre_final_authorization_is_incident": "EARLY_VOLUNTARY_FINAL_RESPONSE",
     "waiting_for_cold_rescue_is_not_valid_end_reason": true,
     "future_wake_exists_does_not_authorize_current_owner_to_end": true,
-    "verified_same_canonical_continuation_authorizes_only_bounded_turn_end_not_program_end": true
+    "verified_same_canonical_continuation_authorizes_only_bounded_turn_end_not_program_end": true,
+    "normal_continue_final_requires_exact_fast_main": true,
+    "provisional_due_left_after_close_is_incident": "NORMAL_CLOSE_LEFT_PROVISIONAL_DUE",
+    "watchdog_as_expected_successor_is_incident": "NORMAL_PATH_DEPENDED_ON_WATCHDOG"
   },
   "final_response_is_authoritative_side_effect": true,
   "pre_final_authorization": {
@@ -79,7 +87,7 @@
       "state/NOW.json"
     ],
     "check_immediately_before_user_visible_final": true,
-    "authorization_rule": "Honor operator pause and terminal states first. Otherwise apply turn_decision and all bounded close requirements; verified continuation alone is never sufficient.",
+    "authorization_rule": "Honor operator pause and terminal states first. For normal CONTINUE, final is authorized only after the live SAME MAIN exact END+60 continuation and consistent non-WORKING close projection are freshly verified; provisional or Watchdog coverage is insufficient.",
     "if_denied": "DO_NOT_EMIT_FINAL_CONTINUE_USEFUL_WORK",
     "stale_prior_check_forbidden": true,
     "normal_status_report_does_not_authorize_final": true
@@ -96,7 +104,7 @@
       "A CONTINUE close below 600s requires a concrete documented reason and alternatives_checked; below 480s additionally requires an allowlisted short-turn exception.",
       "At elapsed >=600s, do not start a new large unit; finish only the smallest safe in-flight unit.",
       "Aim to close by ~720s; exceeding that soft ceiling requires an actual in-flight safety/atomicity reason.",
-      "Checkpoint, set normal same-canonical due to actual END+60s unless an explicit durable exception applies, validate the run record, then report."
+      "Checkpoint, observe actual END, live-verify SAME MAIN at exact END+60, persist the exact fast due and non-WORKING handoff projection, then report. Provisional crash insurance or Watchdog coverage cannot authorize normal close."
     ],
     "close_reserve_rule": "Use measured close cost only to avoid overrunning the platform safety budget. Do not use reserve as a reason to stop before 600s when another small safe unit fits. Never pad.",
     "normal_close_evidence": [
