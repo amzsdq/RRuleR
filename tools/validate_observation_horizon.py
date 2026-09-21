@@ -15,6 +15,9 @@ def instant(value):
     if dt.tzinfo is None: raise ValueError("observation horizon timestamp lacks timezone")
     return dt.timestamp()
 
+def provenance_identity(state):
+    return (state.get("provenance_kind"), str(state.get("provenance_ref", "")), state.get("provenance_attempt"))
+
 def validate(horizon, policy, source, previous=None, previous_states=None):
     kind = horizon.get("provenance_kind"); ref = str(horizon.get("provenance_ref", "")); trusted = horizon.get("trusted_observed_through")
     if kind not in policy.get("accepted_provenance_kinds", []): raise ValueError("unsupported observation horizon provenance kind")
@@ -22,10 +25,13 @@ def validate(horizon, policy, source, previous=None, previous_states=None):
     trusted_instant = instant(trusted)
     predecessors = list(previous_states or [])
     if previous is not None: predecessors.append(previous)
+    current_identity = provenance_identity(horizon)
     for predecessor in predecessors:
         previous_trusted = predecessor.get("trusted_observed_through")
         if not previous_trusted: raise ValueError("previous observation horizon incomplete")
         if trusted_instant < instant(previous_trusted): raise ValueError("observation horizon rollback is forbidden")
+        if provenance_identity(predecessor) == current_identity and previous_trusted != trusted:
+            raise ValueError("same observation provenance identity cannot be repinned to a different timestamp; replace provenance explicitly")
     if kind == "GITHUB_ACTIONS_OBSERVED_TIMESTAMP":
         if not ref.isdigit(): raise ValueError("GitHub Actions provenance ref must be a run id")
         expected_attempt = horizon.get("provenance_attempt")
