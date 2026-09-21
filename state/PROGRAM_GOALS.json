@@ -1,8 +1,108 @@
 {
-  "schema_version":"1.1","program_id":"RRULER-PROGRAM-001","status":"ACTIVE",
-  "goals":[
-    {"goal_id":"GOAL-COMPETE-SAAS","priority":"PROGRAM","statement":"Build RRuleR into a production-oriented autonomous agent runtime/control plane that can credibly compete with commercial agent SaaS for long-running autonomous work.","acceptance_mode":"MULTI_DIMENSION_EVIDENCE","dimensions":[{"id":"UTILIZATION","target":"Sustained wall-clock useful-work coverage with minimal dead time","priority":"P0"},{"id":"PERSISTENCE","target":"Cold-start continuation from durable state"},{"id":"RECOVERY","target":"Abrupt worker/session/scheduler/tool failures recover quickly without duplicate harmful work"},{"id":"ORCHESTRATION","target":"Safe delegation and multi-agent coordination where beneficial"},{"id":"TOOL_REACH","target":"Useful work across available tools/environments with replaceable adapters"},{"id":"OBSERVABILITY","target":"Operator can see current state, progress, failures, utilization and next action"},{"id":"VERIFICATION","target":"Completion and side effects independently evidenced"},{"id":"GOVERNANCE","target":"Public-safe, auditable authority and security boundaries"},{"id":"USABILITY","target":"Fresh session can reproduce/operate system with low manual setup"}]},
-    {"goal_id":"GOAL-UTILIZATION-P0","priority":"P0","statement":"Achieve and sustain >=840 seconds of substantive evidenced useful-work coverage in 900-second fixed wall-clock windows, independent of worker boundaries, while separately driving abrupt-loss recovery toward <=120 seconds p95.","acceptance":{"minimum_valid_completed_turns":3,"rolling_mean_useful_seconds_gte":840,"maximum_unexplained_progress_gap_seconds":120,"primary_measurement":"THREE_CONSECUTIVE_FIXED_900S_WINDOWS_EACH_USEFUL_COVERAGE_GTE_840_WITH_SUBSTANTIVE_EVIDENCE_GAPS_LTE_120","worker_boundary_required":false,"heartbeat_only_evidence_forbidden":true,"recovery_slo_policy":"control/recovery-slo.v1.json","handoff":"INDEPENDENT_FAST_WAKE_PREFERRED; SAME_CANONICAL_IS_COLD_RESCUE_UNTIL_OVERLAP_PROVEN","after_pass":"RETAIN_AS_REGRESSION_SLO"}}
+  "schema_version": "1.2",
+  "program_id": "RRULER-PROGRAM-001",
+  "status": "ACTIVE",
+  "goals": [
+    {
+      "goal_id": "GOAL-COMPETE-SAAS",
+      "priority": "PROGRAM",
+      "statement": "Build RRuleR into a production-oriented autonomous agent runtime/control plane that can credibly compete with commercial agent SaaS for long-running autonomous work.",
+      "acceptance_mode": "MULTI_DIMENSION_EVIDENCE",
+      "dimensions": [
+        {
+          "id": "UTILIZATION",
+          "target": "Sustained wall-clock useful-work coverage with minimal dead time",
+          "priority": "P0"
+        },
+        {
+          "id": "PERSISTENCE",
+          "target": "Cold-start continuation from durable state"
+        },
+        {
+          "id": "RECOVERY",
+          "target": "Abrupt worker/session/scheduler/tool failures recover quickly without duplicate harmful work"
+        },
+        {
+          "id": "ORCHESTRATION",
+          "target": "Safe delegation and multi-agent coordination where beneficial"
+        },
+        {
+          "id": "TOOL_REACH",
+          "target": "Useful work across available tools/environments with replaceable adapters"
+        },
+        {
+          "id": "OBSERVABILITY",
+          "target": "Operator can see current state, progress, failures, utilization and next action"
+        },
+        {
+          "id": "VERIFICATION",
+          "target": "Completion and side effects independently evidenced"
+        },
+        {
+          "id": "GOVERNANCE",
+          "target": "Public-safe, auditable authority and security boundaries"
+        },
+        {
+          "id": "USABILITY",
+          "target": "Fresh session can reproduce/operate system with low manual setup"
+        }
+      ]
+    },
+    {
+      "goal_id": "GOAL-TURN-WORKTIME-P0A",
+      "priority": "P0-A",
+      "statement": "Make every normal nonterminal CONTINUE turn sustain at least 10 minutes (600 observed elapsed seconds) of chained authorized work unless an explicit STOP/PAUSE, durable terminal state, genuine BLOCKED/fail-closed condition, or platform-enforced termination applies; maximize evidenced useful-work coverage without padding or fabricated activity.",
+      "acceptance": {
+        "minimum_consecutive_valid_turns": 3,
+        "normal_continue_minimum_elapsed_seconds": 600,
+        "target_fixed_window_seconds": 900,
+        "target_evidenced_useful_seconds": 840,
+        "maximum_unexplained_progress_gap_seconds": 120,
+        "per_unit_evidence_required": true,
+        "elapsed_time_is_not_automatically_useful_work": true,
+        "after_pass": "RETAIN_AS_REGRESSION_GATE"
+      }
+    },
+    {
+      "goal_id": "GOAL-SCHEDULE-REARM-P0B",
+      "priority": "P0-B",
+      "statement": "Make normal continuation scheduling exact, unambiguous, and fast: after actual observed END, mutate the SAME enabled recurring MAIN to exactly 1 minute (60 seconds) later, live-verify the exact DTSTART, persist the identical due across durable projections, and measure provider delivery/startup delay separately.",
+      "acceptance": {
+        "minimum_consecutive_verified_normal_closes": 3,
+        "final_rearm_offset_seconds": 60,
+        "human_meaning": "exactly 1 minute (60 seconds) after actual observed END; never 60 minutes and never the next natural hourly recurrence",
+        "same_canonical_required": true,
+        "enabled_required": true,
+        "recurring_schedule_required": true,
+        "exact_dtstart_live_reread_required": true,
+        "durable_due_projection_consistency_required": true,
+        "provider_delivery_delay_measured_separately": true,
+        "unitless_time_arithmetic_forbidden": true,
+        "after_pass": "RETAIN_AS_REGRESSION_GATE"
+      }
+    }
   ],
-  "autonomy":{"authorized_scope":"amzsdq/RRuleR","mode":"SELF_DIRECTED_R_AND_D","next_objective_selection":"HIGHEST_EXPECTED_EFFECT_ON_ACTIVE_GOALS","failed_experiment_behavior":"DIAGNOSE_RESEARCH_REDESIGN_RETEST","operator_approval_not_required_for":"REVERSIBLE_RRULER_REPO_RESEARCH_DESIGN_IMPLEMENTATION_TESTING","operator_or_platform_gate_still_required_for":["CONSEQUENTIAL_ACTIONS_OUTSIDE_RRULER","SECRETS_OR_PRIVATE_DATA","OTHER_REPOSITORY_MUTATION","PLATFORM_RESTRICTED_ACTIONS"]}
+  "autonomy": {
+    "authorized_scope": "amzsdq/RRuleR",
+    "mode": "SELF_DIRECTED_R_AND_D",
+    "next_objective_selection": "FIRST_MAXIMIZE_EXPECTED_PROGRESS_ON_OPERATOR_LOCKED_P0_A_OR_P0_B; OTHERWISE HIGHEST_EXPECTED_EFFECT_ON_ACTIVE_GOALS",
+    "failed_experiment_behavior": "OBSERVE_MEASURE_PRIOR_ART_SCAN_DESIGN_REVERSIBLE_EXPERIMENT_VERIFY_ADOPT_OR_REVISE_OR_ROLLBACK_OR_REJECT",
+    "operator_approval_not_required_for": "REVERSIBLE_RRULER_REPO_RESEARCH_DESIGN_IMPLEMENTATION_TESTING",
+    "operator_or_platform_gate_still_required_for": [
+      "CONSEQUENTIAL_ACTIONS_OUTSIDE_RRULER",
+      "SECRETS_OR_PRIVATE_DATA",
+      "OTHER_REPOSITORY_MUTATION",
+      "PLATFORM_RESTRICTED_ACTIONS"
+    ]
+  },
+  "operator_priority_lock": {
+    "updated_at": "2026-09-22",
+    "status": "ACTIVE",
+    "ordered_p0_goals": [
+      "GOAL-TURN-WORKTIME-P0A",
+      "GOAL-SCHEDULE-REARM-P0B"
+    ],
+    "rule": "Until both P0 goals have stable evidence and are retained as regression gates, other product/runtime expansion is secondary unless it directly improves one of these two goals or preserves required safety/correctness.",
+    "self_redefinition_forbidden": true
+  }
 }
