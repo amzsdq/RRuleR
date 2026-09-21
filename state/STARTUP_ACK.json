@@ -3,11 +3,11 @@
   "main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
   "current_expected_due_at": "2026-09-22T00:54:59+09:00",
   "generation_key": "DUE:2026-09-22T00:54:59+09:00",
-  "boot_started_at": "2026-09-22T00:54:31+09:00",
-  "boot_started_authority_epoch": "MIGRATION-v5.1",
-  "rearm_verified_at": "2026-09-22T00:54:48+09:00",
-  "verified_provisional_due_at": "2026-09-22T01:08:00+09:00",
-  "status": "REARM_VERIFIED",
-  "last_updated_at": "2026-09-22T00:54:48+09:00",
-  "note": "Same authoritative MAIN verified enabled with recurring hourly fallback due 01:08 KST. Retired predecessors remain disabled."
+  "boot_started_at": null,
+  "boot_started_authority_epoch": null,
+  "rearm_verified_at": null,
+  "verified_provisional_due_at": null,
+  "status": "AWAITING_BOOT_STARTED",
+  "last_updated_at": "2026-09-22T00:54:05+09:00",
+  "note": "Clean operator-created replacement MAIN is authoritative. Both prior MAIN canonicals are retired; await first startup receipt from clean canonical."
 }
