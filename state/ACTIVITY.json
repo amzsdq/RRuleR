@@ -1,3 +1,17 @@
 {
-  "schema_version":"1.0","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","canonical_automation_id":"6ab152b636748191a71873ba4d5ef551","status":"HANDOFF_READY","active_run_id":null,"authority_epoch":79,"substantive_work_started_at":"2026-09-22T01:19:04+09:00","last_progress_at":"2026-09-22T01:29:15+09:00","last_progress_kind":"TURN_CLOSE_VERIFIED_END_PLUS_60","current_unit":null,"next_wake_due_at":"2026-09-22T01:30:15+09:00","successor_observed":false,"handoff_ready":true,"operator_ui_note":"Normal close: SAME MAIN live-verified enabled recurring at exact observed END+60 = 01:30:15 KST; v5.3 short rolling provisional remains bootstrap policy for next wake."
+  "schema_version": "1.0",
+  "program_id": "RRULER-PROGRAM-001",
+  "root_job_id": "RRULER-UTILIZATION-003",
+  "canonical_automation_id": "6ab152b636748191a71873ba4d5ef551",
+  "status": "HANDOFF_READY",
+  "active_run_id": null,
+  "authority_epoch": 79,
+  "substantive_work_started_at": "2026-09-22T01:19:04+09:00",
+  "last_progress_at": "2026-09-22T01:36:44+09:00",
+  "last_progress_kind": "OPERATOR_RECOVERY_REARM_V5_4",
+  "current_unit": null,
+  "next_wake_due_at": "2026-09-22T01:38:00+09:00",
+  "successor_observed": false,
+  "handoff_ready": true,
+  "operator_ui_note": "Recovery due 01:38:00 KST. v5.4: normal ~10m turn arms +11m provisional once; no repeated +2m rolling; exact END+60 normal close."
 }
