@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_RUN_CONTINUATION_GATE",
-  "version": 8,
+  "version": 9,
   "status": "ACTIVE",
-  "purpose": "During the schedule-category isolation canary, allow normal close only after SAME MAIN is live-verified as an exact END+60 one-shot. RRULE is intentionally absent; Watchdog is not normal continuity.",
+  "purpose": "Allow normal CONTINUE close only after SAME MAIN recurring RRULE is live-verified at exact END+60. Watchdog is not normal continuity.",
   "program_nonterminal_states": [
     "CONTINUE",
     "DEGRADED_CONTINUATION"
@@ -38,7 +38,7 @@
       "LATEST_CHECKPOINT_PERSISTED",
       "ACTUAL_END_OBSERVED",
       "SAME_MAIN_MUTATED_TO_EXACT_END_PLUS_60_SECONDS",
-      "LIVE_MAIN_REREAD_PROVES_SAME_CANONICAL_ENABLED_EXACT_ONE_SHOT_DSTART_NO_RRULE",
+      "LIVE_MAIN_REREAD_PROVES_SAME_CANONICAL_ENABLED_RECURRING_EXACT_DSTART",
       "DURABLE_EXPECTED_FAST_DUE_PERSISTED",
       "NON_WORKING_CURRENT_ACTIVITY_HANDOFF_PROJECTION_VALIDATED",
       "TURN_STATUS_AND_RUN_EVIDENCE_PERSISTED"
@@ -88,7 +88,7 @@
       "state/NOW.json"
     ],
     "check_immediately_before_user_visible_final": true,
-    "authorization_rule": "Honor operator pause and terminal states first. For normal CONTINUE during the one-shot canary, final is authorized only after the live SAME MAIN exact END+60 one-shot continuation and consistent non-WORKING close projection are freshly verified.",
+    "authorization_rule": "Honor operator pause and terminal states first. For normal CONTINUE, final is authorized only after the live SAME MAIN recurring RRULE at exact END+60 and consistent non-WORKING close projection are freshly verified.",
     "if_denied": "DO_NOT_EMIT_FINAL_CONTINUE_USEFUL_WORK",
     "stale_prior_check_forbidden": true,
     "normal_status_report_does_not_authorize_final": true
