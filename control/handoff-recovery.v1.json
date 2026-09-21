@@ -34,17 +34,20 @@
       "rationale": "Uncommitted disappearance requires fencing before takeover; optimize independently from normal scheduler delivery."
     },
     "STARTUP_ACK_MISSING": {
-      "requires_observed_invocation": true,
-      "boot_started_deadline_seconds": 120,
-      "rearm_verified_deadline_seconds_after_boot": 120,
-      "missing_boundaries_remain_unknown": true,
-      "detection_action": "MARK_INCOMPLETE_PRESERVE_RAW_INVOCATION",
-      "substantive_authority_granted_by_detection": false,
-      "recovery_requires_independent_wake_source": true,
-      "current_executable_fallback": "NEXT_HOURLY_SAME_CANONICAL_OCCURRENCE",
-      "target_recovery_seconds_lte": 120,
-      "capability_status": "DETECTION_ACTIVE_FAST_RECOVERY_TRANSPORT_NOT_PROVISIONED",
-      "rationale": "An invocation record without durable BOOT_STARTED or REARM_VERIFIED must be distinguished from scheduler non-delivery. Detection is not a wake mechanism and cannot itself satisfy the recovery target."
+      "requires_committed_close": false,
+      "stale_grace_required": false,
+      "detection": "MAIN expected_due + startup_watchdog grace elapsed with no generation-matched BOOT_STARTED/equivalent newer bootstrap evidence.",
+      "recovery": "Fixed Watchdog rearms SAME MAIN canonical to now+60s when fresh fencing permits, verifies it, then rechecks Watchdog at now+240s.",
+      "substantive_authority_for_watchdog": false,
+      "rationale": "Covers failures before MAIN can establish its own provisional rescue."
+    },
+    "BOOTSTRAP_REARM_MISSING": {
+      "requires_committed_close": false,
+      "stale_grace_required": false,
+      "detection": "BOOT_STARTED exists but generation-matched REARM_VERIFIED/newer verified continuation is absent beyond policy grace.",
+      "recovery": "Fixed Watchdog rearms SAME MAIN canonical to now+60s when safe; Watchdog never continues substantive work itself.",
+      "substantive_authority_for_watchdog": false,
+      "rationale": "Distinguishes bootstrap entry from successful self-protection."
     }
   },
   "stale_path": {
@@ -63,10 +66,10 @@
     }
   },
   "recovery_sequence": [
-    "RE_READ_CURRENT_ACTIVITY_HANDOFF",
+    "RE_READ_NOW_CURRENT_STARTUP_ACK_WATCHDOG_ACTIVITY_HANDOFF",
     "VERIFY_NEWEST_SCHEDULE_GENERATION_AND_PROGRAM_NONTERMINAL",
-    "CLASSIFY_NORMAL_CONTINUATION_VS_PREDICTIVE_PREARM_VS_ABRUPT_LOSS",
-    "CLASSIFY_STARTUP_ACK_MISSING_WITHOUT_INFERRING_UNOBSERVED_BOUNDARIES",
+    "CLASSIFY_NORMAL_CONTINUATION_VS_STARTUP_ACK_MISSING_VS_BOOTSTRAP_REARM_MISSING_VS_PREDICTIVE_PREARM_VS_ABRUPT_LOSS",
+    "IF_WATCHDOG_CLASS_FAIL_CLOSED_ON_SUBSTANTIVE_AUTHORITY_AND_ONLY_REARM_SAME_MAIN_WHEN_SAFE",
     "IF_PREDICTIVE_AND_PREDECESSOR_FRESH_DO_NOT_CLAIM_SUBSTANTIVE_AUTHORITY",
     "VERIFY_PREDECESSOR_STALE_WHEN_ABRUPT_LOSS",
     "ADVANCE_AUTHORITY_EPOCH_ONLY_WHEN_TAKEOVER_IS_SAFE",
