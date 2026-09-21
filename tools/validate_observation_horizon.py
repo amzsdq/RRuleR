@@ -57,13 +57,22 @@ def api(repo, token, path):
         return json.load(response)
 
 
+def load_predecessor_states(previous_paths):
+    states = []
+    for path in previous_paths:
+        if not path.exists():
+            raise ValueError(f"explicit predecessor observation horizon file missing: {path}")
+        states.append(json.loads(path.read_text()))
+    return states
+
+
 def main():
     horizon_path = Path(sys.argv[1] if len(sys.argv) > 1 else "state/OBSERVATION_HORIZON.json")
     policy_path = Path(sys.argv[2] if len(sys.argv) > 2 else "control/observation-horizon.v1.json")
     previous_paths = [Path(p) for p in sys.argv[3:]]
     horizon = json.loads(horizon_path.read_text())
     policy = json.loads(policy_path.read_text())
-    previous_states = [json.loads(p.read_text()) for p in previous_paths if p.exists()]
+    previous_states = load_predecessor_states(previous_paths)
     kind = horizon.get("provenance_kind")
     ref = str(horizon.get("provenance_ref", ""))
     repo = os.environ["REPO"]
