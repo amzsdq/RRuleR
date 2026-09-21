@@ -6,32 +6,34 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "root_goal": "P0 sustained evidenced useful-work coverage",
   "status": "CONTINUE",
-  "current_owner": "RUN-UTIL-20260921-212747",
-  "authority_epoch": 70,
+  "current_owner": "RUN-UTIL-20260921-215434",
+  "authority_epoch": 71,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-107",
+    "id": "CP-UTILIZATION-108",
     "state": "WORKING",
     "completed": [
-      "Classified stale epoch 69 as post-bootstrap progress loss: BOOT_STARTED and REARM_VERIFIED existed, but no first durable useful boundary was recorded.",
-      "Started provisional cold-rescue generation and verified same-canonical continuation at 21:41:24 KST."
+      "Recovered the 21:41:24 STARTUP_ACK_MISSING generation by reusing the same MAIN canonical.",
+      "Corrected malformed STARTUP_ACK canonical identity before authority claim.",
+      "Recorded BOOT_STARTED=21:55:37 and REARM_VERIFIED=21:56:12 for recovery generation.",
+      "Verified MAIN provisional continuation at 22:09:11 and Watchdog one-shot at 22:12:11, both enabled."
     ],
     "evidence": [
-      "epoch69 last_progress_at=2026-09-21T21:16:18+09:00",
-      "provisional wake observed=2026-09-21T21:27:22+09:00",
-      "BOOT_STARTED=2026-09-21T21:28:24+09:00",
-      "REARM_VERIFIED=2026-09-21T21:28:51+09:00",
-      "Watchdog STARTUP_ACK_MISSING recovery armed: MAIN=21:54:52 KST, Watchdog=21:58:10 KST, both enabled and verified"
+      "watchdog recovery MAIN due=2026-09-21T21:54:52+09:00",
+      "BOOT_STARTED=2026-09-21T21:55:37+09:00",
+      "REARM_VERIFIED=2026-09-21T21:56:12+09:00",
+      "live MAIN DTSTART=20260921T130911Z RRULE:FREQ=HOURLY enabled=true",
+      "live Watchdog DTSTART=20260921T221211 Asia/Seoul one-shot enabled=true"
     ],
-    "observation": "The 21:41:24 MAIN generation had an invocation record but no generation-matched durable bootstrap receipts after grace. Startup Watchdog rearmed the same MAIN canonical without claiming substantive authority.",
-    "next_action": "Successor MAIN must write generation-matched BOOT_STARTED and REARM_VERIFIED for the 21:54:52 recovery generation before substantive work."
+    "observation": "The fixed Watchdog recovered a second missing-bootstrap MAIN generation and the successor reached verified bootstrap protection without creating replacement canonicals.",
+    "next_action": "Add recovery-segment reporting to summarize_turn_close and focused tests while preserving unknown boundaries."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T21:54:52+09:00",
+    "next_due_at": "2026-09-21T22:09:11+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -55,13 +57,13 @@
       "normal_check_offset_seconds": 180,
       "recovery_recheck_seconds": 240,
       "main_recovery_due_offset_seconds": 60,
-      "next_watchdog_due_at": "2026-09-21T21:58:10+09:00",
-      "coverage": "RECOVERY_ARMED",
-      "last_classification": "STARTUP_ACK_MISSING",
+      "next_watchdog_due_at": "2026-09-21T22:12:11+09:00",
+      "coverage": "HEALTHY_BOOTSTRAP",
+      "last_classification": "HEALTHY_BOOTSTRAP",
       "last_recovery_at": "2026-09-21T21:53:52+09:00",
       "enabled_verified": true
     },
-    "next_due_source": "WATCHDOG_STARTUP_ACK_MISSING_RECOVERY"
+    "next_due_source": "EPOCH_71_VERIFIED_PROVISIONAL_ARM"
   },
   "safety": {
     "public_repo": true,
