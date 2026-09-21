@@ -1,18 +1,18 @@
 {
-  "schema_version":"1.0",
-  "program_id":"RRULER-PROGRAM-001",
-  "program_ref":"planning/PROGRAM.md",
-  "project_id":"P001",
-  "project_ref":"planning/projects/P001-SUSTAINED-UTILIZATION.md",
-  "work_spec_id":"WS-P001-002",
-  "work_spec_ref":"planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md",
-  "execution_status":"ACTIVE",
-  "pause_reason":null,
-  "resume_target":{
-    "step":"Use STARTUP-002 as new evidence to prepare and run the next guarded scheduler-timing experiment, measuring every boundary prospectively.",
-    "selection_rule":"Target the measured 155-second scheduler delivery segment; preserve single substantive authority and completion-relative fallback, and do not promote predictive timing from one sample."
+  "schema_version": "1.0",
+  "program_id": "RRULER-PROGRAM-001",
+  "program_ref": "planning/PROGRAM.md",
+  "project_id": "P001",
+  "project_ref": "planning/projects/P001-SUSTAINED-UTILIZATION.md",
+  "work_spec_id": "WS-P001-002",
+  "work_spec_ref": "planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md",
+  "execution_status": "PAUSED",
+  "pause_reason": "Operator-authorized maintenance: stop new work and self-rearm; checkpoint current safe unit only. Resume only after maintenance hold is cleared.",
+  "resume_target": {
+    "step": "Use STARTUP-002 as new evidence to prepare and run the next guarded scheduler-timing experiment, measuring every boundary prospectively.",
+    "selection_rule": "Target the measured 155-second scheduler delivery segment; preserve single substantive authority and completion-relative fallback, and do not promote predictive timing from one sample."
   },
-  "turn_plan_role":"TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec.",
-  "updated_at":"2026-09-21T18:22:00+09:00",
-  "resumed_by_operator_at":"2026-09-21T06:47:45.338Z"
+  "turn_plan_role": "TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec.",
+  "updated_at": "2026-09-21T09:34:54.659Z",
+  "resumed_by_operator_at": "2026-09-21T06:47:45.338Z"
 }
