@@ -2,10 +2,18 @@
 """Validate mutually consistent CURRENT/ACTIVITY/HANDOFF ownership projections."""
 from __future__ import annotations
 import json, sys
+from datetime import datetime
 from pathlib import Path
 
+NORMAL_CLOSE_OFFSET_SECONDS = 60  # exactly 1 minute (60 seconds)
+
+def _seconds(start: str, end: str) -> int:
+    a=datetime.fromisoformat(start); b=datetime.fromisoformat(end)
+    if a.tzinfo is None or b.tzinfo is None: raise ValueError('timestamps must include timezone')
+    return int((b-a).total_seconds())
+
 def validate_projection(current: dict, activity: dict, handoff: dict) -> dict:
-    errors=[]; run_state=current.get('run_state'); owner=current.get('current_owner'); epoch=current.get('authority_epoch'); next_due=current.get('continuation',{}).get('next_due_at')
+    errors=[]; run_state=current.get('run_state'); owner=current.get('current_owner'); epoch=current.get('authority_epoch'); continuation=current.get('continuation',{}); next_due=continuation.get('next_due_at')
     if activity.get('authority_epoch') != epoch: errors.append('ACTIVITY_AUTHORITY_EPOCH_MISMATCH')
     if run_state == 'WORKING':
         if activity.get('status') != 'WORKING': errors.append('WORKING_CURRENT_REQUIRES_WORKING_ACTIVITY')
@@ -23,7 +31,15 @@ def validate_projection(current: dict, activity: dict, handoff: dict) -> dict:
         if handoff.get('predecessor_authority_epoch') != epoch: errors.append('CLOSED_HANDOFF_AUTHORITY_EPOCH_MISMATCH')
         if activity.get('next_wake_due_at') != next_due: errors.append('CLOSED_ACTIVITY_NEXT_DUE_MISMATCH')
         if handoff.get('successor_expected_at') != next_due: errors.append('CLOSED_HANDOFF_NEXT_DUE_MISMATCH')
-    return {'valid':not errors,'run_state':run_state,'owner':owner,'authority_epoch':epoch,'errors':errors}
+        actual_end=continuation.get('actual_end_at'); verified=continuation.get('verified_next_fast_due_at')
+        if not actual_end: errors.append('CLOSED_CURRENT_MISSING_ACTUAL_END')
+        if not verified: errors.append('CLOSED_CURRENT_MISSING_VERIFIED_FAST_DUE')
+        if verified and verified != next_due: errors.append('CLOSED_VERIFIED_FAST_DUE_MISMATCH')
+        if actual_end and next_due:
+            try:
+                if _seconds(actual_end,next_due) != NORMAL_CLOSE_OFFSET_SECONDS: errors.append('CLOSED_NEXT_DUE_NOT_EXACTLY_1_MINUTE_60_SECONDS_AFTER_ACTUAL_END')
+            except (TypeError,ValueError): errors.append('CLOSED_INVALID_TIMEZONE_AWARE_TIMESTAMP')
+    return {'valid':not errors,'run_state':run_state,'owner':owner,'authority_epoch':epoch,'normal_close_offset_seconds':NORMAL_CLOSE_OFFSET_SECONDS,'errors':errors}
 
 def main():
     if len(sys.argv)!=4: print('usage: validate_close_projection.py CURRENT_JSON ACTIVITY_JSON HANDOFF_JSON',file=sys.stderr); return 2
