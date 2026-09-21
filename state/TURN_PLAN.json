@@ -1,38 +1,32 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
   "authority_epoch": 80,
-  "run_id": "RUN-UTIL-20260922-013717",
-  "status": "CLOSE_READY",
-  "phase": "V5_4_ADAPTIVE_PROVISIONAL_LIVE_VERIFICATION",
-  "objective_id": "WS-P001-002-V5.4-PROVISIONAL",
-  "objective": "Verify the repaired SAME-MAIN provisional horizon in live operation: +660s once for a normal 600s turn, no routine +2m rolling refresh, guarded extension only when due is threatened, exact END+60 normal close, and no regression of the 600s hard floor.",
+  "run_id": null,
+  "status": "READY_FOR_NEXT_WAKE",
+  "phase": "V5_5_DURABLE_UNIT_CHAT_TRACE_CANARY",
+  "objective_id": "WS-P001-002-V5.5-UNIT-CHAT-TRACE",
+  "objective": "Directly verify same-wake sustained work cadence in chat without weakening durable evidence or close authority.",
   "expected_useful_seconds": 600,
   "acceptance_criteria": [
-    "Generation-matched BOOT_STARTED and REARM_VERIFIED are durable for the 01:38 generation.",
-    "Fresh ACTIVE_CONTROLS/lifecycle/CI/runtime/scheduler-fence agree on +660s provisional and 600s hard floor.",
-    "No routine short-rolling schedule mutation occurred; exactly one guarded extension was used only after initial due entered the 90s collision guard.",
-    "Integrated control-plane validation passes on the extended projection.",
-    "Normal close uses SAME MAIN exact observed END+60 and persists the same due to CURRENT/ACTIVITY/HANDOFF."
+    "Provisional SAME MAIN schedule is live-verified, durably persisted, then one compact schedule trace is emitted.",
+    "Each bounded substantive unit completion trace occurs only after observed unit START/END/DURATION and artifact-backed work evidence are durably persisted.",
+    "After each unit trace, same-wake authorized work continues while normal CONTINUE elapsed is below 600s.",
+    "No mere read, plan, wait, retry, or scheduler-only event is mislabeled as a completed unit.",
+    "Normal close live-verifies SAME MAIN exact observed END+60, persists one consistent close projection, then emits the final next-due trace.",
+    "No duplicate substantive overlap or stale schedule rollback occurs."
   ],
   "checkpointable_substeps": [
-    "Persist generation-matched bootstrap and provisional rearm receipts.",
-    "Audit and repair stale +780s/CI authority.",
-    "Continue useful authorized work through >=600 observed elapsed seconds.",
-    "Exact END+60 rearm, live verify, persist close projection, then hand off."
+    "Fresh bootstrap, policy sync, provisional live verification, durable REARM_VERIFIED, and schedule trace.",
+    "Execute bounded substantive unit; persist unit timing/evidence; emit trace; continue.",
+    "Repeat safe bounded units while below 600s, using fallback/residual work during external waits.",
+    "At or after 600s finish the smallest safe in-flight unit, checkpoint, exact END+60 rearm, durable projection, final due trace, TURN STATUS."
   ],
-  "current_substep": 4,
-  "handoff_boundary": "READY_FOR_EXACT_END_PLUS_60_CLOSE",
-  "created_for_next_wake": false,
-  "started_at": "2026-09-22T01:37:17+09:00",
-  "last_progress_at": "2026-09-22T01:48:41+09:00",
-  "progress_evidence": [
-    "BOOT_STARTED 01:37:17 and initial REARM_VERIFIED 01:37:29 are durable.",
-    "Initial SAME MAIN provisional 01:48:17 was live verified.",
-    "Stale 780s assumptions repaired in CI, runtime-continuity, and scheduler-fence; ACTIVE_CONTROLS now requires CI sync surfaces.",
-    "600-second hard floor was exceeded before close preparation.",
-    "At 01:47:20 initial provisional entered <=90s guard, so SAME MAIN was extended exactly once to 01:50:17 and live update was verified.",
-    "Integrated control-plane validation on the extended state passed at 01:48:22 KST."
-  ]
+  "current_substep": 0,
+  "early_finish_fallback": "If the obvious unit finishes or becomes externally wait-bound before 600s, select an independent authorized fallback/residual unit or decompose the next safe unit. Do not close merely because a trace was emitted.",
+  "handoff_boundary": "ONLY_AFTER_600S_NORMAL_FLOOR_AND_EXACT_END_PLUS_60_LIVE_VERIFICATION",
+  "created_for_next_wake": true,
+  "expected_wake_at": "2026-09-22T02:01:20+09:00",
+  "progress_evidence": []
 }
