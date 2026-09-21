@@ -11,22 +11,31 @@
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-102",
+    "id": "CP-UTILIZATION-103",
     "state": "CONTINUE",
     "completed": [
       "Reconciled stale STARTUP-004 using observed automation invocation at 19:05:35.566381 KST without inventing claim/useful progress.",
       "Separated operator-rescheduled 19:37:36 generation from normal END+60 compliance.",
       "Claimed nonconflicting authority epoch 67 and provisionally armed same-canonical continuation.",
       "Appended the second eligible live review with STARTUP-004 delivery separated from missing durable progress.",
-      "Recorded STARTUP-005 first durable useful boundary without treating the operator-rescheduled generation as END+60 evidence."
+      "Recorded STARTUP-005 first durable useful boundary without treating the operator-rescheduled generation as END+60 evidence.",
+      "Added a machine-readable successor durable-progress audit with five focused regression tests.",
+      "Extended turn-review output to preserve provider delivery while exposing missing authority/first-useful status.",
+      "Repaired 12 literal backslash-n separators in the control-plane workflow and verified none remain.",
+      "Verified nine focused tests locally; external Actions result is not yet published."
     ],
     "evidence": [
       "automation last_run_time=2026-09-21T10:05:35.566381+00:00",
       "automation updated_at=2026-09-21T10:36:58.386521+00:00",
-      "planning/evidence/TURN-CLOSE-V4-RETEST.md@1cb12a07b0e98257d08b78273b2da6bde7581484"
+      "planning/evidence/TURN-CLOSE-V4-RETEST.md@1cb12a07b0e98257d08b78273b2da6bde7581484",
+      "tools/audit_successor_progress.py@77d12e5893559b377bfeabbb335a64a81caa813f",
+      "tests/test_audit_successor_progress.py@a7b39564ee4213cb0f1a39ece5b2065fc4c9a7f6",
+      ".github/workflows/validate-control-plane.yml@274e4f2e3b2a9189c2d042205c997e72f72c5e48",
+      "tools/build_turn_review.py@8c990e52f7ae0ee162896ce647c7a3f15a114f58",
+      "tests/test_build_turn_review.py@10ce38df9ad7cba74322c052f14e8e9336d56f27"
     ],
-    "observation": "STARTUP-004 provider delivery was about 30s but subsequent durable progress is unknown. Current operator-rescheduled wake delivery was 69s; it is not a comparable END+60 sample.",
-    "next_action": "Implement missing successor durable-progress diagnostic and focused tests, integrate into CI, then validate ledgers."
+    "observation": "STARTUP-004 provider delivery remains 30s with missing durable progress; the new audit identifies the missing claim without converting unknown time to zero. STARTUP-005 remains excluded from END+60 comparison.",
+    "next_action": "Close epoch 67 with exact observed END+60 and create clean STARTUP-006 for the third eligible review."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
