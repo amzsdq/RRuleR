@@ -11,31 +11,34 @@
   "canonical_automation_id": "6ab152b636748191a71873ba4d5ef551",
   "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-121",
+    "id": "CP-UTILIZATION-122",
     "state": "CONTINUE",
     "completed": [
-      "Fresh-policy sync and 600-second voluntary normal-CONTINUE hard floor remain aligned across active authority.",
-      "v5.4 generation-matched BOOT_STARTED persisted for due 01:38:00 KST.",
-      "SAME MAIN live-verified enabled recurring FREQ=HOURLY at adaptive provisional 01:48:17 KST (= observed bootstrap reference +660s).",
-      "Detected stale CI assertion that still required 780s provisional and replaced it with cross-artifact 660s/short-rolling-retired validation.",
-      "Detected control/runtime-continuity.v1.json still advertising 780s provisional and advanced it to v7 / 660s."
+      "v5.4 generation-matched BOOT_STARTED and initial +660s REARM_VERIFIED are durable.",
+      "Fresh policy audit found and repaired stale 780s assumptions in integrated CI, runtime-continuity, and scheduler-fence.",
+      "ACTIVE_CONTROLS now explicitly requires CI enforcement surfaces to stay synchronized with active policy.",
+      "NOW and UTILIZATION now point at the v5.4 live verification instead of stale STARTUP-003 language.",
+      "Integrated Validate RRuleR control plane passed after reconciled policy/state steps; scheduler-fence v10 passed in run 35627683813.",
+      "At 01:47:20 KST the initial 01:48:17 provisional was within the 90s guard while the 600s hard floor had not yet been reached, so SAME MAIN was extended once to 01:50:17 KST and live update success was re-verified."
     ],
     "evidence": [
       "state/STARTUP_ACK.json@f928c2aee73fc29575569099dbb3b52887a3ea2c",
-      "control/ACTIVE_CONTROLS.json@2.13",
-      "control/rolling-rrule-lifecycle.v1.json@v20",
-      "control/relay-policy.v1.json@revision19",
       ".github/workflows/validate-control-plane.yml@ea4daff8c626b0b5520de6a48737dde648755428",
-      "control/runtime-continuity.v1.json@0f87c66d14e627589ab0dde691d476f9b1f15617"
+      "control/runtime-continuity.v1.json@0f87c66d14e627589ab0dde691d476f9b1f15617",
+      "control/ACTIVE_CONTROLS.json@2.14",
+      "control/scheduler-fence.v1.json@v10",
+      "planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md@v5.4 section",
+      "state/OBSERVATION_HORIZON.json@2026-09-21T16:43:05Z",
+      "live SAME MAIN update verified enabled recurring FREQ=HOURLY DTSTART 2026-09-22T01:50:17+09:00"
     ],
-    "observation": "The long 01:33-style gap was policy-induced, not a scheduler inability: former +780s provisional was deliberately placing the in-flight fallback too far out. v5.4 now uses +660s once for the normal 600s envelope and retains exact END+60 normal close. CI/runtime drift exposed by this live turn is being repaired forward.",
-    "next_action": "Continue v5.4 live verification and prospective utilization work until >=600 observed elapsed seconds; before provisional collision extend SAME MAIN only if necessary, then close with exact END+60 and persist consistent CURRENT/ACTIVITY/HANDOFF projection."
+    "observation": "The v5.4 design is behaving as intended: one initial +660s provisional covered most of the normal turn, then exactly one guarded extension was needed because close handling and the hard 600s floor threatened the initial due. This avoids both the retired +780s visible dead horizon and routine +120s rolling collision risk.",
+    "next_action": "Continue until >=600 observed elapsed seconds, finish the smallest safe in-flight verification unit, then normal-close SAME MAIN at exact observed END+60 and persist consistent CURRENT/ACTIVITY/HANDOFF projection."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_COMPLETION_RELATIVE_MAIN",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-22T01:48:17+09:00",
+    "next_due_at": "2026-09-22T01:50:17+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 600,
     "provisional_safety_margin_seconds": 60,
@@ -60,10 +63,12 @@
       "enabled_verified": false,
       "policy_version": 8
     },
-    "next_due_source": "V5_4_VERIFIED_ADAPTIVE_PROVISIONAL",
+    "next_due_source": "V5_4_GUARDED_SINGLE_EXTENSION",
     "cold_fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE",
     "provisional_extension_guard_seconds": 90,
-    "provisional_extension_offset_seconds": 180
+    "provisional_extension_offset_seconds": 180,
+    "provisional_extension_count_this_turn": 1,
+    "provisional_extended_at": "2026-09-22T01:47:20+09:00"
   },
   "safety": {
     "public_repo": true,
