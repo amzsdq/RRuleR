@@ -3,15 +3,15 @@
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
   "handoff_state": "COMMITTED",
-  "handoff_mode": "OPERATOR_CANONICAL_MIGRATION_TO_NEW_MAIN",
+  "handoff_mode": "OPERATOR_CLEAN_CONTEXT_CANONICAL_MIGRATION",
   "predecessor_run_id": "RUN-UTIL-20260922-003010",
   "predecessor_authority_epoch": 76,
   "successor_run_id": null,
-  "successor_expected_at": "2026-09-22T01:38:00+09:00",
+  "successor_expected_at": "2026-09-22T00:54:59+09:00",
   "successor_observed_at": null,
   "predecessor_last_progress_at": "2026-09-22T00:39:00+09:00",
-  "recovery_basis": "EXPLICIT_OPERATOR_CANONICAL_MIGRATION",
-  "active_unit": "Continue WS-P001-002 under the new operator-created MAIN recurring reservation.",
+  "recovery_basis": "EXPLICIT_OPERATOR_CLEAN_CONTEXT_CANONICAL_MIGRATION",
+  "active_unit": "Continue WS-P001-002 under the clean operator-created MAIN recurring reservation.",
   "checkpoint_id": "CP-UTILIZATION-114",
-  "next_action": "New MAIN writes early startup receipts, preserves its operator-created recurring category, and continues SAME MAIN END+60 chaining."
+  "next_action": "Clean MAIN writes early startup receipts, preserves recurring category, and continues SAME MAIN END+60 chaining."
 }
