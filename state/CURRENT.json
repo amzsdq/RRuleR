@@ -28,7 +28,7 @@
       "control/handoff-recovery.v1.json@d81c6f3dd1da972222b32ba2fe06a472d655880d",
       "control/rolling-rrule-lifecycle.v1.json@590b8a1ee5cb16f5b077ed68475ea0a47916a7ad"
     ],
-    "observation": "STARTUP-006 proves END+60 local scheduling and 73s provider delivery, but the invoked occurrence left no BOOT_STARTED, REARM_VERIFIED, authority claim, or useful progress. The current hourly fallback wake is STARTUP-007 and is not a normal END+60 sample.",
+    "observation": "STARTUP-006 proves END+60 local scheduling and 73s provider delivery, but the invoked occurrence left no BOOT_STARTED, REARM_VERIFIED, authority claim, or useful progress. The current hourly fallback wake is STARTUP-007 and is not a normal END+60 sample. Startup Watchdog installed; live MAIN due resynchronized to 21:02:29 KST and Watchdog first check to 21:05:29 KST.",
     "next_action": "Integrate bootstrap acknowledgement invariants into CI, then inspect the event-wake candidate and select the smallest executable independent recovery transport slice."
   },
   "continuation": {
@@ -61,7 +61,8 @@
       "main_recovery_due_offset_seconds": 60,
       "next_watchdog_due_at": "2026-09-21T21:05:29+09:00",
       "coverage": "PRE_BOOTSTRAP"
-    }
+    },
+    "next_due_source": "LIVE_MAIN_AUTOMATION_RESYNC_2026-09-21T20:54:32+09:00"
   },
   "safety": {
     "public_repo": true,
