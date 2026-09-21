@@ -125,3 +125,17 @@ def test_operator_rescheduled_sample_has_own_bucket_and_preserves_unknowns():
     assert gap["comparison_eligible"] is False
     assert out["normal_scheduler_gap_samples"] == []
     assert out["recovery_gap_samples"] == []
+
+
+def test_legacy_operator_reset_marker_uses_operator_bucket():
+    startup = {"samples": [{
+        "sample_id": "LEGACY-OP",
+        "validity": "EXCLUDED_OPERATOR_MAINTENANCE_RECOVERY",
+        "exclusion_reason": "OPERATOR_SCHEDULE_RESET",
+        "scheduled_due_at": "2026-09-21T23:52:00+09:00",
+        "successor_observed_at": "2026-09-21T23:50:45+09:00",
+    }]}
+    out = summarize([], startup)
+    assert len(out["operator_rescheduled_gap_samples"]) == 1
+    assert out["normal_scheduler_gap_samples"] == []
+    assert out["recovery_gap_samples"] == []
