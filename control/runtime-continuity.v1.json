@@ -1,6 +1,6 @@
 {
   "policy_id": "RRULER_RUNTIME_CONTINUITY",
-  "version": 5,
+  "version": 6,
   "status": "ACTIVE",
   "principle": "DURABLE_WORKFLOW_DISPOSABLE_REASONING_WORKER",
   "components": {
@@ -43,6 +43,14 @@
     "provisional_rescue_offset_seconds": 780,
     "rule": "Normal close shifts SAME MAIN to exact END+60. If that occurrence is lost before bootstrap, the SAME MAIN recurring RRULE supplies the natural hourly cold fallback. Watchdog is not required."
   },
+  "startup_receipt_generation_fence": {
+    "required": true,
+    "receipt": "BOOT_STARTED",
+    "generation_field": "generation_key",
+    "receipt_generation_field": "boot_started_authority_epoch",
+    "rule": "A BOOT_STARTED receipt is valid only for the scheduler generation whose generation_key exactly matches boot_started_authority_epoch. A stale receipt from an earlier occurrence cannot satisfy current startup acknowledgement.",
+    "failure_class": "STARTUP_ACK_BOOT_EPOCH_GENERATION_MISMATCH"
+  },
   "predictive_prearm": {
     "experiment_id": "UTIL-EXP-018",
     "purpose": "Hide scheduler delivery latency under predecessor useful work.",
@@ -75,7 +83,7 @@
     ]
   },
   "rolling_recovery": {
-    "startup": "minimum fence then classify normal vs predictive vs recovery before substantive authority",
+    "startup": "minimum fence, persist generation-matched BOOT_STARTED, then classify normal vs predictive vs recovery before substantive authority",
     "normal_close": "checkpoint then live-verify SAME MAIN END+60; do not arm Watchdog",
     "mutation_failure": "retry once when safe; if older verified future continuation survives, classify DEGRADED_CONTINUATION within its safety envelope; otherwise fail closed before conflicting substantive side effects",
     "stale_occurrence": "classify a natural SAME MAIN recurrence after missing bootstrap as MAIN_COLD_FALLBACK_RECOVERY; recover forward without replacing the canonical"
