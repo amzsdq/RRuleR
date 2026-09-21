@@ -238,6 +238,20 @@
       "qualification": "SUBSTANTIVE_ACCEPTED",
       "basis": "Validated the predecessor run and appended the first validity-aware operator review row. Both boundaries were directly observed around the durable commit; no surrounding bootstrap/control time is counted.",
       "observed_seconds": 16
+    },
+    {
+      "record_id": "WE-20260921-E66-002",
+      "authority_epoch": 66,
+      "run_id": "RUN-UTIL-20260921-185559",
+      "start_at": "2026-09-21T18:57:04+09:00",
+      "end_at": "2026-09-21T18:59:10+09:00",
+      "start_boundary": "OBSERVED",
+      "end_boundary": "OBSERVED",
+      "kind": "scheduler_timing_correction",
+      "artifact": "tools/compute_completion_due.py@07ab6260da1eec2a0f16ba02b1aa1cf0753e4257 + tests/test_compute_completion_due.py@7b9e8774d5f27e3abdd37e7e73f9801410604e39 + control/rolling-rrule-lifecycle.v1.json@5796f3a8d285bd494d2be433f271254a621974f0 + .github/workflows/validate-control-plane.yml@5dc85e60026576180d12a892b42a0190e2f881f9",
+      "qualification": "SUBSTANTIVE_ACCEPTED",
+      "basis": "Implemented exact-second completion-relative due computation, added focused rollover/validation tests, made second precision an active lifecycle invariant, and integrated the new test into CI. Boundaries are adjacent observed progress boundaries; no later validation time is counted.",
+      "observed_seconds": 126
     }
   ],
   "collection": {
