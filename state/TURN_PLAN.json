@@ -4,7 +4,7 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "authority_epoch": 76,
   "run_id": "RUN-UTIL-20260922-003010",
-  "status": "IN_PROGRESS",
+  "status": "COMPLETE",
   "phase": "ONE_SHOT_CANARY_FAILURE_EVIDENCE_HARDENING",
   "objective_id": "WS-P001-002-ONE-SHOT-CANARY-REJECTION",
   "objective": "Preserve the exact one-shot category canary failure as a distinct experimental sample and prevent it from contaminating normal RRULE or emergency-recovery comparisons.",
@@ -21,12 +21,12 @@
     "Persist STARTUP-018/019 observed boundaries and accepted useful evidence.",
     "Close through live-verified SAME MAIN recurring END+60."
   ],
-  "current_substep": 3,
-  "handoff_boundary": "VERIFIED_SAME_MAIN_RECURRING_END_PLUS_60",
+  "current_substep": 4,
+  "handoff_boundary": "VERIFIED_SAME_MAIN_CUSTOM_RECURRING_END_PLUS_60",
   "early_finish_fallback": "Update the live retest evidence with the rejected category canary and exact observed 99-second delivery segment.",
   "created_for_next_wake": false,
   "started_at": "2026-09-22T00:30:10+09:00",
-  "last_progress_at": "2026-09-22T00:39:00+09:00",
+  "last_progress_at": "2026-09-22T00:40:36+09:00",
   "progress_evidence": [
     "BOOT_STARTED 00:30:10 for DUE:00:30:39",
     "REARM_VERIFIED 00:31:29; recurring provisional due 00:43:10 enabled",
@@ -35,6 +35,7 @@
     "Full exact-remote-source test suite passed: startup audit 14, turn-close summary 9.",
     "Live ledger audit passed: 19 samples, zero unacknowledged errors, one rejected one-shot bucket.",
     "Fresh custom-recurring v4.3 policy reconciled across relay policy, scheduler fence, CI, and live SAME MAIN schedule.",
-    "Five direct custom-recurring semantic checks passed."
+    "Five direct custom-recurring semantic checks passed.",
+    "Final enabled=false race detected and repaired; live SAME MAIN custom recurring END+60 00:41:36 verified enabled."
   ]
 }
