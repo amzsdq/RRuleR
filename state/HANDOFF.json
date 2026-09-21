@@ -2,7 +2,7 @@
   "schema_version": "1.2",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "handoff_state": "RECOVERY_CLAIMED",
+  "handoff_state": "PREPARED",
   "handoff_mode": "WATCHDOG_SAME_CANONICAL_RECOVERY",
   "predecessor_run_id": "RUN-UTIL-20260921-212747",
   "predecessor_authority_epoch": 70,
@@ -11,7 +11,7 @@
   "successor_observed_at": "2026-09-21T21:54:34+09:00",
   "predecessor_last_progress_at": "2026-09-21T21:30:51+09:00",
   "recovery_basis": "The 21:41:24 generation had a live invocation observation but no durable bootstrap receipts after grace. Fixed Watchdog rearmed the same MAIN canonical.",
-  "active_unit": "Recovery-segment reporting in turn-close summary.",
-  "checkpoint_id": "CP-UTILIZATION-108",
-  "next_action": "Implement and test recovery-segment summary fields, then exact END+60 close."
+  "active_unit": "Checkpoint complete; continuation verification in progress.",
+  "checkpoint_id": "CP-UTILIZATION-109",
+  "next_action": "Verify same MAIN at END+60 and same Watchdog at MAIN+180s, then successor reviews recovery evidence."
 }
