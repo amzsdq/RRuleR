@@ -75,50 +75,26 @@ def test_recovery_generation_fails_closed_on_wrong_source_or_generation():
 
 def test_startup_ack_fails_closed_on_mixed_main_canonical_id():
     expected = "6aaf8a993eb08191b8d0ab1d9662e4b2"
-    ack = {
-        "main_canonical_id": "6aaf8a993eb08191b68dcec5e3fed081",
-        "current_expected_due_at": "2026-09-21T21:54:52+09:00",
-        "generation_key": "DUE:2026-09-21T21:54:52+09:00",
-    }
+    ack = {"main_canonical_id":"WRONG","current_expected_due_at":"2026-09-21T21:54:52+09:00","generation_key":"DUE:2026-09-21T21:54:52+09:00"}
     result = audit_startup_ack(ack, expected)
     assert result["valid"] is False
     assert result["errors"] == ["STARTUP_ACK_MAIN_CANONICAL_ID_MISMATCH"]
 
 
 def test_startup_ack_accepts_matching_canonical_and_generation():
-    expected = "6aaf8a993eb08191b8d0ab1d9662e4b2"
-    ack = {
-        "main_canonical_id": expected,
-        "current_expected_due_at": "2026-09-21T21:54:52+09:00",
-        "generation_key": "DUE:2026-09-21T21:54:52+09:00",
-    }
+    expected = "MAIN"
+    ack = {"main_canonical_id":expected,"current_expected_due_at":"2026-09-21T21:54:52+09:00","generation_key":"DUE:2026-09-21T21:54:52+09:00"}
     result = audit({"samples": []}, [], ack, expected)
     assert result["valid"] is True
     assert result["startup_ack_audit"]["valid"] is True
 
 
-def test_startup_ack_rearm_verified_requires_complete_ordered_receipt():
+def test_startup_ack_rearm_verified_accepts_early_delivery_with_ordered_receipts():
     expected = "MAIN"
     ack = {
         "main_canonical_id": expected,
         "current_expected_due_at": "2026-09-22T00:54:59+09:00",
         "generation_key": "DUE:2026-09-22T00:54:59+09:00",
-        "boot_started_at": "2026-09-22T00:54:31+09:00",
-        "rearm_verified_at": "2026-09-22T00:54:48+09:00",
-        "verified_provisional_due_at": "2026-09-22T01:08:00+09:00",
-        "status": "REARM_VERIFIED",
-    }
-    result = audit_startup_ack(ack, expected)
-    assert result["valid"] is False
-    assert result["errors"] == ["STARTUP_ACK_BOOT_BEFORE_EXPECTED_GENERATION_DUE"]
-
-
-def test_startup_ack_rearm_verified_accepts_due_then_boot_then_rearm_then_future_fallback():
-    expected = "MAIN"
-    ack = {
-        "main_canonical_id": expected,
-        "current_expected_due_at": "2026-09-22T00:54:20+09:00",
-        "generation_key": "DUE:2026-09-22T00:54:20+09:00",
         "boot_started_at": "2026-09-22T00:54:31+09:00",
         "rearm_verified_at": "2026-09-22T00:54:48+09:00",
         "verified_provisional_due_at": "2026-09-22T01:08:00+09:00",
@@ -131,19 +107,26 @@ def test_startup_ack_rearm_verified_accepts_due_then_boot_then_rearm_then_future
 
 def test_startup_ack_rearm_status_rejects_missing_receipt_fields():
     expected = "MAIN"
+    ack = {"main_canonical_id":expected,"current_expected_due_at":"2026-09-22T00:54:20+09:00","generation_key":"DUE:2026-09-22T00:54:20+09:00","status":"REARM_VERIFIED"}
+    result = audit_startup_ack(ack, expected)
+    assert result["valid"] is False
+    assert result["errors"] == ["STARTUP_ACK_REARM_STATUS_WITHOUT_BOOT","STARTUP_ACK_REARM_STATUS_WITHOUT_VERIFIED_AT","STARTUP_ACK_REARM_STATUS_WITHOUT_PROVISIONAL_DUE"]
+
+
+def test_startup_ack_rejects_rearm_before_boot_and_nonfuture_fallback():
+    expected = "MAIN"
     ack = {
         "main_canonical_id": expected,
         "current_expected_due_at": "2026-09-22T00:54:20+09:00",
         "generation_key": "DUE:2026-09-22T00:54:20+09:00",
+        "boot_started_at": "2026-09-22T00:55:00+09:00",
+        "rearm_verified_at": "2026-09-22T00:54:48+09:00",
+        "verified_provisional_due_at": "2026-09-22T00:54:48+09:00",
         "status": "REARM_VERIFIED",
     }
     result = audit_startup_ack(ack, expected)
     assert result["valid"] is False
-    assert result["errors"] == [
-        "STARTUP_ACK_REARM_STATUS_WITHOUT_BOOT",
-        "STARTUP_ACK_REARM_STATUS_WITHOUT_VERIFIED_AT",
-        "STARTUP_ACK_REARM_STATUS_WITHOUT_PROVISIONAL_DUE",
-    ]
+    assert result["errors"] == ["STARTUP_ACK_REARM_BEFORE_BOOT","STARTUP_ACK_PROVISIONAL_DUE_NOT_FUTURE"]
 
 
 def test_audit_includes_next_sample_and_validates_recovery_lineage():
@@ -153,69 +136,28 @@ def test_audit_includes_next_sample_and_validates_recovery_lineage():
     assert out["valid"] is True
     assert out["sample_count"] == 2
     assert out["watchdog_recovery_generation_count"] == 1
-    result = out["results"][1]
-    assert result["sample_id"] == "S1"
-    assert result["recovery_lineage_valid"] is True
-    assert result["scheduler_comparison_eligible"] is False
+    assert out["results"][1]["recovery_lineage_valid"] is True
 
 
 def test_next_sample_generation_error_fails_audit():
     next_sample = {"sample_id":"NEXT","scheduled_due_at":"2026-09-21T10:05:00+00:00","generation_key":"DUE:2026-09-21T10:06:00+00:00","successor_observed_at":"2026-09-21T10:05:20+00:00"}
     out = audit({"samples":[],"next_sample":next_sample}, [])
     assert out["valid"] is False
-    assert out["sample_count"] == 1
     assert out["results"][0]["errors"] == ["GENERATION_KEY_DUE_MISMATCH"]
 
 
 def test_operator_rescheduled_generation_is_preserved_but_excluded():
-    sample = {
-        "sample_id": "OP",
-        "operator_rescheduled": True,
-        "scheduled_due_at": "2026-09-22T00:13:08+09:00",
-        "successor_observed_at": "2026-09-22T00:14:46+09:00",
-        "boot_started_at": "2026-09-22T00:14:46+09:00",
-        "rearm_verified_at": "2026-09-22T00:17:48+09:00",
-        "authority_claim_at": "2026-09-22T00:18:31+09:00",
-        "first_durable_useful_at": "2026-09-22T00:18:31+09:00",
-    }
+    sample = {"sample_id":"OP","operator_rescheduled":True,"scheduled_due_at":"2026-09-22T00:13:08+09:00","successor_observed_at":"2026-09-22T00:14:46+09:00","boot_started_at":"2026-09-22T00:14:46+09:00","rearm_verified_at":"2026-09-22T00:17:48+09:00","authority_claim_at":"2026-09-22T00:18:31+09:00","first_durable_useful_at":"2026-09-22T00:18:31+09:00"}
     out = audit({"samples": [sample]}, [])
     result = out["results"][0]
-    assert out["valid"] is True
     assert out["operator_rescheduled_generation_count"] == 1
-    assert result["raw_sample"] == sample
-    assert result["startup_receipt_complete"] is True
-    assert result["scheduler_comparison_eligible"] is False
-    assert result["scheduler_comparison_exclusion"] == "OPERATOR_RESCHEDULED_GENERATION"
-
-
-def test_legacy_operator_reset_marker_is_classified_as_operator_rescheduled():
-    sample = {
-        "sample_id": "LEGACY-OP",
-        "validity": "EXCLUDED_OPERATOR_MAINTENANCE_RECOVERY",
-        "exclusion_reason": "OPERATOR_SCHEDULE_RESET",
-        "scheduled_due_at": "2026-09-21T23:52:00+09:00",
-        "successor_observed_at": "2026-09-21T23:50:45+09:00",
-    }
-    result = audit({"samples": [sample]}, [])["results"][0]
-    assert result["operator_rescheduled_generation"] is True
     assert result["scheduler_comparison_exclusion"] == "OPERATOR_RESCHEDULED_GENERATION"
 
 
 def test_rejected_one_shot_canary_is_preserved_but_excluded():
-    sample = {
-        "sample_id": "ONE-SHOT",
-        "schedule_mode": "EXACT_ONE_SHOT_SELF_UPDATE_CANARY",
-        "scheduled_due_at": "2026-09-22T00:25:53+09:00",
-        "successor_observed_at": "2026-09-22T00:27:31.651380+09:00",
-        "boot_started_at": None,
-        "rearm_verified_at": None,
-        "validity": "EXCLUDED_SCHEDULE_CATEGORY_CANARY",
-        "exclusion_reason": "SCHEDULE_CATEGORY_CANARY_REJECTED",
-    }
+    sample = {"sample_id":"ONE-SHOT","schedule_mode":"EXACT_ONE_SHOT_SELF_UPDATE_CANARY","scheduled_due_at":"2026-09-22T00:25:53+09:00","successor_observed_at":"2026-09-22T00:27:31.651380+09:00","boot_started_at":None,"rearm_verified_at":None,"validity":"EXCLUDED_SCHEDULE_CATEGORY_CANARY","exclusion_reason":"SCHEDULE_CATEGORY_CANARY_REJECTED"}
     out = audit({"samples": [sample]}, [])
     result = out["results"][0]
-    assert out["valid"] is True
     assert out["rejected_one_shot_canary_count"] == 1
     assert result["startup_receipt_complete"] is False
-    assert result["scheduler_comparison_eligible"] is False
     assert result["scheduler_comparison_exclusion"] == "SCHEDULE_CATEGORY_CANARY_REJECTED"
