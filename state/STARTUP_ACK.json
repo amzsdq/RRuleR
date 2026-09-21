@@ -5,9 +5,9 @@
   "generation_key": "DUE:2026-09-21T21:54:52+09:00",
   "boot_started_at": "2026-09-21T21:55:37+09:00",
   "boot_started_authority_epoch": 70,
-  "rearm_verified_at": null,
-  "verified_provisional_due_at": null,
-  "status": "BOOT_STARTED",
-  "last_updated_at": "2026-09-21T21:55:37+09:00",
-  "note": "Watchdog recovery generation entered durable bootstrap after fresh NOW/CURRENT/live canonical/scheduler-fence validation. Corrected a malformed mixed canonical ID before establishing provisional continuation."
+  "rearm_verified_at": "2026-09-21T21:56:12+09:00",
+  "verified_provisional_due_at": "2026-09-21T22:09:11+09:00",
+  "status": "REARM_VERIFIED",
+  "last_updated_at": "2026-09-21T21:56:12+09:00",
+  "note": "Watchdog recovery generation entered bootstrap. The same MAIN canonical is enabled with verified hourly RRULE provisional continuation at 22:09:11 KST. Malformed canonical ID from the recovery handoff was corrected before authority/work."
 }
