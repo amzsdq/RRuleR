@@ -142,14 +142,14 @@
     "boot_started_at": "2026-09-21T20:49:21+09:00",
     "rearm_verified_at": "2026-09-21T20:49:46+09:00",
     "authority_claim_at": "2026-09-21T20:50:15+09:00",
-    "first_durable_useful_at": null,
+    "first_durable_useful_at": "2026-09-21T20:52:13+09:00",
     "due_to_observation_seconds": -26,
     "observation_to_boot_seconds": 32,
     "boot_to_rearm_verified_seconds": 25,
     "rearm_verified_to_claim_seconds": 29,
-    "validity": "HOURLY_FALLBACK_RECOVERY",
+    "validity": "EXCLUDED_HOURLY_FALLBACK_RECOVERY",
     "exclusion_reason": "NOT_NORMAL_END_PLUS_60_GENERATION",
-    "classification": "RECOVERED_ON_HOURLY_FALLBACK_AFTER_STARTUP_ACK_MISSING",
+    "classification": "HOURLY_FALLBACK_RECOVERED_WITH_BOOTSTRAP_STAGE_EVIDENCE",
     "required_fields": [
       "scheduled_due_at",
       "successor_observed_at",
@@ -158,7 +158,9 @@
       "authority_claim_at",
       "first_durable_useful_at"
     ],
-    "rule": "This wake belongs to the next hourly fallback occurrence after STARTUP-006 lacked durable acknowledgement. Use for recovery-stage diagnostics, not normal END+60 comparison."
+    "rule": "This wake belongs to the next hourly fallback occurrence after STARTUP-006 lacked durable acknowledgement. Use for recovery-stage diagnostics, not normal END+60 comparison.",
+    "claim_to_first_useful_seconds": 118,
+    "due_to_first_useful_seconds": 178
   },
   "decision_rule": "STARTUP-006 demonstrates an invoked occurrence with no durable bootstrap acknowledgement. STARTUP-007 records the hourly fallback recovery stages. Observability does not itself provide an independent fast wake."
 }
