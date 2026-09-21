@@ -1,37 +1,3 @@
 {
-  "schema_version": "1.0",
-  "policy_ref": "control/startup-watchdog.v1.json",
-  "policy_version": 8,
-  "main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
-  "watchdog_canonical_id": "6ab11b3af3608191b68dcec5e3fed081",
-  "mode": "DISABLED_BREAK_GLASS_STANDBY",
-  "status": "DISABLED_STANDBY",
-  "main_expected_due_at": "2026-09-22T01:33:00+09:00",
-  "next_watchdog_due_at": null,
-  "startup_grace_seconds": 180,
-  "recovery_recheck_seconds": 240,
-  "main_recovery_due_offset_seconds": 60,
-  "last_classification": "NORMAL_STATE_DISABLED",
-  "last_recovery_at": "2026-09-21T22:33:20+09:00",
-  "last_recovery_reason": "MAIN due 2026-09-21T22:26:45+09:00 lacked generation-matched startup receipts after grace; Watchdog rearmed the same MAIN for 22:34:20.",
-  "prompt_policy_version": "2.2-CLEAN-MAIN-STANDBY",
-  "last_updated_at": "2026-09-22T01:24:40+09:00",
-  "last_healthy_bootstrap_at": "2026-09-22T01:19:04+09:00",
-  "last_watchdog_scheduled_due_at": "2026-09-21T23:17:40+09:00",
-  "last_watchdog_observed_at": "2026-09-21T23:15:39+09:00",
-  "last_watchdog_delivery_delay_seconds": -121,
-  "main_enabled_verified": true,
-  "main_verified_due_at": "2026-09-22T01:33:00+09:00",
-  "watchdog_enabled_verified": false,
-  "watchdog_verified_due_at": null,
-  "watchdog_rearm_retry_count": 0,
-  "note": "Watchdog remains disabled break-glass standby. Current clean MAIN v5.2 owns normal continuation; retired MAIN canonicals remain ineligible for recovery. This state tracks MAIN only for observability and does not arm Watchdog.",
-  "idle_distant_due": {
-    "enabled": false,
-    "normal_fast_due_offset_seconds": 60,
-    "extra_slack_seconds": 120,
-    "recovery_due_offset_seconds": 60,
-    "active_work_exempt": true,
-    "idle_inference_from_silence_forbidden": true
-  }
+  "schema_version":"1.0","policy_ref":"control/startup-watchdog.v1.json","policy_version":8,"main_canonical_id":"6ab152b636748191a71873ba4d5ef551","watchdog_canonical_id":"6ab11b3af3608191b68dcec5e3fed081","mode":"DISABLED_BREAK_GLASS_STANDBY","status":"DISABLED_STANDBY","main_expected_due_at":"2026-09-22T02:18:11+09:00","next_watchdog_due_at":null,"startup_grace_seconds":180,"recovery_recheck_seconds":240,"main_recovery_due_offset_seconds":60,"last_classification":"HEALTHY_BOOTSTRAP_WATCHDOG_DISABLED","last_recovery_at":"2026-09-21T22:33:20+09:00","last_recovery_reason":"Historical break-glass recovery only; no current activation.","prompt_policy_version":"V5.5_DURABLE_UNIT_CHAT_TRACE_CANARY","last_updated_at":"2026-09-22T02:13:06+09:00","last_healthy_bootstrap_at":"2026-09-22T02:07:19+09:00","last_watchdog_scheduled_due_at":"2026-09-21T23:17:40+09:00","last_watchdog_observed_at":"2026-09-21T23:15:39+09:00","last_watchdog_delivery_delay_seconds":-121,"main_enabled_verified":true,"main_verified_due_at":"2026-09-22T02:18:11+09:00","watchdog_enabled_verified":false,"watchdog_verified_due_at":null,"watchdog_rearm_retry_count":0,"note":"Watchdog remains disabled break-glass standby. Current MAIN v5.5 owns normal continuation; generation-matched BOOT_STARTED and REARM_VERIFIED are durable; retired MAIN canonicals remain ineligible for recovery.","idle_distant_due":{"enabled":false,"normal_fast_due_offset_seconds":60,"extra_slack_seconds":120,"recovery_due_offset_seconds":60,"active_work_exempt":true,"idle_inference_from_silence_forbidden":true}
 }
