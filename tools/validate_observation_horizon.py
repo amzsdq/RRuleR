@@ -15,7 +15,7 @@ def instant(value):
     return dt.timestamp()
 
 
-def validate(horizon, policy, source, previous=None):
+def validate(horizon, policy, source, previous=None, previous_states=None):
     kind = horizon.get("provenance_kind")
     ref = str(horizon.get("provenance_ref", ""))
     trusted = horizon.get("trusted_observed_through")
@@ -24,8 +24,11 @@ def validate(horizon, policy, source, previous=None):
     if not ref or not trusted:
         raise ValueError("observation horizon provenance incomplete")
     trusted_instant = instant(trusted)
+    predecessors = list(previous_states or [])
     if previous is not None:
-        previous_trusted = previous.get("trusted_observed_through")
+        predecessors.append(previous)
+    for predecessor in predecessors:
+        previous_trusted = predecessor.get("trusted_observed_through")
         if not previous_trusted:
             raise ValueError("previous observation horizon incomplete")
         if trusted_instant < instant(previous_trusted):
@@ -57,17 +60,17 @@ def api(repo, token, path):
 def main():
     horizon_path = Path(sys.argv[1] if len(sys.argv) > 1 else "state/OBSERVATION_HORIZON.json")
     policy_path = Path(sys.argv[2] if len(sys.argv) > 2 else "control/observation-horizon.v1.json")
-    previous_path = Path(sys.argv[3]) if len(sys.argv) > 3 else None
+    previous_paths = [Path(p) for p in sys.argv[3:]]
     horizon = json.loads(horizon_path.read_text())
     policy = json.loads(policy_path.read_text())
-    previous = json.loads(previous_path.read_text()) if previous_path and previous_path.exists() else None
+    previous_states = [json.loads(p.read_text()) for p in previous_paths if p.exists()]
     kind = horizon.get("provenance_kind")
     ref = str(horizon.get("provenance_ref", ""))
     repo = os.environ["REPO"]
     token = os.environ["GH_TOKEN"]
     path = f"actions/runs/{ref}" if kind == "GITHUB_ACTIONS_OBSERVED_TIMESTAMP" else f"commits/{ref}"
-    validate(horizon, policy, api(repo, token, path), previous=previous)
-    print(f"observation horizon provenance valid: {kind}:{ref}")
+    validate(horizon, policy, api(repo, token, path), previous_states=previous_states)
+    print(f"observation horizon provenance valid: {kind}:{ref}; predecessors={len(previous_states)}")
 
 
 if __name__ == "__main__":
