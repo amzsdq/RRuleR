@@ -6,38 +6,36 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "root_goal": "P0 sustained evidenced useful-work coverage",
   "status": "CONTINUE",
-  "current_owner": null,
-  "authority_epoch": 79,
+  "current_owner": "RUN-UTIL-20260922-013717",
+  "authority_epoch": 80,
   "canonical_automation_id": "6ab152b636748191a71873ba4d5ef551",
-  "run_state": "HANDOFF_COMMITTED",
+  "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-120",
+    "id": "CP-UTILIZATION-121",
     "state": "CONTINUE",
     "completed": [
-      "Fresh-policy sync and 600-second voluntary normal-CONTINUE hard floor aligned across active authority, tests and operational docs.",
-      "Pre-v5.2 repository rollback baseline preserved without permitting retired canonical reactivation.",
-      "Historical pre-hard-floor runs preserved without retroactive rewriting.",
-      "Current MAIN prompt advanced concurrently to v5.3 short rolling provisional; the 600-second hard floor and fresh-policy sync remain intact.",
-      "This bounded turn exceeded the 600-second floor and normal-close SAME MAIN was live-verified enabled recurring at exact observed END+60 = 01:30:15 KST.",
-      "Rejected temporary v5.3 +2m short-rolling strategy after prior controlled A/B evidence showed overlap; adopted evidence-backed v5.4 +11m adaptive provisional.",
-      "01:30:15 occurrence produced last_run_time around 01:30:17 but no new generation-matched BOOT_STARTED by >01:33; invocation metadata was not promoted to bootstrap success."
+      "Fresh-policy sync and 600-second voluntary normal-CONTINUE hard floor remain aligned across active authority.",
+      "v5.4 generation-matched BOOT_STARTED persisted for due 01:38:00 KST.",
+      "SAME MAIN live-verified enabled recurring FREQ=HOURLY at adaptive provisional 01:48:17 KST (= observed bootstrap reference +660s).",
+      "Detected stale CI assertion that still required 780s provisional and replaced it with cross-artifact 660s/short-rolling-retired validation.",
+      "Detected control/runtime-continuity.v1.json still advertising 780s provisional and advanced it to v7 / 660s."
     ],
     "evidence": [
-      "control/ACTIVE_CONTROLS.json@2.11",
-      "control/run-continuation-gate.v1.json@v12",
-      "control/relay-policy.v1.json@revision17",
-      "planning/evidence/MAIN-V5.2-POLICY-SYNC-ROLLBACK.md",
-      "rollback/pre-policy-sync-bootstrap-20260922@e34d0a61483621ac85285d2993fd2737552789d7",
-      "MAIN canonical 6ab152b636748191a71873ba4d5ef551 live schedule DTSTART 20260922T013015 Asia/Seoul + RRULE:FREQ=HOURLY"
+      "state/STARTUP_ACK.json@f928c2aee73fc29575569099dbb3b52887a3ea2c",
+      "control/ACTIVE_CONTROLS.json@2.13",
+      "control/rolling-rrule-lifecycle.v1.json@v20",
+      "control/relay-policy.v1.json@revision19",
+      ".github/workflows/validate-control-plane.yml@ea4daff8c626b0b5520de6a48737dde648755428",
+      "control/runtime-continuity.v1.json@0f87c66d14e627589ab0dde691d476f9b1f15617"
     ],
-    "observation": "Active authority no longer treats 480/8 minutes as a normal floor or allows voluntary pre-600 normal CONTINUE close. Stale quarter/14+1 operational documentation was superseded. v5.3 short rolling provisional is newer than this turn's initial v5.2 bootstrap and was preserved rather than overwritten.",
-    "next_action": "Wake SAME MAIN at operator-recovery due 01:38:00 KST; require generation-matched BOOT_STARTED, then arm SAME MAIN once at wake+660s and continue under 600s hard floor."
+    "observation": "The long 01:33-style gap was policy-induced, not a scheduler inability: former +780s provisional was deliberately placing the in-flight fallback too far out. v5.4 now uses +660s once for the normal 600s envelope and retains exact END+60 normal close. CI/runtime drift exposed by this live turn is being repaired forward.",
+    "next_action": "Continue v5.4 live verification and prospective utilization work until >=600 observed elapsed seconds; before provisional collision extend SAME MAIN only if necessary, then close with exact END+60 and persist consistent CURRENT/ACTIVITY/HANDOFF projection."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_COMPLETION_RELATIVE_MAIN",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-22T01:38:00+09:00",
+    "next_due_at": "2026-09-22T01:48:17+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 600,
     "provisional_safety_margin_seconds": 60,
@@ -62,7 +60,7 @@
       "enabled_verified": false,
       "policy_version": 8
     },
-    "next_due_source": "OPERATOR_RECOVERY_AFTER_INVOCATION_WITHOUT_BOOT_ACK",
+    "next_due_source": "V5_4_VERIFIED_ADAPTIVE_PROVISIONAL",
     "cold_fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE",
     "provisional_extension_guard_seconds": 90,
     "provisional_extension_offset_seconds": 180
