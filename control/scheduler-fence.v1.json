@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_SCHEDULER_FENCE",
-  "version": 7,
+  "version": 8,
   "status": "ACTIVE",
-  "purpose": "Prevent stale schedule/canonical rollback after operator migration to the new MAIN while supporting SAME MAIN completion-relative continuation.",
+  "purpose": "Prevent stale schedule/canonical rollback after clean operator migration while supporting SAME MAIN completion-relative continuation.",
   "authoritative_expected_due_path": "state/CURRENT.json#/continuation/next_due_at",
   "active_lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
   "startup_order": [
@@ -49,10 +49,13 @@
     "local_extra_delay_without_evidence_forbidden": true,
     "scheduler_delivery_latency_measured_separately": true
   },
-  "compatibility_note": "The prior custom-recurring and exact one-shot canaries are historical. The operator-created current MAIN uses its recurring hourly category and self-shifts DTSTART to exact END+60. Retired predecessor canonical rollback is forbidden.",
+  "compatibility_note": "Prior custom-recurring/exact-one-shot experiments and both earlier MAIN canonicals are historical. Current clean operator-created MAIN uses recurring hourly RRULE and self-shifts DTSTART to exact END+60. Retired canonical rollback is forbidden.",
   "canonical_migration": {
-    "current_main_canonical_id": "6ab14f7951848191b65e4b5d4bc979d8",
-    "retired_predecessor_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
+    "current_main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
+    "retired_main_canonical_ids": [
+      "6ab14f7951848191b65e4b5d4bc979d8",
+      "6aaf8a993eb08191b8d0ab1d9662e4b2"
+    ],
     "retired_reactivation_forbidden": true,
     "newest_current_wins": true
   }
