@@ -378,6 +378,20 @@
       "qualification": "SUBSTANTIVE_ACCEPTED",
       "basis": "Separated explicit operator-rescheduled MAIN generations from both normal END+60 scheduler samples and emergency recovery samples, preserved raw observed startup stages, added legacy marker compatibility and focused fixtures, and passed exact remote-code behavior checks. Boundaries are observed GitHub commit timestamps; no surrounding bootstrap or close time is counted.",
       "observed_seconds": 96
+    },
+    {
+      "record_id": "WE-20260922-E76-001",
+      "authority_epoch": 76,
+      "run_id": "RUN-UTIL-20260922-003010",
+      "start_at": "2026-09-22T00:32:05+09:00",
+      "end_at": "2026-09-22T00:33:36+09:00",
+      "start_boundary": "OBSERVED",
+      "end_boundary": "OBSERVED",
+      "kind": "rejected_one_shot_canary_evidence_hardening",
+      "artifact": "tools/audit_startup_boundaries.py@b2ecaad + tools/summarize_turn_close.py@1493dfe + tests/test_audit_startup_boundaries.py@d3fb0e4 + tests/test_summarize_turn_close.py@2cbf74a",
+      "qualification": "SUBSTANTIVE_ACCEPTED",
+      "basis": "Added a dedicated rejected-one-shot canary class and report bucket so the platform-completed one-shot cannot contaminate normal RRULE, operator-rescheduled, or emergency-recovery comparisons. Missing BOOT_STARTED/REARM_VERIFIED remain unknown. Exact remote-code behavior checks passed. Start is the observed substantive-work boundary persisted with the epoch claim; end is the observed final test commit boundary.",
+      "observed_seconds": 91
     }
   ],
   "collection": {
