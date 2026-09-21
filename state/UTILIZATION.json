@@ -1,8 +1,8 @@
 {
-  "schema_version": "1.7",
+  "schema_version": "1.8",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "status": "STARTUP_003_CANARY_ACTIVE",
+  "status": "V5_4_ADAPTIVE_PROVISIONAL_LIVE_SAMPLE_ACTIVE",
   "target": {
     "acceptance_window_seconds": 900,
     "required_useful_seconds": 840,
@@ -21,14 +21,16 @@
     "provisional_offset_seconds": 660,
     "provisional_extension_guard_seconds": 90,
     "provisional_extension_offset_seconds": 180,
-    "short_rolling_120_seconds_retired_as_default": true
+    "short_rolling_120_seconds_retired_as_default": true,
+    "normal_midturn_schedule_mutation": false
   },
   "measurement": {
     "continuous_progress_evidence_required": true,
     "missing_boundary_policy": "MARK_UNKNOWN_DO_NOT_INFER",
     "scheduler_and_startup_separate": true,
     "fixed_window_policy_ref": "control/rolling-window-promotion.v1.json",
-    "pending_evidence_is_not_accepted": true
+    "pending_evidence_is_not_accepted": true,
+    "trusted_observation_horizon_ref": "state/OBSERVATION_HORIZON.json"
   },
   "latest_completed_bounded_turn": {
     "run_id": "RUN-UTIL-20260921-154958",
@@ -41,36 +43,29 @@
   },
   "startup_measurement": {
     "ledger": "state/SUCCESSOR_STARTUP.json",
-    "latest_valid_sample": "STARTUP-002",
-    "due_to_observation_seconds": 155,
-    "observation_to_claim_seconds": 21,
-    "claim_to_first_useful_seconds": 0,
-    "dominant_measured_segment": "SCHEDULER_DUE_TO_INVOCATION_OBSERVATION"
+    "rule": "Preserve raw historical samples; classify current v5.4 generation prospectively only from observed boundaries. Invocation metadata alone is not BOOT_STARTED or first useful work."
   },
   "active_retest": {
-    "experiment_id": "UTIL-EXP-019",
-    "sample_id": "STARTUP-003",
-    "purpose": "Test guarded timing compensation against the measured scheduler-delivery segment while preserving single substantive authority and completion-relative fallback.",
-    "required_observed_boundaries": [
-      "predecessor_last_useful_at",
-      "scheduled_due_at",
-      "successor_observed_at",
-      "authority_claim_at",
-      "first_durable_useful_at"
-    ],
-    "promotion_rule": "Do not promote predictive timing from one sample; rollback on unsafe overlap or failed useful-work handoff."
+    "experiment_id": "UTIL-EXP-019-V5.4-PROVISIONAL",
+    "run_id": "RUN-UTIL-20260922-013717",
+    "scheduled_due_at": "2026-09-22T01:38:00+09:00",
+    "boot_started_at": "2026-09-22T01:37:17+09:00",
+    "rearm_verified_at": "2026-09-22T01:37:29+09:00",
+    "verified_provisional_due_at": "2026-09-22T01:48:17+09:00",
+    "purpose": "Verify workload-relative +660s crash insurance plus exact END+60 normal close without routine short rolling or retired +780s horizon.",
+    "promotion_rule": "Do not promote from bootstrap/provisional success alone. Require >=600s normal turn close, live SAME MAIN exact END+60 verification, consistent close projection, and no duplicate substantive side effect or schedule rollback."
   },
   "valid_completed_windows_rolling": [],
   "rolling_mean_observed_useful_seconds": null,
   "goal_reached": false,
   "latest_diagnosis": {
-    "cause_class": "PROVISIONAL_HORIZON_POLICY_MISMATCH",
-    "evidence": "The former +780s provisional made a normal ~10m turn appear to wait until ~13m. Manual near-due mutation proved the scheduler accepts earlier DTSTART, but prior controlled reservation A/B evidence found repeated +2m SHORT_ROLLING caused an overlapping duplicate invocation while +11m LONG_PROVISIONAL completed >600s with no observed overlap and low mutation churn. The 01:30:15 scheduled invocation also produced last_run_time without a matching new BOOT_STARTED by 01:33+, so invocation metadata alone is not bootstrap proof.",
-    "implication": "Use workload-relative adaptive +11m provisional for normal ~10m turns, no routine mid-turn mutation, exact END+60 at close, and distinguish scheduler invocation from durable BOOT_STARTED."
+    "cause_class": "PROVISIONAL_HORIZON_POLICY_MISMATCH_REPAIRED_PENDING_LIVE_CLOSE",
+    "evidence": "Manual near-due mutation proved the scheduler accepts earlier DTSTART. The former +780s policy caused the long visible wait; repeated +2m rolling is rejected by prior overlap evidence. Fresh v5.4 bootstrap live-verified SAME MAIN at +660s, and policy drift in CI, runtime-continuity, and scheduler-fence has been reconciled. Integrated control-plane validation passes after reconciliation.",
+    "implication": "Keep one workload-relative +660s provisional for a normal ~600s turn, no routine mid-turn mutation, exact END+60 at close, and keep policy-enforcing CI surfaces synchronized with active controls."
   },
   "next_corrective_experiment": {
-    "experiment_id": "UTIL-EXP-019-STARTUP-003",
-    "hypothesis": "Earlier guarded same-canonical due placement can absorb observed delivery latency under predecessor useful work without creating dual substantive authority.",
-    "success_signal": "Observed successor first-useful handoff materially reduces cross-turn loss with no duplicate substantive side effect or schedule rollback."
+    "experiment_id": "UTIL-EXP-019-V5.4-CLOSE",
+    "hypothesis": "One +660s provisional can cover a >=600s normal turn with less visible dead horizon than +780s and without the collision risk of repeated +120s rolling.",
+    "success_signal": "Current run reaches >=600 observed elapsed seconds, closes on SAME MAIN exact END+60, and subsequent generation boots without duplicate substantive overlap."
   }
 }
