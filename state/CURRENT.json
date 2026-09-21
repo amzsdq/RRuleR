@@ -31,7 +31,7 @@
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T22:07:23+09:00",
+    "next_due_at": "2026-09-21T22:13:24+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -55,17 +55,17 @@
       "normal_check_offset_seconds": 180,
       "recovery_recheck_seconds": 240,
       "main_recovery_due_offset_seconds": 60,
-      "next_watchdog_due_at": "2026-09-21T22:10:23+09:00",
-      "coverage": "ARMED",
-      "last_classification": "HEALTHY_BOOTSTRAP",
-      "last_recovery_at": "2026-09-21T21:53:52+09:00",
+      "next_watchdog_due_at": "2026-09-21T22:16:24+09:00",
+      "coverage": "RECOVERY_ARMED",
+      "last_classification": "STARTUP_ACK_MISSING",
+      "last_recovery_at": "2026-09-21T22:12:24+09:00",
       "enabled_verified": true,
       "policy_version": 3,
       "idle_distant_due_enabled": true,
       "idle_distant_due_extra_slack_seconds": 120,
       "idle_distant_due_recovery_offset_seconds": 60
     },
-    "next_due_source": "EPOCH_71_ACTUAL_END_PLUS_60_VERIFIED"
+    "next_due_source": "WATCHDOG_STARTUP_ACK_MISSING_RECOVERY"
   },
   "safety": {
     "public_repo": true,
