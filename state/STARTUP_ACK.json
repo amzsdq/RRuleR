@@ -5,9 +5,9 @@
   "generation_key": "DUE:2026-09-21T21:27:36+09:00",
   "boot_started_at": "2026-09-21T21:28:24+09:00",
   "boot_started_authority_epoch": 69,
-  "rearm_verified_at": null,
-  "verified_provisional_due_at": null,
-  "status": "BOOT_STARTED",
-  "last_updated_at": "2026-09-21T21:28:24+09:00",
-  "note": "Generation-matched BOOT_STARTED for provisional cold-rescue wake after epoch 69 became stale before first durable useful work; no boundary is inferred."
+  "rearm_verified_at": "2026-09-21T21:28:51+09:00",
+  "verified_provisional_due_at": "2026-09-21T21:41:24+09:00",
+  "status": "REARM_VERIFIED",
+  "last_updated_at": "2026-09-21T21:28:51+09:00",
+  "note": "Provisional cold-rescue generation entered bootstrap and verified same-canonical continuation after stale epoch 69; authority recovery remains pending."
 }
