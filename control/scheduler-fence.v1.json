@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_SCHEDULER_FENCE",
-  "version": 5,
+  "version": 6,
   "status": "ACTIVE",
-  "purpose": "Prevent stale schedule rollback while supporting rolling same-canonical cold rescue, completion-relative continuation, and guarded predictive-prearm canaries.",
+  "purpose": "Prevent stale schedule rollback while supporting the SAME MAIN custom recurring 24-hour-slot category canary, completion-relative continuation, and guarded predictive-prearm history.",
   "authoritative_expected_due_path": "state/CURRENT.json#/continuation/next_due_at",
   "active_lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
   "startup_order": [
@@ -21,7 +21,7 @@
   "queued_old_occurrence_must_not_disable_canonical": true,
   "queued_old_occurrence_must_not_restore_old_prompt_or_title": true,
   "queued_old_occurrence_must_not_roll_dstart_backward": true,
-  "scheduler_mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE",
+  "scheduler_mechanism": "RRULE_CUSTOM_RECURRING_24H_SLOT_COMPLETION_RELATIVE_CANARY",
   "predictive_prearm": {
     "experiment_id": "UTIL-EXP-018",
     "declared_by": "state/PREDICTIVE_PREARM_CANARY.json",
@@ -49,5 +49,38 @@
     "local_extra_delay_without_evidence_forbidden": true,
     "scheduler_delivery_latency_measured_separately": true
   },
-  "compatibility_note": "Fixed quarter-hour rotation remains retired. Predictive prearm is a measured canary layered on the same-canonical rolling lifecycle, not a new canonical or dual-owner scheduler."
+  "compatibility_note": "Fixed quarter-hour rotation and exact one-shot self-update are retired. During the active category canary, preserve SAME MAIN custom recurring DAILY+24 BYHOUR semantics and reconcile only DTSTART/BYMINUTE/BYSECOND forward.",
+  "custom_recurring_canary": {
+    "schedule_mode": "CUSTOM_RECURRING_24H_SLOT_SELF_SHIFT_CANARY",
+    "frequency": "DAILY",
+    "byhour_required": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "due_alignment": "DTSTART minute/second MUST equal BYMINUTE/BYSECOND",
+    "simple_hourly_restore_forbidden": true,
+    "one_shot_restore_forbidden": true
+  }
 }
