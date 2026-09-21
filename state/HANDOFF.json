@@ -11,7 +11,7 @@
   "successor_observed_at": "2026-09-21T20:48:49+09:00",
   "predecessor_last_progress_at": "2026-09-21T19:47:23+09:00",
   "recovery_basis": "STARTUP-006 invocation was observed at 19:50:28.457228 KST but produced no durable bootstrap/claim/useful evidence; current wake is the next hourly same-canonical fallback occurrence.",
-  "active_unit": "Bootstrap-stage observability and STARTUP_ACK_MISSING classification.",
-  "checkpoint_id": "CP-UTILIZATION-104",
-  "next_action": "Persist BOOT_STARTED and REARM_VERIFIED semantics, add tests, then continue with a bounded independent-wake feasibility slice."
+  "active_unit": "Guarded pre-bootstrap rescue decision path implemented; live event consumer remains unprovisioned.",
+  "checkpoint_id": "CP-UTILIZATION-105",
+  "next_action": "Preserve fail-closed inactive ledger; on an authorized provisioning turn create/verify the supported event consumer, run the write probe, and add atomic outstanding-generation claim before activation."
 }
