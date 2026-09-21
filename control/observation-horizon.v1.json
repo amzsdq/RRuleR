@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_OBSERVATION_HORIZON",
-  "version": 2,
+  "version": 3,
   "status": "ACTIVE",
-  "purpose": "Separate trusted observation horizon provenance from useful-work evidence endpoints so valid trailing gaps remain measurable without allowing caller-invented or author-controlled future horizons.",
+  "purpose": "Separate trusted observation horizon provenance from useful-work evidence endpoints so valid trailing gaps remain measurable without allowing caller-invented, author-controlled, or retroactively mutable horizons.",
   "authoritative_state": "state/OBSERVATION_HORIZON.json",
   "rules": {
     "horizon_is_not_useful_work": true,
@@ -13,16 +13,11 @@
     "timezone_required": true,
     "monotonic_forward_only": true,
     "trailing_unexplained_gap_remains_subject_to_evidence_policy": true,
-    "author_controlled_commit_timestamps_are_not_external_observation": true
+    "author_controlled_commit_timestamps_are_not_external_observation": true,
+    "actions_provenance_must_bind_run_attempt": true,
+    "actions_attempt_endpoint_is_authoritative": true
   },
-  "accepted_provenance_kinds": [
-    "GITHUB_ACTIONS_OBSERVED_TIMESTAMP"
-  ],
-  "rejected_provenance_kinds": [
-    "GITHUB_COMMIT_COMMITTER_TIMESTAMP",
-    "CALLER_SUPPLIED_ONLY",
-    "INFERRED_FROM_USEFUL_EVIDENCE",
-    "LOCAL_UNPERSISTED_CLOCK"
-  ],
-  "fail_closed": "If a promotion request supplies observed_through later than the trusted durable horizon, reject that promotion request as UNTRUSTED_OBSERVATION_HORIZON. Do not shorten a valid trusted horizon to the latest useful-evidence endpoint. Git commit author/committer timestamps are author-controlled metadata and MUST NOT establish a trusted external observation boundary."
+  "accepted_provenance_kinds": ["GITHUB_ACTIONS_OBSERVED_TIMESTAMP"],
+  "rejected_provenance_kinds": ["GITHUB_COMMIT_COMMITTER_TIMESTAMP", "CALLER_SUPPLIED_ONLY", "INFERRED_FROM_USEFUL_EVIDENCE", "LOCAL_UNPERSISTED_CLOCK"],
+  "fail_closed": "Reject promotion beyond the durable trusted horizon. Git commit timestamps cannot establish the boundary. Actions provenance MUST bind both run id and run attempt, and validation MUST fetch that immutable attempt-specific endpoint so a later re-run of the same run id cannot retroactively move the authoritative updated_at boundary."
 }
