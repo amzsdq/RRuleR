@@ -1,10 +1,10 @@
 {
   "policy_id": "RRULER_STARTUP_WATCHDOG",
-  "version": 7,
+  "version": 8,
   "status": "STANDBY_DISABLED_BY_DEFAULT",
-  "purpose": "Break-glass emergency recovery only for the current operator-created MAIN canonical. Normal continuity is provided by SAME MAIN END+60 self-shift plus SAME MAIN recurring schedule. Retired predecessor canonicals are never recovery targets.",
+  "purpose": "Break-glass emergency recovery only for the clean operator-created MAIN canonical. Normal continuity is SAME MAIN END+60 plus SAME MAIN recurring schedule. Retired MAIN canonicals are never recovery targets.",
   "role": "BREAK_GLASS_EMERGENCY_RECOVERY_ONLY",
-  "main_canonical_id": "6ab14f7951848191b65e4b5d4bc979d8",
+  "main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
   "watchdog_canonical_id": "6ab11b3af3608191b68dcec5e3fed081",
   "scheduler_mode": "MANUAL_OR_EXPLICITLY_ACTIVATED_ONE_SHOT",
   "substantive_work_forbidden": true,
@@ -83,7 +83,7 @@
     "pause_terminal": "Explicit operator PAUSED/STOP or durable terminal prevents any emergency wake."
   },
   "prompt_sync_contract": {
-    "rule": "GitHub policy is authoritative. MAIN must not arm this Watchdog during normal turns. Emergency recovery may target only the fresh CURRENT canonical, never a retired predecessor.",
+    "rule": "GitHub policy is authoritative. MAIN must not arm this Watchdog during normal turns. Emergency recovery may target only the fresh CURRENT canonical, never either retired predecessor.",
     "replacement_forbidden": true,
     "rrule_for_watchdog_forbidden": true
   },
@@ -128,6 +128,7 @@
     "disable_after_verified_recovery": true
   },
   "retired_main_canonicals": [
+    "6ab14f7951848191b65e4b5d4bc979d8",
     "6aaf8a993eb08191b8d0ab1d9662e4b2"
   ]
 }
