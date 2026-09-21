@@ -18,6 +18,31 @@ def instant(value):
 def provenance_identity(state):
     return (state.get("provenance_kind"), str(state.get("provenance_ref", "")), state.get("provenance_attempt"))
 
+def provenance_record(state):
+    return {"provenance_kind": state.get("provenance_kind"), "provenance_ref": str(state.get("provenance_ref", "")), "provenance_attempt": state.get("provenance_attempt"), "trusted_observed_through": state.get("trusted_observed_through")}
+
+def provenance_history(state):
+    history = state.get("provenance_history", [])
+    if not isinstance(history, list): raise ValueError("observation provenance history must be a list")
+    return history
+
+def validate_history_transition(horizon, predecessor):
+    current_history = provenance_history(horizon); previous_history = provenance_history(predecessor)
+    if current_history[:len(previous_history)] != previous_history:
+        raise ValueError("observation provenance history is append-only")
+    same_identity = provenance_identity(predecessor) == provenance_identity(horizon)
+    if same_identity:
+        if current_history != previous_history:
+            raise ValueError("same observation provenance identity cannot mutate provenance history")
+        return
+    expected = previous_history + [provenance_record(predecessor)]
+    if current_history != expected:
+        raise ValueError("provenance replacement must append the predecessor identity and timestamp exactly once")
+    current_identity = provenance_identity(horizon)
+    for record in current_history:
+        if provenance_identity(record) == current_identity:
+            raise ValueError("retired observation provenance identity cannot be reused")
+
 def validate(horizon, policy, source, previous=None, previous_states=None):
     kind = horizon.get("provenance_kind"); ref = str(horizon.get("provenance_ref", "")); trusted = horizon.get("trusted_observed_through")
     if kind not in policy.get("accepted_provenance_kinds", []): raise ValueError("unsupported observation horizon provenance kind")
@@ -32,6 +57,7 @@ def validate(horizon, policy, source, previous=None, previous_states=None):
         if trusted_instant < instant(previous_trusted): raise ValueError("observation horizon rollback is forbidden")
         if provenance_identity(predecessor) == current_identity and previous_trusted != trusted:
             raise ValueError("same observation provenance identity cannot be repinned to a different timestamp; replace provenance explicitly")
+        validate_history_transition(horizon, predecessor)
     if kind == "GITHUB_ACTIONS_OBSERVED_TIMESTAMP":
         if not ref.isdigit(): raise ValueError("GitHub Actions provenance ref must be a run id")
         expected_attempt = horizon.get("provenance_attempt")
