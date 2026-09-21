@@ -11,7 +11,7 @@
   "successor_observed_at": "2026-09-21T19:38:45+09:00",
   "predecessor_last_progress_at": "2026-09-21T19:02:56+09:00",
   "recovery_basis": "Operator-requested immediate post-maintenance run. Do not use this invocation as an ordinary scheduler due-to-observation sample. Preserve forward-only generation and collect STARTUP-003 only from the next eligible scheduled handoff.",
-  "active_unit": "Review second eligible turn and harden missing-successor observability.",
-  "checkpoint_id": "CP-UTILIZATION-101",
-  "next_action": "Create first useful artifact, record STARTUP-005 first-useful, then continue bounded work."
+  "active_unit": "Successor-progress diagnostics implemented and verified.",
+  "checkpoint_id": "CP-UTILIZATION-103",
+  "next_action": "Observe exact END, rearm same canonical to END+60, then persist STARTUP-006 and closed run record."
 }
