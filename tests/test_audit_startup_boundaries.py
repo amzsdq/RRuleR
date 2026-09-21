@@ -116,3 +116,24 @@ def test_next_sample_generation_error_fails_audit():
     assert out["valid"] is False
     assert out["sample_count"] == 1
     assert out["results"][0]["errors"] == ["GENERATION_KEY_DUE_MISMATCH"]
+
+
+def test_operator_rescheduled_generation_is_preserved_but_excluded():
+    sample = {
+        "sample_id": "OP",
+        "operator_rescheduled": True,
+        "scheduled_due_at": "2026-09-22T00:13:08+09:00",
+        "successor_observed_at": "2026-09-22T00:14:46+09:00",
+        "boot_started_at": "2026-09-22T00:14:46+09:00",
+        "rearm_verified_at": "2026-09-22T00:17:48+09:00",
+        "authority_claim_at": "2026-09-22T00:18:31+09:00",
+        "first_durable_useful_at": "2026-09-22T00:18:31+09:00",
+    }
+    out = audit({"samples": [sample]}, [])
+    result = out["results"][0]
+    assert out["valid"] is True
+    assert out["operator_rescheduled_generation_count"] == 1
+    assert result["raw_sample"] == sample
+    assert result["startup_receipt_complete"] is True
+    assert result["scheduler_comparison_eligible"] is False
+    assert result["scheduler_comparison_exclusion"] == "OPERATOR_RESCHEDULED_GENERATION"
