@@ -137,6 +137,6 @@
     "normal_close_offset": "1 minute (60 seconds)",
     "minimum_continue": "10 minutes (600 seconds)",
     "soft_ceiling": "12 minutes (720 seconds)",
-    "rule": "Bare time arithmetic such as END+60 is forbidden in human-readable policy text."
+    "rule": "Bare numeric timing arithmetic without an explicit seconds/minutes/hours unit is forbidden in human-readable policy text."
   }
 }
