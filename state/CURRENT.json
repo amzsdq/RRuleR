@@ -49,7 +49,19 @@
     "active_control_registry": "control/ACTIVE_CONTROLS.json",
     "scheduler_fence_policy": "control/scheduler-fence.v1.json",
     "run_continuation_gate_policy": "control/run-continuation-gate.v1.json",
-    "normal_continue_due_rule": "ACTUAL_OBSERVED_TURN_END_PLUS_EXACTLY_60_SECONDS"
+    "normal_continue_due_rule": "ACTUAL_OBSERVED_TURN_END_PLUS_EXACTLY_60_SECONDS",
+    "startup_watchdog": {
+      "canonical_id": "6ab11b3af3608191b68dcec5e3fed081",
+      "policy_ref": "control/startup-watchdog.v1.json",
+      "state_ref": "state/WATCHDOG.json",
+      "ack_ref": "state/STARTUP_ACK.json",
+      "mode": "ONE_SHOT_SELF_RELAY",
+      "normal_check_offset_seconds": 180,
+      "recovery_recheck_seconds": 240,
+      "main_recovery_due_offset_seconds": 60,
+      "next_watchdog_due_at": "2026-09-21T21:05:29+09:00",
+      "coverage": "PRE_BOOTSTRAP"
+    }
   },
   "safety": {
     "public_repo": true,
