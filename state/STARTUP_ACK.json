@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
   "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "current_expected_due_at": "2026-09-22T00:13:08+09:00",
-  "generation_key": "DUE:2026-09-22T00:13:08+09:00",
-  "boot_started_at": "2026-09-22T00:14:46+09:00",
-  "boot_started_authority_epoch": 75,
-  "rearm_verified_at": "2026-09-22T00:17:48+09:00",
-  "verified_provisional_due_at": "2026-09-22T00:27:46+09:00",
-  "status": "REARM_VERIFIED",
-  "last_updated_at": "2026-09-22T00:17:48+09:00",
-  "note": "SAME MAIN recurring RRULE cold fallback was live re-read with exact provisional DTSTART 00:27:46 and enabled=true. Watchdog was not used."
+  "current_expected_due_at": "2026-09-22T00:25:53+09:00",
+  "generation_key": "DUE:2026-09-22T00:25:53+09:00",
+  "boot_started_at": null,
+  "boot_started_authority_epoch": null,
+  "rearm_verified_at": null,
+  "verified_provisional_due_at": null,
+  "status": "AWAITING_BOOT_STARTED",
+  "last_updated_at": "2026-09-22T00:25:36+09:00",
+  "note": "Fresh v4.1 exact one-shot category canary superseded the in-flight v4.0 RRULE close rule. SAME MAIN one-shot at exact predecessor END+60 was live-verified enabled; Watchdog was not used."
 }
