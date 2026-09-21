@@ -9,7 +9,7 @@
   "current_owner": "RUN-UTIL-20260921-193957",
   "authority_epoch": 67,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "WORKING",
+  "run_state": "CHECKPOINTED",
   "checkpoint": {
     "id": "CP-UTILIZATION-103",
     "state": "CONTINUE",
@@ -34,14 +34,14 @@
       "tools/build_turn_review.py@8c990e52f7ae0ee162896ce647c7a3f15a114f58",
       "tests/test_build_turn_review.py@10ce38df9ad7cba74322c052f14e8e9336d56f27"
     ],
-    "observation": "STARTUP-004 provider delivery remains 30s with missing durable progress; the new audit identifies the missing claim without converting unknown time to zero. STARTUP-005 remains excluded from END+60 comparison.",
-    "next_action": "Close epoch 67 with exact observed END+60 and create clean STARTUP-006 for the third eligible review."
+    "observation": "Epoch 67 completed 498 elapsed seconds with 385 strict accepted useful seconds. STARTUP-004 delivery remains measured at 30s while missing progress stays UNKNOWN. Exact local END+60 was armed and verified for STARTUP-006.",
+    "next_action": "Successor records STARTUP-006 actual invocation, authority claim, and first durable useful boundary; append the third eligible review and compare three turns without imputing unknown time."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T19:52:00+09:00",
+    "next_due_at": "2026-09-21T19:49:15+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
