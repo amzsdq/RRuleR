@@ -22,18 +22,19 @@
     "Run focused tests and validate live state.",
     "Close at >=600s with exact END+60 MAIN and enabled Watchdog."
   ],
-  "current_substep": 4,
+  "current_substep": 5,
   "handoff_boundary": "Epoch 73 active after fixed-Watchdog recovery and verified provisional protection.",
   "early_finish_fallback": "Add paired-generation evidence for the 22:26:45 failure and 22:34:20 recovery.",
   "created_for_next_wake": false,
   "started_at": "2026-09-21T22:34:41+09:00",
-  "last_progress_at": "2026-09-21T22:41:30+09:00",
+  "last_progress_at": "2026-09-21T22:45:51+09:00",
   "progress_evidence": [
     "BOOT_STARTED 22:35:28 for DUE:2026-09-21T22:34:20+09:00",
     "REARM_VERIFIED 22:35:59; MAIN due 22:48:28 enabled",
     "Watchdog due 22:51:28 enabled and exact one-shot",
     "Lifecycle v10 defines a consistent non-WORKING close projection and AGENTS requires validation.",
     "validate_close_projection.py plus five focused tests added; live WORKING projection passes.",
-    "Control-plane workflow now fetches and executes the new validator."
+    "Control-plane workflow now fetches and executes the new validator.",
+    "STARTUP-013/014 recovery lineage audited across 14 samples; 88 discovered tests passed."
   ]
 }
