@@ -22,16 +22,19 @@
     "Inspect integrated CI or execute equivalent repository-data verification.",
     "Use remaining budget on the next unaccepted live-retest evidence item."
   ],
-  "current_substep": 3,
-  "handoff_boundary": "First live review row and valid STARTUP-003 are durable; exact-second completion-relative rearm correction remains.",
+  "current_substep": 4,
+  "handoff_boundary": "368 strict useful seconds accepted; exact-second final rearm and durable close remain.",
   "early_finish_fallback": "Extend reporting tests to generate validity-aware operator review rows from durable ledgers, then integrate into CI.",
   "created_for_next_wake": false,
   "started_at": "2026-09-21T18:55:59+09:00",
-  "last_progress_at": "2026-09-21T18:59:10+09:00",
+  "last_progress_at": "2026-09-21T19:02:56+09:00",
   "progress_evidence": [
     "state/RUNS.jsonl@7daba51d74f994e836b0ea77f72d144053f7d837",
     "planning/evidence/TURN-CLOSE-V4-RETEST.md@a412c1cb9c106f088ad6af54ed26b4c8d53c39de",
     "tools/compute_completion_due.py@07ab6260da1eec2a0f16ba02b1aa1cf0753e4257",
-    "control/rolling-rrule-lifecycle.v1.json@5796f3a8d285bd494d2be433f271254a621974f0"
+    "control/rolling-rrule-lifecycle.v1.json@5796f3a8d285bd494d2be433f271254a621974f0",
+    "tools/build_turn_review.py@7aea3abc8e91fbe606baae9a9bf89c6280c689f4",
+    ".github/workflows/validate-control-plane.yml@19d7f002fc4b8b22bd962deb3bb7ab07de301b5f",
+    "planning/evidence/TURN-CLOSE-V4-RETEST.md@2ad94829147d0d1accc9aaabda8fe428a8cb0280"
   ]
 }
