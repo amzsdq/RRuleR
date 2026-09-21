@@ -1,0 +1,67 @@
+name: Validate P0 scorecard
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "state/P0_SCORECARD.json"
+      - "state/PROGRAM_GOALS.json"
+      - "control/run-continuation-gate.v1.json"
+      - "control/rolling-rrule-lifecycle.v1.json"
+      - ".github/workflows/validate-p0-scorecard.yml"
+  pull_request:
+    paths:
+      - "state/P0_SCORECARD.json"
+      - "state/PROGRAM_GOALS.json"
+      - "control/run-continuation-gate.v1.json"
+      - "control/rolling-rrule-lifecycle.v1.json"
+      - ".github/workflows/validate-p0-scorecard.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject stale P0 timing projection
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          score = json.loads(Path('state/P0_SCORECARD.json').read_text())
+          goals = json.loads(Path('state/PROGRAM_GOALS.json').read_text())
+          gate = json.loads(Path('control/run-continuation-gate.v1.json').read_text())
+          lifecycle = json.loads(Path('control/rolling-rrule-lifecycle.v1.json').read_text())
+
+          metrics = score.get('metrics', {})
+          if metrics.get('minimum_continue_turn_seconds') != 600:
+              raise SystemExit('P0 scorecard drift: normal CONTINUE floor must be 10 minutes (600 seconds)')
+          if metrics.get('verified_fallback_final_rearm_offset_seconds') != 60:
+              raise SystemExit('P0 scorecard drift: normal close must be 1 minute (60 seconds)')
+          if '10 minutes (600 seconds)' not in metrics.get('normal_continue_minimum_human', ''):
+              raise SystemExit('P0 scorecard lacks explicit 10-minute (600-second) human semantics')
+          if '1 minute (60 seconds)' not in metrics.get('verified_fallback_final_rearm_human', ''):
+              raise SystemExit('P0 scorecard lacks explicit 1-minute (60-second) human semantics')
+
+          decision = gate.get('turn_decision', {})
+          if decision.get('normal_continue_minimum_elapsed_seconds') != 600:
+              raise SystemExit('continuation gate drift from 10 minutes (600 seconds)')
+          timing = lifecycle.get('timing', {})
+          if timing.get('final_rearm_offset_seconds') != 60:
+              raise SystemExit('lifecycle drift from 1 minute (60 seconds) final rearm')
+
+          goalmap = {g.get('goal_id'): g for g in goals.get('goals', [])}
+          p0a = goalmap.get('GOAL-TURN-WORKTIME-P0A')
+          p0b = goalmap.get('GOAL-SCHEDULE-REARM-P0B')
+          if not p0a or p0a.get('acceptance', {}).get('normal_continue_minimum_elapsed_seconds') != 600:
+              raise SystemExit('operator-locked P0-A 10-minute (600-second) goal missing/drifted')
+          if not p0b or p0b.get('acceptance', {}).get('final_rearm_offset_seconds') != 60:
+              raise SystemExit('operator-locked P0-B 1-minute (60-second) goal missing/drifted')
+
+          print('P0 scorecard timing projection is aligned: 10 minutes (600 seconds) work floor; 1 minute (60 seconds) final rearm.')
+          PY
