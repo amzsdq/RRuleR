@@ -1,0 +1,16 @@
+{
+  "record_id":"WE-20260921-E60-001",
+  "authority_epoch":60,
+  "run_id":"RUN-UTIL-20260921-170146",
+  "start_at":"2026-09-21T17:02:47+09:00",
+  "end_at":"2026-09-21T17:07:59+09:00",
+  "start_boundary":"OBSERVED_GITHUB_COMMIT",
+  "end_boundary":"OBSERVED_GITHUB_COMMIT",
+  "observed_seconds":312,
+  "qualification":"SUBSTANTIVE_CANDIDATE_PENDING_CANONICAL_LEDGER_APPEND",
+  "kind":"utilization_cadence_diagnosis_and_predictive_prearm_implementation",
+  "artifact":"state/UTILIZATION.json@67b9215908541a4f07f13630f698ee1a1c6ee99e + state/EXPERIMENTS.jsonl@2af9bccb7d0197b4b1bbd73c10e5082433ae716f + control/handoff-recovery.v1.json@e1b18c01e4b9166a9d92f2b9b2a59162337be958 + planning/evidence/P001-UTILIZATION-BASELINE-2026-09-21.md@5572298f5ebdf9641f26e1a8d488a20b145c6aef + control/rolling-rrule-lifecycle.v1.json@35d68cf905696c5b8c5e92458ab07c09f2ffcfd1 + state/PREDICTIVE_PREARM_CANARY.json@557abeeb54b8b575b4e407d497651e1808c6afc6 + control/scheduler-fence.v1.json@460ae8a3e81e4869452ee157db8d29b2a002798e + control/runtime-continuity.v1.json@659bb15f7df0608e8e3504074f26f712edb44197 + control/relay-policy.v1.json@8d56bc34daf7ee82d1311c29a4bfd115cf059b80 + .github/workflows/validate-control-plane.yml@525ac252621b9d05cd8acb4a969c0f22b0555ddd",
+  "basis":"Continuous materially new P001 work between observed commit boundaries: refreshed stale utilization state, proved the 600s-work/60s-gap cadence ceiling is below the 840/900 P0 target, designed and armed a guarded same-canonical predictive-prearm canary, aligned authority/fence/runtime controls, and added CI invariants. Scheduler-only mutation is not the basis of this interval.",
+  "canonical_ledger_status":"PENDING_APPEND_BECAUSE_THIS_CONNECTOR_SURFACE_CANNOT_ATOMICALLY_APPEND_TO_THE_EXISTING_ONE_LINE_LEDGER_WITHOUT_REWRITING_UNRELATED_HISTORY",
+  "anti_inference":"No time before 17:02:47 or after 17:07:59 is claimed by this record. Canonical P0 promotion must ignore this candidate until it is validated and appended to state/WORK_EVIDENCE.json."
+}
