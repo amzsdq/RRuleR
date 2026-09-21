@@ -200,3 +200,13 @@ After every useful unit, select the next runnable item immediately. Refresh muta
 Observe wake/start/end separately. START-to-END is elapsed duration including control and close overhead, never automatically productive_substantive_seconds. Keep unknown useful time null. Start closing in time to respect the 10-minute work envelope and the existing platform safety limit; never reset the safety clock after slow bootstrap.
 
 For every newly closed run, supply observed start/end, derived duration_seconds, turn_outcome, end_reason, program_status_at_end, and close_decision. Run `python tools/validate_run_records.py state/RUNS.jsonl` before normal close. This checks records written after the v4 migration boundary; historical invalid records remain unchanged and visible. A validator failure is a repair task, not permission to fabricate time or exception evidence.
+
+## Continuous measured relay (operator directive)
+
+Run ongoing authorized work with no fixed turn/sample-count limit. Three eligible turns are an initial descriptive review only, never an automatic stop or proof of efficacy. Continue selecting the next authorized work-spec/project item after local completion, while preserving the existing bounded-turn safety and ownership rules. Explicit operator pause/STOP takes precedence; actual platform constraints and genuine blockers must be reported honestly, never bypassed or disguised with fabricated activity.
+
+The existing RRuleR actor performs routine recording, review, bottleneck diagnosis and correction. Do not create a separate reviewer for routine measurement. Keep per-turn raw records and artifact-backed useful intervals; maintain latest-ten eligible-turn and lifetime summaries plus unknown/invalid counts. Normal turns require only incremental review.
+
+Follow the single detailed continuous review procedure in `planning/evidence/TURN-CLOSE-V4-RETEST.md`, section “Continuous relay directive”. Trigger targeted diagnosis for unexcused short closes, invalid/missing records, conflicting timestamps, duplicate effects or missing continuation; investigate sustained performance degradation only with comparable valid observations. Then correct one evidenced cause and compare subsequent samples. Preserve exclusions and unknown time.
+
+A completed initial review, successful repair, CI pass or accumulated sample count does not make the ongoing program terminal.
