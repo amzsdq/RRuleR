@@ -1,6 +1,6 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 19,
+  "version": 20,
   "status": "ACTIVE",
   "purpose": "CLEAN MIGRATED MAIN: normal path is operator-created SAME MAIN recurring RRULE -> bounded work -> SAME MAIN exact END+60 shift. Both prior MAIN canonicals are retired. Watchdog is disabled break-glass only.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
@@ -21,8 +21,8 @@
   ],
   "timing": {
     "target_useful_work_seconds": 600,
-    "provisional_safety_margin_seconds": 45,
-    "provisional_due_offset_seconds": 120,
+    "provisional_safety_margin_seconds": 60,
+    "provisional_due_offset_seconds": 660,
     "final_rearm_offset_seconds": 60,
     "rrule_frequency": "HOURLY",
     "fixed_quarter_cycle_required": false,
@@ -34,22 +34,24 @@
     "schedule_mode": "SAME_CANONICAL_RECURRING_RRULE_SELF_SHIFT",
     "normal_continue_minimum_elapsed_seconds": 600,
     "pre_600_voluntary_continue_close_forbidden": true,
-    "provisional_refresh_guard_seconds": 45,
-    "provisional_refresh_offset_seconds": 120
+    "provisional_extension_guard_seconds": 90,
+    "provisional_extension_offset_seconds": 180
   },
   "provisional_arm": {
-    "when": "Immediately after minimum stale-wake/fence/authority validation and before full restore or substantive work.",
-    "due": "arm_reference + provisional_due_offset_seconds (120 seconds). Do NOT add target work duration.",
-    "reason": "Keep SAME MAIN crash insurance close to the active turn with a short rolling provisional. Long +780s provisional placement is retired because it creates avoidable visible/real continuation gaps.",
+    "when": "Immediately after minimum stale-wake/fence/authority validation and BOOT_STARTED receipt, before full restore or substantive work.",
+    "due": "observed wake/arm reference + 660 seconds for the normal ~600s bounded envelope.",
+    "reason": "Evidence-backed adaptive long provisional: prior SHORT_ROLLING +2m A/B variant produced an overlapping duplicate invocation, while LONG_PROVISIONAL +11m completed >600s with no observed overlap and only initial/final schedule mutations. The former +780s/13m horizon is unnecessarily long for the normal ~10m envelope.",
     "verification_required": true,
     "mutation_failure": "Retry once when safe. If an older verified future continuation remains alive, enter DEGRADED_CONTINUATION and continue only within its safety envelope; otherwise fail closed before substantive side effects.",
-    "refresh_rule": "While the turn is active, if verified provisional due has <=45 seconds remaining and normal close is not ready, shift THIS SAME MAIN to NOW+120s and live-verify before continuing.",
-    "long_provisional_forbidden": true
+    "normal_midturn_mutation": false,
+    "extension_rule": "Only if useful authorized work or required close handling clearly threatens to cross the verified provisional due, extend THIS SAME MAIN before collision, preferably to NOW+180s, live-verify, and record the exception.",
+    "forbidden_normal_strategy": "REPEATED_SHORT_ROLLING_REFRESH",
+    "retired_horizon_seconds": 780
   },
   "work": {
     "rule": "Perform sustained useful authorized work by chaining bounded units. For a normal nonterminal CONTINUE turn, 600 observed elapsed seconds is the minimum voluntary duration. Before 600s, start the next clear low-risk checkpointable unit, independent fallback/residual unit, or smaller decomposed slice. CI pending, local packet completion, checkpoint completion, secured continuation, or no-obvious-next-task never authorize a voluntary pre-600s CONTINUE close. Earlier end must be STOP/PAUSE, durable terminal, genuine BLOCKED/fail-closed authority or safety state, or platform-enforced termination and must be reported as such. At >=600s, do not start a new large unit; close after the smallest safe in-flight boundary. Normal soft ceiling is ~720s.",
     "checkpoint_rule": "Persist enough durable progress that a cold successor can resume without chat context.",
-    "collision_rule": "If the verified provisional due has <=45 seconds remaining while useful authorized work continues, extend THIS SAME MAIN to NOW+120s, live-verify, persist the newer due, then continue. Stale queued wakes must fence against the newer generation.",
+    "collision_rule": "Normally do not mutate the schedule mid-turn. If useful work or required close handling will plausibly cross the +660s provisional due, extend THIS SAME MAIN once before collision (prefer NOW+180s), live-verify, persist the newer due, then continue. Never allow stale queued wakes to gain substantive authority.",
     "unit_chaining_required_before_target": true,
     "new_large_unit_forbidden_after_target": true,
     "soft_ceiling_seconds": 720,
@@ -121,7 +123,7 @@
     "experiment_id": "UTIL-EXP-018",
     "status": "ROLLED_BACK_AFTER_FAILED_FIRST_CANARY",
     "result_ref": "state/PREDICTIVE_PREARM_CANARY.json",
-    "reentry_condition": "Do not repeat until UTIL-EXP-019 produces new evidence explaining or materially reducing successor observation/claim-to-first-useful delay.",
+    "reentry_condition": "Do not treat short/early recurring wakes as the normal strategy. Prior +2m rolling reservation A/B evidence also showed overlap; use adaptive +11m provisional for ~10m envelopes unless new controlled evidence justifies another policy.",
     "historical_candidate_due": "target_bounded_close - 30 seconds",
     "safety_rule": "Any future retry still requires fresh authority fencing and no duplicate substantive side effects."
   },
@@ -176,7 +178,7 @@
   },
   "normal_path_invariant": {
     "expected_path": "CURRENT_MAIN_NORMAL_CLOSE -> SAME_CURRENT_MAIN_RECURRING_SHIFTED_TO_END_PLUS_60 -> NEXT_MAIN",
-    "provisional_role": "SHORT_ROLLING_IN_FLIGHT_CRASH_INSURANCE_ONLY",
+    "provisional_role": "ADAPTIVE_LONG_IN_FLIGHT_CRASH_INSURANCE_PLUS_11M_FOR_NORMAL_10M_ENVELOPE",
     "watchdog_role": "DISABLED_BREAK_GLASS_EMERGENCY_ONLY",
     "experiment": "CUSTOM_RECURRING_CATEGORY_CANARY_ENDED_BY_OPERATOR_MIGRATION",
     "forbidden_substitutions": [
