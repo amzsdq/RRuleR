@@ -16,14 +16,18 @@
     "completed": [
       "Recovered the 22:07:23 receipt-less generation through the fixed Startup Watchdog.",
       "Persisted generation-matched BOOT_STARTED and REARM_VERIFIED for the 22:13:24 recovery generation.",
-      "Verified same MAIN canonical provisional continuation at 22:29:29 and same Watchdog one-shot at 22:32:29, both enabled."
+      "Verified same MAIN canonical provisional continuation at 22:29:29 and same Watchdog one-shot at 22:32:29, both enabled.",
+      "Recorded STARTUP-011 failure and STARTUP-012 fixed-Watchdog recovery with observed segment boundaries.",
+      "Updated startup boundary audit to validate next_sample; eleven focused tests and the actual 12-sample audit passed."
     ],
     "evidence": [
       "state/STARTUP_ACK.json generation DUE:2026-09-21T22:13:24+09:00",
-      "live automation metadata re-read after both schedule mutations"
+      "live automation metadata re-read after both schedule mutations",
+      "state/SUCCESSOR_STARTUP.json commits 7c3b890 and f3d9286",
+      "tools/audit_startup_boundaries.py f3f0352 + tests 8575cc7; actual audit valid=true"
     ],
-    "observation": "Epoch 72 is a fixed-Watchdog pre-bootstrap recovery generation. It must remain excluded from normal scheduler comparisons while preserving each observed segment.",
-    "next_action": "Record failed normal generation and successful recovery generation in SUCCESSOR_STARTUP, then make the boundary audit validate next_sample."
+    "observation": "The fixed Watchdog recovered the receipt-less 22:07:23 normal generation. Active next_sample auditing now prevents the newest recovery generation from escaping lineage/generation validation.",
+    "next_action": "Close with exact END+60, set ACTIVITY to a non-WORKING handoff state, and let the successor evaluate recovery latency and stale close-state semantics."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
