@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
   "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "current_expected_due_at": "2026-09-22T00:02:08+09:00",
-  "generation_key": "DUE:2026-09-22T00:02:08+09:00",
-  "boot_started_at": null,
-  "boot_started_authority_epoch": null,
+  "current_expected_due_at": "2026-09-22T00:13:08+09:00",
+  "generation_key": "DUE:2026-09-22T00:13:08+09:00",
+  "boot_started_at": "2026-09-22T00:14:46+09:00",
+  "boot_started_authority_epoch": 75,
   "rearm_verified_at": null,
   "verified_provisional_due_at": null,
-  "status": "AWAITING_BOOT_STARTED",
-  "last_updated_at": "2026-09-22T00:01:20+09:00",
-  "note": "Normal MAIN->MAIN fast continuation is live-verified at predecessor END+60. Watchdog remains disabled standby; SAME MAIN recurring RRULE is the cold fallback."
+  "status": "BOOT_STARTED",
+  "last_updated_at": "2026-09-22T00:17:08+09:00",
+  "note": "Observed the operator-rescheduled SAME MAIN generation at 00:13:08. This supersedes the stale 00:02:08 projection; delivery-to-turn-start was 98 seconds. Provisional recurring cold fallback verification is next."
 }
