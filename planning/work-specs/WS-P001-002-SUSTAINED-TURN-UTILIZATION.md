@@ -1,6 +1,6 @@
 # WS-P001-002 — Sustained Turn Utilization
 
-Status: **READY (execution paused by operator)**  
+Status: **ACTIVE**  
 Parent project: [P001 — Sustained Utilization & Continuous Execution](../projects/P001-SUSTAINED-UTILIZATION.md)
 
 ## Problem
@@ -38,11 +38,18 @@ Make one bounded wake spend most of its available execution budget on substantiv
 
 Acceptance progress: **0 / 6**
 
+## Evidence-pipeline diagnosis (2026-09-21)
+
+`state/WORK_EVIDENCE.json` is a strict acceptance ledger, not an automatic activity feed. Its last accepted record is authority epoch 43 even though `state/CURRENT.json` advanced to epoch 58. No collector/generator exists under `tools/`; the repository contains validators for evidence and observation horizons, but evidence insertion depended on the active worker explicitly persisting qualifying observed intervals. Later turns continued to create substantive artifacts without advancing this ledger. This is the direct cause of the multi-epoch freshness gap.
+
+Correction direction: make qualifying-evidence capture an explicit close-of-substantive-unit responsibility, while preserving the existing rule that unknown time remains unknown and scheduler/heartbeat-only activity never becomes useful-work evidence.
+
 ## Exact resume step
 
-1. Reconcile the evidence pipeline first: determine why `state/WORK_EVIDENCE.json` stopped at authority epoch 43 while execution advanced to later epochs.
+1. Implement and exercise a deterministic current-turn evidence-capture path that cannot promote inferred time.
 2. Produce a current baseline from durable run/activity/commit evidence without inventing missing time.
-3. Choose the next intervention by expected effect on useful-work occupancy, not by proximity of the code being inspected.
+3. Rank the dominant causes of under-utilization from that baseline.
+4. Choose the next intervention by expected effect on useful-work occupancy, not by proximity of the code being inspected.
 
 ## Decision rule
 
