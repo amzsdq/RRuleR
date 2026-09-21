@@ -336,11 +336,25 @@
       "qualification": "SUBSTANTIVE_ACCEPTED",
       "basis": "Persisted the paired receipt-less normal generation and fixed-Watchdog recovery with explicit lineage and observed boundaries, then made the boundary audit include the active next_sample and added focused regression coverage. Eleven audit tests and the actual 12-sample ledger audit passed.",
       "observed_seconds": 240
+    },
+    {
+      "record_id": "WE-20260921-E73-001",
+      "authority_epoch": 73,
+      "run_id": "RUN-UTIL-20260921-223441",
+      "start_at": "2026-09-21T22:36:46+09:00",
+      "end_at": "2026-09-21T22:45:51+09:00",
+      "start_boundary": "OBSERVED",
+      "end_boundary": "OBSERVED",
+      "kind": "close_state_projection_and_recovery_audit_hardening",
+      "artifact": "tools/validate_close_projection.py@a5ad905 + tests/test_validate_close_projection.py@8d0a357 + control/rolling-rrule-lifecycle.v1.json@5aa4774 + AGENTS.md@592aa7f + .github/workflows/validate-control-plane.yml@d0776bb + state/SUCCESSOR_STARTUP.json@0336564",
+      "qualification": "SUBSTANTIVE_ACCEPTED",
+      "basis": "Specified and implemented an atomic close-state projection validator, added five discoverable regression tests, wired it into control-plane CI, and durably recorded the latest failed normal generation plus fixed-Watchdog recovery lineage. The actual 14-sample startup audit and all 88 discovered tests passed. Boundaries are observed authority claim and post-verification time; no later close work is counted.",
+      "observed_seconds": 545
     }
   ],
   "collection": {
     "started_at": "2026-09-21T05:03:12+09:00",
     "historical_backfill": false,
-    "latest_observed_record": "WE-20260921-E68-002"
+    "latest_observed_record": "WE-20260921-E73-001"
   }
 }
