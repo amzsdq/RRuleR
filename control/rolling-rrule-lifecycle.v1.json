@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 4,
+  "version": 5,
   "status": "ACTIVE",
-  "purpose": "Use one same-canonical hourly RRULE as bounded cold rescue and completion-relative continuation; predictive prearm remains rolled back until successor-start latency is understood.",
+  "purpose": "Use one same-canonical hourly RRULE as bounded cold rescue with a strict normal CONTINUE fast continuation of actual observed turn END + 60 seconds; predictive prearm remains evidence-gated.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
   "startup_order": [
     "READ_MINIMUM_FENCE_CURRENT_AND_CANONICAL_AUTHORITY",
@@ -24,7 +24,9 @@
     "final_rearm_offset_seconds": 60,
     "rrule_frequency": "HOURLY",
     "fixed_quarter_cycle_required": false,
-    "exact_second_final_rearm_required": true
+    "exact_second_final_rearm_required": true,
+    "normal_continue_due_rule": "ACTUAL_OBSERVED_TURN_END_PLUS_EXACTLY_60_SECONDS",
+    "normal_continue_offset_is_default_invariant": true
   },
   "provisional_arm": {
     "when": "Immediately after minimum stale-wake/fence/authority validation and before full restore or substantive work.",
@@ -47,11 +49,13 @@
       "PERSIST_EXPECTED_DUE",
       "RETURN"
     ],
-    "due": "actual observed normal-close timestamp + 60 seconds, preserving seconds exactly; minute rounding is forbidden",
+    "due": "actual observed turn END timestamp + exactly 60 seconds, preserving seconds exactly; minute rounding is forbidden",
     "verification_required": true,
     "status": "ACTIVE_FALLBACK",
     "computation_tool": "tools/compute_completion_due.py",
-    "precision_rule": "Pass local_dtstart with YYYYMMDDTHHMMSS under the canonical timezone. Do not truncate or round seconds."
+    "precision_rule": "Pass local_dtstart with YYYYMMDDTHHMMSS under the canonical timezone. Do not truncate or round seconds.",
+    "exception_rule": "Any delay other than +60 seconds on a normal CONTINUE close requires a fresh durable platform/safety/task constraint and an explicit exception_reason recorded with the run. Do not add extra local slack merely because scheduler delivery itself may be late.",
+    "delivery_jitter_rule": "Measure scheduled-due -> actual invocation separately. Do not hide provider delivery latency by lengthening the local completion-relative offset."
   },
   "predictive_prearm_canary": {
     "experiment_id": "UTIL-EXP-018",
