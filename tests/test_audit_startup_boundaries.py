@@ -182,3 +182,23 @@ def test_rejected_one_shot_canary_is_preserved_but_excluded():
     assert out["rejected_one_shot_canary_count"] == 1
     assert result["startup_receipt_complete"] is False
     assert result["scheduler_comparison_exclusion"] == "SCHEDULE_CATEGORY_CANARY_REJECTED"
+
+
+def test_natural_hourly_cold_fallback_after_missed_fast_shift_is_not_fast_scheduler_sample():
+    sample = {
+        "sample_id":"COLD",
+        "predecessor_run_id":"RUN-UTIL-1",
+        "scheduled_due_at":"2026-09-22T07:20:29+09:00",
+        "generation_key":"DUE:2026-09-22T07:20:29+09:00",
+        "successor_observed_at":"2026-09-22T08:18:39+09:00",
+        "boot_started_at":"2026-09-22T08:18:39+09:00",
+        "rearm_verified_at":"2026-09-22T08:18:47+09:00",
+        "generation_class":"SAME_MAIN_NATURAL_HOURLY_COLD_FALLBACK_AFTER_MISSED_FAST_SHIFT",
+    }
+    out = audit({"samples":[sample]}, _run(end="2026-09-22T07:19:29+09:00"))
+    result = out["results"][0]
+    assert out["valid"] is True
+    assert out["cold_fallback_generation_count"] == 1
+    assert result["cold_fallback_generation"] is True
+    assert result["scheduler_comparison_eligible"] is False
+    assert result["scheduler_comparison_exclusion"] == "SAME_MAIN_NATURAL_HOURLY_COLD_FALLBACK"
