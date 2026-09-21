@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
-  "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "current_expected_due_at": "2026-09-22T00:41:36+09:00",
-  "generation_key": "DUE:2026-09-22T00:41:36+09:00",
+  "main_canonical_id": "6ab14f7951848191b65e4b5d4bc979d8",
+  "current_expected_due_at": "2026-09-22T01:38:00+09:00",
+  "generation_key": "DUE:2026-09-22T01:38:00+09:00",
   "boot_started_at": null,
   "boot_started_authority_epoch": null,
   "rearm_verified_at": null,
   "verified_provisional_due_at": null,
   "status": "AWAITING_BOOT_STARTED",
-  "last_updated_at": "2026-09-22T00:40:56+09:00",
-  "note": "SAME MAIN custom recurring END+60 was live-verified enabled with DAILY+24 BYHOUR, BYMINUTE=41 and BYSECOND=36. Watchdog was not used."
+  "last_updated_at": "2026-09-22T00:45:22+09:00",
+  "note": "Operator-created replacement MAIN is now authoritative. Retired predecessor must remain disabled. Await first startup receipt from new canonical."
 }
