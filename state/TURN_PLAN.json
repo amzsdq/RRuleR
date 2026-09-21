@@ -2,39 +2,31 @@
   "schema_version": "1.1",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "authority_epoch": 66,
-  "run_id": "RUN-UTIL-20260921-185559",
-  "status": "CHECKPOINTED",
-  "phase": "TURN_CLOSE_V4_LIVE_RETEST_2",
+  "authority_epoch": 67,
+  "run_id": "RUN-UTIL-20260921-193957",
+  "status": "ACTIVE",
+  "phase": "TURN_CLOSE_V4_CONTINUOUS_RETEST",
   "objective_id": "WS-P001-002-TURN-CLOSE-V4-RETEST",
-  "objective": "Validate and review the first eligible post-repair turn, complete STARTUP-003 prospectively, and advance the multi-turn live retest without inferring useful time.",
+  "objective": "Review the second eligible closed turn, preserve the incomplete STARTUP-004 evidence, and harden detection of invoked successors that leave no durable claim/useful progress.",
   "expected_useful_seconds": 600,
   "acceptance_criteria": [
-    "Predecessor RUNS record passes the validator.",
-    "A readable review row is appended with UNKNOWN fields preserved.",
-    "STARTUP-003 boundaries are recorded prospectively and invalid samples remain excluded.",
-    "Integrated CI evidence is inspected or a concrete independent verification is completed.",
-    "Current turn reaches the bounded close rule with verified continuation."
+    "Second eligible closed turn is reviewed from durable records.",
+    "STARTUP-004 delivery observation is preserved while missing boundaries remain unknown.",
+    "Operator-rescheduled STARTUP-005 is excluded from END+60 compliance comparison.",
+    "A machine-readable missing-successor-progress diagnostic is implemented and tested.",
+    "Current normal close arms exact END+60 continuation for a clean next sample."
   ],
   "checkpointable_substeps": [
-    "Validate predecessor RUNS and derive its review row only from durable evidence.",
-    "Append the first operator review row and record STARTUP-003 first useful boundary.",
-    "Inspect integrated CI or execute equivalent repository-data verification.",
-    "Use remaining budget on the next unaccepted live-retest evidence item."
+    "Append second live review row from RUNS/WORK_EVIDENCE/STARTUP.",
+    "Record STARTUP-005 first-useful boundary on the first substantive commit.",
+    "Implement and test missing successor durable-progress diagnostic.",
+    "Validate current ledgers and close with exact END+60."
   ],
-  "current_substep": 4,
-  "handoff_boundary": "Second eligible live turn closed with 368 strict useful seconds and exact-second +60s continuation.",
-  "early_finish_fallback": "Extend reporting tests to generate validity-aware operator review rows from durable ledgers, then integrate into CI.",
+  "current_substep": 1,
+  "handoff_boundary": "Epoch 67 claimed; first substantive artifact pending.",
+  "early_finish_fallback": "Extend turn review tooling to surface incomplete successor samples and missing-claim/useful aging without treating them as scheduler delivery failures.",
   "created_for_next_wake": false,
-  "started_at": "2026-09-21T18:55:59+09:00",
-  "last_progress_at": "2026-09-21T19:02:56+09:00",
-  "progress_evidence": [
-    "state/RUNS.jsonl@7daba51d74f994e836b0ea77f72d144053f7d837",
-    "planning/evidence/TURN-CLOSE-V4-RETEST.md@a412c1cb9c106f088ad6af54ed26b4c8d53c39de",
-    "tools/compute_completion_due.py@07ab6260da1eec2a0f16ba02b1aa1cf0753e4257",
-    "control/rolling-rrule-lifecycle.v1.json@5796f3a8d285bd494d2be433f271254a621974f0",
-    "tools/build_turn_review.py@7aea3abc8e91fbe606baae9a9bf89c6280c689f4",
-    ".github/workflows/validate-control-plane.yml@19d7f002fc4b8b22bd962deb3bb7ab07de301b5f",
-    "planning/evidence/TURN-CLOSE-V4-RETEST.md@2ad94829147d0d1accc9aaabda8fe428a8cb0280"
-  ]
+  "started_at": "2026-09-21T19:39:57+09:00",
+  "last_progress_at": "2026-09-21T19:39:57+09:00",
+  "progress_evidence": []
 }
