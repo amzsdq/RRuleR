@@ -3,9 +3,16 @@
 import json
 import os
 import sys
+import urllib.parse
 import urllib.request
 from datetime import datetime
 from pathlib import Path
+
+
+TRUSTED_ACTION_WORKFLOWS = {
+    ".github/workflows/validate-control-plane.yml",
+    ".github/workflows/validate-observation-horizon.yml",
+}
 
 
 def instant(value):
@@ -48,6 +55,27 @@ def validate(horizon, policy, source, previous=None, previous_states=None):
     return True
 
 
+def validate_actions_causality(source, compare_result, current_sha):
+    """Require Actions provenance to come from a trusted push workflow on current ancestry."""
+    if source.get("event") != "push" or source.get("head_branch") != "main":
+        raise ValueError("observation horizon Actions provenance is not a trusted main push")
+    if source.get("path") not in TRUSTED_ACTION_WORKFLOWS:
+        raise ValueError("observation horizon Actions provenance workflow is not trusted")
+    source_sha = source.get("head_sha")
+    if not source_sha or not current_sha:
+        raise ValueError("observation horizon Actions provenance lacks commit causality")
+    status = compare_result.get("status")
+    if status not in {"identical", "ahead"}:
+        raise ValueError("observation horizon Actions provenance commit is not an ancestor of current commit")
+    base = compare_result.get("base_commit", {}).get("sha")
+    merge_base = compare_result.get("merge_base_commit", {}).get("sha")
+    if status == "identical" and source_sha != current_sha:
+        raise ValueError("observation horizon Actions provenance identical comparison is inconsistent")
+    if status == "ahead" and base != source_sha and merge_base != source_sha:
+        raise ValueError("observation horizon Actions provenance ancestry is inconsistent")
+    return True
+
+
 def api(repo, token, path):
     req = urllib.request.Request(
         f"https://api.github.com/repos/{repo}/{path}",
@@ -78,7 +106,15 @@ def main():
     repo = os.environ["REPO"]
     token = os.environ["GH_TOKEN"]
     path = f"actions/runs/{ref}" if kind == "GITHUB_ACTIONS_OBSERVED_TIMESTAMP" else f"commits/{ref}"
-    validate(horizon, policy, api(repo, token, path), previous_states=previous_states)
+    source = api(repo, token, path)
+    validate(horizon, policy, source, previous_states=previous_states)
+    if kind == "GITHUB_ACTIONS_OBSERVED_TIMESTAMP":
+        current_sha = os.environ.get("GITHUB_SHA")
+        if not current_sha:
+            raise ValueError("GITHUB_SHA is required for Actions provenance causality")
+        source_sha = source.get("head_sha", "")
+        compare_path = "compare/" + urllib.parse.quote(source_sha, safe="") + "..." + urllib.parse.quote(current_sha, safe="")
+        validate_actions_causality(source, api(repo, token, compare_path), current_sha)
     print(f"observation horizon provenance valid: {kind}:{ref}; predecessors={len(previous_states)}")
 
 
