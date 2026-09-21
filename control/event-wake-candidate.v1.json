@@ -69,11 +69,10 @@
     "purpose": "Independent bounded producer if the worker fails before emitting its next event.",
     "decision_tool": "tools/evaluate_event_rescue.py",
     "additional_emit_condition": "consumer verified, no outstanding generation, and either STARTUP_ACK_MISSING age at least 120 seconds or owner progress stale at least 180 seconds",
-    "current_integration_status": "DECISION_ENGINE_TESTED_WORKFLOW_GATE_REPLACEMENT_PENDING",
+    "current_integration_status": "DECISION_ENGINE_AND_WORKFLOW_GATE_INTEGRATED_FAIL_CLOSED",
     "activation_blockers": [
       "Provision a supported GitHub PR event consumer",
       "Pass EVENT_WORKER_WRITE_PROBE_001",
-      "Integrate the tested decision engine into the rescue workflow",
       "Atomically claim one outstanding generation before emitting an event"
     ]
   },
