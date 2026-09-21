@@ -2,13 +2,22 @@
   "schema_version": "1.2",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "trusted_observed_through": "2026-09-20T22:36:28+00:00",
+  "trusted_observed_through": "2026-09-21T16:43:05+00:00",
   "provenance_kind": "GITHUB_ACTIONS_OBSERVED_TIMESTAMP",
-  "provenance_ref": "35542168328",
+  "provenance_ref": "35627331980",
   "provenance_attempt": 1,
-  "provenance_history": [],
+  "provenance_history": [
+    {
+      "trusted_observed_through": "2026-09-20T22:36:28+00:00",
+      "provenance_kind": "GITHUB_ACTIONS_OBSERVED_TIMESTAMP",
+      "provenance_ref": "35542168328",
+      "provenance_attempt": 1,
+      "retired_at": "2026-09-21T16:43:05+00:00",
+      "retirement_reason": "SUPERSEDED_BY_NEWER_SUCCESSFUL_ATTEMPT_SPECIFIC_ACTIONS_OBSERVATION"
+    }
+  ],
   "boundary": "OBSERVED",
   "counts_as_useful_work": false,
   "monotonic_forward_only": true,
-  "note": "Current provenance is pinned to successful GitHub Actions run 35542168328 attempt 1. provenance_history is append-only: replacing provenance must retire the prior identity+timestamp into history, and retired identities cannot be reused. This prevents A->B->A repinning from bypassing immediate-predecessor checks."
+  "note": "Advanced to successful Validate RRuleR control plane run 35627331980 attempt 1, whose attempt-specific API updated_at is 2026-09-21T16:43:05Z. Prior provenance identity+timestamp was retired exactly once into append-only history. This horizon is external observation only and does not count as useful work."
 }
