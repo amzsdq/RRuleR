@@ -24,13 +24,25 @@ def audit(payload: dict[str, Any], as_of: datetime, threshold_seconds: int) -> d
         observed = sample.get("successor_observed_at")
         if not observed:
             continue
+        boot = sample.get("boot_started_at")
+        rearm = sample.get("rearm_verified_at")
         claim = sample.get("authority_claim_at")
         useful = sample.get("first_durable_useful_at")
-        boundary = claim or observed
+        stage_tracking = (
+            "boot_started_at" in sample
+            or "rearm_verified_at" in sample
+            or "boot_started_at" in sample.get("required_fields", [])
+            or "rearm_verified_at" in sample.get("required_fields", [])
+        )
+        boundary = claim or rearm or boot or observed
         age = max(0, int((as_of - parse_time(boundary)).total_seconds()))
 
         code = None
-        if not claim:
+        if stage_tracking and not boot:
+            code = "MISSING_BOOTSTRAP_ACK_AFTER_INVOCATION"
+        elif stage_tracking and not rearm:
+            code = "MISSING_REARM_VERIFICATION_AFTER_BOOTSTRAP"
+        elif not claim:
             code = "MISSING_AUTHORITY_CLAIM_AFTER_INVOCATION"
         elif not useful:
             code = "MISSING_FIRST_USEFUL_AFTER_CLAIM"
