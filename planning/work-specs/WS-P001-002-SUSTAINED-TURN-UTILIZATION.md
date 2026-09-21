@@ -76,9 +76,25 @@ Separate successor startup into observed segments:
 
 Predictive prearm is rolled back; completion-relative same-canonical continuation is the active fallback while this experiment runs.
 
+### v5.4 provisional-horizon correction
+
+A live operator mutation proved that the SAME MAIN scheduler accepts an earlier recurring `DTSTART`; the long wait was not a platform minimum. The active policy itself had been arming the in-flight crash-insurance due at `target 600s + 180s safety = 780s`, which made a normal ~10-minute turn look like it needed a ~13-minute successor horizon.
+
+The first attempted correction, routine `NOW+120s` short rolling refresh, is **rejected as the normal strategy** because prior controlled A/B evidence showed an overlapping duplicate invocation under repeated short rolling. The selected v5.4 correction is therefore workload-relative rather than aggressively rolling:
+
+- normal nonterminal turn hard floor remains 600 observed elapsed seconds;
+- arm the SAME MAIN once at observed wake/arm reference +660 seconds (600s target +60s safety);
+- normally perform no mid-turn schedule mutation;
+- only if useful work or required close handling clearly threatens the provisional due, extend SAME MAIN once before collision, preferably to `NOW+180s`, and verify it;
+- normal close still replaces the provisional due with exact observed `END+60s` on the SAME recurring MAIN;
+- natural hourly recurrence remains cold fallback if a shifted occurrence fails before durable bootstrap;
+- Watchdog remains disabled break-glass standby.
+
+The 01:38 generation is the first live v5.4 verification turn. It durably wrote generation-matched `BOOT_STARTED`, live-verified SAME MAIN enabled recurring at 01:48:17 KST, and persisted `REARM_VERIFIED`. Fresh-policy audit then found two stale 780-second authorities outside the primary lifecycle: the integrated CI assertion and `control/runtime-continuity.v1.json`. Both were repaired forward; integrated control-plane validation subsequently passed after working-owner/handoff projection was reconciled. This demonstrates why fresh policy synchronization must include validators and secondary mandatory controls, not only the headline lifecycle artifact.
+
 ## Exact resume step
 
-Continue `UTIL-EXP-019` with five observed boundaries: invocation, `BOOT_STARTED`, provisional `REARM_VERIFIED`, authority claim, and first durable useful work. `STARTUP-006` is the first confirmed `STARTUP_ACK_MISSING` sample and must retain unknown missing boundaries. The guarded event-rescue evaluator and workflow gate are implemented, but fast recovery is not active until a supported GitHub PR event consumer is provisioned, its bounded write probe passes, and an outstanding generation is atomically claimed. Do not report detection as recovery or repeat predictive prearm without new evidence.
+Continue `UTIL-EXP-019` with five observed boundaries: invocation, `BOOT_STARTED`, provisional `REARM_VERIFIED`, authority claim, and first durable useful work. Treat the 01:38 v5.4 generation as a prospective provisional-horizon sample, but do not promote it until the turn closes normally at >=600s and the SAME MAIN exact `END+60` due is live-verified and projected consistently to CURRENT/ACTIVITY/HANDOFF. Preserve missing boundaries as unknown; do not infer scheduler or useful-work success from invocation metadata alone.
 
 ## Decision rule
 
