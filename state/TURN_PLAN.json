@@ -4,7 +4,7 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "authority_epoch": 65,
   "run_id": "RUN-UTIL-20260921-184232",
-  "status": "ACTIVE",
+  "status": "CHECKPOINTED",
   "phase": "TURN_CLOSE_V4_LIVE_RETEST",
   "objective_id": "WS-P001-002-TURN-CLOSE-V4-RETEST",
   "objective": "Implement and verify strict v4 close reporting plus STARTUP boundary audit, then close one valid bounded turn without misclassifying the maintenance wake.",
@@ -23,16 +23,19 @@
     "Inspect CI/actual output and persist observed close evidence."
   ],
   "current_substep": 4,
-  "handoff_boundary": "Implementation and focused local assertions complete; integrated CI and durable close remain.",
+  "handoff_boundary": "Two reporting/audit tools, CI integration, eight focused assertions, actual-ledger invalid-sample classification, and retest evidence are durable. Same-canonical successor is armed for 18:54 KST.",
   "early_finish_fallback": "Update the v4 retest evidence with exact commits and separate local assertion results from Actions/live behavior.",
   "created_for_next_wake": false,
   "started_at": "2026-09-21T18:42:32+09:00",
-  "last_progress_at": "2026-09-21T18:47:30+09:00",
+  "last_progress_at": "2026-09-21T18:50:37+09:00",
   "progress_evidence": [
     "tools/summarize_turn_close.py@929d92154d2f0f7f4a69a1f4c73123ee5e0f6c34",
     "tests/test_summarize_turn_close.py@36977f9b17a4b3869d5c384753bb9eb123951f32",
     "tools/audit_startup_boundaries.py@240c8a3e6d510b68ae95135118a52fd602a8a1f0",
     "tests/test_audit_startup_boundaries.py@ba3d7dba2945fe440f57728c91090fdceaad3fcf",
-    ".github/workflows/validate-control-plane.yml@744eeeda5e3351ddb84bff95951c0ebe2061257a"
+    ".github/workflows/validate-control-plane.yml@744eeeda5e3351ddb84bff95951c0ebe2061257a",
+    "state/SUCCESSOR_STARTUP.json@bcababde7ee6c595f067cebe136d7c61eb6bfaf7",
+    "planning/evidence/TURN-CLOSE-V4-RETEST.md@7d4ab999b80d97c859dee660017dcbe3c9780ec7",
+    "tools/summarize_turn_close.py@fdd292ea1a068e9b98d9fd09ec8a548ae67f5174"
   ]
 }
