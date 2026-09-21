@@ -1,16 +1,16 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
-  "policy_revision": 16,
+  "policy_revision": 17,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
-    "mechanism": "RRULE_CUSTOM_RECURRING_24H_SLOT_COMPLETION_RELATIVE_CANARY",
+    "mechanism": "RRULE_HOURLY_COMPLETION_RELATIVE_MAIN",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "canonical_reuse_required": true,
     "one_shot_conversion_forbidden": true,
     "replacement_automation_forbidden": true,
-    "rrule_frequency": "DAILY",
+    "rrule_frequency": "HOURLY",
     "timing_mode": "exact_schedule",
     "minimum_fence_before_mutation": true,
     "provisional_arm_before_full_restore_and_work": true,
@@ -23,8 +23,7 @@
     "final_checkpoint_before_close": true,
     "verify_every_mutation": true,
     "fixed_quarter_cycle_active": false,
-    "note": "Custom recurring category canary: SAME MAIN keeps one occurrence per hour through DAILY+24 BYHOUR while DTSTART/BYMINUTE/BYSECOND self-shift to exact END+60. Exact one-shot is rejected; Watchdog is disabled standby.",
-    "custom_rule_template": "FREQ=DAILY;BYHOUR=0..23;BYMINUTE=<DUE_MINUTE>;BYSECOND=<DUE_SECOND>"
+    "note": "Clean authoritative MAIN uses SAME canonical recurring HOURLY RRULE. Normal close shifts the same recurring DTSTART to exact observed END+60; the natural hourly recurrence is cold fallback. Retired custom-recurring canary policy is historical only; Watchdog remains disabled standby."
   },
   "utilization": {
     "first_class_objective": true,
@@ -38,8 +37,10 @@
     "p0_max_average_non_useful_gap_seconds_for_600s_turn": 42.9,
     "acceptance_target_fraction": 0.9333333333,
     "busywork_for_window_fill_forbidden": true,
-    "after_each_work_unit": "SELECT_NEXT_SAFE_USEFUL_UNIT_UNTIL_NATURAL_CLOSE_OR_SAFETY_BOUNDARY",
-    "measurement_rule": "Optimize evidenced wall-clock useful coverage across worker boundaries. Do not substitute the 600s bounded-turn target for the 840s/900s P0 acceptance target."
+    "after_each_work_unit": "BEFORE_600S_SELECT_NEXT_SAFE_USEFUL_UNIT_OR_DECOMPOSE; AT_OR_AFTER_600S_FINISH_SMALLEST_SAFE_IN_FLIGHT_UNIT_AND_CLOSE",
+    "measurement_rule": "Optimize evidenced wall-clock useful coverage across worker boundaries. Do not substitute the 600s bounded-turn target for the 840s/900s P0 acceptance target.",
+    "minimum_normal_continue_elapsed_seconds": 600,
+    "pre_600_voluntary_normal_continue_close_forbidden": true
   },
   "program_continuity": {
     "enabled": true,
@@ -86,7 +87,7 @@
     "disable_same_canonical_only_on_program_terminal": true
   },
   "worker_cycle": {
-    "mode": "ROLLING_CONTINUOUS_WORK_WITH_SAME_MAIN_CUSTOM_RECURRING_COLD_FALLBACK",
+    "mode": "ROLLING_CONTINUOUS_WORK_WITH_SAME_MAIN_HOURLY_RRULE_COLD_FALLBACK",
     "plan_before_substantive_work": true,
     "provisional_rescue_planning_horizon_minutes": 10,
     "work_packet_is_stop_timer": false,
@@ -95,7 +96,9 @@
     "primary_objective_expected_useful_seconds_target": 600,
     "primary_objective_target_is_planning_not_acceptance": true,
     "primary_objective_persist_path": "state/TURN_PLAN.json",
-    "watchdog_role": "DISABLED_BREAK_GLASS_STANDBY"
+    "watchdog_role": "DISABLED_BREAK_GLASS_STANDBY",
+    "minimum_normal_continue_elapsed_seconds": 600,
+    "pre_600_normal_continue_close_forbidden": true
   },
   "program_goals": {
     "competitive_agent_saas": {
