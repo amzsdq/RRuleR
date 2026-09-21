@@ -7,6 +7,13 @@ from pathlib import Path
 
 ENFORCE_FROM = datetime.fromisoformat('2026-09-21T09:35:00+00:00')
 EXCEPTIONS = {'PLATFORM_ENFORCED_TERMINATION', 'EXPLICIT_OPERATOR_INTERVENTION', 'AUTHORITY_OR_FENCING_FAIL_CLOSED', 'NO_SAFE_RUNNABLE_WORK_AFTER_EXPLICIT_SCAN'}
+VALID_CONTINUE_END_REASONS = {
+    'VERIFIED_SAME_CANONICAL_CONTINUATION',
+    'VERIFIED_SAME_CANONICAL_EXACT_ONE_SHOT_CONTINUATION',
+    'VERIFIED_SAME_CANONICAL_CUSTOM_RECURRING_CONTINUATION',
+    'COMMITTED_SUCCESSOR_HANDOFF',
+    'PLATFORM_ENFORCED_TERMINATION',
+}
 
 def timestamp(value):
     dt = datetime.fromisoformat(value)
@@ -31,20 +38,16 @@ def validate(record):
     if record['close_decision'] not in {'TIME_BOUNDARY', 'TARGET_REACHED_SAFE_BOUNDARY', 'BUDGET_EXHAUSTED', 'EXCEPTION', 'HANDOFF', 'TERMINAL'}:
         raise ValueError('invalid close_decision')
     if outcome == 'CONTINUE':
-        if record['end_reason'] not in {'VERIFIED_SAME_CANONICAL_CONTINUATION', 'COMMITTED_SUCCESSOR_HANDOFF', 'PLATFORM_ENFORCED_TERMINATION'}:
+        if record['end_reason'] not in VALID_CONTINUE_END_REASONS:
             raise ValueError('CONTINUE lacks valid end reason')
-        alternatives = record.get('alternatives_checked')
-        if duration < 600 and (not isinstance(alternatives, list) or not alternatives or not all(isinstance(x,str) and x.strip() for x in alternatives)):
-            raise ValueError('early close lacks concrete alternatives')
-        if duration < 480:
+        if duration < 600:
+            alternatives = record.get('alternatives_checked')
+            if not isinstance(alternatives, list) or not alternatives or not all(isinstance(x,str) and x.strip() for x in alternatives):
+                raise ValueError('early close lacks concrete alternatives')
             if record.get('short_turn_reason') not in EXCEPTIONS or record['close_decision'] != 'EXCEPTION':
-                raise ValueError('short CONTINUE lacks allowlisted exception')
-        elif duration < 600 and record['close_decision'] not in {'BUDGET_EXHAUSTED', 'EXCEPTION', 'HANDOFF'}:
-            raise ValueError('target boundary not reached')
-        if record['close_decision'] == 'BUDGET_EXHAUSTED':
-            reserve = record.get('close_reserve_seconds')
-            if type(reserve) not in (int, float) or not 0 <= reserve <= 600:
-                raise ValueError('invalid close reserve')
+                raise ValueError('CONTINUE before 600s requires allowlisted exception')
+        if record['close_decision'] == 'BUDGET_EXHAUSTED' and duration < 600:
+            raise ValueError('budget exhaustion cannot authorize normal close before 600s')
         if record['end_reason'] == 'COMMITTED_SUCCESSOR_HANDOFF':
             timestamp(record['successor_observed_at'])
     if outcome == 'COMPLETE' and record['program_status_at_end'] != 'PROGRAM_COMPLETE':
