@@ -21,11 +21,14 @@
     "classification":{"enum":["ACTIVE","HANDOFF","COMPLETE","BLOCKED_EXTERNAL","PLATFORM_ENDED","DEGRADED_CONTINUATION"]},
     "notes":{"type":"string"},
     "duration_seconds":{"type":["integer","null"],"minimum":0},
-    "turn_outcome":{"type":["string","null"],"enum":[null,"CONTINUE","COMPLETE","BLOCKED","PAUSED"]}
+    "turn_outcome":{"type":["string","null"],"enum":[null,"CONTINUE","COMPLETE","BLOCKED","PAUSED"]},
+    "short_turn_reason":{"type":["string","null"],"enum":[null,"PLATFORM_ENFORCED_TERMINATION","EXPLICIT_OPERATOR_INTERVENTION","AUTHORITY_OR_FENCING_FAIL_CLOSED","NO_SAFE_RUNNABLE_WORK_AFTER_EXPLICIT_SCAN"]},
+    "alternatives_checked":{"type":"array","items":{"type":"string","minLength":1},"minItems":1,"uniqueItems":true}
   },
   "allOf":[
     {"if":{"properties":{"run_ended_at":{"type":"string"}},"required":["run_ended_at"]},"then":{"required":["end_reason","program_status_at_end"]}},
-    {"if":{"properties":{"end_reason":{"const":"COMMITTED_SUCCESSOR_HANDOFF"}}},"then":{"required":["successor_observed_at"],"properties":{"successor_observed_at":{"type":"string"}}}}
+    {"if":{"properties":{"end_reason":{"const":"COMMITTED_SUCCESSOR_HANDOFF"}}},"then":{"required":["successor_observed_at"],"properties":{"successor_observed_at":{"type":"string"}}}},
+    {"if":{"properties":{"turn_outcome":{"const":"CONTINUE"},"duration_seconds":{"type":"integer","maximum":479}},"required":["turn_outcome","duration_seconds"]},"then":{"required":["short_turn_reason","alternatives_checked"],"properties":{"short_turn_reason":{"type":"string"}}}}
   ],
   "additionalProperties":false
 }
