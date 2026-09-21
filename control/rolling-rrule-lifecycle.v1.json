@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 13,
+  "version": 14,
   "status": "ACTIVE",
-  "purpose": "CUSTOM ONE-SHOT CANARY: normal path is SAME MAIN one-shot -> work -> SAME MAIN exact END+60 one-shot. RRULE is temporarily removed to isolate whether the platform's recurring/hourly category causes long-gap or queue behavior. Watchdog remains disabled break-glass standby.",
+  "purpose": "RRULE PRIMARY restored after exact one-shot category canary failure. Normal path is SAME MAIN recurring RRULE -> work -> SAME MAIN exact END+60 shift. Watchdog is disabled break-glass only.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
   "startup_order": [
     "READ_MINIMUM_FENCE_CURRENT_AND_CANONICAL_AUTHORITY",
@@ -24,14 +24,14 @@
     "provisional_safety_margin_seconds": 180,
     "provisional_due_offset_seconds": 780,
     "final_rearm_offset_seconds": 60,
-    "rrule_frequency": null,
+    "rrule_frequency": "HOURLY",
     "fixed_quarter_cycle_required": false,
     "exact_second_final_rearm_required": true,
     "normal_continue_due_rule": "ACTUAL_OBSERVED_TURN_END_PLUS_EXACTLY_60_SECONDS",
     "normal_continue_offset_is_default_invariant": true,
     "target_turn_elapsed_seconds": 600,
     "normal_soft_ceiling_seconds": 720,
-    "schedule_mode": "EXACT_ONE_SHOT_SELF_UPDATE_CANARY"
+    "schedule_mode": "SAME_CANONICAL_RECURRING_RRULE_SELF_SHIFT"
   },
   "provisional_arm": {
     "when": "Immediately after minimum stale-wake/fence/authority validation and before full restore or substantive work.",
@@ -150,11 +150,11 @@
   "startup_acknowledgement": {
     "ledger": "state/SUCCESSOR_STARTUP.json",
     "boot_started_semantics": "Observed immediately after minimum fence validation proves bootstrap execution entered durable control handling.",
-    "rearm_verified_semantics": "Observed only after the SAME canonical is enabled and its provisional exact one-shot DTSTART is re-read successfully.",
+    "rearm_verified_semantics": "Observed only after the SAME canonical is enabled, recurring RRULE is present, and the provisional DTSTART is re-read successfully.",
     "acknowledgement_deadline_seconds": 120,
     "missing_ack_classification": "STARTUP_ACK_MISSING",
     "rule": "Missing timestamps remain unknown. An invocation record alone does not prove bootstrap entry, rearm, authority, work, or process death.",
-    "recovery_limitation": "This canary intentionally removes the recurring RRULE cold fallback to isolate scheduler-category behavior. If one-shot self-update fails, preserve evidence and use operator/break-glass recovery rather than silently restoring RRULE."
+    "recovery_limitation": "Recurring RRULE is the built-in cold fallback. Exact one-shot self-update is not used for normal continuation because the executed one-shot was platform-completed without preserving a future DTSTART."
   },
   "startup_watchdog": {
     "policy_ref": "control/startup-watchdog.v1.json",
@@ -168,10 +168,10 @@
     "activation_rule": "Only explicit operator activation or a fresh durable emergency policy decision after both MAIN fast continuation and MAIN recurring cold-fallback are diagnosed insufficient."
   },
   "normal_path_invariant": {
-    "expected_path": "MAIN_NORMAL_CLOSE -> SAME_MAIN_EXACT_ONE_SHOT_END_PLUS_60 -> NEXT_MAIN",
+    "expected_path": "MAIN_NORMAL_CLOSE -> SAME_MAIN_RECURRING_RRULE_SHIFTED_TO_END_PLUS_60 -> NEXT_MAIN",
     "provisional_role": "IN_FLIGHT_CRASH_INSURANCE_ONLY",
     "watchdog_role": "DISABLED_BREAK_GLASS_EMERGENCY_ONLY",
-    "experiment": "SCHEDULE_CATEGORY_ISOLATION_ONE_SHOT_CANARY",
+    "experiment": "ONE_SHOT_CATEGORY_CANARY_REJECTED",
     "forbidden_substitutions": [
       "NORMAL_CLOSE_WITH_PROVISIONAL_DUE_LEFT_AS_SUCCESSOR",
       "NORMAL_CLOSE_RELYING_ON_WATCHDOG_AS_EXPECTED_SUCCESSOR",
