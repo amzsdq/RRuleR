@@ -7,11 +7,11 @@
   "active_run_id": "RUN-UTIL-20260921-193957",
   "authority_epoch": 67,
   "substantive_work_started_at": "2026-09-21T19:39:57+09:00",
-  "last_progress_at": "2026-09-21T19:41:47+09:00",
-  "last_progress_kind": "SECOND_LIVE_REVIEW_AND_STARTUP_005_BOUNDARY",
-  "current_unit": "Implement missing successor durable-progress diagnostic and continue continuous retest.",
+  "last_progress_at": "2026-09-21T19:47:23+09:00",
+  "last_progress_kind": "SUCCESSOR_PROGRESS_AUDIT_AND_CI_REPAIR",
+  "current_unit": "Checkpoint and exact END+60 close.",
   "next_wake_due_at": "2026-09-21T19:52:00+09:00",
   "successor_observed": true,
-  "handoff_ready": false,
+  "handoff_ready": true,
   "operator_ui_note": "STARTUP-004 delivery=30s but durable progress missing; current operator-rescheduled wake delivery=69s, excluded from local END+60 comparison."
 }
