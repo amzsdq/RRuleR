@@ -1,1 +1,71 @@
-{"schema_version":"1.7","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","status":"STARTUP_003_CANARY_ACTIVE","target":{"acceptance_window_seconds":900,"required_useful_seconds":840,"minimum_valid_completed_windows":3,"pass_rule":"THREE_CONSECUTIVE_VALID_ACCEPTED_FIXED_WINDOWS_WITH_SELECTED_ROLLING_MEAN_GTE_840","maximum_unexplained_internal_progress_gap_seconds_for_acceptance":120},"execution_envelope":{"bounded_turn_target_useful_seconds":600,"minimum_continue_turn_seconds":480,"verified_fallback_final_rearm_offset_seconds":60,"p0_max_average_non_useful_gap_seconds_for_600s_turn":42.9,"distinction":"The 600-second bounded execution turn is not the 900-second P0 acceptance window."},"measurement":{"continuous_progress_evidence_required":true,"missing_boundary_policy":"MARK_UNKNOWN_DO_NOT_INFER","scheduler_and_startup_separate":true,"fixed_window_policy_ref":"control/rolling-window-promotion.v1.json","pending_evidence_is_not_accepted":true},"latest_completed_bounded_turn":{"run_id":"RUN-UTIL-20260921-154958","authority_epoch":59,"wall_seconds":626,"strict_productive_seconds":557,"strict_wall_coverage_ratio":0.8898,"target_600_coverage_ratio":0.9283,"classification":"PROMISING_SINGLE_TURN_NOT_P0_WINDOW"},"startup_measurement":{"ledger":"state/SUCCESSOR_STARTUP.json","latest_valid_sample":"STARTUP-002","due_to_observation_seconds":155,"observation_to_claim_seconds":21,"claim_to_first_useful_seconds":0,"dominant_measured_segment":"SCHEDULER_DUE_TO_INVOCATION_OBSERVATION"},"active_retest":{"experiment_id":"UTIL-EXP-019","sample_id":"STARTUP-003","purpose":"Test guarded timing compensation against the measured scheduler-delivery segment while preserving single substantive authority and completion-relative fallback.","required_observed_boundaries":["predecessor_last_useful_at","scheduled_due_at","successor_observed_at","authority_claim_at","first_durable_useful_at"],"promotion_rule":"Do not promote predictive timing from one sample; rollback on unsafe overlap or failed useful-work handoff."},"valid_completed_windows_rolling":[],"rolling_mean_observed_useful_seconds":null,"goal_reached":false,"latest_diagnosis":{"cause_class":"SCHEDULER_DELIVERY_LATENCY_DOMINATES_LATEST_PROSPECTIVE_SAMPLE","evidence":"STARTUP-002 measured 155s due-to-observation, 21s observation-to-claim, and 0s claim-to-first-useful.","implication":"Optimize or compensate scheduler delivery before spending effort on post-observation startup."},"next_corrective_experiment":{"experiment_id":"UTIL-EXP-019-STARTUP-003","hypothesis":"Earlier guarded same-canonical due placement can absorb observed delivery latency under predecessor useful work without creating dual substantive authority.","success_signal":"Observed successor first-useful handoff materially reduces cross-turn loss with no duplicate substantive side effect or schedule rollback."}}
+{
+  "schema_version": "1.7",
+  "program_id": "RRULER-PROGRAM-001",
+  "root_job_id": "RRULER-UTILIZATION-003",
+  "status": "STARTUP_003_CANARY_ACTIVE",
+  "target": {
+    "acceptance_window_seconds": 900,
+    "required_useful_seconds": 840,
+    "minimum_valid_completed_windows": 3,
+    "pass_rule": "THREE_CONSECUTIVE_VALID_ACCEPTED_FIXED_WINDOWS_WITH_SELECTED_ROLLING_MEAN_GTE_840",
+    "maximum_unexplained_internal_progress_gap_seconds_for_acceptance": 120
+  },
+  "execution_envelope": {
+    "bounded_turn_target_useful_seconds": 600,
+    "minimum_continue_turn_seconds": 600,
+    "verified_fallback_final_rearm_offset_seconds": 60,
+    "p0_max_average_non_useful_gap_seconds_for_600s_turn": 42.9,
+    "distinction": "The 600-second bounded execution turn is not the 900-second P0 acceptance window.",
+    "normal_continue_pre600_voluntary_close_forbidden": true
+  },
+  "measurement": {
+    "continuous_progress_evidence_required": true,
+    "missing_boundary_policy": "MARK_UNKNOWN_DO_NOT_INFER",
+    "scheduler_and_startup_separate": true,
+    "fixed_window_policy_ref": "control/rolling-window-promotion.v1.json",
+    "pending_evidence_is_not_accepted": true
+  },
+  "latest_completed_bounded_turn": {
+    "run_id": "RUN-UTIL-20260921-154958",
+    "authority_epoch": 59,
+    "wall_seconds": 626,
+    "strict_productive_seconds": 557,
+    "strict_wall_coverage_ratio": 0.8898,
+    "target_600_coverage_ratio": 0.9283,
+    "classification": "PROMISING_SINGLE_TURN_NOT_P0_WINDOW"
+  },
+  "startup_measurement": {
+    "ledger": "state/SUCCESSOR_STARTUP.json",
+    "latest_valid_sample": "STARTUP-002",
+    "due_to_observation_seconds": 155,
+    "observation_to_claim_seconds": 21,
+    "claim_to_first_useful_seconds": 0,
+    "dominant_measured_segment": "SCHEDULER_DUE_TO_INVOCATION_OBSERVATION"
+  },
+  "active_retest": {
+    "experiment_id": "UTIL-EXP-019",
+    "sample_id": "STARTUP-003",
+    "purpose": "Test guarded timing compensation against the measured scheduler-delivery segment while preserving single substantive authority and completion-relative fallback.",
+    "required_observed_boundaries": [
+      "predecessor_last_useful_at",
+      "scheduled_due_at",
+      "successor_observed_at",
+      "authority_claim_at",
+      "first_durable_useful_at"
+    ],
+    "promotion_rule": "Do not promote predictive timing from one sample; rollback on unsafe overlap or failed useful-work handoff."
+  },
+  "valid_completed_windows_rolling": [],
+  "rolling_mean_observed_useful_seconds": null,
+  "goal_reached": false,
+  "latest_diagnosis": {
+    "cause_class": "SCHEDULER_DELIVERY_LATENCY_DOMINATES_LATEST_PROSPECTIVE_SAMPLE",
+    "evidence": "STARTUP-002 measured 155s due-to-observation, 21s observation-to-claim, and 0s claim-to-first-useful.",
+    "implication": "Optimize or compensate scheduler delivery before spending effort on post-observation startup."
+  },
+  "next_corrective_experiment": {
+    "experiment_id": "UTIL-EXP-019-STARTUP-003",
+    "hypothesis": "Earlier guarded same-canonical due placement can absorb observed delivery latency under predecessor useful work without creating dual substantive authority.",
+    "success_signal": "Observed successor first-useful handoff materially reduces cross-turn loss with no duplicate substantive side effect or schedule rollback."
+  }
+}
