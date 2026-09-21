@@ -17,9 +17,11 @@
     "p0_max_average_non_useful_gap_seconds_for_600s_turn": 42.9,
     "distinction": "The 600-second bounded execution turn is not the 900-second P0 acceptance window.",
     "normal_continue_pre600_voluntary_close_forbidden": true,
-    "short_rolling_provisional_offset_seconds": 120,
-    "short_rolling_refresh_guard_seconds": 45,
-    "long_provisional_780_seconds_retired": true
+    "long_provisional_780_seconds_retired": true,
+    "provisional_offset_seconds": 660,
+    "provisional_extension_guard_seconds": 90,
+    "provisional_extension_offset_seconds": 180,
+    "short_rolling_120_seconds_retired_as_default": true
   },
   "measurement": {
     "continuous_progress_evidence_required": true,
@@ -62,9 +64,9 @@
   "rolling_mean_observed_useful_seconds": null,
   "goal_reached": false,
   "latest_diagnosis": {
-    "cause_class": "LONG_PROVISIONAL_POLICY_CREATED_AVOIDABLE_NEXT_DUE_GAP",
-    "evidence": "Live operator mutation of the same recurring MAIN to a near due succeeded immediately; platform capability was not the blocker. Prior policy explicitly armed target 600s + 180s margin = 780s.",
-    "implication": "Use short rolling SAME-MAIN provisional NOW+120s with <=45s refresh guard; preserve exact END+60 normal close and measure provider delivery latency separately."
+    "cause_class": "PROVISIONAL_HORIZON_POLICY_MISMATCH",
+    "evidence": "The former +780s provisional made a normal ~10m turn appear to wait until ~13m. Manual near-due mutation proved the scheduler accepts earlier DTSTART, but prior controlled reservation A/B evidence found repeated +2m SHORT_ROLLING caused an overlapping duplicate invocation while +11m LONG_PROVISIONAL completed >600s with no observed overlap and low mutation churn. The 01:30:15 scheduled invocation also produced last_run_time without a matching new BOOT_STARTED by 01:33+, so invocation metadata alone is not bootstrap proof.",
+    "implication": "Use workload-relative adaptive +11m provisional for normal ~10m turns, no routine mid-turn mutation, exact END+60 at close, and distinguish scheduler invocation from durable BOOT_STARTED."
   },
   "next_corrective_experiment": {
     "experiment_id": "UTIL-EXP-019-STARTUP-003",
