@@ -13,6 +13,10 @@ OPERATOR_RESCHEDULE_EXCLUSIONS = {
     "EXPLICIT_OPERATOR_RESCHEDULE",
     "OPERATOR_SCHEDULE_RESET",
 }
+ONE_SHOT_CANARY_EXCLUSIONS = {
+    "SCHEDULE_CATEGORY_CANARY_REJECTED",
+    "ONE_SHOT_CANARY_FAILURE",
+}
 
 
 def _ts(value: str) -> datetime:
@@ -118,6 +122,11 @@ def audit(
             sample.get("maintenance_interrupted") is True
             or exclusion in MAINTENANCE_EXCLUSIONS
         )
+        rejected_one_shot_canary = (
+            sample.get("schedule_mode") == "EXACT_ONE_SHOT_SELF_UPDATE_CANARY"
+            or exclusion in ONE_SHOT_CANARY_EXCLUSIONS
+            or sample.get("validity") == "EXCLUDED_SCHEDULE_CATEGORY_CANARY"
+        )
         operator_rescheduled = (
             sample.get("operator_rescheduled") is True
             or exclusion in OPERATOR_RESCHEDULE_EXCLUSIONS
@@ -133,6 +142,8 @@ def audit(
 
         if maintenance_interrupted:
             comparison_exclusion = "OPERATOR_MAINTENANCE_INTERRUPTION"
+        elif rejected_one_shot_canary:
+            comparison_exclusion = "SCHEDULE_CATEGORY_CANARY_REJECTED"
         elif operator_rescheduled:
             comparison_exclusion = "OPERATOR_RESCHEDULED_GENERATION"
         elif recovery_generation:
@@ -154,12 +165,13 @@ def audit(
             "acknowledged_invalid": acknowledged_invalid,
             "startup_receipt_complete": bool(sample.get("boot_started_at") and sample.get("rearm_verified_at")),
             "operator_rescheduled_generation": operator_rescheduled,
+            "rejected_one_shot_canary": rejected_one_shot_canary,
             "recovery_generation": recovery_generation,
             "recovery_kind": recovery_kind,
             "recovery_lineage_valid": recovery_lineage_valid,
             "scheduler_comparison_eligible": (
-                comparison_ready and not maintenance_interrupted and not operator_rescheduled
-                and not recovery_generation and not errors
+                comparison_ready and not maintenance_interrupted and not rejected_one_shot_canary
+                and not operator_rescheduled and not recovery_generation and not errors
             ),
             "scheduler_comparison_exclusion": comparison_exclusion,
         })
@@ -177,6 +189,9 @@ def audit(
         "watchdog_recovery_generation_count": sum(item["recovery_generation"] for item in results),
         "operator_rescheduled_generation_count": sum(
             item["operator_rescheduled_generation"] for item in results
+        ),
+        "rejected_one_shot_canary_count": sum(
+            item["rejected_one_shot_canary"] for item in results
         ),
         "results": results,
         "raw_evidence_policy": "PRESERVED_WITH_EXCLUSION_NOT_DELETED_OR_REWRITTEN",
