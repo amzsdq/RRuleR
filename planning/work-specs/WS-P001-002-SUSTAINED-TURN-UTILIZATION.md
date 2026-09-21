@@ -83,3 +83,15 @@ Complete `UTIL-EXP-019` prospectively on the next handoff. Persist predecessor l
 ## Decision rule
 
 Any rule/control/process change is valid if its net expected contribution to P001 is positive. More rules are acceptable when they materially improve the outcome; fewer rules are preferable only when protection/effect is preserved or improved.
+
+## Chained-turn execution policy
+
+The primary utilization rule is now work-unit chaining rather than merely satisfying an 8-minute floor.
+
+- If a bounded unit completes before 10 elapsed minutes, immediately execute the next clear, low-risk, checkpointable authorized unit from this work spec/project when it fits the remaining platform safety budget.
+- If the next obvious unit is too large, decompose it and execute a smaller safe slice when possible.
+- At 10 elapsed minutes or later, do not start a new large unit; finish only the smallest safe in-flight unit, checkpoint, and hand off.
+- Normal turns should usually close between 10 and about 12 minutes. Going beyond ~12 minutes requires a genuine in-flight safety/atomicity reason.
+- A CONTINUE close below 10 minutes must record why no safe next unit could be started; below 8 minutes remains a high-severity utilization failure unless an allowlisted exception applies.
+
+This policy is intended to increase useful work by pulling forward already-authorized next work, not by padding, splitting trivial changes, or inventing activity.
