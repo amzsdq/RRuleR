@@ -23,16 +23,20 @@
     "Record STARTUP-010 first useful and update review/checkpoint.",
     "Close at >=600s safe boundary with synchronized MAIN and Watchdog."
   ],
-  "current_substep": 2,
+  "current_substep": 4,
   "handoff_boundary": "Epoch 70 active after verified provisional cold-rescue bootstrap.",
   "early_finish_fallback": "Add recovery-segment reporting to summarize_turn_close while preserving unknown boundaries.",
   "created_for_next_wake": false,
   "started_at": "2026-09-21T21:27:47+09:00",
-  "last_progress_at": "2026-09-21T21:29:37+09:00",
+  "last_progress_at": "2026-09-21T21:30:51+09:00",
   "progress_evidence": [
     "epoch69 post-bootstrap progress loss preserved without inferred work",
     "STARTUP-010 BOOT_STARTED=2026-09-21T21:28:24+09:00",
     "STARTUP-010 REARM_VERIFIED=2026-09-21T21:28:51+09:00",
-    "verified provisional due=2026-09-21T21:41:24+09:00"
+    "verified provisional due=2026-09-21T21:41:24+09:00",
+    "tools/audit_startup_boundaries.py execution repair committed",
+    "7 focused audit tests passed without pytest dependency",
+    "actual STARTUP/RUNS audit valid=true; recovery samples excluded from normal scheduler comparison",
+    "STARTUP-010 first useful=2026-09-21T21:30:51+09:00"
   ]
 }
