@@ -21,11 +21,16 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 ```text
 /
 ├─ AGENTS.md
+├─ planning/
+│  ├─ PROGRAM.md              # north-star + ordered project roadmap
+│  ├─ projects/               # outcome-oriented project plans
+│  └─ work-specs/             # implementable specs + acceptance progress
 ├─ control/
 │  ├─ POLICY.md
 │  ├─ relay-policy.v1.json
 │  └─ schemas/                 # execution contracts: checkpoint/lease/effect receipt
 ├─ state/
+│  ├─ NOW.json               # single pointer: program -> project -> work spec -> exact resume target
 │  ├─ CURRENT.json
 │  ├─ HANDOFF.json
 │  ├─ RELAY_VALIDATION.json   # machine acceptance ledger for the live relay
@@ -58,11 +63,11 @@ RRuleR is a public-safe durable control plane and workspace for long-running Cha
 A fresh session reads:
 
 1. `AGENTS.md`
-2. `control/POLICY.md`
-3. on relay runs, `control/relay-policy.v1.json`
-4. `state/CURRENT.json`
-5. `state/HANDOFF.json` and `state/RELAY_VALIDATION.json` when continuing/validating a relay
-6. the referenced checkpoint/task/spec
+2. `control/ACTIVE_CONTROLS.json` and required controls
+3. `planning/PROGRAM.md`
+4. `state/NOW.json`, then its referenced project and work spec
+5. `state/CURRENT.json`, `state/ACTIVITY.json`, `state/HANDOFF.json`, and `state/TURN_PLAN.json`
+6. task-specific implementation/evidence files only as needed
 7. `docs/RELAY_RRULE_SELF_UPDATE.md` when operating the relay
 
 Then it reconstructs state, validates authority, establishes the next wake, and immediately performs substantive work.
@@ -93,4 +98,4 @@ This repository is public. Never persist secrets, session cookies, tokens, passw
 1. Build RRuleR toward credible competitiveness with commercial long-running agent SaaS on persistence, recovery, orchestration, observability, verification, governance, usability, and especially sustained useful work.
 2. P0 until proven: >=840 seconds of evidenced useful work per intended 900-second relay turn across at least three valid turns; then preserve this as a regression SLO while advancing other dimensions.
 
-See `state/PROGRAM_GOALS.json` and `docs/COMPETITIVE_BASELINE.md`.
+See `planning/PROGRAM.md` for the human-readable roadmap, `state/NOW.json` for the active planning pointer, `state/PROGRAM_GOALS.json` for machine-readable program goals, and `docs/COMPETITIVE_BASELINE.md` for the competitive reference baseline.
