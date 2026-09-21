@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 
 ENFORCE_FROM = datetime.fromisoformat('2026-09-21T09:35:00+00:00')
-EXCEPTIONS = {'PLATFORM_ENFORCED_TERMINATION', 'EXPLICIT_OPERATOR_INTERVENTION', 'AUTHORITY_OR_FENCING_FAIL_CLOSED', 'NO_SAFE_RUNNABLE_WORK_AFTER_EXPLICIT_SCAN'}
+PRE600_CONTINUE_EXCEPTIONS = {'PLATFORM_ENFORCED_TERMINATION'}
 VALID_CONTINUE_END_REASONS = {
     'VERIFIED_SAME_CANONICAL_CONTINUATION',
     'VERIFIED_SAME_CANONICAL_EXACT_ONE_SHOT_CONTINUATION',
@@ -41,11 +41,8 @@ def validate(record):
         if record['end_reason'] not in VALID_CONTINUE_END_REASONS:
             raise ValueError('CONTINUE lacks valid end reason')
         if duration < 600:
-            alternatives = record.get('alternatives_checked')
-            if not isinstance(alternatives, list) or not alternatives or not all(isinstance(x,str) and x.strip() for x in alternatives):
-                raise ValueError('early close lacks concrete alternatives')
-            if record.get('short_turn_reason') not in EXCEPTIONS or record['close_decision'] != 'EXCEPTION':
-                raise ValueError('CONTINUE before 600s requires allowlisted exception')
+            if record.get('short_turn_reason') not in PRE600_CONTINUE_EXCEPTIONS or record['close_decision'] != 'EXCEPTION' or record['end_reason'] != 'PLATFORM_ENFORCED_TERMINATION':
+                raise ValueError('voluntary normal CONTINUE before 600s is forbidden')
         if record['close_decision'] == 'BUDGET_EXHAUSTED' and duration < 600:
             raise ValueError('budget exhaustion cannot authorize normal close before 600s')
         if record['end_reason'] == 'COMMITTED_SUCCESSOR_HANDOFF':
