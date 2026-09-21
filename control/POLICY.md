@@ -11,6 +11,8 @@
 
 Machine-readable active controls and fresh durable state govern execution. If prose disagrees, fail closed only for the disputed side effect, reconcile forward, and continue safe useful work.
 
+Every wake must perform a fresh policy sync from `control/ACTIVE_CONTROLS.json` and its currently mandatory artifacts before substantive work. Automation/bootstrap text is a survival kernel and pointer, not a cached substitute for fresh dynamic policy. For a normal nonterminal `CONTINUE` turn, 600 observed elapsed seconds is the minimum voluntary duration. Before 600 seconds, chain or decompose authorized work; CI pending, local completion, checkpointing, or a secured next wake do not authorize early close. Earlier termination must be represented truthfully as STOP/PAUSE, program terminal, genuine BLOCKED/fail-closed state, or platform-enforced termination.
+
 ## Architectural axioms
 
 1. Persistence belongs to GitHub.
@@ -37,7 +39,7 @@ After continuation is verified, obtain/confirm authority, persist WORKING activi
 
 ## Active scheduler policy
 
-The active mechanism is one same-canonical hourly RRULE under the rolling lifecycle. The verified fallback is completion-relative rearm; `UTIL-EXP-018` additionally authorizes a guarded predictive-prearm canary for normal continuation latency hiding.
+The active mechanism is one same-canonical hourly RRULE under the rolling lifecycle. The verified normal path is completion-relative END+60 rearm with the natural hourly recurrence as cold fallback. `UTIL-EXP-018` predictive prearm is rolled back and is historical evidence, not active authority.
 
 Startup order:
 
@@ -60,7 +62,7 @@ LATEST CHECKPOINT
  -> PERSIST VERIFIED DUE
 ```
 
-Predictive-prearm canary path:
+Historical predictive-prearm canary path (rolled back; not active authority):
 
 ```text
 +780s PROVISIONAL COLD RESCUE REMAINS INTACT
