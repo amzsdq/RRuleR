@@ -6,36 +6,30 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "root_goal": "P0 sustained evidenced useful-work coverage",
   "status": "CONTINUE",
-  "current_owner": "RUN-UTIL-20260921-221537",
-  "authority_epoch": 72,
+  "current_owner": "RUN-UTIL-20260921-223441",
+  "authority_epoch": 73,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "HANDOFF_COMMITTED",
+  "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-110",
-    "state": "COMPLETE",
+    "id": "CP-UTILIZATION-111",
+    "state": "WORKING",
     "completed": [
-      "Recovered the 22:07:23 receipt-less generation through the fixed Startup Watchdog.",
-      "Persisted generation-matched BOOT_STARTED and REARM_VERIFIED for the 22:13:24 recovery generation.",
-      "Verified same MAIN canonical provisional continuation at 22:29:29 and same Watchdog one-shot at 22:32:29, both enabled.",
-      "Recorded STARTUP-011 failure and STARTUP-012 fixed-Watchdog recovery with observed segment boundaries.",
-      "Updated startup boundary audit to validate next_sample; eleven focused tests and the actual 12-sample audit passed.",
-      "Closed epoch 72 at a 608-second boundary with same-canonical MAIN and Watchdog live-verified."
+      "Recovered the 22:26:45 receipt-less generation through the fixed Startup Watchdog.",
+      "Persisted generation-matched BOOT_STARTED and REARM_VERIFIED for recovery due 22:34:20.",
+      "Verified same MAIN provisional continuation at 22:48:28 and same Watchdog one-shot at 22:51:28, both enabled."
     ],
     "evidence": [
-      "state/STARTUP_ACK.json generation DUE:2026-09-21T22:13:24+09:00",
-      "live automation metadata re-read after both schedule mutations",
-      "state/SUCCESSOR_STARTUP.json commits 7c3b890 and f3d9286",
-      "tools/audit_startup_boundaries.py f3f0352 + tests 8575cc7; actual audit valid=true",
-      "WORK_EVIDENCE epoch72 record validated; live close MAIN 22:26:45 and Watchdog 22:29:45"
+      "state/STARTUP_ACK.json generation DUE:2026-09-21T22:34:20+09:00",
+      "live MAIN and Watchdog metadata re-read after mutation"
     ],
-    "observation": "The fixed Watchdog recovered the receipt-less 22:07:23 normal generation. Active next_sample auditing now prevents the newest recovery generation from escaping lineage/generation validation.",
-    "next_action": "Watchdog rearmed the same MAIN for 22:34:20 after the 22:26:45 generation produced no durable startup receipts; successor must write BOOT_STARTED and REARM_VERIFIED before substantive work."
+    "observation": "Epoch 73 is a fixed-Watchdog recovery generation. The prior close correctly projected ACTIVITY=HANDOFF_READY, demonstrating the idle-state shape needed by IDLE_DISTANT_DUE.",
+    "next_action": "Harden the lifecycle contract and validation so closed/handoff states cannot retain an active WORKING projection."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T22:34:20+09:00",
+    "next_due_at": "2026-09-21T22:48:28+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -59,9 +53,9 @@
       "normal_check_offset_seconds": 180,
       "recovery_recheck_seconds": 240,
       "main_recovery_due_offset_seconds": 60,
-      "next_watchdog_due_at": "2026-09-21T22:37:20+09:00",
-      "coverage": "RECOVERY_ARMED",
-      "last_classification": "STARTUP_ACK_MISSING",
+      "next_watchdog_due_at": "2026-09-21T22:51:28+09:00",
+      "coverage": "HEALTHY_BOOTSTRAP",
+      "last_classification": "HEALTHY_BOOTSTRAP",
       "last_recovery_at": "2026-09-21T22:33:20+09:00",
       "enabled_verified": true,
       "policy_version": 3,
@@ -69,7 +63,7 @@
       "idle_distant_due_extra_slack_seconds": 120,
       "idle_distant_due_recovery_offset_seconds": 60
     },
-    "next_due_source": "WATCHDOG_STARTUP_ACK_MISSING_RECOVERY"
+    "next_due_source": "PROVISIONAL_BOOTSTRAP_REARM"
   },
   "safety": {
     "public_repo": true,
