@@ -14,11 +14,13 @@ Read `state/NOW.json` first. If execution_status is PAUSED, do not start substan
 3. Read `state/CURRENT.json`, `state/ACTIVITY.json`, `state/HANDOFF.json`, and `state/TURN_PLAN.json`.
 4. Resolve north-star goal, active project, active work spec, program status, owner/authority epoch, latest checkpoint, exact next action, current activity evidence, and durable expected next due.
 5. Apply `control/scheduler-fence.v1.json` before substantive side effects. A timing/generation mismatch is recovery work when a newer valid same-canonical continuation exists; reconcile forward and never roll schedule generation or authority backward.
-6. Before substantive work, establish and verify a valid successor/continuation path for THIS SAME canonical according to the active rolling lifecycle. Never create a replacement canonical merely to continue this actor.
-7. Persist WORKING activity before or with the first substantive durable change after authority is obtained.
-8. Persist one primary turn objective in `state/TURN_PLAN.json` before substantive execution. The turn objective MUST implement the active work spec; it must not silently invent a different project or strategy.
-9. Read only task-specific files needed for the current objective.
-10. Continue from durable state; never restart completed work merely because local chat context is missing.
+6. Immediately after minimum fresh NOW/CURRENT/canonical/fence validation, persist a generation-matched `BOOT_STARTED` receipt in `state/STARTUP_ACK.json`. Do this before provisional arm, full restore, or substantive work; never infer the receipt from clock arrival or automation metadata alone.
+7. Establish and verify a valid provisional successor/continuation path for THIS SAME canonical according to the active rolling lifecycle. Never create a replacement canonical merely to continue this actor.
+8. Immediately after provisional continuation verification, persist generation-matched `REARM_VERIFIED` in `state/STARTUP_ACK.json`, including the verified provisional due. Only then continue full restore/authority/work.
+9. Persist WORKING activity before or with the first substantive durable change after authority is obtained.
+10. Persist one primary turn objective in `state/TURN_PLAN.json` before substantive execution. The turn objective MUST implement the active work spec; it must not silently invent a different project or strategy.
+11. Read only task-specific files needed for the current objective.
+12. Continue from durable state; never restart completed work merely because local chat context is missing.
 
 ## Planning spine and anti-local-optimization
 
@@ -49,7 +51,7 @@ When progress changes, update the work-spec acceptance/evidence first, then proj
 The scheduler mechanism is `RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE` unless fresh active controls explicitly replace it.
 
 - Startup: fence -> preserve newest verified continuation -> provisional-arm same canonical -> verify -> work.
-- Normal `CONTINUE` close: checkpoint -> set THIS SAME canonical's next due to the **actual observed turn END + exactly 60 seconds** (preserve seconds; no minute rounding) -> verify -> persist observed due. This is the canonical default, not a tunable convenience. A different delay requires fresh durable evidence/constraint plus an explicit exception reason; scheduler delivery jitter is measured separately and must not be compensated by adding unexplained local delay.
+- Normal `CONTINUE` close: checkpoint -> set THIS SAME canonical's next due to the **actual observed turn END + exactly 60 seconds** (preserve seconds; no minute rounding) -> verify -> persist observed due -> update the fixed startup Watchdog one-shot to **fresh MAIN expected due + 3 minutes** -> verify -> persist `state/WATCHDOG.json`. This is the canonical default. If Watchdog sync fails, retry once when safe and record `DEGRADED_WATCHDOG_COVERAGE`; do not falsely claim pre-bootstrap protection. A different MAIN delay requires fresh durable evidence/constraint plus an explicit exception reason; scheduler delivery jitter is measured separately.
 - A successful checkpoint, test, CI pass, handoff, document, milestone, root, or subgoal is progress, not program completion.
 - A future cold-rescue wake is safety coverage; it does not authorize a healthy current owner to stop.
 - If the armed successor becomes too near while useful authorized work remains, refresh/extend it when the active lifecycle policy permits.
@@ -212,3 +214,14 @@ The existing RRuleR actor performs routine recording, review, bottleneck diagnos
 Follow the single detailed continuous review procedure in `planning/evidence/TURN-CLOSE-V4-RETEST.md`, section “Continuous relay directive”. Trigger targeted diagnosis for unexcused short closes, invalid/missing records, conflicting timestamps, duplicate effects or missing continuation; investigate sustained performance degradation only with comparable valid observations. Then correct one evidenced cause and compare subsequent samples. Preserve exclusions and unknown time.
 
 A completed initial review, successful repair, CI pass or accumulated sample count does not make the ongoing program terminal.
+
+## Startup Watchdog
+
+The fixed startup Watchdog is an independent one-shot self-relay governed by `control/startup-watchdog.v1.json`. Its only job is to close the gap before MAIN can provisionally rearm itself.
+
+- MAIN writes `BOOT_STARTED` after minimum fresh validation and `REARM_VERIFIED` after provisional same-canonical continuation verification.
+- Normal Watchdog check is scheduled for fresh MAIN expected due + 3 minutes.
+- Missing generation-matched `BOOT_STARTED` after that grace is `STARTUP_ACK_MISSING`; when fresh fencing permits, Watchdog rearms the SAME MAIN canonical to now+1 minute and rechecks itself at now+4 minutes.
+- `BOOT_STARTED` without timely `REARM_VERIFIED` is `BOOTSTRAP_REARM_MISSING` and follows the same bounded recovery pattern when safe.
+- Watchdog never performs substantive program work, never claims substantive authority, never creates replacement MAIN/Watchdog canonicals, and never uses RRULE.
+- Fresh GitHub policy is authoritative. MAIN and Watchdog reservation prompts must keep their stable embedded kernels synchronized with `control/startup-watchdog.v1.json`; dynamic task/state remains GitHub-only.
