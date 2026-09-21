@@ -8,7 +8,7 @@
   "status": "CONTINUE",
   "current_owner": "RUN-UTIL-20260922-003010",
   "authority_epoch": 76,
-  "canonical_automation_id": "6ab14f7951848191b65e4b5d4bc979d8",
+  "canonical_automation_id": "6ab152b636748191a71873ba4d5ef551",
   "run_state": "HANDOFF_COMMITTED",
   "checkpoint": {
     "id": "CP-UTILIZATION-114",
@@ -23,7 +23,8 @@
       "Detected enabled=false close race, then re-enabled and live-verified SAME MAIN custom recurring END+60 at 00:41:36.",
       "Operator migrated MAIN from retired predecessor canonical to operator-created recurring reservation.",
       "Retired predecessor MAIN was disabled before new canonical activation.",
-      "New MAIN schedule preserved as operator-created RRULE:FREQ=HOURLY with natural next due 01:38:00 KST."
+      "New MAIN schedule preserved as operator-created RRULE:FREQ=HOURLY with natural next due 01:38:00 KST.",
+      "Operator migrated MAIN to clean operator-created reservation 6ab152b636748191a71873ba4d5ef551; both prior MAIN canonicals remain retired and disabled."
     ],
     "evidence": [
       "state/SUCCESSOR_STARTUP.json@9f66357",
@@ -35,16 +36,17 @@
       "23 exact-remote-source tests PASS; live ledger audit PASS",
       "live SAME MAIN: enabled, DTSTART 00:41:36, DAILY+24 BYHOUR, BYMINUTE=41, BYSECOND=36",
       "new MAIN canonical 6ab14f7951848191b65e4b5d4bc979d8: enabled, RRULE:FREQ=HOURLY, DTSTART 00:38:00 KST",
-      "retired predecessor 6aaf8a993eb08191b8d0ab1d9662e4b2: disabled"
+      "retired predecessor 6aaf8a993eb08191b8d0ab1d9662e4b2: disabled",
+      "new clean MAIN canonical 6ab152b636748191a71873ba4d5ef551: enabled, RRULE:FREQ=HOURLY, DTSTART 00:54:59 KST"
     ],
-    "observation": "Operator-directed canonical migration supersedes the custom-recurring category canary. The new operator-created MAIN reservation is authoritative; old MAIN is retired and must not be reactivated.",
-    "next_action": "Observe the new MAIN canonical natural wake at 01:38:00 KST, record BOOT_STARTED/REARM_VERIFIED, then continue normal END+60 same-canonical chaining."
+    "observation": "Operator-directed clean-context canonical migration supersedes both prior MAIN canonicals. The new operator-created reservation is authoritative; predecessor canonicals must never be reactivated.",
+    "next_action": "Observe new clean MAIN wake at 00:54:59 KST, record BOOT_STARTED/REARM_VERIFIED, then continue SAME MAIN END+60 chaining."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_COMPLETION_RELATIVE_MAIN",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-22T01:38:00+09:00",
+    "next_due_at": "2026-09-22T00:54:59+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -68,9 +70,9 @@
       "coverage": "NOT_REQUIRED_FOR_NORMAL_CONTINUITY",
       "next_watchdog_due_at": null,
       "enabled_verified": false,
-      "policy_version": 6
+      "policy_version": 8
     },
-    "next_due_source": "OPERATOR_CREATED_MAIN_NATURAL_RRULE_DUE",
+    "next_due_source": "CLEAN_OPERATOR_CREATED_MAIN_MIGRATION_FAST_DUE",
     "cold_fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE"
   },
   "safety": {
