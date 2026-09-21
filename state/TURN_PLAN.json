@@ -23,18 +23,22 @@
     "Inspect existing event-wake candidate and package the smallest executable recovery transport step.",
     "Checkpoint and exact END+60 close."
   ],
-  "current_substep": 3,
-  "handoff_boundary": "Bootstrap-stage semantics and audit complete; CI invariant integration remains.",
+  "current_substep": 5,
+  "handoff_boundary": "Bootstrap observability, guarded rescue evaluator/workflow gate, and initial three-turn review complete; live event consumer provisioning remains external/unauthorized in this automation turn.",
   "early_finish_fallback": "Audit state/WAKE_ARCHITECTURE and event-wake candidate for an actually executable same-canonical wake path; do not mistake detection for recovery.",
   "created_for_next_wake": false,
   "started_at": "2026-09-21T20:49:46+09:00",
-  "last_progress_at": "2026-09-21T20:52:13+09:00",
+  "last_progress_at": "2026-09-21T20:59:31+09:00",
   "progress_evidence": [
     "automation last_run_time=2026-09-21T10:50:28.457228+00:00",
     "provisional DTSTART=20260921T210229",
     "tools/audit_successor_progress.py@a0be8d6287796440b8aa54e9b05b598e0c92768b",
     "control/handoff-recovery.v1.json@d81c6f3dd1da972222b32ba2fe06a472d655880d",
     "control/rolling-rrule-lifecycle.v1.json@590b8a1ee5cb16f5b077ed68475ea0a47916a7ad",
-    "8 focused startup-progress tests passed"
+    "8 focused startup-progress tests passed",
+    "tools/evaluate_event_rescue.py@ceafec60ecfb665957b46ac1e80e195cbd724b83",
+    "tests/test_evaluate_event_rescue.py@b626fa64b43f3878faed92a6dd61aea386b72084",
+    ".github/workflows/event-wake-rescue-pulse.yml@641a66d68d51e6b26f3c8e05bf2ce77c798e2291",
+    "planning/evidence/TURN-CLOSE-V4-RETEST.md@fc34b285ce7e22d57d7618050115394b25e13aa0"
   ]
 }
