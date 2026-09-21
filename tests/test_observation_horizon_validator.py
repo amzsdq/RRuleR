@@ -24,6 +24,25 @@ class ObservationHorizonValidatorTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "rollback"):
             validate(horizon, POLICY, source, previous=previous)
 
+    def test_rejects_rollback_against_any_merge_parent(self):
+        parents = [
+            {"trusted_observed_through": "2026-09-20T23:04:48+00:00"},
+            {"trusted_observed_through": "2026-09-20T23:06:48+00:00"},
+        ]
+        horizon = {"provenance_kind": "GITHUB_ACTIONS_OBSERVED_TIMESTAMP", "provenance_ref": "123", "trusted_observed_through": "2026-09-20T23:05:48+00:00"}
+        source = {"status": "completed", "conclusion": "success", "updated_at": "2026-09-20T23:05:48Z"}
+        with self.assertRaisesRegex(ValueError, "rollback"):
+            validate(horizon, POLICY, source, previous_states=parents)
+
+    def test_accepts_horizon_at_or_above_all_merge_parents(self):
+        parents = [
+            {"trusted_observed_through": "2026-09-20T23:04:48+00:00"},
+            {"trusted_observed_through": "2026-09-20T23:05:48+00:00"},
+        ]
+        horizon = {"provenance_kind": "GITHUB_ACTIONS_OBSERVED_TIMESTAMP", "provenance_ref": "123", "trusted_observed_through": "2026-09-20T23:05:48+00:00"}
+        source = {"status": "completed", "conclusion": "success", "updated_at": "2026-09-20T23:05:48Z"}
+        self.assertTrue(validate(horizon, POLICY, source, previous_states=parents))
+
     def test_rejects_forged_timestamp(self):
         horizon = {"provenance_kind": "GITHUB_ACTIONS_OBSERVED_TIMESTAMP", "provenance_ref": "123", "trusted_observed_through": "2026-09-20T23:06:48+00:00"}
         source = {"status": "completed", "conclusion": "success", "updated_at": "2026-09-20T23:05:48Z"}
