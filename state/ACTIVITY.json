@@ -8,10 +8,10 @@
   "authority_epoch": 73,
   "substantive_work_started_at": "2026-09-21T22:36:46+09:00",
   "last_progress_at": "2026-09-21T22:45:51+09:00",
-  "last_progress_kind": "TURN_CLOSED_WITH_VERIFIED_CONTINUATION",
-  "current_unit": "Await generation-matched successor bootstrap.",
-  "next_wake_due_at": "2026-09-21T22:47:28+09:00",
+  "last_progress_kind": "OPERATOR_FAST_PATH_RECOVERY_REARM",
+  "current_unit": "Await generation-matched MAIN bootstrap on the normal fast path.",
+  "next_wake_due_at": "2026-09-21T23:10:59+09:00",
   "successor_observed": false,
   "handoff_ready": true,
-  "operator_ui_note": "Epoch 73 is closed; no substantive owner is active. Same MAIN is verified for 22:47:28 and Watchdog for 22:50:28."
+  "operator_ui_note": "No substantive owner is active. MAIN is operator-rearmed for 23:10:59; Watchdog is emergency-only at 23:13:59."
 }
