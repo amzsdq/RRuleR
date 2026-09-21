@@ -11,6 +11,7 @@ MAINTENANCE_EXCLUSIONS = {"OPERATOR_MAINTENANCE_INTERRUPTION", "MAINTENANCE_PAUS
 OPERATOR_RESCHEDULE_EXCLUSIONS = {
     "OPERATOR_RESCHEDULED_GENERATION",
     "EXPLICIT_OPERATOR_RESCHEDULE",
+    "OPERATOR_SCHEDULE_RESET",
 }
 
 
@@ -120,7 +121,8 @@ def audit(
         operator_rescheduled = (
             sample.get("operator_rescheduled") is True
             or exclusion in OPERATOR_RESCHEDULE_EXCLUSIONS
-            or sample.get("validity") == "EXCLUDED_OPERATOR_RESCHEDULED"
+            or sample.get("validity")
+            in {"EXCLUDED_OPERATOR_RESCHEDULED", "EXCLUDED_OPERATOR_MAINTENANCE_RECOVERY"}
         )
         comparison_ready = bool(due and sample.get("successor_observed_at"))
         acknowledged_invalid = (
