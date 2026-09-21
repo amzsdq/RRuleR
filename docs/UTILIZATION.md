@@ -1,107 +1,121 @@
 # Relay Utilization Measurement
 
 ## Goal
-RRuleR optimizes useful-work utilization subject to correctness invariants. A correct relay that voluntarily ends a runnable nonterminal turn is operationally defective.
 
-The active performance target is a **rolling mean observed useful-work span >= 840 seconds across at least 3 valid completed turns**, with continuous progress evidence inside every counted span. The intended operating shape is approximately 14 minutes of useful work inside each 15-minute wake interval, with roughly one minute of runtime/handoff safety margin.
+RRuleR optimizes evidenced useful-work coverage subject to correctness invariants. A correct relay that voluntarily ends a runnable normal nonterminal `CONTINUE` turn before the current minimum is operationally defective.
 
-## Primary metric
-`useful_work_utilization = productive_substantive_seconds / eligible_active_window_seconds`
+Two time scales must remain separate:
 
-Eligible time excludes explicit operator pause, proven external blocking, and platform-wide unavailability. It includes voluntary early stop, avoidable handoff/scheduler gaps, and successor delay caused by stale durable state.
+- **bounded execution turn:** normal nonterminal `CONTINUE` has a 600-second voluntary hard floor and ~720-second soft ceiling;
+- **P0 acceptance window:** 900 seconds with >=840 seconds of evidenced useful coverage, evaluated independently of the bounded-turn duration.
 
-For the current experiment, the reconstructable proxy is:
+The 600-second turn is not the 840/900 acceptance threshold.
 
-`observed_useful_span_seconds = last_meaningful_progress_at - substantive_work_started_at`
+## Primary measurement
 
-A span alone is **not** proof that every second was useful work. Two commits 14 minutes apart with a long idle gap must not pass. A turn counts only when meaningful durable progress evidence covers the span with no unexplained internal gap greater than 120 seconds and no known waiting/idle interval masquerading as work.
+Useful time is accepted only from observed artifact-backed boundaries. Elapsed START-to-END is not automatically useful work.
 
-## Wake cadence versus execution
-The 15-minute RRULE is a wake cadence, not a work-duration quota. A run does not gain permission to end because a work unit, checkpoint, document, root, or CI check completed.
+`useful_work_utilization = evidenced_productive_seconds / eligible_active_window_seconds`
 
-The same canonical automation remains an hourly RRULE whose BYMINUTE phase rotates `00 -> 15 -> 30 -> 45 -> 00`. Each expected wake secures and verifies the following quarter before substantive work.
+Eligible time excludes explicit operator pause, proven external blocking, and platform-wide unavailability. It includes voluntary early stop, avoidable continuation gaps, and scheduler/startup loss caused by the relay design.
 
-OpenAI's current Scheduled Tasks documentation describes eligible paid recurring tasks as running up to once per hour. RRuleR's effective quarter-hour fast path is therefore an experimental same-task schedule-mutation technique, not a documented native 15-minute recurrence. Expected due time and actual successor observation must be stored separately.
+Missing boundaries remain unknown. Do not infer hidden work from commits, schedule times, or silence.
 
-## Live 14+1 measurement protocol
-A turn that is intended to count toward the 840-second gate must follow this sequence:
+## Current continuation topology
 
-1. **Wake boundary** — record the actual worker wake time; do not substitute the nominal scheduled time.
-2. **Rearm first** — move the same canonical RRULE to the next quarter and verify success.
-3. **Authority claim** — advance to a fresh authority epoch and mark `state/ACTIVITY.json` as `WORKING`.
-4. **Substantive start** — persist `substantive_work_started_at` at the first real useful-work boundary.
-5. **Progress evidence** — after meaningful bounded units, refresh `last_progress_at` and describe the current unit. A turn intended for acceptance must not contain an unexplained internal progress-evidence gap >120 seconds.
-6. **12-minute admission cutoff** — after roughly 720 seconds, stop starting work that cannot be checkpointed quickly.
-7. **14-minute handoff-ready point** — at roughly 840 seconds, set `handoff_ready=true`; continue only tiny safe units while waiting for actual successor evidence. Do not idle merely because 840 seconds was reached.
-8. **Successor evidence** — the successor first secures its own next quarter, then durably requests handoff. Scheduled clock arrival alone is not successor evidence.
-9. **Drain** — predecessor stops admitting new substantive units, closes the smallest safe unit, persists the final meaningful progress boundary and exact next action, then commits handoff.
-10. **Finalize** — only after the end boundary is known, update `state/RUNS.jsonl` and `state/UTILIZATION.json`. Missing timestamps make the measurement invalid; they are never inferred.
+The authoritative normal scheduler is the current clean SAME MAIN recurring hourly RRULE. The current MAIN self-shifts its DTSTART to exact observed END+60 for the fast continuation path while preserving recurrence. The same recurring RRULE is the built-in cold fallback if a shifted wake is lost. Watchdog is disabled break-glass standby and is not part of normal continuation.
 
-## Valid-turn contract
-A turn may enter `state/UTILIZATION.json#/valid_completed_turns` only when all of the following are positively evidenced:
+Retired custom-recurring and prior MAIN canonicals are historical only and must not be reactivated.
 
-- one root/run identity and one authority epoch cover the measurement;
-- `substantive_work_started_at` is durable;
-- final meaningful progress time is durable and is not earlier than substantive start;
-- ordered meaningful progress evidence spans the interval with no unexplained internal gap >120 seconds;
-- known waiting or idle intervals are not counted as productive coverage;
-- run end/handoff boundary is durable;
-- end reason is in the allowed end-reason set;
-- `COMMITTED_SUCCESSOR_HANDOFF` includes durable successor observation;
-- no authority rollback or conflicting duplicate execution invalidated the interval;
-- `observed_useful_span_seconds` is computed from recorded timestamps, never from schedule assumptions.
+Expected due time and actual invocation/BOOT_STARTED must be recorded separately. Scheduler/provider delivery latency is not worker useful time and must not be hidden inside turn-duration claims.
 
-A turn can be operationally useful yet measurement-invalid. Invalid evidence is retained for diagnosis but does not count toward the three-turn gate.
+## Fresh-policy synchronization
 
-## Measurable end contract
-Every durably observed run end must record:
-- `run_ended_at`;
-- `end_reason`;
-- `program_status_at_end`;
-- `successor_observed_at` when the reason is committed successor handoff.
+Every wake reads fresh `control/ACTIVE_CONTROLS.json` and the artifacts it currently marks mandatory before substantive work. Prior-wake cached policy cannot override fresh durable controls. Reservation/bootstrap text is a survival kernel; dynamic policy belongs in fresh GitHub durable state except explicit operator and canonical-safety invariants.
 
-Allowed end reasons are exactly:
-- `PROGRAM_COMPLETE`;
-- `BLOCKED_EXTERNAL`;
-- `COMMITTED_SUCCESSOR_HANDOFF`;
-- `EXPLICIT_OPERATOR_STOP`;
-- `PLATFORM_ENFORCED_TERMINATION`.
+## 600-second normal CONTINUE hard floor
 
-An ended run with no allowed reason is a validation failure, not healthy idle. A handoff end without durable successor observation is also invalid.
+For a normal nonterminal `CONTINUE` turn:
 
-## Successor measurement
-At each cold successor wake:
-1. secure the next wake first;
-2. read predecessor activity and run evidence;
-3. persist successor observation/handoff request before takeover when a predecessor is still fresh;
-4. claim a newer authority epoch only after normal handoff or eligible stale-predecessor recovery;
-5. classify the predecessor end only from evidence, never from assumption;
-6. measure predecessor productive-end to successor productive-start when both boundaries are known;
-7. leave the metric unknown rather than fabricate a duration when a boundary is missing;
-8. continue substantive work in the same turn after recording the observation.
+1. 600 observed elapsed seconds is the minimum voluntary turn duration, not merely a target.
+2. Before 600 seconds, when a bounded unit completes, immediately select the next clear low-risk checkpointable authorized unit.
+3. If the obvious unit is too large, decompose it and execute a smaller safe slice.
+4. If the primary unit is waiting on CI or external evidence, select an independent fallback/residual authorized unit.
+5. CI pending, packet/substep/checkpoint completion, secured continuation, or `nothing obvious` do not authorize voluntary pre-600 close.
+6. Earlier end is reserved for explicit operator STOP/PAUSE, durable program terminal state, a genuine BLOCKED/fail-closed authority or safety condition with no safe authorized work, or platform-enforced termination. Record the corresponding status/reason rather than disguising it as a normal CONTINUE close.
+7. At or after 600 seconds, stop starting new large units and finish only the smallest safe in-flight unit. ~720 seconds is the normal soft ceiling.
+8. Never pad, sleep, fabricate timestamps, or invent busywork to manufacture duration.
 
-If the predecessor was already stale for at least the configured recovery grace before the handoff request, recovery policy v2 permits a fast takeover after an immediate re-read proves no newer predecessor progress. This avoids paying the same 120-second freshness grace twice while still forbidding takeover from a fresh predecessor.
+Historical runs recorded before adoption of this hard floor remain historical evidence and are not retroactively rewritten.
+
+## Normal close contract
+
+A normal `STATUS=CONTINUE` close requires:
+
+1. latest useful checkpoint persisted;
+2. actual END observed;
+3. THIS SAME MAIN mutated to exact `END+60s` while preserving recurring schedule and `is_enabled=true`;
+4. live metadata re-read proving same canonical, enabled state, recurrence, and exact DTSTART;
+5. the same verified fast due persisted coherently to CURRENT/ACTIVITY/HANDOFF;
+6. non-WORKING close projection validated;
+7. turn status/evidence persisted from actual observed boundaries.
+
+A long provisional crash-insurance due cannot satisfy normal close. If exact fast rearm fails, retry once when safe. Preserve an older verified recurring fallback if available and classify degraded continuation; do not create a replacement MAIN merely to continue.
+
+## P0 acceptance measurement
+
+P0 is evaluated on fixed 900-second windows. A valid accepted window requires >=840 seconds of evidenced useful coverage and no unexplained internal progress gap above the active threshold. Current pass logic requires at least three valid completed windows and the rolling mean of selected valid windows to meet the 840-second target.
+
+This target is intentionally stricter than the bounded-turn minimum. With 600-second turns, cross-turn scheduler/startup/close losses must be measured explicitly rather than hidden by treating elapsed time as productive.
+
+## Useful-work evidence
+
+Productive evidence may include materially new implementation, validation, reconciliation, research, design, or durable documentation that advances the active work spec. Scheduler mutation, heartbeat-only state, waiting, timestamp-only changes, duplicate checkpoint prose, and CI polling without a new result do not independently prove useful work.
+
+Evidence rules:
+
+- observed boundaries only;
+- forward-only capture;
+- unknown time is not useful time;
+- materially new artifact/test/design evidence is required for accepted useful-work records;
+- known waiting/idle intervals are not counted as productive coverage;
+- no authority rollback or conflicting duplicate execution may contaminate the interval.
+
+## Scheduler and startup measurement
+
+For each continuation generation, preserve distinct observations where available:
+
+- scheduled due;
+- actual invocation observation;
+- `BOOT_STARTED`;
+- provisional `REARM_VERIFIED`;
+- authority claim;
+- first durable useful mutation;
+- predecessor last useful boundary;
+- actual END;
+- verified next fast due.
+
+Provider delivery delay and post-invocation startup delay are different failure classes and must not be merged.
 
 ## Under-target diagnosis
-Every valid completed turn below 840 seconds must select one dominant cause:
 
-- `PACKET_TOO_SMALL`
-- `EARLY_VOLUNTARY_END`
-- `WAITING_ON_TOOL_OR_CI`
-- `SCHEDULER_GAP`
-- `HANDOFF_DELAY`
-- `AUTHORITY_RECOVERY`
-- `UNKNOWN_EVIDENCE_GAP`
+When a valid sample/window misses the target, classify the dominant measured cause before changing policy. Typical classes include:
 
-Then persist exactly one concrete corrective experiment for the next worker. The next worker applies it before choosing its work packet. Repeating a failed intervention without new evidence is forbidden.
+- early voluntary end;
+- packet too small;
+- scheduler/provider delivery gap;
+- startup/authority delay;
+- handoff/close delay;
+- waiting on tool or CI;
+- recovery/fencing overhead;
+- unknown evidence gap.
 
-## Classification
-Productive work includes reasoning, research, implementation, validation, reconciliation, and durable documentation that advances the active root. Necessary overhead includes authority, checkpoint, wake verification, and bounded handoff work. Relay-caused idle is runnable time with no executor because of relay design or voluntary early stop. Platform unavailability is tracked separately.
+Choose the next corrective experiment from observed evidence. Repeating a failed intervention without new evidence is forbidden.
 
 ## Correctness constraints
-Utilization optimization never overrides authority fencing, duplicate-execution prevention, idempotency/reconciliation, public-safety rules, or terminal acceptance gates. Scheduler bookkeeping drift is repaired forward rather than used as a reason to idle, but authority must never be rolled backward.
 
-## Active acceptance gate
-The utilization root cannot pass merely because the no-self-termination policy exists. It requires live successor-cycle evidence that run termination is classified with the measurable end contract, progress evidence is sufficiently dense to reject sparse-span false positives, and any gap/overlap is reported from durable timestamps.
+Utilization optimization never overrides authority fencing, duplicate-execution prevention, idempotency/reconciliation, public-repository safety, explicit operator STOP/PAUSE, or program terminal acceptance. Scheduler bookkeeping drift is repaired forward; stale wakes may not roll DTSTART, canonical lineage, authority, or checkpoint state backward.
 
-PASS requires at least 3 valid completed turns and a rolling mean of their last three `observed_useful_span_seconds` values >= 840. Each counted turn must also satisfy the continuous-progress evidence rule. Until then, utilization handoff measurement remains blocking and program status remains `CONTINUE`.
+## Current acceptance gate
+
+The utilization program does not pass because a 600-second hard floor exists or because a single long turn succeeds. It passes only from the active machine-readable P0 policy and valid prospective evidence. Until those thresholds are durably met, program status remains nonterminal and the relay continues through the current SAME MAIN continuation mechanism.
