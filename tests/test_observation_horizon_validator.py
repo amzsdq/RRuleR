@@ -54,8 +54,15 @@ class ObservationHorizonValidatorTests(unittest.TestCase):
             self.assertEqual(len(states), 2)
 
     def test_rejects_forged_timestamp(self):
-        with self.assertRaisesRegex(ValueError, "does not match"):
+        with self.assertRaisesRegex(ValueError, "drifted"):
             validate(actions_horizon(trusted="2026-09-20T23:06:48+00:00"), POLICY, actions_source())
+
+    def test_same_attempt_timestamp_drift_fails_closed(self):
+        # Even if GitHub were ever to change updated_at for an already-bound attempt,
+        # durable pinning must detect the change instead of silently moving the horizon.
+        same_attempt_later_state = actions_source(attempt=1, updated="2026-09-21T00:05:48Z")
+        with self.assertRaisesRegex(ValueError, "drifted"):
+            validate(actions_horizon(attempt=1), POLICY, same_attempt_later_state)
 
     def test_rejects_unsuccessful_actions_run(self):
         with self.assertRaisesRegex(ValueError, "not successful"):
@@ -67,7 +74,7 @@ class ObservationHorizonValidatorTests(unittest.TestCase):
 
     def test_rerun_cannot_retroactively_move_bound_attempt_timestamp(self):
         # A later re-run may have the same run id and a newer updated_at, but it is a
-        # different immutable attempt and must not satisfy provenance bound to attempt 1.
+        # different bound attempt and must not satisfy provenance bound to attempt 1.
         later_rerun = actions_source(attempt=2, updated="2026-09-21T00:05:48Z")
         with self.assertRaisesRegex(ValueError, "attempt mismatch"):
             validate(actions_horizon(attempt=1), POLICY, later_rerun)
