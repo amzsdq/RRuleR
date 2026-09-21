@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
   "main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
-  "current_expected_due_at": "2026-09-22T00:54:59+09:00",
-  "generation_key": "DUE:2026-09-22T00:54:59+09:00",
+  "current_expected_due_at": "2026-09-22T00:58:13+09:00",
+  "generation_key": "DUE:2026-09-22T00:58:13+09:00",
   "boot_started_at": null,
   "boot_started_authority_epoch": null,
   "rearm_verified_at": null,
   "verified_provisional_due_at": null,
   "status": "AWAITING_BOOT_STARTED",
-  "last_updated_at": "2026-09-22T00:54:05+09:00",
-  "note": "Clean operator-created replacement MAIN is authoritative. Both prior MAIN canonicals are retired; await first startup receipt from clean canonical."
+  "last_updated_at": "2026-09-22T00:57:13+09:00",
+  "note": "Forward-only reconciliation after a concurrent stale write restored the prior 00:54:59 generation. Same clean MAIN remains authoritative and recurring; successor must write fresh generation-matched receipts."
 }
