@@ -1,8 +1,6 @@
 name: Validate observation horizon provenance
 
 on:
-  push:
-    branches: ["main"]
   pull_request:
   workflow_dispatch:
 
