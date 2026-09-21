@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.13",
+  "schema_version": "2.14",
   "program_id": "RRULER-PROGRAM-001",
   "status": "ACTIVE",
   "purpose": "Single machine-readable registry of control artifacts that every fresh worker must load before substantive work.",
@@ -26,6 +26,10 @@
     "state/STARTUP_ACK.json",
     "state/WATCHDOG.json"
   ],
+  "mandatory_policy_sync_surfaces": [
+    ".github/workflows/validate-control-plane.yml",
+    ".github/workflows/validate-continuation-policy.yml"
+  ],
   "mandatory_before_corrective_experiment_selection": [
     "control/evidence-policy.v1.json",
     "control/rolling-window-promotion.v1.json",
@@ -40,6 +44,7 @@
   "hard_invariants": [
     "DURABLE_STATE_IS_AUTHORITATIVE",
     "FRESH_ACTIVE_CONTROLS_AND_MANDATORY_POLICY_SYNC_REQUIRED_EVERY_WAKE",
+    "ACTIVE_POLICY_CHANGES_MUST_UPDATE_ENFORCING_CI_SURFACES_IN_SAME_CHANGE_SET_OR_FAIL_CLOSED",
     "NORMAL_NONTERMINAL_CONTINUE_VOLUNTARY_CLOSE_BEFORE_600S_FORBIDDEN",
     "AUTHORITY_EPOCH_MONOTONIC",
     "MINIMUM_FENCE_THEN_PROVISIONAL_REARM_AND_VERIFY_BEFORE_FULL_RESTORE_OR_SUBSTANTIVE_WORK",
@@ -61,5 +66,5 @@
     "ALL_RETIRED_MAIN_CANONICALS_MUST_NEVER_REACTIVATE",
     "SAME_MAIN_PROVISIONAL_MATCHES_BOUNDED_ENVELOPE_AND_AVOIDS_SHORT_ROLLING_COLLISION"
   ],
-  "conflict_rule": "Every wake reloads fresh ACTIVE_CONTROLS and mandatory artifacts; prior-wake cached policy cannot override them. If mandatory artifacts conflict, fail closed only for the disputed side effect and reconcile durably. Normal nonterminal CONTINUE cannot voluntarily close before 600 observed elapsed seconds. Current clean MAIN=6ab152b636748191a71873ba4d5ef551. For the normal ~10m envelope, provisional recurrence is armed once at observed wake +660s (~11m); repeated +2m rolling refresh is forbidden as the normal strategy because prior live A/B evidence showed overlap. The former +780s/13m provisional is also retired as unnecessarily long. Extend SAME MAIN only if work/close handling clearly threatens the +11m due. Normal close shifts only THIS SAME MAIN to exact END+60. Never reactivate retired MAIN canonicals 6ab14f7951848191b65e4b5d4bc979d8 or 6aaf8a993eb08191b8d0ab1d9662e4b2. Watchdog remains disabled standby."
+  "conflict_rule": "Every wake reloads fresh ACTIVE_CONTROLS and mandatory artifacts; prior-wake cached policy cannot override them. CI/workflow surfaces listed in mandatory_policy_sync_surfaces are enforcement mirrors: whenever an active policy value changes, update those mirrors in the same coherent change set or treat the mismatch as policy drift and fail closed for the disputed assertion. Normal nonterminal CONTINUE cannot voluntarily close before 600 observed elapsed seconds. Current clean MAIN=6ab152b636748191a71873ba4d5ef551. For the normal ~10m envelope, provisional recurrence is armed once at observed wake +660s (~11m); repeated +2m rolling refresh is forbidden as the normal strategy because prior live A/B evidence showed overlap. The former +780s/13m provisional is retired as unnecessarily long. Extend SAME MAIN only if work/close handling clearly threatens the +11m due. Normal close shifts only THIS SAME MAIN to exact END+60. Never reactivate retired MAIN canonicals 6ab14f7951848191b65e4b5d4bc979d8 or 6aaf8a993eb08191b8d0ab1d9662e4b2. Watchdog remains disabled standby."
 }
