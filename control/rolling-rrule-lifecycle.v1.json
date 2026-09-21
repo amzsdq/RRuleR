@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 11,
+  "version": 12,
   "status": "ACTIVE",
-  "purpose": "Normal continuation is MAIN->MAIN at actual observed END + exactly 60 seconds. The ~13-minute provisional MAIN due exists only as in-flight crash insurance, and the Startup Watchdog is emergency-only pre-bootstrap recovery; neither may substitute for normal post-close chaining.",
+  "purpose": "Self-reliant MAIN continuation: normal path is MAIN->MAIN at actual END+60. The same MAIN recurring RRULE is also its cold fallback. Watchdog is disabled-by-default emergency standby and is not part of ordinary correctness or close.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
   "startup_order": [
     "READ_MINIMUM_FENCE_CURRENT_AND_CANONICAL_AUTHORITY",
@@ -17,7 +17,6 @@
     "WORK_AND_CHECKPOINT",
     "RECORD_FIRST_DURABLE_USEFUL_BOUNDARY",
     "FINAL_REARM_AND_VERIFY",
-    "SYNC_STARTUP_WATCHDOG_TO_MAIN_DUE_PLUS_180S",
     "RETURN"
   ],
   "timing": {
@@ -55,10 +54,6 @@
       "MUTATE_SAME_CANONICAL_DSTART",
       "VERIFY_SAME_CANONICAL_ENABLED_RRULE_AND_DSTART",
       "PERSIST_EXPECTED_DUE",
-      "UPDATE_FIXED_STARTUP_WATCHDOG_ONE_SHOT_TO_MAIN_DUE_PLUS_180S",
-      "SET_FIXED_STARTUP_WATCHDOG_IS_ENABLED_TRUE",
-      "VERIFY_WATCHDOG_SAME_CANONICAL_ENABLED_ONE_SHOT_AND_DUE",
-      "PERSIST_WATCHDOG_DUE",
       "PERSIST_NON_WORKING_CLOSE_PROJECTION",
       "VALIDATE_CURRENT_ACTIVITY_HANDOFF_PROJECTION",
       "RETURN"
@@ -70,12 +65,12 @@
     "precision_rule": "Pass local_dtstart with YYYYMMDDTHHMMSS under the canonical timezone. Do not truncate or round seconds.",
     "exception_rule": "Any delay other than +60 seconds on a normal CONTINUE close requires a fresh durable platform/safety/task constraint and an explicit exception_reason recorded with the run. Do not add extra local slack merely because scheduler delivery itself may be late.",
     "delivery_jitter_rule": "Measure scheduled-due -> actual invocation separately. Do not hide provider delivery latency by lengthening the local completion-relative offset.",
-    "watchdog_sync_failure": "Retry once when safe. Preserve already-verified MAIN continuation, record DEGRADED_WATCHDOG_COVERAGE, and do not claim pre-bootstrap protection until Watchdog is verified.",
-    "watchdog_reenable_rule": "MAIN must explicitly set the fixed Watchdog is_enabled=true on every one-shot reschedule. Schedule-only mutation is insufficient because a fired one-shot may remain disabled.",
-    "watchdog_verification_rule": "After Watchdog mutation, re-read live metadata and require same Watchdog canonical id, is_enabled=true, one-shot schedule, and exact intended due.",
+    "watchdog_sync_failure": "NOT_APPLICABLE_IN_NORMAL_PATH",
+    "watchdog_reenable_rule": "FORBIDDEN_DURING_NORMAL_CLOSE",
+    "watchdog_verification_rule": "Watchdog verification is not required for normal MAIN close because Watchdog remains disabled standby.",
     "close_state_projection": {
       "purpose": "Give the Startup Watchdog durable positive proof that the predecessor is no longer substantively active, without inferring idle from silence.",
-      "after": "Only after MAIN and Watchdog continuations are both live-verified and their exact due values are known.",
+      "after": "Only after SAME MAIN END+60 continuation is live-verified and its exact due is known.",
       "current": {
         "run_state": "HANDOFF_COMMITTED",
         "owner_rule": "Retain the just-closed predecessor run as current_owner until successor authority advances.",
@@ -158,33 +153,27 @@
     "acknowledgement_deadline_seconds": 120,
     "missing_ack_classification": "STARTUP_ACK_MISSING",
     "rule": "Missing timestamps remain unknown. An invocation record alone does not prove bootstrap entry, rearm, authority, work, or process death.",
-    "recovery_limitation": "This acknowledgement makes the failure diagnosable. It does not wake a worker; fast recovery still requires an independent supported trigger."
+    "recovery_limitation": "The acknowledgement makes failure diagnosable. Fast nominal recovery remains SAME MAIN self-shift; cold recovery is SAME MAIN natural hourly recurrence. Watchdog is optional break-glass only."
   },
   "startup_watchdog": {
     "policy_ref": "control/startup-watchdog.v1.json",
     "ack_ref": "state/STARTUP_ACK.json",
     "state_ref": "state/WATCHDOG.json",
-    "protection_boundary": "Emergency only: Watchdog protects a missing MAIN bootstrap before provisional arm; provisional arm protects an already-started turn after bootstrap. Normal continuation remains MAIN->MAIN END+60.",
-    "normal_watchdog_due_offset_seconds": 180,
-    "recovery_main_offset_seconds": 60,
-    "recovery_recheck_seconds": 240,
-    "receipt_inference_forbidden": true,
-    "self_rearm_enabled_required": true,
-    "post_update_live_verification_required": true,
-    "idle_distant_due_enabled": true,
-    "idle_distant_due_extra_slack_seconds": 120,
-    "idle_distant_due_expected_fast_due_rule": "LATEST_OBSERVED_CLOSED_TURN_END_PLUS_60S",
-    "idle_distant_due_active_work_exemption": true,
-    "idle_distant_due_recovery_main_offset_seconds": 60,
-    "normal_path_dependency": "Watchdog must be armed only after the normal MAIN END+60 successor is live-verified. Watchdog is not a normal scheduler hop."
+    "status": "STANDBY_DISABLED_BY_DEFAULT",
+    "protection_boundary": "Optional break-glass emergency only. Normal correctness relies on SAME MAIN fast self-shift plus its recurring RRULE cold fallback.",
+    "normal_path_dependency": "NONE",
+    "main_must_arm_watchdog_on_close": false,
+    "automatic_watchdog_sync_forbidden": true,
+    "activation_rule": "Only explicit operator activation or a fresh durable emergency policy decision after both MAIN fast continuation and MAIN recurring cold-fallback are diagnosed insufficient."
   },
   "normal_path_invariant": {
-    "expected_path": "MAIN_NORMAL_CLOSE -> SAME_MAIN_END_PLUS_60 -> NEXT_MAIN",
+    "expected_path": "MAIN_NORMAL_CLOSE -> SAME_MAIN_END_PLUS_60 -> NEXT_MAIN; if a shifted wake is lost before bootstrap, SAME_MAIN natural recurring RRULE is the cold fallback",
     "provisional_role": "IN_FLIGHT_CRASH_INSURANCE_ONLY",
-    "watchdog_role": "PRE_BOOTSTRAP_EMERGENCY_ONLY",
+    "watchdog_role": "DISABLED_BREAK_GLASS_EMERGENCY_ONLY",
     "forbidden_substitutions": [
       "NORMAL_CLOSE_WITH_PROVISIONAL_DUE_LEFT_AS_SUCCESSOR",
       "NORMAL_CLOSE_RELYING_ON_WATCHDOG_AS_EXPECTED_SUCCESSOR",
+      "NORMAL_CLOSE_REQUIRING_WATCHDOG_SYNC",
       "FINAL_RESPONSE_BEFORE_LIVE_END_PLUS_60_MAIN_VERIFICATION"
     ]
   }
