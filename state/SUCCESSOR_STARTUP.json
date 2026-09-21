@@ -227,7 +227,7 @@
     "boot_started_at": "2026-09-21T21:28:24+09:00",
     "rearm_verified_at": "2026-09-21T21:28:51+09:00",
     "authority_claim_at": "2026-09-21T21:29:37+09:00",
-    "first_durable_useful_at": null,
+    "first_durable_useful_at": "2026-09-21T21:30:51+09:00",
     "generation_key": "DUE:2026-09-21T21:27:36+09:00",
     "due_to_observation_seconds": -14,
     "observation_to_boot_seconds": 62,
@@ -242,8 +242,12 @@
       "first_durable_useful_at"
     ],
     "rule": "Provisional cold-rescue generation after STARTUP-009 booted but produced no first useful boundary. Record only observed boundaries and keep recovery samples out of normal scheduler comparison.",
-    "validity": "PENDING_FIRST_USEFUL",
-    "classification": "PROVISIONAL_COLD_RESCUE_BOOTSTRAP_VERIFIED"
+    "validity": "RECOVERY_COMPLETE_PENDING_CLOSE",
+    "classification": "PROVISIONAL_COLD_RESCUE_RESTORED_DURABLE_USEFUL_WORK",
+    "recovery_kind": "PROVISIONAL_COLD_RESCUE",
+    "claim_to_first_useful_seconds": 74,
+    "due_to_first_useful_seconds": 195,
+    "audit_note": "Epoch 70 produced the first material audit repair commit at the observed first-useful boundary; this is a recovery sample, not a normal END+60 scheduler comparison."
   },
   "decision_rule": "STARTUP-010 measures post-bootstrap provisional recovery, distinct from fixed-Watchdog pre-bootstrap recovery. Validate lineage and receipt order; do not infer missing useful work."
 }
