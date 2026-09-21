@@ -40,8 +40,8 @@
     "predecessor_run_id": "RUN-UTIL-20260921-184232",
     "predecessor_last_useful_at": "2026-09-21T18:50:37+09:00",
     "scheduled_due_at": "2026-09-21T18:54:00+09:00",
-    "successor_observed_at": null,
-    "authority_claim_at": null,
+    "successor_observed_at": "2026-09-21T18:54:48+09:00",
+    "authority_claim_at": "2026-09-21T18:55:59+09:00",
     "first_durable_useful_at": null,
     "required_fields": [
       "predecessor_last_useful_at",
@@ -50,7 +50,9 @@
       "authority_claim_at",
       "first_durable_useful_at"
     ],
-    "rule": "Record only observed boundaries. This is the first prospective replacement for invalid STARTUP-002; do not infer missing timestamps."
+    "rule": "Record only observed boundaries. This is the first prospective replacement for invalid STARTUP-002; do not infer missing timestamps.",
+    "due_to_observation_seconds": 48,
+    "observation_to_claim_seconds": 71
   },
   "decision_rule": "STARTUP-002 is excluded because its predecessor last-useful boundary is later than the matched predecessor end. Collect a new prospective eligible sample; do not reuse the 155-second scheduler estimate as validated evidence."
 }
