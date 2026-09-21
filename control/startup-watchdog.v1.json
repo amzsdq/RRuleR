@@ -1,9 +1,9 @@
 {
   "policy_id": "RRULER_STARTUP_WATCHDOG",
-  "version": 3,
+  "version": 4,
   "status": "ACTIVE",
-  "purpose": "Close pre-bootstrap availability gaps and repair clearly idle MAIN schedules that are alive but materially farther out than the normal END+60 continuation.",
-  "role": "LIVENESS_AND_PREBOOTSTRAP_RECOVERY_ONLY",
+  "purpose": "Emergency-only recovery for missing MAIN bootstrap or a proven idle failed handoff. Normal scheduling is MAIN->MAIN END+60 and must not depend on this Watchdog.",
+  "role": "EMERGENCY_PRE_BOOTSTRAP_RECOVERY_ONLY",
   "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "watchdog_canonical_id": "6ab11b3af3608191b68dcec5e3fed081",
   "scheduler_mode": "ONE_SHOT_SELF_RELAY",
@@ -14,7 +14,7 @@
     "startup_grace_seconds": 180,
     "recovery_recheck_seconds": 240,
     "main_recovery_due_offset_seconds": 60,
-    "rationale": "Allow ordinary provider delivery jitter while bounding a missing-bootstrap hole far below the hourly RRULE fallback.",
+    "rationale": "Emergency grace for a MAIN fast successor that fails to enter durable bootstrap. This is not part of nominal relay cadence.",
     "enabled_rearm_required": true,
     "enabled_verification_required": true,
     "idle_distant_due_extra_slack_seconds": 120,
@@ -110,5 +110,11 @@
     "active_provisional_exemption": "A future ~13 minute provisional continuation belonging to a proven active WORKING turn is healthy safety coverage and MUST NOT be pulled forward by this rule.",
     "missing_boundary_rule": "If latest closed END or owner state is unknown/conflicting, do not infer idle or expected fast due; classify WATCHDOG_AMBIGUOUS and recheck.",
     "recovery": "Rearm only the SAME MAIN canonical to now+60s with is_enabled=true, verify live metadata, record recovery, and recheck the SAME Watchdog at now+240s."
+  },
+  "normal_path_contract": {
+    "expected_normal_successor": "SAME_MAIN_AT_PREDECESSOR_END_PLUS_60_SECONDS",
+    "watchdog_is_expected_normal_successor": false,
+    "watchdog_may_authorize_normal_close": false,
+    "arming_order": "Only after the normal MAIN fast successor is live-verified, arm Watchdog at MAIN due +180s."
   }
 }
