@@ -1,24 +1,18 @@
 {
   "policy_id": "RRULER_STARTUP_WATCHDOG",
-  "version": 4,
-  "status": "ACTIVE",
-  "purpose": "Emergency-only recovery for missing MAIN bootstrap or a proven idle failed handoff. Normal scheduling is MAIN->MAIN END+60 and must not depend on this Watchdog.",
-  "role": "EMERGENCY_PRE_BOOTSTRAP_RECOVERY_ONLY",
+  "version": 5,
+  "status": "STANDBY_DISABLED_BY_DEFAULT",
+  "purpose": "Break-glass emergency recovery only. Normal continuity is provided by SAME MAIN END+60 self-shift plus SAME MAIN recurring RRULE cold fallback. Watchdog remains disabled unless explicitly activated for a diagnosed emergency.",
+  "role": "BREAK_GLASS_EMERGENCY_RECOVERY_ONLY",
   "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "watchdog_canonical_id": "6ab11b3af3608191b68dcec5e3fed081",
-  "scheduler_mode": "ONE_SHOT_SELF_RELAY",
+  "scheduler_mode": "MANUAL_OR_EXPLICITLY_ACTIVATED_ONE_SHOT",
   "substantive_work_forbidden": true,
   "source_of_truth": "FRESH_GITHUB_DURABLE_STATE",
   "normal_monitoring": {
-    "watchdog_due_rule": "FRESH_MAIN_EXPECTED_DUE_PLUS_180_SECONDS",
-    "startup_grace_seconds": 180,
-    "recovery_recheck_seconds": 240,
-    "main_recovery_due_offset_seconds": 60,
-    "rationale": "Emergency grace for a MAIN fast successor that fails to enter durable bootstrap. This is not part of nominal relay cadence.",
-    "enabled_rearm_required": true,
-    "enabled_verification_required": true,
-    "idle_distant_due_extra_slack_seconds": 120,
-    "idle_recovery_due_offset_seconds": 60
+    "enabled": false,
+    "rationale": "Normal monitoring and per-turn arming are intentionally removed. MAIN must be self-reliant.",
+    "main_recovery_due_offset_seconds": 60
   },
   "startup_receipts": {
     "path": "state/STARTUP_ACK.json",
@@ -78,12 +72,12 @@
     ]
   },
   "main_sync_contract": {
-    "normal_close": "After MAIN verifies its own END+60 successor and persists the fresh expected due, MAIN must pull the SAME Watchdog one-shot to MAIN expected_due +180s, explicitly set is_enabled=true, re-read live Watchdog metadata, and verify same canonical + enabled + exact due.",
-    "failure_semantics": "Watchdog sync failure does not invalidate an already verified MAIN continuation, but must be recorded as DEGRADED_WATCHDOG_COVERAGE and retried once when safe.",
-    "pause_terminal": "Explicit operator PAUSED/STOP or durable program terminal prevents Watchdog from waking MAIN."
+    "normal_close": "DO_NOT_ARM_WATCHDOG. MAIN normal close verifies only SAME MAIN END+60 and durable close projection.",
+    "failure_semantics": "Watchdog being disabled is healthy normal state, not degraded coverage.",
+    "pause_terminal": "Explicit operator PAUSED/STOP or durable terminal prevents any emergency wake."
   },
   "prompt_sync_contract": {
-    "rule": "GitHub policy is authoritative. Each Watchdog wake applies fresh policy first. If the embedded stable kernel materially differs, update the SAME Watchdog prompt in that run. MAIN prompt must carry the same startup-receipt, Watchdog-sync, explicit is_enabled=true, and post-update verification kernel.",
+    "rule": "GitHub policy is authoritative. MAIN must not arm this Watchdog during normal turns. If emergency activation is explicitly chosen, use this same canonical only and disable again after verified recovery.",
     "replacement_forbidden": true,
     "rrule_for_watchdog_forbidden": true
   },
@@ -95,13 +89,13 @@
     "stale_generation_rollback_forbidden": true
   },
   "self_rearm_contract": {
-    "invariant": "Every nonterminal Watchdog one-shot rearm MUST mutate THIS SAME Watchdog canonical with is_enabled=true and then re-read live automation metadata.",
-    "success_condition": "same canonical id + is_enabled=true + exact one-shot intended due are all verified",
-    "failure_condition": "schedule changed but enabled=false, due mismatch, or canonical mismatch; treat as failed continuation and retry once when safe",
-    "reason": "A fired one-shot may be disabled by the scheduler; changing only DTSTART is not sufficient continuation proof."
+    "invariant": "Automatic Watchdog self-relay is not part of normal operation and is disabled by default.",
+    "success_condition": "For an explicitly activated emergency run, any mutation must preserve the same canonical and be live-verified.",
+    "failure_condition": "Fail closed; do not create a replacement Watchdog.",
+    "reason": "One-shot completion semantics can disable the actor after firing, so normal correctness must never depend on Watchdog self-relay."
   },
   "idle_distant_due_guard": {
-    "purpose": "Repair the case where MAIN remains enabled but, while nobody is substantively working, its next wake is unnecessarily far away.",
+    "purpose": "Retired from normal operation. MAIN recurring RRULE is the built-in cold fallback.",
     "idle_proof_required": true,
     "idle_proof_rule": "Use fresh durable state, not absence of recent chat/tool output. Treat idle as proven only when no fresh CURRENT/ACTIVITY/HANDOFF/startup evidence establishes an active substantive owner and the latest applicable run has an observed close boundary. If CURRENT or ACTIVITY says WORKING and ownership freshness cannot be disproven by an existing authority/liveness rule, classify WATCHDOG_AMBIGUOUS instead of IDLE_DISTANT_DUE.",
     "expected_fast_due_rule": "latest observed eligible closed-turn END + 60 seconds",
@@ -109,12 +103,15 @@
     "trigger_rule": "MAIN enabled=true AND program CONTINUE AND idle proven AND live MAIN due > expected_fast_due + 120 seconds.",
     "active_provisional_exemption": "A future ~13 minute provisional continuation belonging to a proven active WORKING turn is healthy safety coverage and MUST NOT be pulled forward by this rule.",
     "missing_boundary_rule": "If latest closed END or owner state is unknown/conflicting, do not infer idle or expected fast due; classify WATCHDOG_AMBIGUOUS and recheck.",
-    "recovery": "Rearm only the SAME MAIN canonical to now+60s with is_enabled=true, verify live metadata, record recovery, and recheck the SAME Watchdog at now+240s."
+    "recovery": "Rearm only the SAME MAIN canonical to now+60s with is_enabled=true, verify live metadata, record recovery, and recheck the SAME Watchdog at now+240s.",
+    "enabled": false
   },
   "normal_path_contract": {
     "expected_normal_successor": "SAME_MAIN_AT_PREDECESSOR_END_PLUS_60_SECONDS",
+    "cold_fallback": "SAME_MAIN_NATURAL_RECURRING_RRULE_OCCURRENCE",
     "watchdog_is_expected_normal_successor": false,
     "watchdog_may_authorize_normal_close": false,
-    "arming_order": "Only after the normal MAIN fast successor is live-verified, arm Watchdog at MAIN due +180s."
+    "main_must_arm_watchdog": false,
+    "arming_order": "NONE_IN_NORMAL_OPERATION"
   }
 }
