@@ -9,12 +9,13 @@
   "execution_status": "ACTIVE",
   "pause_reason": null,
   "resume_target": {
-    "step": "Complete the live v5.4 adaptive-provisional verification for RUN-UTIL-20260922-013717: preserve the verified SAME MAIN +660s provisional, continue safe authorized P001 work until >=600 observed elapsed seconds, extend once only if the provisional due is genuinely threatened, then normal-close on the SAME recurring MAIN at exact observed END+60 and persist one consistent close projection.",
-    "selection_rule": "Read fresh ACTIVE_CONTROLS each wake. Normal nonterminal CONTINUE cannot voluntarily close before 600 observed elapsed seconds. Active provisional policy is once at wake/arm reference +660s, not retired +780s and not routine +120s rolling refresh. CI/policy mirrors must remain synchronized. At/after 600s finish the smallest safe in-flight unit and close through live-verified SAME MAIN exact END+60."
+    "step": "Run the v5.5 durable-unit chat-trace canary on the authoritative SAME MAIN: live-verify +660s provisional and emit the schedule trace; execute bounded substantive units, durably persist each unit's observed START/END/DURATION plus artifact-backed work evidence before its completion trace, and continue same-wake work through the normal >=600s floor; then live-verify exact END+60 and emit the final next-due trace.",
+    "selection_rule": "Read fresh ACTIVE_CONTROLS each wake. Progress chat is observability only and never close authority. Before 600s, after each durably evidenced unit trace immediately select the next safe authorized unit. Preserve SAME MAIN recurring RRULE; no replacement MAIN; exact END+60 normal close."
   },
   "turn_plan_role": "TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec and fresh ACTIVE_CONTROLS.",
-  "updated_at": "2026-09-22T01:45:10+09:00",
-  "resumed_by_operator_at": "2026-09-21T09:40:32.149Z",
+  "updated_at": "2026-09-22T02:00:20+09:00",
+  "resumed_by_operator_at": "2026-09-22T02:00:20+09:00",
   "maintenance_repair_ref": "planning/evidence/MAIN-V5.2-POLICY-SYNC-ROLLBACK.md",
-  "active_runtime_revision": "MAIN_BOOTSTRAP_V5.4_ADAPTIVE_LONG_PROVISIONAL"
+  "active_runtime_revision": "MAIN_BOOTSTRAP_V5.5_DURABLE_UNIT_CHAT_TRACE_CANARY",
+  "operator_requested_next_due_at": "2026-09-22T02:01:20+09:00"
 }
