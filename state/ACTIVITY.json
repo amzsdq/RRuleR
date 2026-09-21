@@ -7,11 +7,11 @@
   "active_run_id": "RUN-UTIL-20260921-204946",
   "authority_epoch": 68,
   "substantive_work_started_at": "2026-09-21T20:49:46+09:00",
-  "last_progress_at": "2026-09-21T20:52:13+09:00",
-  "last_progress_kind": "BOOTSTRAP_STAGE_OBSERVABILITY_IMPLEMENTED",
-  "current_unit": "Wire bootstrap-stage invariants into CI, then inspect independent wake transport.",
+  "last_progress_at": "2026-09-21T20:59:31+09:00",
+  "last_progress_kind": "GUARDED_EVENT_RESCUE_SLICE_AND_THREE_TURN_REVIEW",
+  "current_unit": "Checkpoint epoch 68 and close with exact END+60.",
   "next_wake_due_at": "2026-09-21T21:02:29+09:00",
   "successor_observed": true,
-  "handoff_ready": false,
+  "handoff_ready": true,
   "operator_ui_note": "STARTUP-006 invoked at 19:50:28 but left no durable bootstrap/progress. Epoch 68 recovered on the hourly fallback and provisionally rearmed."
 }
