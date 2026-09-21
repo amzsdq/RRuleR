@@ -4,6 +4,8 @@ from validate_run_records import validate
 class RunValidationTests(unittest.TestCase):
     def record(self):
         return dict(run_started_at='2026-09-21T17:00:00+00:00', run_ended_at='2026-09-21T17:10:00+00:00', duration_seconds=600, turn_outcome='CONTINUE', end_reason='VERIFIED_SAME_CANONICAL_CONTINUATION', program_status_at_end='CONTINUE', close_decision='TIME_BOUNDARY')
+    def trace(self):
+        return dict(unit_id='U1', start_at='2026-09-21T17:01:00+00:00', end_at='2026-09-21T17:02:00+00:00', duration_seconds=60, artifact='tools/example.py@abc', work_evidence_ref='WE-E81-001', message='완료: validator hardened (duration 1m 0s)', durably_persisted=True, continued_same_wake=True, source_kind='test_or_validator_added_or_hardened')
     def test_normal(self):
         validate(self.record())
     def test_missing_duration(self):
@@ -34,6 +36,18 @@ class RunValidationTests(unittest.TestCase):
         validate(dict(run_started_at='2026-09-21T10:00:00+00:00',run_ended_at='2026-09-21T10:02:00+00:00'))
     def test_no_inflated_useful_time(self):
         r=self.record(); r['productive_substantive_seconds']=601
+        with self.assertRaises(ValueError): validate(r)
+    def test_v55_trace_record_accepted(self):
+        r=self.record(); r.update(chat_trace_policy='DURABLE_UNIT_CHAT_TRACE_CANARY_V5_5', schedule_trace_verified=True, final_due_trace_verified=True, unit_completion_traces=[self.trace()])
+        validate(r)
+    def test_v55_unpersisted_trace_rejected(self):
+        r=self.record(); t=self.trace(); t['durably_persisted']=False; r.update(chat_trace_policy='DURABLE_UNIT_CHAT_TRACE_CANARY_V5_5', schedule_trace_verified=True, final_due_trace_verified=True, unit_completion_traces=[t])
+        with self.assertRaises(ValueError): validate(r)
+    def test_v55_scheduler_only_completion_trace_rejected(self):
+        r=self.record(); t=self.trace(); t['source_kind']='SCHEDULER_MUTATION_ALONE'; r.update(chat_trace_policy='DURABLE_UNIT_CHAT_TRACE_CANARY_V5_5', schedule_trace_verified=True, final_due_trace_verified=True, unit_completion_traces=[t])
+        with self.assertRaises(ValueError): validate(r)
+    def test_v55_missing_final_due_trace_rejected(self):
+        r=self.record(); r.update(chat_trace_policy='DURABLE_UNIT_CHAT_TRACE_CANARY_V5_5', schedule_trace_verified=True, final_due_trace_verified=False, unit_completion_traces=[self.trace()])
         with self.assertRaises(ValueError): validate(r)
 
 if __name__=='__main__': unittest.main()
