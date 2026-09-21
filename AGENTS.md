@@ -63,6 +63,9 @@ Useful-work utilization is a first-class objective.
 - Keep checkpoints current enough for cold resume without fabricating activity.
 - Never pad, sleep, split trivial changes, or invent unrelated busywork to consume time or satisfy evidence cadence.
 - Prefer units with safe checkpoint boundaries; as runtime exposure grows, shift toward smaller units rather than idling.
+- A CONTINUE turn has a **minimum useful-work floor of 8 minutes** unless a real stop condition applies. Finishing one experiment setup, scheduler mutation, measurement capture, CI check, or bounded substep before 8 minutes is not permission to end.
+- If the current substep becomes wait-bound, immediately switch to another safe authorized runnable item from the same work spec/project rather than ending the turn. Waiting for a future observation is not a blocker while other useful work exists.
+- A short CONTINUE turn (<8 minutes) is an exception that MUST record a concrete `short_turn_reason` and the exhausted alternatives. Acceptable reasons are limited to: actual platform-enforced termination, explicit operator intervention, authority/fencing failure closed, or no safe runnable work anywhere in the active work spec/project after an explicit scan.
 
 ### Forward useful-work evidence capture
 
@@ -153,6 +156,11 @@ END=<YYYY-MM-DD HH:MM:SS KST>
 DURATION=<Xm Ys or Xs>
 STATUS=<CONTINUE|COMPLETE|BLOCKED|PAUSED>
 ```
+
+Short-turn guard:
+- `STATUS=CONTINUE` with `DURATION<8m` is presumptively a utilization failure.
+- Before closing such a turn, scan the active work spec/project for the next safe runnable unit and continue working if one exists.
+- If a short turn is unavoidable, persist `short_turn_reason` and `alternatives_checked` in the durable run record; do not use vague reasons such as "experiment armed", "waiting for next wake", "CI pending", or "nothing obvious".
 
 Semantics:
 - `CONTINUE` — useful authorized work remains; durable resume target/continuation is preserved.
