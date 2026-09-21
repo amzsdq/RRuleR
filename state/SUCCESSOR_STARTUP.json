@@ -195,10 +195,10 @@
     "sample_id": "STARTUP-009",
     "recovery_of_sample_id": "STARTUP-008",
     "scheduled_due_at": "2026-09-21T21:11:09+09:00",
-    "successor_observed_at": null,
-    "boot_started_at": null,
-    "rearm_verified_at": null,
-    "authority_claim_at": null,
+    "successor_observed_at": "2026-09-21T21:13:21+09:00",
+    "boot_started_at": "2026-09-21T21:14:36+09:00",
+    "rearm_verified_at": "2026-09-21T21:15:12+09:00",
+    "authority_claim_at": "2026-09-21T21:16:18+09:00",
     "first_durable_useful_at": null,
     "generation_key": "DUE:2026-09-21T21:11:09+09:00",
     "required_fields": [
@@ -210,8 +210,13 @@
       "first_durable_useful_at"
     ],
     "rule": "Prospective Watchdog recovery generation. MAIN must write generation-matched BOOT_STARTED before provisional arm and REARM_VERIFIED after verification; do not infer receipts from automation metadata.",
-    "validity": "PENDING_SUCCESSOR",
-    "classification": "STARTUP_WATCHDOG_RECOVERY_GENERATION"
+    "validity": "PENDING_FIRST_USEFUL",
+    "classification": "WATCHDOG_RECOVERY_BOOTSTRAP_VERIFIED",
+    "due_to_observation_seconds": 132,
+    "observation_to_boot_seconds": 75,
+    "boot_to_rearm_verified_seconds": 36,
+    "rearm_verified_to_claim_seconds": 66,
+    "audit_note": "Fixed Watchdog rearmed this recovery generation after STARTUP-008 lacked receipts. Invocation, BOOT_STARTED, provisional REARM_VERIFIED, and authority claim are observed; first useful remains null until a material artifact is committed."
   },
-  "decision_rule": "STARTUP-009 measures the first live recovery triggered by the fixed Startup Watchdog after STARTUP-008 lacked durable startup receipts. Keep Watchdog actions non-substantive and preserve all unobserved boundaries as null."
+  "decision_rule": "STARTUP-009 is the first live fixed-Watchdog recovery generation. Accept recovery only with matching generation lineage and observed receipts; do not infer first useful or promote this recovery sample as a normal END+60 comparison."
 }
