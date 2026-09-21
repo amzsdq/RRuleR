@@ -182,8 +182,8 @@
       "FINAL_RESPONSE_BEFORE_LIVE_END_PLUS_60_MAIN_VERIFICATION"
     ]
   },
-  "current_main_canonical_id": "6ab14f7951848191b65e4b5d4bc979d8",
-  "retired_predecessor_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
+  "current_main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
+  "retired_predecessor_canonical_id": "6ab14f7951848191b65e4b5d4bc979d8",
   "canonical_migration": {
     "current_main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
     "retired_main_canonical_ids": [
