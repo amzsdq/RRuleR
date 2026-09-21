@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 15,
+  "version": 16,
   "status": "ACTIVE",
-  "purpose": "CUSTOM RECURRING CATEGORY CANARY: keep SAME MAIN recurring continuity and hourly cold-fallback semantics while avoiding the simple FREQ=HOURLY preset. Use FREQ=DAILY with all 24 BYHOUR values and self-shift BYMINUTE/BYSECOND plus DTSTART to exact END+60. Watchdog remains disabled break-glass only.",
+  "purpose": "MIGRATED MAIN: normal path is operator-created SAME MAIN recurring RRULE -> bounded work -> SAME MAIN exact END+60 shift. The prior custom-recurring category canary is ended. Watchdog is disabled break-glass only.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
   "startup_order": [
     "READ_MINIMUM_FENCE_CURRENT_AND_CANONICAL_AUTHORITY",
@@ -24,20 +24,19 @@
     "provisional_safety_margin_seconds": 180,
     "provisional_due_offset_seconds": 780,
     "final_rearm_offset_seconds": 60,
-    "rrule_frequency": "DAILY",
+    "rrule_frequency": "HOURLY",
     "fixed_quarter_cycle_required": false,
     "exact_second_final_rearm_required": true,
     "normal_continue_due_rule": "ACTUAL_OBSERVED_TURN_END_PLUS_EXACTLY_60_SECONDS",
     "normal_continue_offset_is_default_invariant": true,
     "target_turn_elapsed_seconds": 600,
     "normal_soft_ceiling_seconds": 720,
-    "schedule_mode": "CUSTOM_RECURRING_24H_SLOT_SELF_SHIFT_CANARY",
-    "custom_rule_template": "FREQ=DAILY;BYHOUR=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23;BYMINUTE=<DUE_MINUTE>;BYSECOND=<DUE_SECOND>"
+    "schedule_mode": "SAME_CANONICAL_RECURRING_RRULE_SELF_SHIFT"
   },
   "provisional_arm": {
     "when": "Immediately after minimum stale-wake/fence/authority validation and before full restore or substantive work.",
     "due": "wake_or_arm_reference + target_useful_work_seconds + provisional_safety_margin_seconds",
-    "reason": "During the active turn, move the SAME canonical custom recurring schedule to a bounded crash-insurance due while retaining the 24-hour recurring rule. This is temporary in-flight insurance only.",
+    "reason": "During the active turn, move the SAME current MAIN recurring schedule to a bounded crash-insurance due. This is temporary in-flight insurance only.",
     "verification_required": true,
     "mutation_failure": "Retry once when safe. If an older verified future continuation remains alive, enter DEGRADED_CONTINUATION and continue only within its safety envelope; otherwise fail closed before substantive side effects."
   },
@@ -53,8 +52,8 @@
     "order": [
       "PERSIST_LATEST_CHECKPOINT",
       "COMPUTE_COMPLETION_RELATIVE_DUE",
-      "MUTATE_SAME_CANONICAL_CUSTOM_RECURRING_DSTART_BYMINUTE_BYSECOND",
-      "VERIFY_SAME_CANONICAL_ENABLED_CUSTOM_RECURRING_EXACT_DUE",
+      "MUTATE_SAME_CANONICAL_RECURRING_DSTART",
+      "VERIFY_SAME_CANONICAL_ENABLED_RECURRING_EXACT_DSTART",
       "PERSIST_EXPECTED_DUE",
       "PERSIST_NON_WORKING_CLOSE_PROJECTION",
       "VALIDATE_CURRENT_ACTIVITY_HANDOFF_PROJECTION",
@@ -100,8 +99,8 @@
       "normal_continue_final_forbidden_until": [
         "ACTUAL_END_OBSERVED",
         "LATEST_CHECKPOINT_PERSISTED",
-        "SAME_MAIN_CUSTOM_RECURRING_SCHEDULE_MUTATED_TO_END_PLUS_EXACTLY_60_SECONDS",
-        "LIVE_MAIN_REREAD_SAME_CANONICAL_ENABLED_CUSTOM_RRULE_EXACT_DSTART_AND_MATCHING_BYMINUTE_BYSECOND",
+        "SAME_MAIN_RECURRING_SCHEDULE_MUTATED_TO_END_PLUS_EXACTLY_60_SECONDS",
+        "LIVE_MAIN_REREAD_SAME_CANONICAL_ENABLED_RECURRING_EXACT_DSTART",
         "EXACT_FAST_DUE_PERSISTED_TO_CURRENT_ACTIVITY_HANDOFF",
         "NON_WORKING_CLOSE_PROJECTION_VALIDATED"
       ],
@@ -151,11 +150,11 @@
   "startup_acknowledgement": {
     "ledger": "state/SUCCESSOR_STARTUP.json",
     "boot_started_semantics": "Observed immediately after minimum fence validation proves bootstrap execution entered durable control handling.",
-    "rearm_verified_semantics": "Observed only after the SAME canonical is enabled, the custom recurring RRULE is present, and exact provisional DTSTART plus matching BYMINUTE/BYSECOND are re-read successfully.",
+    "rearm_verified_semantics": "Observed only after the current SAME MAIN canonical is enabled, recurrence is present, and provisional DTSTART is re-read successfully.",
     "acknowledgement_deadline_seconds": 120,
     "missing_ack_classification": "STARTUP_ACK_MISSING",
     "rule": "Missing timestamps remain unknown. An invocation record alone does not prove bootstrap entry, rearm, authority, work, or process death.",
-    "recovery_limitation": "Custom recurring rule preserves an hourly cold fallback without using the simple hourly preset. Exact one-shot remains rejected."
+    "recovery_limitation": "Current operator-created MAIN recurring schedule is the built-in cold fallback. Retired predecessor canonical must never be reactivated."
   },
   "startup_watchdog": {
     "policy_ref": "control/startup-watchdog.v1.json",
@@ -169,15 +168,17 @@
     "activation_rule": "Only explicit operator activation or a fresh durable emergency policy decision after both MAIN fast continuation and MAIN recurring cold-fallback are diagnosed insufficient."
   },
   "normal_path_invariant": {
-    "expected_path": "MAIN_NORMAL_CLOSE -> SAME_MAIN_CUSTOM_RECURRING_SHIFTED_TO_END_PLUS_60 -> NEXT_MAIN",
+    "expected_path": "CURRENT_MAIN_NORMAL_CLOSE -> SAME_CURRENT_MAIN_RECURRING_SHIFTED_TO_END_PLUS_60 -> NEXT_MAIN",
     "provisional_role": "IN_FLIGHT_CRASH_INSURANCE_ONLY",
     "watchdog_role": "DISABLED_BREAK_GLASS_EMERGENCY_ONLY",
-    "experiment": "CUSTOM_RECURRING_CATEGORY_CANARY",
+    "experiment": "CUSTOM_RECURRING_CATEGORY_CANARY_ENDED_BY_OPERATOR_MIGRATION",
     "forbidden_substitutions": [
+      "REACTIVATE_RETIRED_PREDECESSOR_MAIN",
       "NORMAL_CLOSE_WITH_PROVISIONAL_DUE_LEFT_AS_SUCCESSOR",
       "NORMAL_CLOSE_RELYING_ON_WATCHDOG_AS_EXPECTED_SUCCESSOR",
-      "FINAL_RESPONSE_BEFORE_LIVE_END_PLUS_60_MAIN_VERIFICATION",
-      "SILENT_RESTORE_OF_SIMPLE_FREQ_HOURLY_DURING_CANARY"
+      "FINAL_RESPONSE_BEFORE_LIVE_END_PLUS_60_MAIN_VERIFICATION"
     ]
-  }
+  },
+  "current_main_canonical_id": "6ab14f7951848191b65e4b5d4bc979d8",
+  "retired_predecessor_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2"
 }
