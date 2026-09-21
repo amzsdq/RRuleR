@@ -4,36 +4,35 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "authority_epoch": 78,
   "run_id": "RUN-UTIL-20260922-010103",
-  "status": "CONTINUE",
+  "status": "ACTIVE",
   "phase": "CLEAN_MAIN_STARTUP_RECEIPT_GENERATION_FENCING",
   "objective_id": "WS-P001-002-STARTUP-RECEIPT-GENERATION-FENCE",
-  "objective": "Prevent a BOOT_STARTED receipt from a stale scheduler generation from satisfying the current clean MAIN startup acknowledgement.",
-  "expected_useful_seconds": 300,
+  "objective": "Prevent a BOOT_STARTED receipt from a stale scheduler generation from satisfying the current clean MAIN startup acknowledgement while preserving full startup audit behavior.",
+  "expected_useful_seconds": 600,
   "acceptance_criteria": [
     "STARTUP_ACK boot_started_authority_epoch must equal generation_key whenever BOOT_STARTED exists.",
     "A stale-generation BOOT_STARTED is rejected explicitly.",
     "Current clean MAIN receipt remains valid with generation-matched BOOT_STARTED and ordered REARM_VERIFIED.",
-    "Existing startup audit classification counters remain available."
+    "Existing startup audit output fields, classification counters, and CLI remain preserved."
   ],
   "checkpointable_substeps": [
-    "Persist generation-matched BOOT_STARTED for current wake.",
-    "Verify same clean MAIN recurring provisional fallback and persist REARM_VERIFIED.",
+    "Persist generation-matched BOOT_STARTED and verify same clean MAIN provisional fallback.",
     "Harden startup ACK audit with boot-generation binding.",
-    "Add focused stale-generation regression fixture and preserve classification counters.",
-    "Validate exact remote source and close through same MAIN END+60."
+    "Add focused stale-generation regression fixture.",
+    "Restore/verify full pre-change audit surface and repair discovered CI invariant typo.",
+    "Observe integrated CI result and close through same MAIN END+60."
   ],
-  "current_substep": 4,
-  "handoff_boundary": "GENERATION_FENCE_IMPLEMENTED_PENDING_EXECUTABLE_VALIDATION_AND_NORMAL_CLOSE",
-  "early_finish_fallback": "Re-read exact remote source and reconcile any schema/test compatibility regression before close.",
+  "current_substep": 5,
+  "handoff_boundary": "FULL_AUDIT_SURFACE_RESTORED_PENDING_INTEGRATED_CI_AND_NORMAL_CLOSE",
+  "early_finish_fallback": "If integrated CI remains pending, preserve status as pending and close only after durable checkpoint plus exact END+60 rearm.",
   "created_for_next_wake": false,
   "started_at": "2026-09-22T01:01:03+09:00",
-  "last_progress_at": "2026-09-22T01:03:23+09:00",
+  "last_progress_at": "2026-09-22T01:04:59+09:00",
   "progress_evidence": [
-    "BOOT_STARTED persisted for DUE:2026-09-22T00:58:13+09:00.",
-    "Same clean MAIN verified enabled with recurring RRULE and provisional due 01:20:00 KST; REARM_VERIFIED persisted.",
-    "tools/audit_startup_boundaries.py now rejects boot_started_authority_epoch != generation_key.",
-    "tests/test_audit_startup_boundaries.py includes a stale-generation BOOT_STARTED regression fixture.",
-    "Classification counters accidentally omitted during first rewrite were detected immediately and restored before handoff.",
-    "Container network cannot resolve github.com, so executable validation remains unproven rather than claimed."
+    "BOOT_STARTED persisted for DUE:2026-09-22T00:58:13+09:00; REARM_VERIFIED persisted after live same-MAIN recurring verification.",
+    "Generation fence and stale-generation regression fixture committed.",
+    "Static diff review detected that an intermediate rewrite had removed legacy audit output/CLI behavior; full original audit surface was restored from pre-change commit while retaining only the generation-fence additions.",
+    "CI custom-recurring branch referenced undefined variable active; corrected to controls with a one-line diff.",
+    "Latest integrated Actions run started for restored audit commit; result not yet claimed."
   ]
 }
