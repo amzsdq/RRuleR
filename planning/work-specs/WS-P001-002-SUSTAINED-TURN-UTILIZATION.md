@@ -47,28 +47,38 @@ The epoch-43 to epoch-58 measurement blackout was caused by missing explicit pro
 
 Epoch 59: 626 wall seconds, 557 strict useful seconds (88.98% wall coverage; 92.83% of the 600-second useful target). This materially improves the historical tiny-packet pattern but is not itself a fixed 900-second P0 window.
 
-## Current dominant cause: continuation-latency ceiling
+## Continuation-latency ceiling
 
-P0 requires 840/900 = 93.33% useful coverage. With a 600-second bounded useful turn, average non-useful cross-turn loss must stay <=42.9 seconds. The current nominal 60-second post-close rearm offset already exceeds that budget before scheduler delivery latency and startup/checkpoint overhead. A prior production sample observed about 64 seconds of scheduler delivery delay after due.
+P0 requires 840/900 = 93.33% useful coverage. With a 600-second bounded useful turn, average non-useful cross-turn loss must stay <=42.9 seconds. A 60-second post-close rearm offset already exceeds that budget before scheduler delivery latency and startup/checkpoint overhead.
 
-Therefore the active post-close continuation cadence cannot reliably pass P0 even with perfect in-turn execution.
+## UTIL-EXP-018 result — predictive prearm failed first canary
 
-## Active correction — UTIL-EXP-018
+The first guarded predictive-prearm sample did not produce a P0-eligible handoff:
 
-Guarded predictive same-canonical successor prearm:
+- predecessor last durable useful boundary: 17:11:53 KST;
+- successor invocation observation: 17:11:58 KST;
+- first durable useful successor mutation: 18:10:27 KST;
+- predecessor-to-first-useful gap: 3514 seconds;
+- duplicate substantive side effect observed: no;
+- schedule rollback observed: no.
 
-1. retain the 780-second provisional cold-rescue horizon;
-2. near bounded close, arm the same canonical successor for a due boundary before target close;
-3. predecessor continues useful work through close rather than yielding to the arm;
-4. if successor appears while predecessor is still fresh/conflicting, successor may fence/read/observe but cannot claim substantive authority or duplicate side effects;
-5. measure predecessor last useful boundary -> successor first useful boundary directly;
-6. rollback on unsafe overlap, duplicate side effect, schedule rollback, or missed successor.
+This falsifies predictive due placement as a sufficient correction for the observed path. The same intervention must not be repeated without new evidence.
 
-Promotion requires at least two safe canary handoffs with post-close gap <=42 seconds, then a valid fixed 900-second window.
+## Active correction — UTIL-EXP-019
+
+Separate successor startup into observed segments:
+
+1. scheduled due -> successor invocation observation;
+2. invocation observation -> nonconflicting authority claim;
+3. authority claim -> first durable useful mutation.
+
+`state/SUCCESSOR_STARTUP.json` is the prospective ledger. Missing boundaries remain unknown. Optimize the largest measured avoidable segment before changing scheduler due placement again.
+
+Predictive prearm is rolled back; completion-relative same-canonical continuation is the active fallback while this experiment runs.
 
 ## Exact resume step
 
-Complete `PREARM-CANARY-001` for epoch 60. Record predictive due, successor observation, predecessor last useful boundary, successor first useful boundary, post-close gap, and overlap/fence result. If safe and <=42 seconds, repeat once before promotion. If not, classify the measured failure and choose the next highest-effect correction rather than repeating blindly.
+Complete `UTIL-EXP-019` prospectively on the next handoff. Persist predecessor last-useful and due boundaries, then require the successor to record invocation observation, authority claim, and first durable useful work separately. Rank the measured segments and implement the highest-effect correction. Do not repeat `UTIL-EXP-018` until new evidence explains or materially reduces successor-start delay.
 
 ## Decision rule
 
