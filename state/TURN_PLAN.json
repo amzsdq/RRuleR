@@ -27,9 +27,11 @@
   "early_finish_fallback": "Extend reporting tests to generate validity-aware operator review rows from durable ledgers, then integrate into CI.",
   "created_for_next_wake": false,
   "started_at": "2026-09-21T18:55:59+09:00",
-  "last_progress_at": "2026-09-21T18:57:04+09:00",
+  "last_progress_at": "2026-09-21T18:59:10+09:00",
   "progress_evidence": [
     "state/RUNS.jsonl@7daba51d74f994e836b0ea77f72d144053f7d837",
-    "planning/evidence/TURN-CLOSE-V4-RETEST.md@a412c1cb9c106f088ad6af54ed26b4c8d53c39de"
+    "planning/evidence/TURN-CLOSE-V4-RETEST.md@a412c1cb9c106f088ad6af54ed26b4c8d53c39de",
+    "tools/compute_completion_due.py@07ab6260da1eec2a0f16ba02b1aa1cf0753e4257",
+    "control/rolling-rrule-lifecycle.v1.json@5796f3a8d285bd494d2be433f271254a621974f0"
   ]
 }
