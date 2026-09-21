@@ -78,8 +78,18 @@ jobs:
           assert lifecycle['time_unit_safety']['required'] is True
           assert gate['time_unit_safety']['required'] is True
           assert lifecycle['normal_final_rearm']['due'].find('1 minute (60 seconds)') >= 0
-          assert 'END+60' not in controls['conflict_rule']
-          assert 'NOW+180' not in controls['conflict_rule']
+          import re
+          def iter_strings(x):
+              if isinstance(x, str):
+                  yield x
+              elif isinstance(x, dict):
+                  for v in x.values(): yield from iter_strings(v)
+              elif isinstance(x, list):
+                  for v in x: yield from iter_strings(v)
+          ambiguous = re.compile(r'(?:END|NOW|WAKE)\s*\+\s*\d+(?!\s*(?:seconds?|minutes?|hours?))|\+\d+\s*[smh]\b', re.I)
+          for name,obj in [('controls',controls),('lifecycle',lifecycle),('gate',gate),('policy',policy)]:
+              bad=[s for s in iter_strings(obj) if ambiguous.search(s)]
+              assert not bad, f'{name} contains ambiguous human-readable timing: {bad[:3]}'
           trace=lifecycle['chat_trace']; assert trace['enabled'] is True and trace['mode']=='DURABLE_UNIT_CHAT_TRACE_CANARY'; assert trace['trace_never_authorizes_close'] is True
           util=policy['utilization']; assert util['voluntary_idle_while_useful_work_exists_forbidden'] is True; assert util['checkpoint_is_yield_condition'] is False; assert util['root_completion_is_yield_condition'] is False; assert util['after_each_work_unit']=='BEFORE_10_MINUTES_600_SECONDS_SELECT_NEXT_SAFE_USEFUL_UNIT_OR_DECOMPOSE; AT_OR_AFTER_10_MINUTES_600_SECONDS_FINISH_SMALLEST_SAFE_IN_FLIGHT_UNIT_AND_CLOSE'; assert util['minimum_normal_continue_elapsed_seconds']==600; assert util['pre_600_voluntary_normal_continue_close_forbidden'] is True
           assert current['continuation']['run_continuation_gate_policy']=='control/run-continuation-gate.v1.json'; assert current['continuation']['minimum_continue_work_seconds']==600
