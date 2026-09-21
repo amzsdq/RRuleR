@@ -26,6 +26,8 @@
     "alternatives_checked":{"type":"array","items":{"type":"string","minLength":1},"minItems":1,"uniqueItems":true},
     "close_decision":{"enum":["TIME_BOUNDARY","TARGET_REACHED_SAFE_BOUNDARY","BUDGET_EXHAUSTED","EXCEPTION","HANDOFF","TERMINAL"]},
     "close_reserve_seconds":{"type":"number","minimum":0},
+    "verified_next_fast_due_at":{"type":["string","null"]},
+    "normal_close_offset_seconds":{"type":["integer","null"],"minimum":0},
     "chat_trace_policy":{"type":"string"},
     "schedule_trace_verified":{"type":"boolean"},
     "final_due_trace_verified":{"type":"boolean"},
@@ -33,6 +35,7 @@
   },
   "allOf": [
     {"if":{"properties":{"run_ended_at":{"type":"string"}},"required":["run_ended_at"]},"then":{"required":["end_reason","program_status_at_end","duration_seconds","turn_outcome","close_decision"],"properties":{"duration_seconds":{"type":"integer","minimum":0},"turn_outcome":{"type":"string"},"close_decision":{"type":"string"}}}},
+    {"if":{"properties":{"end_reason":{"const":"VERIFIED_SAME_CANONICAL_CONTINUATION"}},"required":["end_reason"]},"then":{"required":["verified_next_fast_due_at","normal_close_offset_seconds"],"properties":{"verified_next_fast_due_at":{"type":"string"},"normal_close_offset_seconds":{"const":60}}}},
     {"if":{"properties":{"end_reason":{"const":"COMMITTED_SUCCESSOR_HANDOFF"}},"required":["end_reason"]},"then":{"required":["successor_observed_at"],"properties":{"successor_observed_at":{"type":"string"}}}},
     {"if":{"properties":{"turn_outcome":{"const":"CONTINUE"},"duration_seconds":{"type":"integer","maximum":599}},"required":["turn_outcome","duration_seconds"]},"then":{"required":["short_turn_reason"],"properties":{"short_turn_reason":{"const":"PLATFORM_ENFORCED_TERMINATION"},"close_decision":{"const":"EXCEPTION"},"end_reason":{"const":"PLATFORM_ENFORCED_TERMINATION"}}}},
     {"if":{"properties":{"chat_trace_policy":{"const":"DURABLE_UNIT_CHAT_TRACE_CANARY_V5_5"}},"required":["chat_trace_policy"]},"then":{"required":["schedule_trace_verified","unit_completion_traces"],"properties":{"schedule_trace_verified":{"const":true}}}},
