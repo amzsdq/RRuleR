@@ -49,7 +49,7 @@ When progress changes, update the work-spec acceptance/evidence first, then proj
 The scheduler mechanism is `RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE` unless fresh active controls explicitly replace it.
 
 - Startup: fence -> preserve newest verified continuation -> provisional-arm same canonical -> verify -> work.
-- Normal close: checkpoint -> final-rearm same canonical to completion-relative fast continuation -> verify -> persist due.
+- Normal `CONTINUE` close: checkpoint -> set THIS SAME canonical's next due to the **actual observed turn END + exactly 60 seconds** (preserve seconds; no minute rounding) -> verify -> persist observed due. This is the canonical default, not a tunable convenience. A different delay requires fresh durable evidence/constraint plus an explicit exception reason; scheduler delivery jitter is measured separately and must not be compensated by adding unexplained local delay.
 - A successful checkpoint, test, CI pass, handoff, document, milestone, root, or subgoal is progress, not program completion.
 - A future cold-rescue wake is safety coverage; it does not authorize a healthy current owner to stop.
 - If the armed successor becomes too near while useful authorized work remains, refresh/extend it when the active lifecycle policy permits.
