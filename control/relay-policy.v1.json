@@ -1,7 +1,7 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
-  "policy_revision": 17,
+  "policy_revision": 18,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
@@ -15,15 +15,18 @@
     "minimum_fence_before_mutation": true,
     "provisional_arm_before_full_restore_and_work": true,
     "target_useful_work_seconds": 600,
-    "provisional_safety_margin_seconds": 180,
-    "provisional_due_offset_seconds": 780,
+    "provisional_safety_margin_seconds": 45,
+    "provisional_due_offset_seconds": 120,
     "verified_fallback_final_rearm_from_actual_close_seconds": 60,
     "predictive_prearm_canary_experiment": "UTIL-EXP-018_ROLLED_BACK",
     "predictive_prearm_must_preserve_single_substantive_authority": true,
     "final_checkpoint_before_close": true,
     "verify_every_mutation": true,
     "fixed_quarter_cycle_active": false,
-    "note": "Clean authoritative MAIN uses SAME canonical recurring HOURLY RRULE. Normal close shifts the same recurring DTSTART to exact observed END+60; the natural hourly recurrence is cold fallback. Retired custom-recurring canary policy is historical only; Watchdog remains disabled standby."
+    "note": "Clean authoritative MAIN uses SAME canonical recurring HOURLY RRULE. In-flight crash insurance is short rolling: initial/refresh due NOW+120s, refresh when <=45s remains. Normal close shifts the same recurring DTSTART to exact observed END+60; natural hourly recurrence is cold fallback. Watchdog remains disabled standby.",
+    "provisional_refresh_guard_seconds": 45,
+    "provisional_refresh_offset_seconds": 120,
+    "long_provisional_780_seconds_retired": true
   },
   "utilization": {
     "first_class_objective": true,
@@ -33,7 +36,7 @@
     "evaluation_window_seconds": 900,
     "acceptance_useful_coverage_seconds": 840,
     "maximum_unexplained_evidence_gap_seconds": 120,
-    "provisional_rescue_planning_horizon_seconds": 600,
+    "provisional_rescue_planning_horizon_seconds": 120,
     "p0_max_average_non_useful_gap_seconds_for_600s_turn": 42.9,
     "acceptance_target_fraction": 0.9333333333,
     "busywork_for_window_fill_forbidden": true,
@@ -89,7 +92,7 @@
   "worker_cycle": {
     "mode": "ROLLING_CONTINUOUS_WORK_WITH_SAME_MAIN_HOURLY_RRULE_COLD_FALLBACK",
     "plan_before_substantive_work": true,
-    "provisional_rescue_planning_horizon_minutes": 10,
+    "provisional_rescue_planning_horizon_minutes": 2,
     "work_packet_is_stop_timer": false,
     "on_early_packet_finish": "PULL_NEXT_RELATED_USEFUL_BOUNDED_UNIT",
     "on_overrun": "EXTEND_PROVISIONAL_DUE_BEFORE_COLLISION_IF_USEFUL_AUTHORIZED_WORK_REMAINS",
@@ -98,7 +101,8 @@
     "primary_objective_persist_path": "state/TURN_PLAN.json",
     "watchdog_role": "DISABLED_BREAK_GLASS_STANDBY",
     "minimum_normal_continue_elapsed_seconds": 600,
-    "pre_600_normal_continue_close_forbidden": true
+    "pre_600_normal_continue_close_forbidden": true,
+    "provisional_refresh_guard_seconds": 45
   },
   "program_goals": {
     "competitive_agent_saas": {
