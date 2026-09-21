@@ -28,7 +28,7 @@ These are implementation candidates, not duplicate-work mandates. Record actual 
 - Integrated CI: commit `744eeeda5e3351ddb84bff95951c0ebe2061257a` fetches and executes both new tools and their tests.
 - Local execution: seven focused assertions passed via direct function invocation because pytest is unavailable in the current execution image. This is not an Actions pass and not live efficacy proof.
 - Actual-ledger audit found STARTUP-002 invalid: its `predecessor_last_useful_at=18:15:00 KST` is later than the matched predecessor end `18:12:54 KST`. Raw timestamps remain unchanged; the sample is durably marked `BOUNDARY_INCONSISTENCY` and excluded. Therefore the previously cited 155-second scheduler estimate is not validated evidence.
-- Post-v4 live closed-turn count was zero before this current turn closes. Do not claim the repair effective until the required three prospective valid turns are complete.
+- Post-v4 live closed-turn count was zero before this current turn closes. Three prospective valid turns permit only an initial review, not a conclusive efficacy claim or termination.
 
 ## Live acceptance
 
@@ -41,9 +41,9 @@ Collect at least three valid completed post-repair turns with runnable backlog. 
 |---|---|---:|---:|---:|---:|---|---|---|---|---|---|
 | OBS-RUN-UTIL-20260921-184232 | 18:42:32 → 18:51:46 KST | 554s | UNKNOWN | UNKNOWN | UNKNOWN (STARTUP-003 first-useful pending) | BUDGET_EXHAUSTED; verified same-canonical continuation | CI result unavailable; STARTUP-003 future boundary; 900s window did not fit | ELIGIBLE CLOSED TURN; run validator passed; no pause/forced termination | reporting/audit tools, focused assertions, CI integration; Actions result not yet observed | useful-work measurement incomplete; elapsed improvement alone is not efficacy proof | capture successor first-useful boundary and append prospective artifact-backed WORK_EVIDENCE |
 
-Eligible completed live turns: **1 / 3**. No efficacy conclusion yet.
+Eligible completed live turns recorded here: **1**. Continuous collection has no fixed sample-count limit.
 
-Status: one eligible completed live turn reviewed; two more required before conclusion.
+Status: continuous relay and measurement active; initial review after three eligible turns, then rolling review indefinitely.
 
 ## Operator review contract: elapsed, useful work, and failure attribution
 
@@ -61,3 +61,15 @@ Attribute failures separately: premature voluntary close; runnable backlog exhau
 Before accepting a summary, ensure it preserves validity/exclusion fields and excludes INVALID or maintenance-interrupted samples from comparison; merely printing every sample's numeric gap is insufficient. STARTUP-002 is currently invalid due to predecessor boundary inconsistency, so its 155-second figure must not drive scheduler promotion.
 
 At close, persist the run and accepted useful evidence, run the validators, then append the readable result. If a write fails, state exactly which record is missing and leave the interval unknown. Keep historical raw evidence intact. Every successor checks whether its predecessor's close record is missing and flags that gap without inventing an end time. If normal close bookkeeping cannot include its own final timestamp, label the measured boundary accurately rather than claiming an exact later response-delivery time.
+
+## Continuous relay directive (supersedes finite retest wording)
+
+The existing RRuleR actor owns ongoing work, measurement and bottleneck review. There is no three-turn limit and no automatic shutdown after a sample count or successful measurement. Continue under the existing scheduler and supported platform capabilities until explicit operator pause/STOP; retain safety/authority fences and honestly report genuine blockers. Each invocation remains bounded to the existing 10-minute work envelope. Do not create a separate reviewer or spend another Work session on routine validation.
+
+Accumulate every turn's raw observations and artifact-backed useful intervals. Three eligible turns are the first descriptive check only. Thereafter maintain a rolling view of the latest ten eligible turns alongside lifetime counts and missing/invalid counts. Normal operation gets a short incremental update, not a full audit every turn.
+
+Run a focused bottleneck inspection immediately on an unexcused short close, failed close validator, contradictory timestamps, missing predecessor close record, duplicate/conflicting effect, or missing verified continuation. For performance drift, inspect when three consecutive eligible turns worsen against the preceding valid baseline in known useful coverage or observed successor gap. Require comparable measurements; insufficient data triggers capture repair, never invented performance estimates. These are diagnostic triggers, not statistical significance or promotion criteria.
+
+Inspection flow: identify affected stage -> cite raw observations and exclude interrupted/invalid samples -> rank measured loss -> implement one authorized targeted correction -> record change boundary -> compare subsequent eligible samples. During external wait, continue independent authorized work. If no safe authorized work exists, record that state honestly and preserve permitted continuation; never fabricate work to fill time.
+
+Do not label the program COMPLETE because the initial review, one repair, or a work item is complete. Select the next authorized project/work-spec item. Explicit STOP/pause always wins. Report findings in this document and the existing actor's conversation; no automatic callback to a separate reviewer is assumed.
