@@ -350,11 +350,25 @@
       "qualification": "SUBSTANTIVE_ACCEPTED",
       "basis": "Specified and implemented an atomic close-state projection validator, added five discoverable regression tests, wired it into control-plane CI, and durably recorded the latest failed normal generation plus fixed-Watchdog recovery lineage. The actual 14-sample startup audit and all 88 discovered tests passed. Boundaries are observed authority claim and post-verification time; no later close work is counted.",
       "observed_seconds": 545
+    },
+    {
+      "record_id": "WE-20260921-E74-001",
+      "authority_epoch": 74,
+      "run_id": "RUN-UTIL-20260921-235045",
+      "start_at": "2026-09-21T23:55:22+09:00",
+      "end_at": "2026-09-22T00:00:25+09:00",
+      "start_boundary": "OBSERVED",
+      "end_boundary": "OBSERVED",
+      "kind": "main_self_reliance_policy_and_ci_alignment",
+      "artifact": "control/ACTIVE_CONTROLS.json@4a893090 + control/handoff-recovery.v1.json@6bc5790 + control/runtime-continuity.v1.json@832b5b0 + control/runtime-mode.v1.json@eb1596d + control/startup-watchdog.v1.json@88ad4ca + .github/workflows/validate-control-plane.yml@86ca3f5 + state/WAKE_ARCHITECTURE.json@4324c2f + control/recovery-slo.v1.json@3187b6e",
+      "qualification": "SUBSTANTIVE_ACCEPTED",
+      "basis": "Removed stale mandatory Watchdog coverage from active controls, made missing startup recover through the SAME MAIN natural recurring RRULE, gated Watchdog behind explicit emergency activation, aligned runtime/wake/SLO artifacts, added CI invariants, passed 24 direct semantic checks, and found zero remaining active-policy matches for the retired normal Watchdog dependency. Boundaries are directly observed; surrounding bootstrap/close time is not counted.",
+      "observed_seconds": 303
     }
   ],
   "collection": {
     "started_at": "2026-09-21T05:03:12+09:00",
     "historical_backfill": false,
-    "latest_observed_record": "WE-20260921-E73-001"
+    "latest_observed_record": "WE-20260921-E74-001"
   }
 }
