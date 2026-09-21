@@ -34,7 +34,16 @@ These are implementation candidates, not duplicate-work mandates. Record actual 
 
 Collect at least three valid completed post-repair turns with runnable backlog. Report each observed elapsed duration, known useful duration (or unknown), exception evidence, control/close overhead where observed, and successor gap where observed. Explicit pauses and forced termination are exclusions, not successes. No unexcused early CONTINUE close is allowed; do not call the repair effective solely because elapsed duration grew. Useful output must increase without duplicate/conflicting writes. Scheduler latency remains a separate outcome. Retain the 10-minute envelope and existing ownership fences. Do not promote scheduler timing from this repair.
 
-Status: focused local tests passed; live retest pending.
+
+## Per-turn live review
+
+| Run | Observed start → end | Elapsed | Accepted useful | Control/close | Successor gap | Close | Runnable alternatives | Validity | Artifact / CI evidence | Dominant supported cause | Next corrective action |
+|---|---|---:|---:|---:|---:|---|---|---|---|---|---|
+| OBS-RUN-UTIL-20260921-184232 | 18:42:32 → 18:51:46 KST | 554s | UNKNOWN | UNKNOWN | UNKNOWN (STARTUP-003 first-useful pending) | BUDGET_EXHAUSTED; verified same-canonical continuation | CI result unavailable; STARTUP-003 future boundary; 900s window did not fit | ELIGIBLE CLOSED TURN; run validator passed; no pause/forced termination | reporting/audit tools, focused assertions, CI integration; Actions result not yet observed | useful-work measurement incomplete; elapsed improvement alone is not efficacy proof | capture successor first-useful boundary and append prospective artifact-backed WORK_EVIDENCE |
+
+Eligible completed live turns: **1 / 3**. No efficacy conclusion yet.
+
+Status: one eligible completed live turn reviewed; two more required before conclusion.
 
 ## Operator review contract: elapsed, useful work, and failure attribution
 
