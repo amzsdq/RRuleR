@@ -252,6 +252,20 @@
       "qualification": "SUBSTANTIVE_ACCEPTED",
       "basis": "Implemented exact-second completion-relative due computation, added focused rollover/validation tests, made second precision an active lifecycle invariant, and integrated the new test into CI. Boundaries are adjacent observed progress boundaries; no later validation time is counted.",
       "observed_seconds": 126
+    },
+    {
+      "record_id": "WE-20260921-E66-003",
+      "authority_epoch": 66,
+      "run_id": "RUN-UTIL-20260921-185559",
+      "start_at": "2026-09-21T18:59:10+09:00",
+      "end_at": "2026-09-21T19:02:56+09:00",
+      "start_boundary": "OBSERVED",
+      "end_boundary": "OBSERVED",
+      "kind": "validity_aware_review_and_ci_repair",
+      "artifact": "tools/build_turn_review.py@7aea3abc8e91fbe606baae9a9bf89c6280c689f4 + tests/test_build_turn_review.py@4d7b32e454ff5150194e34fe9f5681d308b8bcb3 + .github/workflows/validate-control-plane.yml@19d7f002fc4b8b22bd962deb3bb7ab07de301b5f + planning/evidence/TURN-CLOSE-V4-RETEST.md@2ad94829147d0d1accc9aaabda8fe428a8cb0280",
+      "qualification": "SUBSTANTIVE_ACCEPTED",
+      "basis": "Implemented validity-aware review row generation, discovered and repaired prior no-op CI integration, verified all four tools are present in the workflow blob, and corrected the operator review with valid STARTUP-003 evidence. Boundaries are observed durable progress points.",
+      "observed_seconds": 226
     }
   ],
   "collection": {
