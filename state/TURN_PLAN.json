@@ -24,11 +24,11 @@
     "Checkpoint and close with live-verified SAME MAIN END+60."
   ],
   "current_substep": 5,
-  "handoff_boundary": "CHECKPOINT_PERSISTED_AWAITING_ACTUAL_END_AND_FAST_REARM",
+  "handoff_boundary": "VERIFIED_SAME_MAIN_END_PLUS_60",
   "early_finish_fallback": "Add a deterministic policy-consistency check that rejects normal-close Watchdog requirements.",
   "created_for_next_wake": false,
   "started_at": "2026-09-21T23:50:45+09:00",
-  "last_progress_at": "2026-09-22T00:00:25+09:00",
+  "last_progress_at": "2026-09-22T00:01:20+09:00",
   "progress_evidence": [
     "BOOT_STARTED 23:50:45 for DUE:2026-09-21T23:52:00+09:00",
     "REARM_VERIFIED 23:51:45.997376; SAME MAIN recurring provisional due 00:03:45 enabled",
@@ -36,6 +36,7 @@
     "Aligned ACTIVE_CONTROLS, relay/recovery/runtime policies and CI to SAME MAIN fast shift + natural recurring cold fallback.",
     "Updated wake architecture and recovery SLO so Watchdog is disabled break-glass standby, not a correctness dependency.",
     "24 direct self-reliance semantic checks passed; stale normal Watchdog dependency searches returned zero.",
-    "Updated P0 scorecard for first MAIN v4 live validation without claiming success."
+    "Updated P0 scorecard for first MAIN v4 live validation without claiming success.",
+    "Live SAME MAIN metadata re-read: enabled recurring RRULE DTSTART 2026-09-22T00:02:08+09:00."
   ]
 }
