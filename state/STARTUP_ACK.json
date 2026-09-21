@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
-  "main_canonical_id": "6aaf8a993eb08191b68dcec5e3fed081",
+  "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "current_expected_due_at": "2026-09-21T21:54:52+09:00",
   "generation_key": "DUE:2026-09-21T21:54:52+09:00",
-  "boot_started_at": null,
-  "boot_started_authority_epoch": null,
+  "boot_started_at": "2026-09-21T21:55:37+09:00",
+  "boot_started_authority_epoch": 70,
   "rearm_verified_at": null,
   "verified_provisional_due_at": null,
-  "status": "AWAITING_BOOT_STARTED",
-  "last_updated_at": "2026-09-21T21:53:52+09:00",
-  "note": "Startup Watchdog rearmed the same MAIN canonical after STARTUP_ACK_MISSING for the 21:41:24 generation. Receipts for the 21:54:52 recovery generation must be observed, not inferred."
+  "status": "BOOT_STARTED",
+  "last_updated_at": "2026-09-21T21:55:37+09:00",
+  "note": "Watchdog recovery generation entered durable bootstrap after fresh NOW/CURRENT/live canonical/scheduler-fence validation. Corrected a malformed mixed canonical ID before establishing provisional continuation."
 }
