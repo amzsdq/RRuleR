@@ -1,6 +1,6 @@
 {
   "policy_id": "RRULER_SCHEDULER_FENCE",
-  "version": 9,
+  "version": 10,
   "status": "ACTIVE",
   "purpose": "Prevent stale schedule/canonical rollback after clean operator migration while supporting SAME MAIN completion-relative continuation.",
   "authoritative_expected_due_path": "state/CURRENT.json#/continuation/next_due_at",
@@ -28,15 +28,21 @@
   "predictive_prearm": {
     "experiment_id": "UTIL-EXP-018",
     "declared_by": "state/PREDICTIVE_PREARM_CANARY.json",
-    "rule": "A wake matching the newest declared predictive_due_at is not stale merely because the predecessor is still fresh. It is a predictive-overlap observation and must follow handoff-recovery PREDICTIVE_PREARM_OVERLAP semantics.",
+    "status": "ROLLED_BACK",
+    "rule": "Historical predictive-overlap samples remain evidence only. Predictive prearm is not an active normal-path scheduler mechanism unless a fresh experiment explicitly re-authorizes it.",
     "fresh_predecessor_action": "DO_NOT_CLAIM_CONFLICTING_SUBSTANTIVE_AUTHORITY",
-    "schedule_rule": "Preserve the newest verified predictive schedule; do not restore the superseded provisional due.",
     "takeover_rule": "Advance authority only after a fresh durable re-read proves committed close, explicit nonconflicting transfer, or applicable stale-owner recovery."
   },
-  "expected_wake_action": "VALIDATE_FENCE_PERSIST_BOOT_REARM_THEN_CLASSIFY_NORMAL_VS_PREDICTIVE_VS_RECOVERY_BEFORE_SUBSTANTIVE_AUTHORITY",
+  "expected_wake_action": "VALIDATE_FENCE_PERSIST_BOOT_REARM_THEN_CLASSIFY_NORMAL_VS_RECOVERY_BEFORE_SUBSTANTIVE_AUTHORITY",
   "timing_defaults": {
     "target_useful_work_seconds": 600,
-    "provisional_safety_margin_seconds": 180,
+    "minimum_normal_continue_elapsed_seconds": 600,
+    "provisional_safety_margin_seconds": 60,
+    "provisional_due_offset_seconds": 660,
+    "provisional_extension_guard_seconds": 90,
+    "provisional_extension_offset_seconds": 180,
+    "routine_short_rolling_refresh": false,
+    "retired_provisional_due_offset_seconds": 780,
     "final_rearm_offset_seconds": 60,
     "normal_continue_due_rule": "ACTUAL_OBSERVED_TURN_END_PLUS_EXACTLY_60_SECONDS",
     "exception_requires_durable_reason": true
@@ -52,7 +58,7 @@
     "local_extra_delay_without_evidence_forbidden": true,
     "scheduler_delivery_latency_measured_separately": true
   },
-  "compatibility_note": "Prior custom-recurring/exact-one-shot experiments and both earlier MAIN canonicals are historical. Current clean operator-created MAIN uses recurring hourly RRULE and self-shifts DTSTART to exact END+60. Retired canonical rollback is forbidden.",
+  "compatibility_note": "Prior custom-recurring/exact-one-shot/predictive-prearm experiments and both earlier MAIN canonicals are historical. Current clean MAIN uses recurring hourly RRULE, arms one +660s provisional for the normal ~600s envelope, and self-shifts DTSTART to exact END+60 on normal close. Retired canonical and retired +780s horizon rollback are forbidden.",
   "canonical_migration": {
     "current_main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
     "retired_main_canonical_ids": [
