@@ -1,3 +1,17 @@
 {
-  "schema_version":"1.2","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","handoff_state":"COMMITTED","handoff_mode":"SAME_MAIN_END_PLUS_60","predecessor_run_id":"RUN-UTIL-20260922-011852","predecessor_authority_epoch":79,"successor_run_id":null,"successor_expected_at":"2026-09-22T01:30:15+09:00","successor_observed_at":null,"predecessor_last_progress_at":"2026-09-22T01:29:15+09:00","recovery_basis":"VERIFIED_SAME_MAIN_RECURRING_EXACT_END_PLUS_60","active_unit":null,"checkpoint_id":"CP-UTILIZATION-120","next_action":"Wake SAME MAIN at verified 01:30:15 KST; read fresh NOW/ACTIVE_CONTROLS and continue WS-P001-002 under v5.3 short rolling provisional + 600s hard floor."
+  "schema_version": "1.2",
+  "program_id": "RRULER-PROGRAM-001",
+  "root_job_id": "RRULER-UTILIZATION-003",
+  "handoff_state": "COMMITTED",
+  "handoff_mode": "OPERATOR_RECOVERY_AFTER_STARTUP_ACK_MISSING",
+  "predecessor_run_id": "RUN-UTIL-20260922-011852",
+  "predecessor_authority_epoch": 79,
+  "successor_run_id": null,
+  "successor_expected_at": "2026-09-22T01:38:00+09:00",
+  "successor_observed_at": null,
+  "predecessor_last_progress_at": "2026-09-22T01:29:15+09:00",
+  "recovery_basis": "01:30:15_SCHEDULED_INVOCATION_WITHOUT_GENERATION_MATCHED_BOOT_STARTED",
+  "active_unit": null,
+  "checkpoint_id": "CP-UTILIZATION-120",
+  "next_action": "At 01:38:00 SAME MAIN wake, persist BOOT_STARTED first, then verify v5.4 +660s provisional and resume authorized work."
 }
