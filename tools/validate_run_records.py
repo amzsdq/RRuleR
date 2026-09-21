@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""Validate newly closed turns; retain legacy observations without rewriting them."""
+"""Validate newly closed turns; retain pre-hard-floor observations without rewriting them."""
 import json
 import sys
 from datetime import datetime
 from pathlib import Path
 
-ENFORCE_FROM = datetime.fromisoformat('2026-09-21T09:35:00+00:00')
+# 600-second voluntary CONTINUE hard floor became authoritative at the durable
+# policy-alignment commit on 2026-09-21 16:10:25Z. Older observations remain
+# historical evidence and are not retroactively reclassified.
+ENFORCE_FROM = datetime.fromisoformat('2026-09-21T16:10:25+00:00')
 PRE600_CONTINUE_EXCEPTIONS = {'PLATFORM_ENFORCED_TERMINATION'}
 VALID_CONTINUE_END_REASONS = {
     'VERIFIED_SAME_CANONICAL_CONTINUATION',
