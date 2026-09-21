@@ -25,7 +25,7 @@ These are implementation candidates, not duplicate-work mandates. Record actual 
 
 - Strict close summary: `tools/summarize_turn_close.py` and focused fixtures. It reports post-v4 closed turns, unexcused short CONTINUE closes, known useful seconds, unknown-useful count, and successor gaps only from complete observed boundaries.
 - STARTUP consistency audit: `tools/audit_startup_boundaries.py` and focused fixtures. It resolves `RUN-...` predecessor IDs against `OBS-RUN-...` observations, preserves raw evidence, and excludes maintenance-interrupted or boundary-inconsistent samples from scheduler comparison.
-- Integrated CI: commit `744eeeda5e3351ddb84bff95951c0ebe2061257a` fetches and executes both new tools and their tests.
+- CI correction: the earlier `744eeeda5e3351ddb84bff95951c0ebe2061257a` write was a no-op despite returning a commit response. Commit `19d7f002fc4b8b22bd962deb3bb7ab07de301b5f` is the first blob-verified integration and fetches/executes turn-close summary, STARTUP audit, exact-second due computation, review generation, and their tests. External Actions result is not yet observed.
 - Local execution: seven focused assertions passed via direct function invocation because pytest is unavailable in the current execution image. This is not an Actions pass and not live efficacy proof.
 - Actual-ledger audit found STARTUP-002 invalid: its `predecessor_last_useful_at=18:15:00 KST` is later than the matched predecessor end `18:12:54 KST`. Raw timestamps remain unchanged; the sample is durably marked `BOUNDARY_INCONSISTENCY` and excluded. Therefore the previously cited 155-second scheduler estimate is not validated evidence.
 - Post-v4 live closed-turn count was zero before this current turn closes. Three prospective valid turns permit only an initial review, not a conclusive efficacy claim or termination.
@@ -39,7 +39,7 @@ Collect at least three valid completed post-repair turns with runnable backlog. 
 
 | Run | Observed start → end | Elapsed | Accepted useful | Control/close | Successor gap | Close | Runnable alternatives | Validity | Artifact / CI evidence | Dominant supported cause | Next corrective action |
 |---|---|---:|---:|---:|---:|---|---|---|---|---|---|
-| OBS-RUN-UTIL-20260921-184232 | 18:42:32 → 18:51:46 KST | 554s | UNKNOWN | UNKNOWN | UNKNOWN (STARTUP-003 first-useful pending) | BUDGET_EXHAUSTED; verified same-canonical continuation | CI result unavailable; STARTUP-003 future boundary; 900s window did not fit | ELIGIBLE CLOSED TURN; run validator passed; no pause/forced termination | reporting/audit tools, focused assertions, CI integration; Actions result not yet observed | useful-work measurement incomplete; elapsed improvement alone is not efficacy proof | capture successor first-useful boundary and append prospective artifact-backed WORK_EVIDENCE |
+| OBS-RUN-UTIL-20260921-184232 | 18:42:32 → 18:51:46 KST | 554s | UNKNOWN | UNKNOWN | 387s (valid STARTUP-003) | BUDGET_EXHAUSTED; verified same-canonical continuation | CI result unavailable; STARTUP-003 future boundary; 900s window did not fit | ELIGIBLE CLOSED TURN; run validator passed; no pause/forced termination | reporting/audit tools, focused assertions, CI integration; Actions result not yet observed | useful-work measurement incomplete; elapsed improvement alone is not efficacy proof | correct end→due timing with exact-second +60s rearm; append prospective artifact-backed WORK_EVIDENCE |
 
 Eligible completed live turns recorded here: **1**. Continuous collection has no fixed sample-count limit.
 
