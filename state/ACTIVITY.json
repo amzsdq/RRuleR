@@ -3,15 +3,15 @@
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "status": "WORKING",
+  "status": "CHECKPOINTED",
   "active_run_id": "RUN-UTIL-20260921-204946",
   "authority_epoch": 68,
   "substantive_work_started_at": "2026-09-21T20:49:46+09:00",
   "last_progress_at": "2026-09-21T20:59:31+09:00",
   "last_progress_kind": "GUARDED_EVENT_RESCUE_SLICE_AND_THREE_TURN_REVIEW",
-  "current_unit": "Checkpoint epoch 68 and close with exact END+60.",
-  "next_wake_due_at": "2026-09-21T21:02:29+09:00",
-  "successor_observed": true,
+  "current_unit": "Await MAIN successor with generation-matched startup receipts.",
+  "next_wake_due_at": "2026-09-21T21:01:19+09:00",
+  "successor_observed": false,
   "handoff_ready": true,
-  "operator_ui_note": "STARTUP-006 invoked at 19:50:28 but left no durable bootstrap/progress. Epoch 68 recovered on the hourly fallback and provisionally rearmed."
+  "operator_ui_note": "Epoch 68: 633s elapsed, 556s strict useful. MAIN due 21:01:19; fixed Startup Watchdog due 21:04:19."
 }
