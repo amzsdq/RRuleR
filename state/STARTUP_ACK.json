@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
   "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "current_expected_due_at": "2026-09-21T22:34:20+09:00",
-  "generation_key": "DUE:2026-09-21T22:34:20+09:00",
-  "boot_started_at": "2026-09-21T22:35:28+09:00",
-  "boot_started_authority_epoch": 72,
-  "rearm_verified_at": "2026-09-21T22:35:59+09:00",
-  "verified_provisional_due_at": "2026-09-21T22:48:28+09:00",
-  "status": "REARM_VERIFIED",
-  "last_updated_at": "2026-09-21T22:35:59+09:00",
-  "note": "Generation-matched BOOT_STARTED and same-canonical provisional RRULE rearm are both durably observed. Live MAIN metadata was re-read enabled at 22:48:28."
+  "current_expected_due_at": "2026-09-21T22:47:28+09:00",
+  "generation_key": "DUE:2026-09-21T22:47:28+09:00",
+  "boot_started_at": null,
+  "boot_started_authority_epoch": null,
+  "rearm_verified_at": null,
+  "verified_provisional_due_at": null,
+  "status": "AWAITING_BOOT_STARTED",
+  "last_updated_at": "2026-09-21T22:46:28+09:00",
+  "note": "Epoch 73 closed normally. Await a generation-matched BOOT_STARTED receipt for the verified same-canonical 22:47:28 continuation."
 }
