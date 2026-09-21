@@ -48,9 +48,8 @@ def validate_history_merge(horizon, predecessors):
     if set(current_keys) != required:
         missing = required - set(current_keys)
         extra = set(current_keys) - required
-        if missing: raise ValueError("observation provenance history lost required merge-parent retirement records")
+        if missing: raise ValueError("append-only observation provenance history lost required merge-parent retirement records")
         if extra: raise ValueError("observation provenance history contains unexplained retirement records")
-    # Canonical order makes independently reconciled merge histories converge deterministically.
     if current_keys != sorted(current_keys, key=lambda key: tuple("" if v is None else str(v) for v in key)):
         raise ValueError("observation provenance history is not in deterministic canonical order")
     for record in current_history:
