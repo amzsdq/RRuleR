@@ -7,11 +7,11 @@
   "active_run_id": "RUN-UTIL-20260921-215434",
   "authority_epoch": 71,
   "substantive_work_started_at": "2026-09-21T21:56:39+09:00",
-  "last_progress_at": "2026-09-21T21:56:39+09:00",
-  "last_progress_kind": "WATCHDOG_RECOVERY_BOOTSTRAP_VERIFIED",
-  "current_unit": "Implement recovery-segment reporting and focused fixtures in summarize_turn_close.",
+  "last_progress_at": "2026-09-21T22:05:25+09:00",
+  "last_progress_kind": "ARTIFACT_BACKED_IMPLEMENTATION",
+  "current_unit": "Checkpoint complete; exact END+60 MAIN and enabled Watchdog continuation verification in progress.",
   "next_wake_due_at": "2026-09-21T22:09:11+09:00",
   "successor_observed": true,
   "handoff_ready": false,
-  "operator_ui_note": "Epoch 71 recovered the missing-bootstrap generation; MAIN and Watchdog are both enabled and verified."
+  "operator_ui_note": "Epoch 71 completed recovery reporting and receipt identity fencing; continuation close is in progress."
 }
