@@ -7,12 +7,14 @@ on:
       - 'control/run-continuation-gate.v1.json'
       - 'control/relay-policy.v1.json'
       - 'state/CURRENT.json'
+      - 'state/UTILIZATION.json'
       - '.github/workflows/validate-continuation-policy.yml'
   pull_request:
     paths:
       - 'control/run-continuation-gate.v1.json'
       - 'control/relay-policy.v1.json'
       - 'state/CURRENT.json'
+      - 'state/UTILIZATION.json'
       - '.github/workflows/validate-continuation-policy.yml'
   workflow_dispatch:
 
@@ -35,26 +37,36 @@ jobs:
           fetch control/run-continuation-gate.v1.json /tmp/gate.json
           fetch control/relay-policy.v1.json /tmp/policy.json
           fetch state/CURRENT.json /tmp/current.json
+          fetch state/UTILIZATION.json /tmp/utilization.json
           python - <<'PY'
           import json
-          gate=json.load(open('/tmp/gate.json')); policy=json.load(open('/tmp/policy.json')); current=json.load(open('/tmp/current.json'))
+          gate=json.load(open('/tmp/gate.json')); policy=json.load(open('/tmp/policy.json')); current=json.load(open('/tmp/current.json')); utilization=json.load(open('/tmp/utilization.json'))
           assert gate['status']=='ACTIVE'
           assert set(gate['program_nonterminal_states'])=={'CONTINUE','DEGRADED_CONTINUATION'}
           assert gate['default_for_nonterminal_owner']=='MUST_CONTINUE_USEFUL_WORK'
           assert gate['nonterminal_no_handoff_rule']['required_action']=='SELECT_AND_EXECUTE_NEXT_USEFUL_ADMISSIBLE_UNIT'
           assert set(gate['run_end_allowed_only_for'])=={'VERIFIED_SAME_CANONICAL_CONTINUATION','COMMITTED_SUCCESSOR_HANDOFF','EXPLICIT_OPERATOR_STOP','PLATFORM_ENFORCED_TERMINATION'}
           close=set(gate['bounded_turn_close_rule']['required_before_verified_continuation_end'])
-          assert {'LATEST_CHECKPOINT_PERSISTED','SAME_CANONICAL_FUTURE_CONTINUATION_MUTATED_AND_VERIFIED','DURABLE_EXPECTED_DUE_PERSISTED','TURN_STATUS_AND_RUN_EVIDENCE_PERSISTED'} <= close
+          assert {'NORMAL_CONTINUE_MINIMUM_600S_REACHED_OR_NONCONTINUE_STOP_PAUSE_TERMINAL_BLOCKED_OR_PLATFORM_TERMINATION','LATEST_CHECKPOINT_PERSISTED','ACTUAL_END_OBSERVED','SAME_MAIN_MUTATED_TO_EXACT_END_PLUS_60_SECONDS','LIVE_MAIN_REREAD_PROVES_SAME_CANONICAL_ENABLED_RECURRING_EXACT_DSTART','DURABLE_EXPECTED_FAST_DUE_PERSISTED','TURN_STATUS_AND_RUN_EVIDENCE_PERSISTED'} <= close
           assert gate['bounded_turn_close_rule']['local_success_alone_never_satisfies_rule'] is True
-          required={'PRIMARY_OBJECTIVE_COMPLETE','CI_PASS','ROOT_COMPLETE','WAITING_FOR_NEXT_WAKE','SCHEDULE_BOUNDARY'}
+          required={'PRIMARY_OBJECTIVE_COMPLETE','CI_PASS','ROOT_COMPLETE','WAITING_FOR_NEXT_WAKE','SCHEDULE_BOUNDARY','NO_OBVIOUS_NEXT_TASK'}
           assert required <= set(gate['never_end_because'])
+          decision=gate['turn_decision']
+          assert decision['target_elapsed_seconds']==600
+          assert decision['short_turn_threshold_seconds']==600
+          assert decision['normal_continue_minimum_elapsed_seconds']==600
+          assert decision['pre_600_voluntary_continue_close_forbidden'] is True
+          assert decision['normal_soft_ceiling_seconds']==720
           util=policy['utilization']
           assert util['voluntary_idle_while_useful_work_exists_forbidden'] is True
           assert util['checkpoint_is_yield_condition'] is False
           assert util['root_completion_is_yield_condition'] is False
           assert util['after_each_work_unit']=='SELECT_NEXT_SAFE_USEFUL_UNIT_UNTIL_NATURAL_CLOSE_OR_SAFETY_BOUNDARY'
           assert current['continuation']['run_continuation_gate_policy']=='control/run-continuation-gate.v1.json'
+          assert current['continuation']['minimum_continue_work_seconds']==600
+          assert utilization['execution_envelope']['minimum_continue_turn_seconds']==600
+          assert utilization['execution_envelope']['normal_continue_pre600_voluntary_close_forbidden'] is True
           if current['program_status'] in gate['program_nonterminal_states']:
               assert current['continuation']['program_terminal_disabled_required'] is True
-          print('continuation authority validation passed')
+          print('continuation authority + 600s hard-floor validation passed')
           PY
