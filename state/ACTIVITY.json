@@ -1,17 +1,3 @@
 {
-  "schema_version": "1.0",
-  "program_id": "RRULER-PROGRAM-001",
-  "root_job_id": "RRULER-UTILIZATION-003",
-  "canonical_automation_id": "6ab152b636748191a71873ba4d5ef551",
-  "status": "WORKING",
-  "active_run_id": "RUN-UTIL-20260922-011852",
-  "authority_epoch": 79,
-  "substantive_work_started_at": "2026-09-22T01:19:04+09:00",
-  "last_progress_at": "2026-09-22T01:28:27+09:00",
-  "last_progress_kind": "SHORT_ROLLING_PROVISIONAL_POLICY_FIX",
-  "current_unit": "Apply operator-verified short rolling SAME-MAIN provisional scheduling; retire +780s long provisional while preserving 600s work floor and END+60 normal close.",
-  "next_wake_due_at": "2026-09-22T01:30:15+09:00",
-  "successor_observed": false,
-  "handoff_ready": false,
-  "operator_ui_note": "v5.3 short rolling provisional active: SAME MAIN near due NOW+120s, refresh at <=45s; normal close remains exact END+60."
+  "schema_version":"1.0","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","canonical_automation_id":"6ab152b636748191a71873ba4d5ef551","status":"HANDOFF_READY","active_run_id":null,"authority_epoch":79,"substantive_work_started_at":"2026-09-22T01:19:04+09:00","last_progress_at":"2026-09-22T01:29:15+09:00","last_progress_kind":"TURN_CLOSE_VERIFIED_END_PLUS_60","current_unit":null,"next_wake_due_at":"2026-09-22T01:30:15+09:00","successor_observed":false,"handoff_ready":true,"operator_ui_note":"Normal close: SAME MAIN live-verified enabled recurring at exact observed END+60 = 01:30:15 KST; v5.3 short rolling provisional remains bootstrap policy for next wake."
 }
