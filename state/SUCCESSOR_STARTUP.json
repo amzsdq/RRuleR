@@ -286,7 +286,7 @@
     "boot_started_at": "2026-09-21T22:16:29+09:00",
     "rearm_verified_at": "2026-09-21T22:17:18+09:00",
     "authority_claim_at": "2026-09-21T22:19:35+09:00",
-    "first_durable_useful_at": null,
+    "first_durable_useful_at": "2026-09-21T22:21:10+09:00",
     "generation_key": "DUE:2026-09-21T22:13:24+09:00",
     "due_to_observation_seconds": 133,
     "observation_to_boot_seconds": 52,
@@ -301,10 +301,12 @@
       "first_durable_useful_at"
     ],
     "rule": "Fixed-Watchdog recovery of STARTUP-011. Keep this recovery generation out of normal scheduler comparison and record only observed boundaries.",
-    "validity": "INCOMPLETE",
-    "classification": "FIXED_WATCHDOG_RECOVERY_BOOTSTRAPPED_PENDING_DURABLE_USEFUL_WORK",
+    "validity": "RECOVERY_COMPLETE_PENDING_CLOSE",
+    "classification": "FIXED_WATCHDOG_PREBOOTSTRAP_RECOVERY_RESTORED_DURABLE_USEFUL_WORK",
     "recovery_kind": "FIXED_WATCHDOG_PREBOOTSTRAP",
-    "audit_note": "The same MAIN canonical was rearmed by the fixed Watchdog. Bootstrap and authority boundaries are observed; first useful remains null until a material artifact commit is observed."
+    "audit_note": "Commit 7c3b890 records the failed normal generation and this fixed-Watchdog recovery lineage. This is the first observed material artifact boundary after authority claim; the recovery sample remains excluded from normal scheduler comparison.",
+    "claim_to_first_useful_seconds": 95,
+    "due_to_first_useful_seconds": 466
   },
   "decision_rule": "STARTUP-011 preserves the failed normal generation; STARTUP-012 measures its fixed-Watchdog recovery. Audit both samples and next_sample, validate lineage and receipt order, and never infer missing boundaries."
 }
