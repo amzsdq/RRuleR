@@ -6,35 +6,38 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "root_goal": "P0 sustained evidenced useful-work coverage",
   "status": "CONTINUE",
-  "current_owner": "RUN-UTIL-20260922-010103",
+  "current_owner": null,
   "authority_epoch": 78,
   "canonical_automation_id": "6ab152b636748191a71873ba4d5ef551",
-  "run_state": "ACTIVE",
+  "run_state": "HANDOFF_COMMITTED",
   "checkpoint": {
-    "id": "CP-UTILIZATION-116",
+    "id": "CP-UTILIZATION-117",
     "state": "CONTINUE",
     "completed": [
-      "Observed clean MAIN wake for generation DUE:2026-09-22T00:58:13+09:00 and persisted generation-matched BOOT_STARTED.",
-      "Verified same clean MAIN enabled recurring RRULE with provisional due 01:20:00 KST and persisted REARM_VERIFIED.",
-      "Confirmed both retired MAIN canonicals remain disabled and Watchdog remains disabled standby.",
-      "Hardened STARTUP_ACK audit so BOOT_STARTED must bind to the same generation_key.",
-      "Added stale-generation BOOT_STARTED regression coverage and restored existing classification counters after immediate static review."
+      "Generation-matched BOOT_STARTED and REARM_VERIFIED were persisted for the clean MAIN wake.",
+      "Startup ACK audit now rejects BOOT_STARTED from a stale generation and regression coverage was added.",
+      "Intermediate broad rewrite regression was detected by commit diff review; full legacy audit output/CLI surface was restored before close.",
+      "CI custom-recurring validation undefined-variable defect was repaired.",
+      "Generation-bound startup receipt rule was aligned across ACTIVE_CONTROLS, runtime continuity, and scheduler-fence startup order.",
+      "Normal close live-verified SAME MAIN enabled=true with recurring RRULE and exact DTSTART 2026-09-22T01:07:52+09:00."
     ],
     "evidence": [
-      "state/STARTUP_ACK.json@52cd4f3",
-      "tools/audit_startup_boundaries.py@b6b7599",
-      "tests/test_audit_startup_boundaries.py@09a996e",
-      "state/TURN_PLAN.json@986434c",
-      "live SAME MAIN metadata: enabled=true, RRULE:FREQ=HOURLY, provisional DTSTART 01:20:00 KST"
+      "planning/evidence/CLEAN-MAIN-STARTUP-GENERATION-FENCE-2026-09-22.md",
+      "tools/audit_startup_boundaries.py@858d5cf",
+      "tests/test_audit_startup_boundaries.py@b13e7e6",
+      "control/ACTIVE_CONTROLS.json@8f448a8",
+      "control/runtime-continuity.v1.json@09ea6c9",
+      "control/scheduler-fence.v1.json@d859b01",
+      "live SAME MAIN metadata verified after close: enabled=true, RRULE:FREQ=HOURLY, DTSTART=20260922T010752 Asia/Seoul"
     ],
-    "observation": "Clean MAIN ordinary continuity succeeded without Watchdog. Executable validation of the newest audit/test patch is still unproven because the local container could not resolve github.com; no PASS is claimed from static inspection alone.",
-    "next_action": "Validate the generation-fence patch when an executable path is available; continue rolling WS-P001-002 evidence collection and same MAIN END+60 chaining."
+    "observation": "Latest integrated GitHub Actions validation remained an external pending item while rapid state/control pushes caused earlier concurrency cancellations. No CI PASS is claimed in this turn.",
+    "next_action": "On the next clean MAIN wake, read fresh CI result for latest source first; repair any concrete failure or, if PASS, record executable validation and continue WS-P001-002 rolling utilization evidence."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_COMPLETION_RELATIVE_MAIN",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-22T01:20:00+09:00",
+    "next_due_at": "2026-09-22T01:07:52+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -59,7 +62,7 @@
       "enabled_verified": false,
       "policy_version": 8
     },
-    "next_due_source": "CURRENT_TURN_PROVISIONAL_CRASH_INSURANCE",
+    "next_due_source": "VERIFIED_ACTUAL_END_PLUS_EXACTLY_60_SECONDS",
     "cold_fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE"
   },
   "safety": {
