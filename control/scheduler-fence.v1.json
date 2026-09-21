@@ -1,6 +1,6 @@
 {
   "policy_id": "RRULER_SCHEDULER_FENCE",
-  "version": 8,
+  "version": 9,
   "status": "ACTIVE",
   "purpose": "Prevent stale schedule/canonical rollback after clean operator migration while supporting SAME MAIN completion-relative continuation.",
   "authoritative_expected_due_path": "state/CURRENT.json#/continuation/next_due_at",
@@ -9,12 +9,15 @@
     "READ_FRESH_CURRENT_AND_LIVE_CANONICAL",
     "COMPARE_ACTUAL_WAKE_AND_EXPECTED_DUE",
     "IF_VALID_OR_RECOVERABLE_PRESERVE_NEWEST_VERIFIED_LIVE_CONTINUATION",
+    "PERSIST_GENERATION_MATCHED_BOOT_STARTED",
+    "PROVISIONAL_ARM_SAME_MAIN_AND_VERIFY_BEFORE_BROAD_RESTORE_OR_SUBSTANTIVE_WORK",
+    "PERSIST_GENERATION_MATCHED_REARM_VERIFIED",
     "CLASSIFY_PREDICTIVE_PREARM_IF_DECLARED",
     "RECONCILE_CURRENT_ACTIVITY_HANDOFF_FORWARD",
     "CLAIM_FRESH_AUTHORITY_ONLY_IF_NONCONFLICTING",
-    "PROVISIONAL_ARM_AND_VERIFY_WHEN_AUTHORITY_CAN_SAFELY_ADVANCE",
     "CONTINUE_WORK_PROTOCOL"
   ],
+  "startup_receipt_generation_rule": "BOOT_STARTED and REARM_VERIFIED must belong to the current generation; a stale receipt cannot satisfy the current wake.",
   "stale_wake_definition": "A wake whose occurrence belongs to an older schedule generation and conflicts with the newest verified durable/live continuation.",
   "stale_wake_action": "RECOVER_FORWARD_NO_ROLLBACK",
   "expected_due_tolerance_seconds": 240,
@@ -30,7 +33,7 @@
     "schedule_rule": "Preserve the newest verified predictive schedule; do not restore the superseded provisional due.",
     "takeover_rule": "Advance authority only after a fresh durable re-read proves committed close, explicit nonconflicting transfer, or applicable stale-owner recovery."
   },
-  "expected_wake_action": "VALIDATE_FENCE_THEN_CLASSIFY_NORMAL_VS_PREDICTIVE_VS_RECOVERY_BEFORE_SUBSTANTIVE_AUTHORITY",
+  "expected_wake_action": "VALIDATE_FENCE_PERSIST_BOOT_REARM_THEN_CLASSIFY_NORMAL_VS_PREDICTIVE_VS_RECOVERY_BEFORE_SUBSTANTIVE_AUTHORITY",
   "timing_defaults": {
     "target_useful_work_seconds": 600,
     "provisional_safety_margin_seconds": 180,
