@@ -160,22 +160,47 @@
       "rule": "This wake belongs to the next hourly fallback occurrence after STARTUP-006 lacked durable acknowledgement. Use for recovery-stage diagnostics, not normal END+60 comparison.",
       "claim_to_first_useful_seconds": 118,
       "due_to_first_useful_seconds": 178
+    },
+    {
+      "sample_id": "STARTUP-008",
+      "predecessor_run_id": "RUN-UTIL-20260921-204946",
+      "predecessor_last_useful_at": "2026-09-21T20:59:31+09:00",
+      "predecessor_run_ended_at": "2026-09-21T21:00:19+09:00",
+      "scheduled_due_at": "2026-09-21T21:01:19+09:00",
+      "successor_observed_at": "2026-09-21T21:03:20.817126+09:00",
+      "boot_started_at": null,
+      "rearm_verified_at": null,
+      "authority_claim_at": null,
+      "first_durable_useful_at": null,
+      "predecessor_last_useful_to_end_seconds": 48,
+      "end_to_due_seconds": 60,
+      "generation_key": "DUE:2026-09-21T21:01:19+09:00",
+      "required_fields": [
+        "scheduled_due_at",
+        "successor_observed_at",
+        "boot_started_at",
+        "rearm_verified_at",
+        "authority_claim_at",
+        "first_durable_useful_at"
+      ],
+      "rule": "First prospective normal-close sample under fixed Startup Watchdog. MAIN must write generation-matched BOOT_STARTED before provisional arm and REARM_VERIFIED after verification.",
+      "validity": "INCOMPLETE",
+      "classification": "INVOKED_WITHOUT_GENERATION_MATCHED_BOOT_OR_REARM_RECEIPT",
+      "due_to_observation_seconds": 121,
+      "exclusion_reason": "STARTUP_ACK_MISSING",
+      "audit_note": "Live automation metadata proves invocation at 21:03:20.817126 KST, 121 seconds after due. After the 180-second startup grace, no generation-matched BOOT_STARTED, REARM_VERIFIED, authority claim, first-useful boundary, or newer verified continuation existed. Watchdog recovery was armed at 21:10:09 KST."
     }
   ],
   "next_sample": {
-    "sample_id": "STARTUP-008",
-    "predecessor_run_id": "RUN-UTIL-20260921-204946",
-    "predecessor_last_useful_at": "2026-09-21T20:59:31+09:00",
-    "predecessor_run_ended_at": "2026-09-21T21:00:19+09:00",
-    "scheduled_due_at": "2026-09-21T21:01:19+09:00",
+    "sample_id": "STARTUP-009",
+    "recovery_of_sample_id": "STARTUP-008",
+    "scheduled_due_at": "2026-09-21T21:11:09+09:00",
     "successor_observed_at": null,
     "boot_started_at": null,
     "rearm_verified_at": null,
     "authority_claim_at": null,
     "first_durable_useful_at": null,
-    "predecessor_last_useful_to_end_seconds": 48,
-    "end_to_due_seconds": 60,
-    "generation_key": "DUE:2026-09-21T21:01:19+09:00",
+    "generation_key": "DUE:2026-09-21T21:11:09+09:00",
     "required_fields": [
       "scheduled_due_at",
       "successor_observed_at",
@@ -184,9 +209,9 @@
       "authority_claim_at",
       "first_durable_useful_at"
     ],
-    "rule": "First prospective normal-close sample under fixed Startup Watchdog. MAIN must write generation-matched BOOT_STARTED before provisional arm and REARM_VERIFIED after verification.",
+    "rule": "Prospective Watchdog recovery generation. MAIN must write generation-matched BOOT_STARTED before provisional arm and REARM_VERIFIED after verification; do not infer receipts from automation metadata.",
     "validity": "PENDING_SUCCESSOR",
-    "classification": "EXACT_END_PLUS_60_WITH_STARTUP_WATCHDOG_ARMED"
+    "classification": "STARTUP_WATCHDOG_RECOVERY_GENERATION"
   },
-  "decision_rule": "STARTUP-008 tests the complete MAIN receipt path plus independent fixed Watchdog coverage. Keep Watchdog actions non-substantive and do not infer missing receipts."
+  "decision_rule": "STARTUP-009 measures the first live recovery triggered by the fixed Startup Watchdog after STARTUP-008 lacked durable startup receipts. Keep Watchdog actions non-substantive and preserve all unobserved boundaries as null."
 }
