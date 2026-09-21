@@ -17,7 +17,28 @@ def _ts(value: str) -> datetime:
     return parsed
 
 
-def audit(startup: dict, run_lines: list[str]) -> dict:
+def audit_startup_ack(ack: dict, expected_main_canonical_id: str) -> dict:
+    errors = []
+    if ack.get("main_canonical_id") != expected_main_canonical_id:
+        errors.append("STARTUP_ACK_MAIN_CANONICAL_ID_MISMATCH")
+    due = ack.get("current_expected_due_at")
+    generation_key = ack.get("generation_key")
+    if due and generation_key and generation_key != f"DUE:{due}":
+        errors.append("STARTUP_ACK_GENERATION_KEY_DUE_MISMATCH")
+    return {
+        "valid": not errors,
+        "errors": errors,
+        "observed_main_canonical_id": ack.get("main_canonical_id"),
+        "expected_main_canonical_id": expected_main_canonical_id,
+    }
+
+
+def audit(
+    startup: dict,
+    run_lines: list[str],
+    startup_ack: dict | None = None,
+    expected_main_canonical_id: str | None = None,
+) -> dict:
     runs = {
         run.get("observation_id"): run
         for run in (json.loads(line) for line in run_lines if line.strip())
@@ -124,9 +145,16 @@ def audit(startup: dict, run_lines: list[str]) -> dict:
             ),
             "scheduler_comparison_exclusion": comparison_exclusion,
         })
+    ack_audit = None
+    if startup_ack is not None and expected_main_canonical_id is not None:
+        ack_audit = audit_startup_ack(startup_ack, expected_main_canonical_id)
     return {
         "sample_count": len(results),
-        "valid": not any(item["unacknowledged_errors"] for item in results),
+        "valid": (
+            not any(item["unacknowledged_errors"] for item in results)
+            and (ack_audit is None or ack_audit["valid"])
+        ),
+        "startup_ack_audit": ack_audit,
         "scheduler_comparison_eligible_count": sum(item["scheduler_comparison_eligible"] for item in results),
         "watchdog_recovery_generation_count": sum(item["recovery_generation"] for item in results),
         "results": results,
@@ -135,12 +163,18 @@ def audit(startup: dict, run_lines: list[str]) -> dict:
 
 
 def main() -> int:
-    if len(sys.argv) != 3:
-        print("usage: audit_startup_boundaries.py SUCCESSOR_STARTUP_JSON RUNS_JSONL", file=sys.stderr)
+    if len(sys.argv) not in {3, 5}:
+        print(
+            "usage: audit_startup_boundaries.py SUCCESSOR_STARTUP_JSON RUNS_JSONL "
+            "[STARTUP_ACK_JSON EXPECTED_MAIN_CANONICAL_ID]",
+            file=sys.stderr,
+        )
         return 2
     startup = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
     runs = Path(sys.argv[2]).read_text(encoding="utf-8").splitlines()
-    result = audit(startup, runs)
+    startup_ack = json.loads(Path(sys.argv[3]).read_text(encoding="utf-8")) if len(sys.argv) == 5 else None
+    expected_main = sys.argv[4] if len(sys.argv) == 5 else None
+    result = audit(startup, runs, startup_ack, expected_main)
     print(json.dumps(result, indent=2, sort_keys=True))
     return int(not result["valid"])
 
