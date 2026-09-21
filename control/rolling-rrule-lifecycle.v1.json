@@ -1,6 +1,6 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 17,
+  "version": 18,
   "status": "ACTIVE",
   "purpose": "CLEAN MIGRATED MAIN: normal path is operator-created SAME MAIN recurring RRULE -> bounded work -> SAME MAIN exact END+60 shift. Both prior MAIN canonicals are retired. Watchdog is disabled break-glass only.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
@@ -31,7 +31,9 @@
     "normal_continue_offset_is_default_invariant": true,
     "target_turn_elapsed_seconds": 600,
     "normal_soft_ceiling_seconds": 720,
-    "schedule_mode": "SAME_CANONICAL_RECURRING_RRULE_SELF_SHIFT"
+    "schedule_mode": "SAME_CANONICAL_RECURRING_RRULE_SELF_SHIFT",
+    "normal_continue_minimum_elapsed_seconds": 600,
+    "pre_600_voluntary_continue_close_forbidden": true
   },
   "provisional_arm": {
     "when": "Immediately after minimum stale-wake/fence/authority validation and before full restore or substantive work.",
@@ -41,12 +43,13 @@
     "mutation_failure": "Retry once when safe. If an older verified future continuation remains alive, enter DEGRADED_CONTINUATION and continue only within its safety envelope; otherwise fail closed before substantive side effects."
   },
   "work": {
-    "rule": "Perform sustained useful authorized work by chaining bounded units. If a unit completes before 600 elapsed seconds, start the next clear low-risk checkpointable unit or a smaller decomposed slice. At >=600s, do not start a new large unit; close after the smallest safe in-flight boundary. Normal soft ceiling is ~720s.",
+    "rule": "Perform sustained useful authorized work by chaining bounded units. For a normal nonterminal CONTINUE turn, 600 observed elapsed seconds is the minimum voluntary duration. Before 600s, start the next clear low-risk checkpointable unit, independent fallback/residual unit, or smaller decomposed slice. CI pending, local packet completion, checkpoint completion, secured continuation, or no-obvious-next-task never authorize a voluntary pre-600s CONTINUE close. Earlier end must be STOP/PAUSE, durable terminal, genuine BLOCKED/fail-closed authority or safety state, or platform-enforced termination and must be reported as such. At >=600s, do not start a new large unit; close after the smallest safe in-flight boundary. Normal soft ceiling is ~720s.",
     "checkpoint_rule": "Persist enough durable progress that a cold successor can resume without chat context.",
     "collision_rule": "If useful work remains and provisional due approaches too closely, extend the provisional DTSTART before collision, then verify.",
     "unit_chaining_required_before_target": true,
     "new_large_unit_forbidden_after_target": true,
-    "soft_ceiling_seconds": 720
+    "soft_ceiling_seconds": 720,
+    "pre_600_normal_continue_close_forbidden": true
   },
   "normal_final_rearm": {
     "order": [
