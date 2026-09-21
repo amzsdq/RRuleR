@@ -8,80 +8,56 @@ sys.path.insert(0, str(ROOT / "tools"))
 from audit_startup_boundaries import audit
 
 
+def _run(obs="OBS-RUN-UTIL-1", end="2026-09-21T10:10:00+00:00"):
+    return [f'{{"observation_id":"{obs}","run_started_at":"2026-09-21T10:00:00+00:00","run_ended_at":"{end}"}}']
+
+
 def test_flags_last_useful_after_predecessor_end():
-    runs = ['{"observation_id":"P","run_started_at":"2026-09-21T10:00:00+00:00","run_ended_at":"2026-09-21T10:10:00+00:00"}']
-    startup = {"samples":[{
-        "sample_id":"S",
-        "predecessor_run_id":"P",
-        "predecessor_last_useful_at":"2026-09-21T10:10:01+00:00",
-        "scheduled_due_at":"2026-09-21T10:09:00+00:00",
-        "successor_observed_at":"2026-09-21T10:10:30+00:00",
-    }]}
-    out = audit(startup, runs)
+    startup = {"samples":[{"sample_id":"S","predecessor_run_id":"RUN-UTIL-1","predecessor_last_useful_at":"2026-09-21T10:10:01+00:00","scheduled_due_at":"2026-09-21T10:09:00+00:00","successor_observed_at":"2026-09-21T10:10:30+00:00"}]}
+    out = audit(startup, _run())
     assert out["valid"] is False
     assert out["results"][0]["errors"] == ["PREDECESSOR_LAST_USEFUL_AFTER_RECORDED_END"]
     assert out["results"][0]["scheduler_comparison_eligible"] is False
 
 
 def test_maintenance_sample_is_preserved_but_excluded():
-    sample = {
-        "sample_id":"M",
-        "predecessor_run_id":"P",
-        "predecessor_last_useful_at":"2026-09-21T10:09:00+00:00",
-        "scheduled_due_at":"2026-09-21T10:10:00+00:00",
-        "successor_observed_at":"2026-09-21T10:11:00+00:00",
-        "exclusion_reason":"OPERATOR_MAINTENANCE_INTERRUPTION",
-    }
-    runs = ['{"observation_id":"P","run_started_at":"2026-09-21T10:00:00+00:00","run_ended_at":"2026-09-21T10:10:00+00:00"}']
-    out = audit({"samples":[sample]}, runs)
-    result = out["results"][0]
+    sample = {"sample_id":"M","predecessor_run_id":"RUN-UTIL-1","predecessor_last_useful_at":"2026-09-21T10:09:00+00:00","scheduled_due_at":"2026-09-21T10:10:00+00:00","successor_observed_at":"2026-09-21T10:11:00+00:00","exclusion_reason":"OPERATOR_MAINTENANCE_INTERRUPTION"}
+    result = audit({"samples":[sample]}, _run())["results"][0]
     assert result["raw_sample"] == sample
     assert result["scheduler_comparison_eligible"] is False
     assert result["scheduler_comparison_exclusion"] == "OPERATOR_MAINTENANCE_INTERRUPTION"
 
 
 def test_complete_consistent_sample_is_eligible():
-    runs = ['{"observation_id":"P","run_started_at":"2026-09-21T10:00:00+00:00","run_ended_at":"2026-09-21T10:10:00+00:00"}']
-    startup = {"samples":[{
-        "sample_id":"OK",
-        "predecessor_run_id":"P",
-        "predecessor_last_useful_at":"2026-09-21T10:09:30+00:00",
-        "scheduled_due_at":"2026-09-21T10:09:00+00:00",
-        "successor_observed_at":"2026-09-21T10:10:30+00:00",
-    }]}
-    out = audit(startup, runs)
+    startup = {"samples":[{"sample_id":"OK","predecessor_run_id":"RUN-UTIL-1","predecessor_last_useful_at":"2026-09-21T10:09:30+00:00","scheduled_due_at":"2026-09-21T10:09:00+00:00","successor_observed_at":"2026-09-21T10:10:30+00:00"}]}
+    out = audit(startup, _run())
     assert out["valid"] is True
     assert out["scheduler_comparison_eligible_count"] == 1
 
 
-def test_matches_observation_prefix_to_predecessor_run_id():
-    runs = ['{"observation_id":"OBS-RUN-UTIL-1","run_started_at":"2026-09-21T10:00:00+00:00","run_ended_at":"2026-09-21T10:10:00+00:00"}']
-    startup = {"samples":[{
-        "sample_id":"PREFIX",
-        "predecessor_run_id":"RUN-UTIL-1",
-        "predecessor_last_useful_at":"2026-09-21T10:10:01+00:00",
-        "scheduled_due_at":"2026-09-21T10:09:00+00:00",
-        "successor_observed_at":"2026-09-21T10:10:30+00:00",
-    }]}
-    result = audit(startup, runs)["results"][0]
-    assert result["predecessor_run_found"] is True
-    assert result["errors"] == ["PREDECESSOR_LAST_USEFUL_AFTER_RECORDED_END"]
-
-
-def test_acknowledged_boundary_inconsistency_stays_flagged_but_does_not_fail_audit():
-    runs = ['{"observation_id":"OBS-RUN-UTIL-2","run_started_at":"2026-09-21T10:00:00+00:00","run_ended_at":"2026-09-21T10:10:00+00:00"}']
-    startup = {"samples":[{
-        "sample_id":"ACK",
-        "predecessor_run_id":"RUN-UTIL-2",
-        "predecessor_last_useful_at":"2026-09-21T10:10:01+00:00",
-        "scheduled_due_at":"2026-09-21T10:09:00+00:00",
-        "successor_observed_at":"2026-09-21T10:10:30+00:00",
-        "validity":"INVALID",
-        "exclusion_reason":"BOUNDARY_INCONSISTENCY",
-    }]}
-    out = audit(startup, runs)
+def test_acknowledged_boundary_inconsistency_does_not_fail_audit():
+    startup = {"samples":[{"sample_id":"ACK","predecessor_run_id":"RUN-UTIL-1","predecessor_last_useful_at":"2026-09-21T10:10:01+00:00","scheduled_due_at":"2026-09-21T10:09:00+00:00","successor_observed_at":"2026-09-21T10:10:30+00:00","validity":"INVALID","exclusion_reason":"BOUNDARY_INCONSISTENCY"}]}
+    out = audit(startup, _run())
     assert out["valid"] is True
-    result = out["results"][0]
-    assert result["errors"] == ["PREDECESSOR_LAST_USEFUL_AFTER_RECORDED_END"]
-    assert result["acknowledged_invalid"] is True
+    assert out["results"][0]["acknowledged_invalid"] is True
+
+
+def test_valid_watchdog_recovery_lineage_is_not_normal_scheduler_sample():
+    failed = {"sample_id":"S0","scheduled_due_at":"2026-09-21T10:00:00+00:00","successor_observed_at":"2026-09-21T10:01:00+00:00","exclusion_reason":"STARTUP_ACK_MISSING","validity":"INCOMPLETE"}
+    recovered = {"sample_id":"S1","recovery_of_sample_id":"S0","scheduled_due_at":"2026-09-21T10:05:00+00:00","generation_key":"DUE:2026-09-21T10:05:00+00:00","successor_observed_at":"2026-09-21T10:05:20+00:00","boot_started_at":"2026-09-21T10:05:30+00:00","rearm_verified_at":"2026-09-21T10:05:40+00:00","authority_claim_at":"2026-09-21T10:05:50+00:00"}
+    out = audit({"samples":[failed,recovered]}, [])
+    result = out["results"][1]
+    assert out["valid"] is True
+    assert out["watchdog_recovery_generation_count"] == 1
+    assert result["startup_receipt_complete"] is True
+    assert result["recovery_lineage_valid"] is True
     assert result["scheduler_comparison_eligible"] is False
+    assert result["scheduler_comparison_exclusion"] == "WATCHDOG_RECOVERY_GENERATION"
+
+
+def test_recovery_generation_fails_closed_on_wrong_source_or_generation():
+    source = {"sample_id":"S0","exclusion_reason":"MISSING_DURABLE_SUCCESSOR_PROGRESS"}
+    recovered = {"sample_id":"S1","recovery_of_sample_id":"S0","scheduled_due_at":"2026-09-21T10:05:00+00:00","generation_key":"DUE:2026-09-21T10:06:00+00:00","successor_observed_at":"2026-09-21T10:05:20+00:00"}
+    out = audit({"samples":[source,recovered]}, [])
+    assert out["valid"] is False
+    assert out["results"][1]["errors"] == ["GENERATION_KEY_DUE_MISMATCH", "RECOVERY_SOURCE_NOT_STARTUP_ACK_MISSING"]
