@@ -35,12 +35,8 @@ Project progress: **1 / 3 committed work specs DONE**; active spec **4 / 6 accep
 
 ## Current measured bottleneck
 
-Epoch 59 demonstrated materially improved in-turn execution: 557 strict useful seconds over 626 wall seconds. Epoch 60 then exposed a higher-level constraint: a 600-second work turn followed by a nominal 60-second post-close continuation gap has an idealized steady-state ceiling of 90.91%, below the P0 requirement of 93.33% even before scheduler jitter/startup overhead.
-
-A prior production sample observed about 64 seconds of scheduler delivery delay after the due boundary. Merely shortening a post-close offset cannot reliably fit the <=42.9-second average non-useful budget for a 600-second turn.
+In-turn execution now sustains bounded work, but `STARTUP-006` exposed the dominant availability hole: the exact END+60 schedule invoked 73 seconds after due yet produced no durable bootstrap acknowledgement, provisional rearm, authority claim, useful work, or next self-rearm. The next hourly occurrence recovered the relay. Normal scheduling and pre-bootstrap recovery are therefore separate problems.
 
 ## Current decision
 
-The highest-effect next correction is `UTIL-EXP-018`, a guarded **predictive same-canonical successor prearm** canary. It attempts to overlap scheduler delivery latency with the predecessor's final useful-work period while preserving exactly one substantive authority owner.
-
-Do not broaden into generic control cleanup. Do not weaken the P0 target to make the current cadence pass. Preserve the 780-second cold-rescue horizon; measure the normal handoff path independently.
+Keep 10-12 minute work-unit chaining and exact END+60 normal continuation. Add forward-only `BOOT_STARTED` and `REARM_VERIFIED` boundaries and classify `STARTUP_ACK_MISSING` without inferring process death. Detection is not recovery: the fast-path candidate remains a guarded GitHub PR event consumer, but it must stay inactive until the consumer is provisioned, its write probe passes, and one outstanding generation can be claimed safely. Hourly same-canonical RRULE remains the actual fallback meanwhile.
