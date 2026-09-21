@@ -1,6 +1,6 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 8,
+  "version": 9,
   "status": "ACTIVE",
   "purpose": "Use one same-canonical hourly RRULE as bounded cold rescue with a strict normal CONTINUE fast continuation of actual observed turn END + 60 seconds; predictive prearm remains evidence-gated.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
@@ -128,6 +128,11 @@
     "recovery_recheck_seconds": 240,
     "receipt_inference_forbidden": true,
     "self_rearm_enabled_required": true,
-    "post_update_live_verification_required": true
+    "post_update_live_verification_required": true,
+    "idle_distant_due_enabled": true,
+    "idle_distant_due_extra_slack_seconds": 120,
+    "idle_distant_due_expected_fast_due_rule": "LATEST_OBSERVED_CLOSED_TURN_END_PLUS_60S",
+    "idle_distant_due_active_work_exemption": true,
+    "idle_distant_due_recovery_main_offset_seconds": 60
   }
 }
