@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0",
   "main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
-  "current_expected_due_at": "2026-09-22T01:07:52+09:00",
-  "generation_key": "DUE:2026-09-22T01:07:52+09:00",
-  "boot_started_at": "2026-09-22T01:09:24+09:00",
-  "boot_started_authority_epoch": "DUE:2026-09-22T01:07:52+09:00",
-  "rearm_verified_at": "2026-09-22T01:09:30+09:00",
-  "verified_provisional_due_at": "2026-09-22T01:23:00+09:00",
+  "current_expected_due_at": "2026-09-22T01:21:43+09:00",
+  "generation_key": "DUE:2026-09-22T01:21:43+09:00",
+  "boot_started_at": "2026-09-22T01:18:52+09:00",
+  "boot_started_authority_epoch": "DUE:2026-09-22T01:21:43+09:00",
+  "rearm_verified_at": "2026-09-22T01:19:04+09:00",
+  "verified_provisional_due_at": "2026-09-22T01:33:00+09:00",
   "status": "REARM_VERIFIED",
-  "last_updated_at": "2026-09-22T01:09:30+09:00",
-  "provider_delivery_delay_seconds": 92,
-  "note": "Generation-matched wake persisted. SAME MAIN verified enabled and recurring with provisional crash-insurance due beyond bounded turn; retired predecessors and watchdog remain disabled."
+  "last_updated_at": "2026-09-22T01:19:04+09:00",
+  "provider_delivery_delay_seconds": null,
+  "note": "v5.2 fresh-policy-sync wake entered durable handling. SAME MAIN recurring crash-insurance moved provisionally beyond the bounded turn; retired predecessors remain retired and watchdog remains disabled. Invocation preceded the previously expected due, so delivery delay is not inferred."
 }
