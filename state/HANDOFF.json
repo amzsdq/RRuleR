@@ -2,16 +2,16 @@
   "schema_version": "1.2",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "handoff_state": "RECOVERY_ARMED",
+  "handoff_state": "RECOVERY_CLAIMED",
   "handoff_mode": "WATCHDOG_SAME_CANONICAL_RECOVERY",
   "predecessor_run_id": "RUN-UTIL-20260921-215434",
   "predecessor_authority_epoch": 71,
-  "successor_run_id": null,
+  "successor_run_id": "RUN-UTIL-20260921-221537",
   "successor_expected_at": "2026-09-21T22:13:24+09:00",
-  "successor_observed_at": null,
+  "successor_observed_at": "2026-09-21T22:15:37+09:00",
   "predecessor_last_progress_at": "2026-09-21T22:05:25+09:00",
-  "recovery_basis": "The 22:07:23 generation had a live invocation observation but no durable generation-matched startup receipts after grace. Watchdog rearmed the same MAIN canonical.",
-  "active_unit": "Successor reviews recovery reporting and current generation receipts.",
-  "checkpoint_id": "CP-UTILIZATION-109",
-  "next_action": "Successor writes BOOT_STARTED and REARM_VERIFIED for DUE:2026-09-21T22:13:24+09:00; Watchdog rechecks at 22:16:24."
+  "recovery_basis": "The 22:07:23 normal generation lacked durable startup receipts; the fixed Watchdog rearmed the same MAIN canonical for 22:13:24, which reached verified bootstrap.",
+  "active_unit": "Persist and audit the paired failed/recovery generations.",
+  "checkpoint_id": "CP-UTILIZATION-110",
+  "next_action": "Keep recovery lineage out of normal scheduler comparison and validate next_sample."
 }
