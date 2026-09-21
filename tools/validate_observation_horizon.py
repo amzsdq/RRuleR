@@ -55,6 +55,8 @@ def validate(horizon, policy, source, previous=None, previous_states=None):
         previous_trusted = predecessor.get("trusted_observed_through")
         if not previous_trusted: raise ValueError("previous observation horizon incomplete")
         if trusted_instant < instant(previous_trusted): raise ValueError("observation horizon rollback is forbidden")
+    for predecessor in predecessors:
+        previous_trusted = predecessor.get("trusted_observed_through")
         if provenance_identity(predecessor) == current_identity and previous_trusted != trusted:
             raise ValueError("same observation provenance identity cannot be repinned to a different timestamp; replace provenance explicitly")
         validate_history_transition(horizon, predecessor)
