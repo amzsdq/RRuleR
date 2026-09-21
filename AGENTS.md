@@ -155,3 +155,13 @@ Run ongoing authorized work with no fixed turn/sample-count limit. Three eligibl
 ## Startup Watchdog
 
 The startup Watchdog is disabled-by-default break-glass standby governed by `control/startup-watchdog.v1.json`. Normal continuity MUST work without it. MAIN writes BOOT_STARTED and REARM_VERIFIED for observability, but normal close does not arm or synchronize Watchdog. Nominal continuation is SAME MAIN at observed END+60. Never reactivate retired MAIN canonicals.
+
+## V5.5 durable unit chat trace
+
+During the v5.5 canary, operator-visible progress messages are mandatory observability events, not turn boundaries.
+
+- After provisional SAME MAIN rearm is live-verified and durably recorded, emit one compact schedule message naming the verified due.
+- For each bounded substantive unit, record observed unit START, END, derived DURATION, and artifact-backed work evidence first. Only then emit one compact `완료: ... (duration ...)` message.
+- Do not emit a completion message for a mere read, plan, wait, retry without completion, scheduler mutation alone, or unpersisted partial work.
+- After emitting a unit trace, immediately continue same-wake work selection while normal nonterminal CONTINUE elapsed is below 600 seconds. The message does not authorize final response or voluntary close.
+- After exact END+60 SAME MAIN live verification and consistent durable close projection, emit one final compact next-due message, then the normal TURN STATUS footer.
