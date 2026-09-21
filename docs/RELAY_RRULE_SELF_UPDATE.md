@@ -1,152 +1,81 @@
-# RRULE Self-Update Relay — Reproduction Guide
+# RRULE Self-Update Relay — Current Guide
 
-Status: **mechanism reproduced across multiple scheduled continuations; machine acceptance ledger active**
+Status: **completion-relative SAME MAIN mechanism active; quarter-phase rotation is historical**
 
-Purpose: one recurring ChatGPT automation acts as a one-slot relay clock while GitHub holds durable state.
+## Current mechanism
 
-## Mechanism
-
-The same recurring automation keeps `RRULE:FREQ=HOURLY` and changes only its phase at each wake:
+One authoritative recurring ChatGPT automation is the normal MAIN continuation actor. GitHub holds durable state and dynamic policy. The current MAIN keeps a recurring hourly RRULE and self-shifts its DTSTART:
 
 ```text
-:00 -> BYMINUTE=15
-:15 -> BYMINUTE=30
-:30 -> BYMINUTE=45
-:45 -> BYMINUTE=0
+wake
+ -> minimum fence + BOOT_STARTED
+ -> provisional SAME MAIN recurring crash-insurance beyond bounded turn
+ -> REARM_VERIFIED
+ -> fresh ACTIVE_CONTROLS policy sync
+ -> bounded useful work
+ -> actual END
+ -> SAME MAIN exact END+60 while preserving recurrence
+ -> live verify
+ -> persist coherent close projection
+ -> return CONTINUE
 ```
 
-The automation ID is unchanged. It does not become one-shot.
+The automation ID does not change. Normal continuation never creates a replacement MAIN and never converts the current MAIN to one-shot.
 
 ## Required invariants
 
-- Exactly one `CANONICAL_AUTOMATION_ID`.
-- Always recurring `RRULE:FREQ=HOURLY`.
-- `timing_mode=exact_schedule`.
-- No normal replacement automation.
-- No one-shot conversion.
-- NEXT WAKE FIRST: verify schedule update before substantive work.
-- Durable work state lives in GitHub, never the automation prompt.
-- Terminal completion disables the automation.
-- After NEXT WAKE is secured, voluntary idle is forbidden while useful admissible work remains.
-- Scheduled quarter arrival is not itself a stop signal.
-- Handoff begins only when successor execution is actually observed.
+- exactly one current authoritative MAIN canonical;
+- retired MAIN canonicals never reactivate;
+- current MAIN remains enabled and recurring while program is nonterminal;
+- `timing_mode=exact_schedule`;
+- fresh GitHub durable state/policy is authoritative for dynamic execution;
+- generation-matched `BOOT_STARTED` and `REARM_VERIFIED` are observed, not inferred;
+- normal `CONTINUE` close requires live SAME MAIN exact END+60 verification;
+- the recurring SAME MAIN RRULE is the cold fallback if a shifted fast wake is lost;
+- Watchdog is disabled break-glass standby, not normal continuity;
+- stale wakes recover forward and never roll schedule/authority/checkpoint backward;
+- normal nonterminal `CONTINUE` has a 600-second voluntary hard floor;
+- no padding, sleeping, fabricated timestamps, or invented work.
 
-## iCalendar example
+## Fresh-policy synchronization
 
-```text
-BEGIN:VEVENT
-DTSTART;TZID=Asia/Seoul:20260920T181500
-RRULE:FREQ=HOURLY;BYMINUTE=15;BYSECOND=0
-END:VEVENT
-```
+Every wake reads fresh `control/ACTIVE_CONTROLS.json` and all artifacts it currently marks mandatory before substantive work. Prior-wake cached policy cannot override fresh durable policy. The reservation prompt is a bootstrap/survival kernel, not the dynamic policy authority, except explicit operator and canonical-safety invariants.
 
-`DTSTART` is the nearest future time matching the next phase.
+## 600-second bounded-turn rule
 
-## Wake algorithm
+Before 600 observed elapsed seconds, a normal nonterminal `CONTINUE` owner chains the next clear low-risk checkpointable authorized unit. Oversized units are decomposed; CI/external waits use an independent fallback/residual unit when available.
 
-1. Determine current scheduled quarter marker: `00|15|30|45`.
-2. Update the same automation to the next RRULE phase.
-3. Verify the update succeeded.
-4. Load `AGENTS.md`, `control/POLICY.md`, `control/relay-policy.v1.json`, `state/CURRENT.json`, and `state/RELAY_VALIDATION.json`.
-5. Reconstruct owner/checkpoint/exact next action.
-6. Start substantive work immediately.
-7. When a bounded unit completes, checkpoint if useful and immediately select the next admissible unit.
-8. Do not yield because a phase/milestone/document/checkpoint/scheduled quarter boundary was crossed.
-9. When successor execution is actually observed, stop starting new units.
-10. Finish the current smallest safe checkpointable unit.
-11. Persist checkpoint + evidence + observed duration/progress + exact next action.
-12. Emit concise STATUS and end.
-13. Successor waits for the durable handoff if necessary, then reconstructs from GitHub.
+Packet/substep/checkpoint completion, CI pending/success, secured continuation, schedule boundaries, or `nothing obvious` do not authorize voluntary pre-600 close.
 
-## Prompt template
+Earlier end is only explicit STOP/PAUSE, durable program terminal, genuine BLOCKED/fail-closed authority/safety state with no safe authorized work, or platform-enforced termination. At/after 600 seconds, stop starting new large units and finish the smallest safe in-flight unit; ~720 seconds is the normal soft ceiling.
 
-```text
-[RRULE SELF-UPDATE RELAY]
-CANONICAL_AUTOMATION_ID=<ID>
-REPO=<owner/repo>
-TIMEZONE=<TZ>
+## Normal close algorithm
 
-ORDER IS MANDATORY
+1. Persist the latest useful checkpoint.
+2. Observe actual END.
+3. Compute exact `END+60s`.
+4. Update THIS SAME MAIN to that DTSTART while preserving its recurring RRULE and enabled state.
+5. Re-read live metadata and require same canonical + `is_enabled=true` + recurrence + exact DTSTART.
+6. Persist the same verified fast due to CURRENT/ACTIVITY/HANDOFF and validate the non-WORKING close projection.
+7. Persist observed turn/evidence boundaries.
+8. Only then emit normal `STATUS=CONTINUE`.
 
-1. NEXT WAKE FIRST
-- Same automation only.
-- Keep recurring RRULE:FREQ=HOURLY.
-- Keep exact_schedule.
-- 00 -> 15 -> 30 -> 45 -> 00.
-- Set DTSTART to nearest future matching quarter.
-- Verify update before substantive work.
+A long provisional due cannot satisfy normal close. If fast rearm fails, retry once when safe. If an older verified recurring fallback survives, classify `DEGRADED_CONTINUATION`; do not claim normal close and do not create a replacement MAIN.
 
-2. LOAD DURABLE STATE
-- Read repo bootstrap/policy/current state/relay validation.
-- Chat history is non-authoritative.
-- Resume the exact durable next action.
+## Cold fallback
 
-3. WORK CONTINUOUSLY
-- Start immediately after next-wake verification.
-- Continue while useful admissible work remains.
-- When one unit finishes, start the next.
-- Checkpointing does not itself authorize stopping.
-- Do not stop because the next quarter arrived.
+If a shifted fast wake is lost before successful bootstrap, the SAME MAIN's natural recurring hourly occurrence is the cold recovery opportunity. It reads fresh durable state, fences against any live owner, preserves the newest schedule generation, and continues forward.
 
-4. SUCCESSOR-TRIGGERED HANDOFF
-- Handoff only after successor execution is actually observed.
-- Then stop starting new units.
-- Finish current smallest safe unit.
-- Persist checkpoint/evidence/observed duration/next action.
-- Emit concise STATUS and end.
-- Successor resumes from durable state without duplicating predecessor work.
+This cold fallback cannot guarantee recovery from a disabled/deleted/platform-broken automation. Watchdog remains an explicitly activated break-glass mechanism for diagnosed emergencies only.
 
-5. FAILURE
-- If self-update fails, do not claim fast continuation succeeded.
-- If the previous recurring RRULE is still verified alive, record DEGRADED_CONTINUATION and its fallback wake.
+## Historical quarter-phase mechanism
 
-6. TERMINAL
-- COMPLETE only with proven root acceptance.
-- On COMPLETE disable this same automation and schedule no successor.
-```
+Earlier experiments rotated hourly RRULE phase through `:00 -> :15 -> :30 -> :45`. Those experiments remain useful historical evidence for same-canonical RRULE mutation, but quarter-phase rotation and successor-observed predecessor handoff are **not current production semantics** and must not be reconstructed from this repository's history.
 
-## Self-rescue property
+## Measurement
 
-If the current schedule is `FREQ=HOURLY;BYMINUTE=15` and the 18:15 attempt to move to `:30` fails, the old hourly RRULE may remain intact and wake again at 19:15.
+Keep scheduled due, actual invocation, `BOOT_STARTED`, `REARM_VERIFIED`, authority claim, first durable useful work, predecessor useful boundaries, actual END, verified next due, and provider delivery delay distinct. START-to-END elapsed time is not automatically productive time. Missing evidence remains unknown.
 
-```text
-fast path:      18:15 -> update succeeds -> 18:30
-degraded path:  18:15 -> update fails -> old RRULE -> 19:15 recovery opportunity
-```
+## Reproduction / rollback
 
-This is not full rescue. It cannot recover a disabled, deleted, missing, or platform-broken automation.
-
-## Handoff / overlap finding
-
-Do not assume the same canonical automation can execute predecessor and successor concurrently. Correctness must survive absence of overlap.
-
-However, lack of proven overlap does **not** justify voluntary early stop. The predecessor continues useful work until either successor execution is actually observed, the root becomes terminal, a genuine external blocker is proven, or the platform ends the run.
-
-If the platform serializes same-canonical executions, the actual path may be:
-
-```text
-predecessor works until platform end
- -> durable latest checkpoint
- -> scheduled successor starts
- -> successor reconstructs
- -> continue
-```
-
-The optimization target is to minimize the idle interval between those events without weakening correctness. Exact concurrency and idle-gap values must be based on positive durable/platform evidence; unknown values remain unknown.
-
-## Reproduction acceptance
-
-`state/RELAY_VALIDATION.json` is the machine acceptance surface. Blocking correctness/reproducibility criteria are:
-
-1. same canonical ID preserved;
-2. recurring RRULE preserved;
-3. at least two phase self-updates succeed;
-4. at least one later scheduled wake actually fires;
-5. successor resumes from durable GitHub state;
-6. at least one additional continuation cycle survives;
-7. durable state/CI remains coherent;
-8. observed runtime boundaries do not break the verified continuation cycle.
-
-Concurrency classification and precise handoff utilization measurement are important performance evidence but are non-blocking to reproduction correctness because the design explicitly supports either overlap or serialization. They remain `PENDING` until positively observed and must never be fabricated.
-
-Record narrative evidence in `experiments/rrule-self-relay/README.md` and machine status in `state/RELAY_VALIDATION.json`.
+Use current machine-readable controls and tests for acceptance. For the v5.2 fresh-policy-sync/600-second-floor change, the pre-change repository baseline is preserved on `rollback/pre-policy-sync-bootstrap-20260922`; rollback must reconcile forward on the SAME current canonical rather than reactivating retired MAINs or restoring stale operational state wholesale.
