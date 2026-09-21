@@ -2,16 +2,16 @@
   "schema_version": "1.0",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "canonical_automation_id": "6ab14f7951848191b65e4b5d4bc979d8",
+  "canonical_automation_id": "6ab152b636748191a71873ba4d5ef551",
   "status": "HANDOFF_READY",
   "active_run_id": null,
   "authority_epoch": 76,
   "substantive_work_started_at": "2026-09-22T00:32:05+09:00",
-  "last_progress_at": "2026-09-22T00:45:22+09:00",
-  "last_progress_kind": "OPERATOR_CANONICAL_MIGRATION_COMMITTED",
-  "current_unit": "Await operator-created MAIN canonical successor.",
-  "next_wake_due_at": "2026-09-22T01:38:00+09:00",
+  "last_progress_at": "2026-09-22T00:54:05+09:00",
+  "last_progress_kind": "CLEAN_OPERATOR_CANONICAL_MIGRATION_COMMITTED",
+  "current_unit": "Await clean operator-created MAIN canonical successor.",
+  "next_wake_due_at": "2026-09-22T00:54:59+09:00",
   "successor_observed": false,
   "handoff_ready": true,
-  "operator_ui_note": "Old MAIN retired. New operator-created hourly MAIN is authoritative; Watchdog remains disabled standby."
+  "operator_ui_note": "Both prior MAIN canonicals retired. Clean operator-created MAIN is authoritative; Watchdog remains disabled standby."
 }
