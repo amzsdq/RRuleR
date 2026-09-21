@@ -4,14 +4,14 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "status": "WORKING",
-  "active_run_id": "RUN-UTIL-20260921-212747",
-  "authority_epoch": 70,
-  "substantive_work_started_at": "2026-09-21T21:27:47+09:00",
-  "last_progress_at": "2026-09-21T21:30:51+09:00",
-  "last_progress_kind": "STARTUP_AUDIT_REPAIR_AND_RECOVERY_LINEAGE_TESTS",
-  "current_unit": "Recovery lineage audit passes focused tests and actual ledger; update review evidence and close safely.",
-  "next_wake_due_at": "2026-09-21T21:41:24+09:00",
+  "active_run_id": "RUN-UTIL-20260921-215434",
+  "authority_epoch": 71,
+  "substantive_work_started_at": "2026-09-21T21:56:39+09:00",
+  "last_progress_at": "2026-09-21T21:56:39+09:00",
+  "last_progress_kind": "WATCHDOG_RECOVERY_BOOTSTRAP_VERIFIED",
+  "current_unit": "Implement recovery-segment reporting and focused fixtures in summarize_turn_close.",
+  "next_wake_due_at": "2026-09-21T22:09:11+09:00",
   "successor_observed": true,
   "handoff_ready": false,
-  "operator_ui_note": "Epoch 70 recovered stale epoch 69 through verified provisional continuation; audit repair in progress."
+  "operator_ui_note": "Epoch 71 recovered the missing-bootstrap generation; MAIN and Watchdog are both enabled and verified."
 }
