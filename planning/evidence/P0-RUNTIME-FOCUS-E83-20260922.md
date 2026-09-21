@@ -21,44 +21,38 @@ This is direct negative evidence for the previous generation's P0-A/P0-B accepta
 Existing runtime-continuity policy already defines this family as `RUNTIME_INVOCATION_ENDED_EARLY`; epoch 82 is therefore treated as that existing failure class with the observed subtype `STALE_WORKING_GENERATION_WITHOUT_VERIFIED_NORMAL_CLOSE`, rather than inventing a competing recovery mechanism.
 
 ## Completed bounded unit 1 — stale generation + scorecard repair
-
 Observed unit START: `2026-09-22 07:09:56 KST`  
 Observed unit END: `2026-09-22 07:11:37 KST`  
 Observed duration: `1 minute 41 seconds (101 seconds)`
 
-Material outputs:
-- Claimed epoch 83 in CURRENT/ACTIVITY/HANDOFF/TURN_PLAN/NOW after explicitly classifying epoch 82 as incomplete rather than silently overwriting its missing close.
-- Audited `state/P0_SCORECARD.json` and found a stale active threshold: `minimum_continue_turn_seconds=480`, contradicting the operator-locked 10-minute (600-second) floor and fresh control policy.
-- Repaired the scorecard to schema 2.4 with `minimum_continue_turn_seconds=600`, explicit `10 minutes (600 seconds)` human semantics, explicit `1 minute (60 seconds)` P0-B close semantics, epoch 83 as current, epoch 82 as incomplete, and consecutive pair gates reset rather than falsely inherited.
-- Preserved the fixed 900-second / 840-second useful-work acceptance objective; the repair changes stale active runtime projection, not the success target.
+Material outputs: epoch 83 claimed forward; stale epoch 82 isolated; P0 scorecard stale 8-minute (480-second) threshold repaired to 10 minutes (600 seconds); exact 1-minute (60-second) P0-B semantics restored.
 
 ## Completed bounded unit 2 — make P0 timing drift fail deterministically
-
 Observed unit START: `2026-09-22 07:11:38 KST`  
 Observed unit END: `2026-09-22 07:13:24 KST`  
 Observed duration: `1 minute 46 seconds (106 seconds)`
 
-Material outputs:
-- Added `.github/workflows/validate-p0-scorecard.yml` to cross-check the P0 scorecard, operator-locked goals, continuation gate, and rolling lifecycle for the exact 10-minute (600-second) work floor and 1-minute (60-second) final rearm.
-- First live workflow attempt failed before validation because repository policy forbids unpinned third-party Actions; runner logs identified the cause.
-- Removed `actions/checkout@v4` and changed the validator to fetch the exact commit through GitHub's authenticated contents API.
-- Live run `35661517829` then completed with conclusion `success`.
-- Promoted `state/P0_SCORECARD.json` to `mandatory_on_wake` and the new validator to `mandatory_policy_sync_surfaces`.
-- Added epoch 83 to `state/STARTUP_BUDGET.json`: provider delivery `1 minute 43 seconds (103 seconds)`, post-observation startup `43 seconds`, total prework loss `2 minutes 26 seconds (146 seconds)`.
+Material outputs: dedicated P0 scorecard validator added; initial unpinned checkout policy failure diagnosed and removed; live validator run `35661517829` passed; scorecard made mandatory-on-wake; epoch 83 delivery/startup budget recorded separately from local rearm.
 
 ## Completed bounded unit 3 — reconcile legacy enforcement and P0-B evidence separation
-
 Observed unit START: `2026-09-22 07:13:25 KST`  
 Observed unit END: `2026-09-22 07:15:06 KST`  
 Observed duration: `1 minute 41 seconds (101 seconds)`
 
-Material outputs:
-- Integrated control-plane validation exposed a pre-existing mirror mismatch: enforcement still asserted the retired predictive-prearm no-dual-authority fence at `recovery_classes.PREDICTIVE_PREARM_OVERLAP`, while policy had moved it only to a historical map. Restored a retired compatibility fence in the expected map without reactivating predictive prearm.
-- Integrated enforcement also still expects aggregate `GOAL-UTILIZATION-P0`. Restored that goal as an explicit compatibility/regression objective while retaining the operator-locked execution order `P0-A -> P0-B`; it does not displace the two immediate runtime goals.
-- Appended epoch 83 to `state/SCHEDULER_OBSERVATIONS.json`: delivery was `1 minute 43 seconds (103 seconds)` late. The three-sample observed range is now -41 to +103 seconds; no tuning is promoted from this small heterogeneous sample.
-- Added `state/SCHEDULER_OBSERVATIONS.json` and `state/STARTUP_BUDGET.json` to mandatory pre-corrective-experiment evidence so future timing experiments must separate local rearm correctness, provider delivery, and post-observation startup.
+Material outputs: retired predictive-prearm compatibility fence restored without reactivation; aggregate utilization goal restored only as compatibility/regression objective under the P0-A/P0-B execution lock; epoch 83 scheduler delivery appended; scheduler observations and startup budget made mandatory before corrective timing experiments.
 
-Evidence commits: `482d4837ad78793f91457a1d93e4a3d1e68bfa2e`, `40ca0dd83b71c8b59bae0cefdc7b05ee7293974d`, `044481bfc47c3f849daa16d1188b30aa9f541bc2`, `f6a16343e96a87b4f4012a033fa63ecf97b77130`.
+## Completed bounded unit 4 — reject the exact 60-minute failure mode in close projection
+Observed unit START: `2026-09-22 07:15:07 KST`  
+Observed unit END: `2026-09-22 07:16:58 KST`  
+Observed duration: `1 minute 51 seconds (111 seconds)`
+
+Material outputs:
+- Strengthened `tools/validate_close_projection.py` so a `HANDOFF_COMMITTED` state is invalid unless `actual_end_at` and `verified_next_fast_due_at` exist, verified fast due equals the projected next due, and projected due is exactly `1 minute (60 seconds)` after observed actual END.
+- Added explicit failure `CLOSED_NEXT_DUE_NOT_EXACTLY_1_MINUTE_60_SECONDS_AFTER_ACTUAL_END`.
+- Added regression tests for missing actual END, missing verified fast due, mismatched verified due, and the exact historical ambiguity: a due `60 minutes` after END must fail even if CURRENT/ACTIVITY/HANDOFF all agree with each other.
+- An earlier CI run on the tool-only commit correctly reached structural validation and failed only because it still had the pre-update test fixture. The subsequent test commit contains the corrected fixture and additional regression cases; integrated CI is still running and is not yet claimed as PASS in this unit.
+
+Evidence commits: `d699c447c5be211917df1f181f08949249da0bca`, `ebd6b763e927c6c4302ef24374465fdd05d1524b`.
 
 ## Active P0 action
 
