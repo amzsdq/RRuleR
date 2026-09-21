@@ -9,10 +9,10 @@
   "execution_status":"ACTIVE",
   "pause_reason":null,
   "resume_target":{
-    "step":"Run UTIL-EXP-019: separately observe successor invocation, authority claim, and first durable useful work; reduce the largest measured startup segment before another predictive-prearm attempt.",
-    "selection_rule":"Do not repeat UTIL-EXP-018 without new evidence. Optimize the largest observed avoidable cross-turn segment while preserving single substantive authority and verified same-canonical continuation."
+    "step":"Use STARTUP-002 as new evidence to prepare and run the next guarded scheduler-timing experiment, measuring every boundary prospectively.",
+    "selection_rule":"Target the measured 155-second scheduler delivery segment; preserve single substantive authority and completion-relative fallback, and do not promote predictive timing from one sample."
   },
   "turn_plan_role":"TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec.",
-  "updated_at":"2026-09-21T18:13:30+09:00",
+  "updated_at":"2026-09-21T18:22:00+09:00",
   "resumed_by_operator_at":"2026-09-21T06:47:45.338Z"
 }
