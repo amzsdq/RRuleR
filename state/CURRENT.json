@@ -12,18 +12,24 @@
   "run_state": "WORKING",
   "checkpoint": {
     "id": "CP-UTILIZATION-111",
-    "state": "WORKING",
+    "state": "VERIFIED",
     "completed": [
-      "Recovered the 22:26:45 receipt-less generation through the fixed Startup Watchdog.",
-      "Persisted generation-matched BOOT_STARTED and REARM_VERIFIED for recovery due 22:34:20.",
-      "Verified same MAIN provisional continuation at 22:48:28 and same Watchdog one-shot at 22:51:28, both enabled."
+      "Recovered the receipt-less 22:26:45 generation through the fixed Startup Watchdog and established generation-matched BOOT_STARTED and REARM_VERIFIED.",
+      "Defined lifecycle v10 atomic close-state projection across CURRENT, ACTIVITY, and HANDOFF.",
+      "Implemented validate_close_projection.py with five discoverable regression tests and integrated it into control-plane CI.",
+      "Recorded STARTUP-013/014 failed-normal and fixed-Watchdog recovery lineage without inferring missing boundaries.",
+      "Validated the 14-sample startup ledger and ran all 88 discovered tests successfully."
     ],
     "evidence": [
-      "state/STARTUP_ACK.json generation DUE:2026-09-21T22:34:20+09:00",
-      "live MAIN and Watchdog metadata re-read after mutation"
+      "tools/validate_close_projection.py@a5ad905",
+      "tests/test_validate_close_projection.py@8d0a357",
+      "control/rolling-rrule-lifecycle.v1.json@5aa4774",
+      ".github/workflows/validate-control-plane.yml@d0776bb",
+      "state/SUCCESSOR_STARTUP.json@0336564",
+      "state/WORK_EVIDENCE.json@343dbff"
     ],
-    "observation": "Epoch 73 is a fixed-Watchdog recovery generation. The prior close correctly projected ACTIVITY=HANDOFF_READY, demonstrating the idle-state shape needed by IDLE_DISTANT_DUE.",
-    "next_action": "Harden the lifecycle contract and validation so closed/handoff states cannot retain an active WORKING projection."
+    "observation": "The close-state contract now prevents a completed predecessor from remaining durably WORKING, which makes IDLE_DISTANT_DUE recovery depend on explicit state rather than silence.",
+    "next_action": "Close epoch 73 with an atomic HANDOFF_READY projection and verify exact same-canonical MAIN and Watchdog continuation."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
