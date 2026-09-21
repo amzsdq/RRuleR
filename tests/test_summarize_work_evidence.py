@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
-from summarize_work_evidence import summarize
+from summarize_work_evidence import summarize, summarize_runs
 
 
 def record(record_id, epoch, run_id, start, end, seconds):
@@ -43,3 +43,22 @@ def test_summary_exposes_epoch_lag():
     assert out["latest_evidence_epoch"] == 43
     assert out["evidence_epoch_lag"] == 15
     assert out["fresh_for_current_epoch"] is False
+
+
+def test_run_summary_flags_short_continue_without_required_reason():
+    lines = ['{"observation_id":"A","run_started_at":"2026-09-21T18:00:00+09:00","run_ended_at":"2026-09-21T18:02:56+09:00","duration_seconds":176,"turn_outcome":"CONTINUE"}']
+    out = summarize_runs(lines)
+    assert out["short_continue_count"] == 1
+    assert out["short_turn_guard_pass"] is False
+    assert out["short_continue_runs"][0]["guard_compliant"] is False
+
+
+def test_run_summary_accepts_documented_exception_and_normal_continue():
+    lines = [
+        '{"observation_id":"A","run_started_at":"2026-09-21T18:00:00+09:00","run_ended_at":"2026-09-21T18:02:00+09:00","duration_seconds":120,"turn_outcome":"CONTINUE","short_turn_reason":"PLATFORM_ENFORCED_TERMINATION","alternatives_checked":["same_work_spec"]}',
+        '{"observation_id":"B","run_started_at":"2026-09-21T18:10:00+09:00","run_ended_at":"2026-09-21T18:19:00+09:00","duration_seconds":540,"turn_outcome":"CONTINUE"}'
+    ]
+    out = summarize_runs(lines)
+    assert out["short_continue_count"] == 1
+    assert out["short_turn_guard_pass"] is True
+    assert out["average_completed_duration_seconds"] == 330
