@@ -1,6 +1,6 @@
 {
   "policy_id": "RRULER_STARTUP_WATCHDOG",
-  "version": 5,
+  "version": 6,
   "status": "STANDBY_DISABLED_BY_DEFAULT",
   "purpose": "Break-glass emergency recovery only. Normal continuity is provided by SAME MAIN END+60 self-shift plus SAME MAIN recurring RRULE cold fallback. Watchdog remains disabled unless explicitly activated for a diagnosed emergency.",
   "role": "BREAK_GLASS_EMERGENCY_RECOVERY_ONLY",
@@ -33,12 +33,12 @@
   },
   "actions": {
     "HEALTHY_BOOTSTRAP": [
-      "DO_NOT_MUTATE_MAIN",
-      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_FRESH_MAIN_EXPECTED_DUE_PLUS_180S",
-      "SET_SAME_WATCHDOG_IS_ENABLED_TRUE",
-      "VERIFY_SAME_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE"
+      "KEEP_WATCHDOG_DISABLED",
+      "DO_NOT_MUTATE_MAIN"
     ],
     "STARTUP_ACK_MISSING": [
+      "NO_AUTOMATIC_ACTION_WHILE_STANDBY_DISABLED",
+      "REQUIRE_EXPLICIT_EMERGENCY_ACTIVATION_BEFORE_ANY_MUTATION",
       "REARM_SAME_MAIN_CANONICAL_TO_NOW_PLUS_60S",
       "VERIFY_MAIN_ENABLED_AND_DUE",
       "PERSIST_WATCHDOG_RECOVERY",
@@ -47,6 +47,8 @@
       "VERIFY_SAME_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE"
     ],
     "BOOTSTRAP_REARM_MISSING": [
+      "NO_AUTOMATIC_ACTION_WHILE_STANDBY_DISABLED",
+      "REQUIRE_EXPLICIT_EMERGENCY_ACTIVATION_BEFORE_ANY_MUTATION",
       "REARM_SAME_MAIN_CANONICAL_TO_NOW_PLUS_60S_WHEN_FENCE_PERMITS",
       "VERIFY_MAIN_ENABLED_AND_DUE",
       "PERSIST_WATCHDOG_RECOVERY",
@@ -55,6 +57,8 @@
       "VERIFY_SAME_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE"
     ],
     "WATCHDOG_AMBIGUOUS": [
+      "NO_AUTOMATIC_ACTION_WHILE_STANDBY_DISABLED",
+      "REQUIRE_EXPLICIT_EMERGENCY_ACTIVATION_BEFORE_ANY_MUTATION",
       "FAIL_CLOSED_ON_MAIN_MUTATION",
       "PERSIST_AMBIGUITY",
       "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S",
@@ -62,6 +66,8 @@
       "VERIFY_SAME_WATCHDOG_ENABLED_ONE_SHOT_AND_DUE"
     ],
     "IDLE_DISTANT_DUE": [
+      "NO_AUTOMATIC_ACTION_WHILE_STANDBY_DISABLED",
+      "REQUIRE_EXPLICIT_EMERGENCY_ACTIVATION_BEFORE_ANY_MUTATION",
       "REARM_SAME_MAIN_CANONICAL_TO_NOW_PLUS_60S",
       "SET_SAME_MAIN_IS_ENABLED_TRUE",
       "VERIFY_MAIN_ENABLED_AND_DUE",
@@ -113,5 +119,12 @@
     "watchdog_may_authorize_normal_close": false,
     "main_must_arm_watchdog": false,
     "arming_order": "NONE_IN_NORMAL_OPERATION"
+  },
+  "emergency_activation_gate": {
+    "normal_operation": false,
+    "explicit_operator_or_durable_emergency_decision_required": true,
+    "activate_only_after_same_main_fast_and_natural_rrule_paths_are_diagnosed_insufficient": true,
+    "auto_activation_for_missing_receipt_forbidden": true,
+    "disable_after_verified_recovery": true
   }
 }
