@@ -21,15 +21,20 @@
     "Persist STARTUP-018/019 observed boundaries and accepted useful evidence.",
     "Close through live-verified SAME MAIN recurring END+60."
   ],
-  "current_substep": 1,
+  "current_substep": 3,
   "handoff_boundary": "VERIFIED_SAME_MAIN_RECURRING_END_PLUS_60",
   "early_finish_fallback": "Update the live retest evidence with the rejected category canary and exact observed 99-second delivery segment.",
   "created_for_next_wake": false,
   "started_at": "2026-09-22T00:30:10+09:00",
-  "last_progress_at": "2026-09-22T00:32:05+09:00",
+  "last_progress_at": "2026-09-22T00:39:00+09:00",
   "progress_evidence": [
     "BOOT_STARTED 00:30:10 for DUE:00:30:39",
     "REARM_VERIFIED 00:31:29; recurring provisional due 00:43:10 enabled",
-    "Authority epoch 76 claimed without Watchdog."
+    "Authority epoch 76 claimed without Watchdog.",
+    "Rejected one-shot canary isolated as STARTUP-018; current RRULE restoration recorded as STARTUP-019.",
+    "Full exact-remote-source test suite passed: startup audit 14, turn-close summary 9.",
+    "Live ledger audit passed: 19 samples, zero unacknowledged errors, one rejected one-shot bucket.",
+    "Fresh custom-recurring v4.3 policy reconciled across relay policy, scheduler fence, CI, and live SAME MAIN schedule.",
+    "Five direct custom-recurring semantic checks passed."
   ]
 }
