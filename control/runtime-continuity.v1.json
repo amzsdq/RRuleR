@@ -99,5 +99,9 @@
     "meaningful_unit_or_material_advancement_required": true,
     "maximum_unexplained_gap_seconds_for_acceptance": 120
   },
-  "design_reference": "docs/RUNTIME_CONTINUITY_ARCHITECTURE.md"
+  "design_reference": "docs/RUNTIME_CONTINUITY_ARCHITECTURE.md",
+  "time_unit_safety": {
+    "required": true,
+    "rule": "Human-readable timing must include explicit units; critical relay timings include both human unit and exact seconds. Bare END+60/NOW+180/+660 forms are forbidden."
+  }
 }
