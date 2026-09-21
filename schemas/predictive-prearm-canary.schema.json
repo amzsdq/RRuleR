@@ -1,0 +1,29 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://github.com/amzsdq/RRuleR/schemas/predictive-prearm-canary.schema.json",
+  "title":"RRuleR Predictive Prearm Canary",
+  "type":"object",
+  "required":["schema_version","program_id","experiment_id","status","p0_gap_budget_seconds","cold_rescue_offset_seconds","samples","promotion_rule"],
+  "properties":{
+    "schema_version":{"type":"string"},
+    "program_id":{"const":"RRULER-PROGRAM-001"},
+    "experiment_id":{"const":"UTIL-EXP-018"},
+    "status":{"type":"string"},
+    "purpose":{"type":"string"},
+    "p0_gap_budget_seconds":{"type":"number","exclusiveMinimum":0},
+    "cold_rescue_offset_seconds":{"const":780},
+    "candidate_predictive_lead_seconds":{"type":"number","minimum":0},
+    "feasibility_prediction":{"type":"object"},
+    "safety_policy_ref":{"type":"string"},
+    "lifecycle_policy_ref":{"type":"string"},
+    "required_sample_fields":{"type":"array","items":{"type":"string"}},
+    "samples":{"type":"array","items":{"$ref":"#/$defs/sample"}},
+    "promotion_rule":{"type":"object","required":["minimum_safe_samples","maximum_post_close_gap_seconds","requires_no_duplicate_substantive_side_effect","requires_no_schedule_rollback","then_requires_valid_fixed_900s_window"]},
+    "rollback_on":{"type":"array","items":{"type":"string"}},
+    "active_sample":{"type":["object","null"]}
+  },
+  "$defs":{
+    "sample":{"type":"object","required":["sample_id","predecessor_run_id","predictive_due_at","successor_observed_at","predecessor_last_useful_at","successor_first_useful_at","post_close_gap_seconds","overlap_or_fence_result","duplicate_substantive_side_effect_observed","schedule_rollback_observed"],"properties":{"sample_id":{"type":"string"},"predecessor_run_id":{"type":"string"},"predictive_due_at":{"type":"string"},"successor_observed_at":{"type":"string"},"predecessor_last_useful_at":{"type":"string"},"successor_first_useful_at":{"type":"string"},"post_close_gap_seconds":{"type":"integer"},"overlap_or_fence_result":{"type":"string"},"duplicate_substantive_side_effect_observed":{"type":"boolean"},"schedule_rollback_observed":{"type":"boolean"}},"additionalProperties":true}
+  },
+  "additionalProperties":true
+}
