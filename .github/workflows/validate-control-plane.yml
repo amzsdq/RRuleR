@@ -94,7 +94,7 @@ jobs:
           if lifecycle.get('status')!='ACTIVE' or lifecycle.get('timing',{}).get('final_rearm_offset_seconds')!=60 or lifecycle.get('timing',{}).get('exact_second_final_rearm_required') is not True: raise SystemExit('rolling lifecycle invalid')
           if lifecycle.get('timing',{}).get('schedule_mode')=='CUSTOM_RECURRING_24H_SLOT_SELF_SHIFT_CANARY':
             if lifecycle.get('timing',{}).get('rrule_frequency')!='DAILY' or 'BYHOUR=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23' not in lifecycle.get('timing',{}).get('custom_rule_template',''): raise SystemExit('custom recurring category canary invalid')
-            if 'SAME_MAIN_CUSTOM_RECURRING_SCHEDULE_IS_COLD_FALLBACK' not in active.get('hard_invariants',[]): raise SystemExit('custom recurring active invariant missing')
+            if 'SAME_MAIN_CUSTOM_RECURRING_SCHEDULE_IS_COLD_FALLBACK' not in controls.get('hard_invariants',[]): raise SystemExit('custom recurring active invariant missing')
           pc=lifecycle.get('predictive_prearm_canary',{})
           if pc.get('experiment_id')!='UTIL-EXP-018' or (pc.get('status')!='ROLLED_BACK_AFTER_FAILED_FIRST_CANARY' and pc.get('keep_provisional_cold_rescue_unchanged') is not True): raise SystemExit('predictive prearm lifecycle invariant invalid')
           if recovery.get('status')!='ACTIVE' or recovery.get('recovery_classes',{}).get('PREDICTIVE_PREARM_OVERLAP',{}).get('substantive_takeover_while_predecessor_fresh') is not False: raise SystemExit('predictive overlap fence invalid')
