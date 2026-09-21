@@ -1,18 +1,84 @@
 {
-  "policy_id":"RRULER_HANDOFF_RECOVERY","version":5,"status":"ACTIVE","purpose":"Recover or transfer authority without duplicating substantive work. Normal completion-relative continuation, predictive-prearm overlap, and abrupt owner loss are distinct classes.",
-  "active_runtime_mode":"RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE",
-  "normal_path":"On a valid same-canonical rolling wake after a committed normal close, verify newest schedule generation, provisionally rearm, reconstruct exact durable checkpoint, then claim a fresh authority epoch.",
-  "recovery_classes":{
-    "NORMAL_COMMITTED_CONTINUATION":{"requires_committed_close":true,"stale_grace_required":false,"latency_metric":"predecessor_last_useful_boundary_to_successor_first_useful_boundary_seconds","rationale":"A committed predecessor close plus verified successor schedule is intentional continuation, not failure recovery."},
-    "PREDICTIVE_PREARM_OVERLAP":{"requires_committed_close":false,"stale_grace_required":false,"substantive_takeover_while_predecessor_fresh":false,"allowed_while_predecessor_fresh":["READ_FRESH_DURABLE_STATE","VERIFY_SCHEDULE_GENERATION","VERIFY_PROGRAM_NONTERMINAL","OBSERVE_PREDECESSOR_FRESHNESS","PERSIST_NON_SUBSTANTIVE_CANARY_EVIDENCE_WHEN_SAFE"],"takeover_condition":"FRESH_RE_READ_PROVES_PREDECESSOR_COMMITTED_CLOSE_OR_NONCONFLICTING_AUTHORITY_TRANSFER","rationale":"A deliberately early same-canonical wake may absorb scheduler latency, but must never create concurrent substantive ownership or duplicate side effects."},
-    "ABRUPT_OWNER_LOSS":{"requires_committed_close":false,"stale_grace_required":true,"latency_metric":"predecessor_last_meaningful_progress_to_replacement_first_meaningful_progress_seconds","target_seconds_lte":120,"rationale":"Uncommitted disappearance requires fencing before takeover; optimize independently from normal scheduler delivery."}
+  "policy_id": "RRULER_HANDOFF_RECOVERY",
+  "version": 6,
+  "status": "ACTIVE",
+  "purpose": "Recover or transfer authority without duplicating substantive work. Normal continuation, predictive overlap, abrupt owner loss, and invoked-without-bootstrap-acknowledgement are distinct classes.",
+  "active_runtime_mode": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE",
+  "normal_path": "On a valid same-canonical rolling wake after a committed normal close, verify newest schedule generation, provisionally rearm, reconstruct exact durable checkpoint, then claim a fresh authority epoch.",
+  "recovery_classes": {
+    "NORMAL_COMMITTED_CONTINUATION": {
+      "requires_committed_close": true,
+      "stale_grace_required": false,
+      "latency_metric": "predecessor_last_useful_boundary_to_successor_first_useful_boundary_seconds",
+      "rationale": "A committed predecessor close plus verified successor schedule is intentional continuation, not failure recovery."
+    },
+    "PREDICTIVE_PREARM_OVERLAP": {
+      "requires_committed_close": false,
+      "stale_grace_required": false,
+      "substantive_takeover_while_predecessor_fresh": false,
+      "allowed_while_predecessor_fresh": [
+        "READ_FRESH_DURABLE_STATE",
+        "VERIFY_SCHEDULE_GENERATION",
+        "VERIFY_PROGRAM_NONTERMINAL",
+        "OBSERVE_PREDECESSOR_FRESHNESS",
+        "PERSIST_NON_SUBSTANTIVE_CANARY_EVIDENCE_WHEN_SAFE"
+      ],
+      "takeover_condition": "FRESH_RE_READ_PROVES_PREDECESSOR_COMMITTED_CLOSE_OR_NONCONFLICTING_AUTHORITY_TRANSFER",
+      "rationale": "A deliberately early same-canonical wake may absorb scheduler latency, but must never create concurrent substantive ownership or duplicate side effects."
+    },
+    "ABRUPT_OWNER_LOSS": {
+      "requires_committed_close": false,
+      "stale_grace_required": true,
+      "latency_metric": "predecessor_last_meaningful_progress_to_replacement_first_meaningful_progress_seconds",
+      "target_seconds_lte": 120,
+      "rationale": "Uncommitted disappearance requires fencing before takeover; optimize independently from normal scheduler delivery."
+    },
+    "STARTUP_ACK_MISSING": {
+      "requires_observed_invocation": true,
+      "boot_started_deadline_seconds": 120,
+      "rearm_verified_deadline_seconds_after_boot": 120,
+      "missing_boundaries_remain_unknown": true,
+      "detection_action": "MARK_INCOMPLETE_PRESERVE_RAW_INVOCATION",
+      "substantive_authority_granted_by_detection": false,
+      "recovery_requires_independent_wake_source": true,
+      "current_executable_fallback": "NEXT_HOURLY_SAME_CANONICAL_OCCURRENCE",
+      "target_recovery_seconds_lte": 120,
+      "capability_status": "DETECTION_ACTIVE_FAST_RECOVERY_TRANSPORT_NOT_PROVISIONED",
+      "rationale": "An invocation record without durable BOOT_STARTED or REARM_VERIFIED must be distinguished from scheduler non-delivery. Detection is not a wake mechanism and cannot itself satisfy the recovery target."
+    }
   },
-  "stale_path":{"eligible_when_predecessor_freshness":"SUSPECT_OR_OVERDUE","recovery_grace_seconds":120,"requires_no_new_predecessor_progress_during_grace":true,"requires_successor_rearm_verified":true,"requires_program_non_terminal":true,"already_stale_fast_path":{"enabled":true,"eligible_when_last_predecessor_progress_age_seconds_gte":120,"additional_grace_seconds":0,"requires_immediate_re_read":true,"requires_predecessor_progress_unchanged_on_re_read":true,"rationale":"Do not add a second 120-second idle tax when predecessor was already stale for the full recovery grace."}},
-  "recovery_sequence":["RE_READ_CURRENT_ACTIVITY_HANDOFF","VERIFY_NEWEST_SCHEDULE_GENERATION_AND_PROGRAM_NONTERMINAL","CLASSIFY_NORMAL_CONTINUATION_VS_PREDICTIVE_PREARM_VS_ABRUPT_LOSS","IF_PREDICTIVE_AND_PREDECESSOR_FRESH_DO_NOT_CLAIM_SUBSTANTIVE_AUTHORITY","VERIFY_PREDECESSOR_STALE_WHEN_ABRUPT_LOSS","ADVANCE_AUTHORITY_EPOCH_ONLY_WHEN_TAKEOVER_IS_SAFE","MARK_SUCCESSOR_WORKING","DO_NOT_REPLAY_AMBIGUOUS_SIDE_EFFECTS","PLAN_CURRENT_OBJECTIVE_FROM_EXACT_DURABLE_NEXT_ACTION","CONTINUE_WORK"],
-  "normal_handoff_preferred_when_true_concurrent_successor_exists":true,
-  "timeout_is_recovery_not_normal_handoff":true,
-  "successor_may_not_take_over_while_predecessor_is_fresh_and_conflicting":true,
-  "predictive_prearm_is_scheduler_latency_hiding_not_dual_worker_authority":true,
-  "fixed_quarter_handoff_request_required":false,
-  "exact_predecessor_end_time_must_not_be_invented":true
+  "stale_path": {
+    "eligible_when_predecessor_freshness": "SUSPECT_OR_OVERDUE",
+    "recovery_grace_seconds": 120,
+    "requires_no_new_predecessor_progress_during_grace": true,
+    "requires_successor_rearm_verified": true,
+    "requires_program_non_terminal": true,
+    "already_stale_fast_path": {
+      "enabled": true,
+      "eligible_when_last_predecessor_progress_age_seconds_gte": 120,
+      "additional_grace_seconds": 0,
+      "requires_immediate_re_read": true,
+      "requires_predecessor_progress_unchanged_on_re_read": true,
+      "rationale": "Do not add a second 120-second idle tax when predecessor was already stale for the full recovery grace."
+    }
+  },
+  "recovery_sequence": [
+    "RE_READ_CURRENT_ACTIVITY_HANDOFF",
+    "VERIFY_NEWEST_SCHEDULE_GENERATION_AND_PROGRAM_NONTERMINAL",
+    "CLASSIFY_NORMAL_CONTINUATION_VS_PREDICTIVE_PREARM_VS_ABRUPT_LOSS",
+    "CLASSIFY_STARTUP_ACK_MISSING_WITHOUT_INFERRING_UNOBSERVED_BOUNDARIES",
+    "IF_PREDICTIVE_AND_PREDECESSOR_FRESH_DO_NOT_CLAIM_SUBSTANTIVE_AUTHORITY",
+    "VERIFY_PREDECESSOR_STALE_WHEN_ABRUPT_LOSS",
+    "ADVANCE_AUTHORITY_EPOCH_ONLY_WHEN_TAKEOVER_IS_SAFE",
+    "MARK_SUCCESSOR_WORKING",
+    "DO_NOT_REPLAY_AMBIGUOUS_SIDE_EFFECTS",
+    "PLAN_CURRENT_OBJECTIVE_FROM_EXACT_DURABLE_NEXT_ACTION",
+    "CONTINUE_WORK"
+  ],
+  "normal_handoff_preferred_when_true_concurrent_successor_exists": true,
+  "timeout_is_recovery_not_normal_handoff": true,
+  "successor_may_not_take_over_while_predecessor_is_fresh_and_conflicting": true,
+  "predictive_prearm_is_scheduler_latency_hiding_not_dual_worker_authority": true,
+  "fixed_quarter_handoff_request_required": false,
+  "exact_predecessor_end_time_must_not_be_invented": true
 }
