@@ -5,9 +5,9 @@
   "generation_key": "DUE:2026-09-21T22:34:20+09:00",
   "boot_started_at": "2026-09-21T22:35:28+09:00",
   "boot_started_authority_epoch": 72,
-  "rearm_verified_at": null,
-  "verified_provisional_due_at": null,
-  "status": "BOOT_STARTED",
-  "last_updated_at": "2026-09-21T22:35:28+09:00",
-  "note": "Generation-matched BOOT_STARTED for the Watchdog recovery due 22:34:20. Minimum NOW/CURRENT/live canonical/fence validation passed; provisional rearm has not yet been inferred."
+  "rearm_verified_at": "2026-09-21T22:35:59+09:00",
+  "verified_provisional_due_at": "2026-09-21T22:48:28+09:00",
+  "status": "REARM_VERIFIED",
+  "last_updated_at": "2026-09-21T22:35:59+09:00",
+  "note": "Generation-matched BOOT_STARTED and same-canonical provisional RRULE rearm are both durably observed. Live MAIN metadata was re-read enabled at 22:48:28."
 }
