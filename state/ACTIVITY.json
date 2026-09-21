@@ -7,11 +7,11 @@
   "active_run_id": "RUN-UTIL-20260922-013717",
   "authority_epoch": 80,
   "substantive_work_started_at": "2026-09-22T01:37:40+09:00",
-  "last_progress_at": "2026-09-22T01:40:33+09:00",
-  "last_progress_kind": "V5_4_POLICY_CI_AND_RUNTIME_CONTINUITY_REPAIR",
-  "current_unit": "Verify adaptive +660s provisional policy end-to-end; repair stale CI/runtime authority while preserving 600s hard floor.",
-  "next_wake_due_at": "2026-09-22T01:48:17+09:00",
+  "last_progress_at": "2026-09-22T01:48:24+09:00",
+  "last_progress_kind": "V5_4_GUARDED_EXTENSION_AND_CONTROL_PLANE_PASS",
+  "current_unit": "Finish v5.4 live verification after >=600s and close SAME MAIN at exact observed END+60.",
+  "next_wake_due_at": "2026-09-22T01:50:17+09:00",
   "successor_observed": true,
   "handoff_ready": false,
-  "operator_ui_note": "v5.4 live turn active. SAME MAIN provisional verified 01:48:17 KST. CI stale 780s assertion and runtime-continuity 780s drift are being reconciled; normal close remains exact END+60 after >=600s."
+  "operator_ui_note": "v5.4 live turn passed 600s floor. SAME MAIN was extended once from 01:48:17 to 01:50:17 inside the 90s guard; integrated control-plane validation passed on the extended projection. Preparing exact END+60 normal close."
 }
