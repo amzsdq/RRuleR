@@ -68,7 +68,8 @@ jobs:
               if not (2 <= len(turn.get('checkpointable_substeps',[])) <= 5): raise SystemExit('turn plan substep count invalid')
               if not (600 <= turn.get('expected_useful_seconds',0) <= 840): raise SystemExit('turn plan duration invalid')
           sched=policy.get('scheduler',{})
-          if sched.get('mechanism')!='RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE' or sched.get('canonical_reuse_required') is not True or sched.get('replacement_automation_forbidden') is not True: raise SystemExit('rolling scheduler invariant invalid')
+          allowed_sched={'RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE','RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_PREDICTIVE_PREARM_CANARY'}
+          if sched.get('mechanism') not in allowed_sched or sched.get('canonical_reuse_required') is not True or sched.get('replacement_automation_forbidden') is not True: raise SystemExit('rolling scheduler invariant invalid')
           if lifecycle.get('status')!='ACTIVE' or lifecycle.get('timing',{}).get('final_rearm_offset_seconds')!=60: raise SystemExit('rolling lifecycle invalid')
           pc=lifecycle.get('predictive_prearm_canary',{})
           if pc.get('experiment_id')!='UTIL-EXP-018' or pc.get('keep_provisional_cold_rescue_unchanged') is not True: raise SystemExit('predictive prearm lifecycle invariant invalid')
