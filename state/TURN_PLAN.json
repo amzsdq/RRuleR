@@ -22,13 +22,14 @@
     "Inspect integrated CI or execute equivalent repository-data verification.",
     "Use remaining budget on the next unaccepted live-retest evidence item."
   ],
-  "current_substep": 1,
-  "handoff_boundary": "Authority epoch 66 claimed; no substantive artifact committed yet.",
+  "current_substep": 3,
+  "handoff_boundary": "First live review row and valid STARTUP-003 are durable; exact-second completion-relative rearm correction remains.",
   "early_finish_fallback": "Extend reporting tests to generate validity-aware operator review rows from durable ledgers, then integrate into CI.",
   "created_for_next_wake": false,
   "started_at": "2026-09-21T18:55:59+09:00",
-  "last_progress_at": "2026-09-21T18:55:59+09:00",
+  "last_progress_at": "2026-09-21T18:57:04+09:00",
   "progress_evidence": [
-    "state/RUNS.jsonl@7daba51d74f994e836b0ea77f72d144053f7d837"
+    "state/RUNS.jsonl@7daba51d74f994e836b0ea77f72d144053f7d837",
+    "planning/evidence/TURN-CLOSE-V4-RETEST.md@a412c1cb9c106f088ad6af54ed26b4c8d53c39de"
   ]
 }
