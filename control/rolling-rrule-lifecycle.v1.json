@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 16,
+  "version": 17,
   "status": "ACTIVE",
-  "purpose": "MIGRATED MAIN: normal path is operator-created SAME MAIN recurring RRULE -> bounded work -> SAME MAIN exact END+60 shift. The prior custom-recurring category canary is ended. Watchdog is disabled break-glass only.",
+  "purpose": "CLEAN MIGRATED MAIN: normal path is operator-created SAME MAIN recurring RRULE -> bounded work -> SAME MAIN exact END+60 shift. Both prior MAIN canonicals are retired. Watchdog is disabled break-glass only.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
   "startup_order": [
     "READ_MINIMUM_FENCE_CURRENT_AND_CANONICAL_AUTHORITY",
@@ -154,7 +154,7 @@
     "acknowledgement_deadline_seconds": 120,
     "missing_ack_classification": "STARTUP_ACK_MISSING",
     "rule": "Missing timestamps remain unknown. An invocation record alone does not prove bootstrap entry, rearm, authority, work, or process death.",
-    "recovery_limitation": "Current operator-created MAIN recurring schedule is the built-in cold fallback. Retired predecessor canonical must never be reactivated."
+    "recovery_limitation": "Current clean operator-created MAIN recurring schedule is the built-in cold fallback. Both retired predecessor canonicals must never be reactivated."
   },
   "startup_watchdog": {
     "policy_ref": "control/startup-watchdog.v1.json",
@@ -180,5 +180,13 @@
     ]
   },
   "current_main_canonical_id": "6ab14f7951848191b65e4b5d4bc979d8",
-  "retired_predecessor_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2"
+  "retired_predecessor_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
+  "canonical_migration": {
+    "current_main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
+    "retired_main_canonical_ids": [
+      "6ab14f7951848191b65e4b5d4bc979d8",
+      "6aaf8a993eb08191b8d0ab1d9662e4b2"
+    ],
+    "migration_basis": "EXPLICIT_OPERATOR_CLEAN_CONTEXT_MIGRATION"
+  }
 }
