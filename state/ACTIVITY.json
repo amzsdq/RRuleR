@@ -4,14 +4,14 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "status": "WORKING",
-  "active_run_id": "RUN-UTIL-20260921-215434",
-  "authority_epoch": 71,
-  "substantive_work_started_at": "2026-09-21T21:56:39+09:00",
-  "last_progress_at": "2026-09-21T22:06:23+09:00",
-  "last_progress_kind": "TURN_CLOSED_VERIFIED_CONTINUATION",
-  "current_unit": "Closed; successor due 22:07:23 KST.",
-  "next_wake_due_at": "2026-09-21T22:07:23+09:00",
+  "active_run_id": "RUN-UTIL-20260921-221537",
+  "authority_epoch": 72,
+  "substantive_work_started_at": "2026-09-21T22:19:35+09:00",
+  "last_progress_at": "2026-09-21T22:19:35+09:00",
+  "last_progress_kind": "AUTHORITY_CLAIMED_AFTER_WATCHDOG_RECOVERY",
+  "current_unit": "Record STARTUP-011 failure and STARTUP-012 Watchdog recovery; audit live next_sample.",
+  "next_wake_due_at": "2026-09-21T22:29:29+09:00",
   "successor_observed": true,
-  "handoff_ready": true,
-  "operator_ui_note": "Epoch 71 closed after 709s; same MAIN and Watchdog enabled and verified."
+  "handoff_ready": false,
+  "operator_ui_note": "Epoch 72 owns substantive work; provisional MAIN and Watchdog protection are verified."
 }
