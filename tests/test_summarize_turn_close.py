@@ -60,3 +60,22 @@ def test_summary_accepts_allowlisted_short_exception():
     out = summarize(runs, {"samples":[]})
     assert out["v4_unexcused_short_close_count"] == 0
     assert out["unknown_useful_turn_count"] == 1
+
+
+def test_invalid_complete_sample_is_visible_but_not_comparison_eligible():
+    runs = []
+    startup = {"samples":[{
+        "sample_id":"INVALID",
+        "scheduled_due_at":"2026-09-21T10:00:00+00:00",
+        "successor_observed_at":"2026-09-21T10:01:00+00:00",
+        "authority_claim_at":"2026-09-21T10:01:10+00:00",
+        "first_durable_useful_at":"2026-09-21T10:01:10+00:00",
+        "predecessor_last_useful_at":"2026-09-21T10:00:30+00:00",
+        "validity":"INVALID",
+        "exclusion_reason":"BOUNDARY_INCONSISTENCY",
+    }]}
+    gap = summarize(runs, startup)["successor_gap_samples"][0]
+    assert gap["complete_boundary_set"] is True
+    assert gap["evidence_valid"] is False
+    assert gap["comparison_eligible"] is False
+    assert gap["exclusion_reason"] == "BOUNDARY_INCONSISTENCY"
