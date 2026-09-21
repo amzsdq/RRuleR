@@ -2,41 +2,34 @@
   "schema_version": "1.1",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "authority_epoch": 74,
-  "run_id": "RUN-UTIL-20260921-235045",
-  "status": "COMPLETE",
-  "phase": "MAIN_SELF_RELIANT_POLICY_ALIGNMENT",
-  "objective_id": "WS-P001-002-MAIN-SELF-RELIANT-V4",
-  "objective": "Make SAME MAIN RRULE the complete normal continuation path and retain Watchdog only as disabled explicit emergency standby.",
-  "expected_useful_seconds": 600,
+  "authority_epoch": 75,
+  "run_id": "RUN-UTIL-20260922-001446",
+  "status": "IN_PROGRESS",
+  "phase": "OPERATOR_RESCHEDULED_GENERATION_EVIDENCE_HARDENING",
+  "objective_id": "WS-P001-002-OPERATOR-RESCHEDULE-CLASSIFICATION",
+  "objective": "Prevent explicit operator-rescheduled MAIN generations from contaminating normal END+60 scheduler comparisons while retaining their observed startup-stage evidence.",
+  "expected_useful_seconds": 300,
   "acceptance_criteria": [
-    "Lifecycle normal close requires only live-verified SAME MAIN END+60 and durable non-WORKING projection.",
-    "Normal close neither arms nor requires Watchdog.",
-    "SAME MAIN recurring RRULE natural recurrence is documented as cold fallback.",
-    "Active controls and operator guidance no longer require Watchdog for ordinary continuity.",
-    "Focused repository consistency checks pass."
+    "Startup audit recognizes explicit operator-rescheduled generations as preserved but comparison-excluded.",
+    "Turn-close summary reports operator-rescheduled generations separately from normal scheduler and recovery samples.",
+    "Focused fixtures cover complete and partial operator-rescheduled samples.",
+    "Current 00:13:08 generation is durably reconciled without inferred predecessor boundaries."
   ],
   "checkpointable_substeps": [
-    "Claim epoch 74 after generation-matched BOOT_STARTED and REARM_VERIFIED.",
-    "Update lifecycle and continuation gate.",
-    "Update relay policy, active controls, and AGENTS guidance.",
-    "Search for stale normal-path Watchdog requirements and reconcile material conflicts.",
-    "Checkpoint and close with live-verified SAME MAIN END+60."
+    "Add explicit operator-rescheduled generation classification to startup audit.",
+    "Align turn-close summary generation-kind and comparison rules.",
+    "Add focused tests and run them locally.",
+    "Persist current generation evidence and close through exact SAME MAIN END+60."
   ],
-  "current_substep": 5,
+  "current_substep": 1,
   "handoff_boundary": "VERIFIED_SAME_MAIN_END_PLUS_60",
-  "early_finish_fallback": "Add a deterministic policy-consistency check that rejects normal-close Watchdog requirements.",
+  "early_finish_fallback": "Update the live retest evidence table with the operator-rescheduled generation and observed 98-second delivery segment.",
   "created_for_next_wake": false,
-  "started_at": "2026-09-21T23:50:45+09:00",
-  "last_progress_at": "2026-09-22T00:01:20+09:00",
+  "started_at": "2026-09-22T00:14:46+09:00",
+  "last_progress_at": "2026-09-22T00:18:31+09:00",
   "progress_evidence": [
-    "BOOT_STARTED 23:50:45 for DUE:2026-09-21T23:52:00+09:00",
-    "REARM_VERIFIED 23:51:45.997376; SAME MAIN recurring provisional due 00:03:45 enabled",
-    "Claimed epoch 74 and found stale independent-Watchdog dependency in ACTIVE_CONTROLS/handoff recovery/CI.",
-    "Aligned ACTIVE_CONTROLS, relay/recovery/runtime policies and CI to SAME MAIN fast shift + natural recurring cold fallback.",
-    "Updated wake architecture and recovery SLO so Watchdog is disabled break-glass standby, not a correctness dependency.",
-    "24 direct self-reliance semantic checks passed; stale normal Watchdog dependency searches returned zero.",
-    "Updated P0 scorecard for first MAIN v4 live validation without claiming success.",
-    "Live SAME MAIN metadata re-read: enabled recurring RRULE DTSTART 2026-09-22T00:02:08+09:00."
+    "BOOT_STARTED 00:14:46 for DUE:2026-09-22T00:13:08+09:00",
+    "REARM_VERIFIED 00:17:48; SAME MAIN recurring provisional due 00:27:46 enabled",
+    "Authority epoch 75 claimed without Watchdog."
   ]
 }
