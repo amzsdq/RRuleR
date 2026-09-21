@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 12,
+  "version": 13,
   "status": "ACTIVE",
-  "purpose": "Self-reliant MAIN continuation: normal path is MAIN->MAIN at actual END+60. The same MAIN recurring RRULE is also its cold fallback. Watchdog is disabled-by-default emergency standby and is not part of ordinary correctness or close.",
+  "purpose": "CUSTOM ONE-SHOT CANARY: normal path is SAME MAIN one-shot -> work -> SAME MAIN exact END+60 one-shot. RRULE is temporarily removed to isolate whether the platform's recurring/hourly category causes long-gap or queue behavior. Watchdog remains disabled break-glass standby.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
   "startup_order": [
     "READ_MINIMUM_FENCE_CURRENT_AND_CANONICAL_AUTHORITY",
@@ -24,18 +24,19 @@
     "provisional_safety_margin_seconds": 180,
     "provisional_due_offset_seconds": 780,
     "final_rearm_offset_seconds": 60,
-    "rrule_frequency": "HOURLY",
+    "rrule_frequency": null,
     "fixed_quarter_cycle_required": false,
     "exact_second_final_rearm_required": true,
     "normal_continue_due_rule": "ACTUAL_OBSERVED_TURN_END_PLUS_EXACTLY_60_SECONDS",
     "normal_continue_offset_is_default_invariant": true,
     "target_turn_elapsed_seconds": 600,
-    "normal_soft_ceiling_seconds": 720
+    "normal_soft_ceiling_seconds": 720,
+    "schedule_mode": "EXACT_ONE_SHOT_SELF_UPDATE_CANARY"
   },
   "provisional_arm": {
     "when": "Immediately after minimum stale-wake/fence/authority validation and before full restore or substantive work.",
     "due": "wake_or_arm_reference + target_useful_work_seconds + provisional_safety_margin_seconds",
-    "reason": "If the active turn dies before normal close, the same canonical retains a bounded cold-rescue opportunity.",
+    "reason": "During the active turn, move the SAME canonical one-shot to a bounded crash-insurance due. This is temporary in-flight insurance only.",
     "verification_required": true,
     "mutation_failure": "Retry once when safe. If an older verified future continuation remains alive, enter DEGRADED_CONTINUATION and continue only within its safety envelope; otherwise fail closed before substantive side effects."
   },
@@ -51,8 +52,8 @@
     "order": [
       "PERSIST_LATEST_CHECKPOINT",
       "COMPUTE_COMPLETION_RELATIVE_DUE",
-      "MUTATE_SAME_CANONICAL_DSTART",
-      "VERIFY_SAME_CANONICAL_ENABLED_RRULE_AND_DSTART",
+      "MUTATE_SAME_CANONICAL_ONE_SHOT_DSTART",
+      "VERIFY_SAME_CANONICAL_ENABLED_EXACT_ONE_SHOT_DSTART",
       "PERSIST_EXPECTED_DUE",
       "PERSIST_NON_WORKING_CLOSE_PROJECTION",
       "VALIDATE_CURRENT_ACTIVITY_HANDOFF_PROJECTION",
@@ -98,8 +99,8 @@
       "normal_continue_final_forbidden_until": [
         "ACTUAL_END_OBSERVED",
         "LATEST_CHECKPOINT_PERSISTED",
-        "SAME_MAIN_MUTATED_TO_END_PLUS_EXACTLY_60_SECONDS",
-        "LIVE_MAIN_REREAD_SAME_CANONICAL_ENABLED_RECURRING_EXACT_DSTART",
+        "SAME_MAIN_MUTATED_TO_END_PLUS_EXACTLY_60_SECONDS_AS_ONE_SHOT",
+        "LIVE_MAIN_REREAD_SAME_CANONICAL_ENABLED_NO_RRULE_EXACT_DSTART",
         "EXACT_FAST_DUE_PERSISTED_TO_CURRENT_ACTIVITY_HANDOFF",
         "NON_WORKING_CLOSE_PROJECTION_VALIDATED"
       ],
@@ -149,11 +150,11 @@
   "startup_acknowledgement": {
     "ledger": "state/SUCCESSOR_STARTUP.json",
     "boot_started_semantics": "Observed immediately after minimum fence validation proves bootstrap execution entered durable control handling.",
-    "rearm_verified_semantics": "Observed only after the same canonical is enabled, recurring, and its provisional DTSTART is re-read successfully.",
+    "rearm_verified_semantics": "Observed only after the SAME canonical is enabled and its provisional exact one-shot DTSTART is re-read successfully.",
     "acknowledgement_deadline_seconds": 120,
     "missing_ack_classification": "STARTUP_ACK_MISSING",
     "rule": "Missing timestamps remain unknown. An invocation record alone does not prove bootstrap entry, rearm, authority, work, or process death.",
-    "recovery_limitation": "The acknowledgement makes failure diagnosable. Fast nominal recovery remains SAME MAIN self-shift; cold recovery is SAME MAIN natural hourly recurrence. Watchdog is optional break-glass only."
+    "recovery_limitation": "This canary intentionally removes the recurring RRULE cold fallback to isolate scheduler-category behavior. If one-shot self-update fails, preserve evidence and use operator/break-glass recovery rather than silently restoring RRULE."
   },
   "startup_watchdog": {
     "policy_ref": "control/startup-watchdog.v1.json",
@@ -167,13 +168,13 @@
     "activation_rule": "Only explicit operator activation or a fresh durable emergency policy decision after both MAIN fast continuation and MAIN recurring cold-fallback are diagnosed insufficient."
   },
   "normal_path_invariant": {
-    "expected_path": "MAIN_NORMAL_CLOSE -> SAME_MAIN_END_PLUS_60 -> NEXT_MAIN; if a shifted wake is lost before bootstrap, SAME_MAIN natural recurring RRULE is the cold fallback",
+    "expected_path": "MAIN_NORMAL_CLOSE -> SAME_MAIN_EXACT_ONE_SHOT_END_PLUS_60 -> NEXT_MAIN",
     "provisional_role": "IN_FLIGHT_CRASH_INSURANCE_ONLY",
     "watchdog_role": "DISABLED_BREAK_GLASS_EMERGENCY_ONLY",
+    "experiment": "SCHEDULE_CATEGORY_ISOLATION_ONE_SHOT_CANARY",
     "forbidden_substitutions": [
       "NORMAL_CLOSE_WITH_PROVISIONAL_DUE_LEFT_AS_SUCCESSOR",
       "NORMAL_CLOSE_RELYING_ON_WATCHDOG_AS_EXPECTED_SUCCESSOR",
-      "NORMAL_CLOSE_REQUIRING_WATCHDOG_SYNC",
       "FINAL_RESPONSE_BEFORE_LIVE_END_PLUS_60_MAIN_VERIFICATION"
     ]
   }
