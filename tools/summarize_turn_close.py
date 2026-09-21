@@ -35,8 +35,8 @@ def _generation_kind(sample: dict) -> str:
         return sample["recovery_kind"]
     if sample.get("recovery_of_sample_id"):
         return "WATCHDOG_RECOVERY"
-    validity = str(sample.get("validity", "")); classification = str(sample.get("classification", ""))
-    if "HOURLY_FALLBACK" in validity or "HOURLY_FALLBACK" in classification:
+    validity = str(sample.get("validity", "")); classification = str(sample.get("classification", "")); generation_class=str(sample.get("generation_class", ""))
+    if "HOURLY_FALLBACK" in validity or "HOURLY_FALLBACK" in classification or "HOURLY_COLD_FALLBACK" in generation_class:
         return "HOURLY_FALLBACK_RECOVERY"
     return "NORMAL_SCHEDULER"
 
@@ -46,13 +46,18 @@ def _startup_gap(sample: dict) -> dict:
     kind=_generation_kind(sample); validity=sample.get("validity")
     evidence_valid=validity not in {"INVALID","INCOMPLETE","EXCLUDED_OPERATOR_RESCHEDULED","EXCLUDED_HOURLY_FALLBACK_RECOVERY","EXCLUDED_SCHEDULE_CATEGORY_CANARY"}
     complete=all((scheduled,observed,claim,first,predecessor)); recovery_complete=all((scheduled,observed,boot,rearm,claim,first))
-    return {"sample_id":sample.get("sample_id"),"generation_kind":kind,"recovery_of_sample_id":sample.get("recovery_of_sample_id"),"due_to_observation_seconds":_seconds(scheduled,observed),"observation_to_boot_seconds":_seconds(observed,boot),"boot_to_rearm_verified_seconds":_seconds(boot,rearm),"rearm_verified_to_claim_seconds":_seconds(rearm,claim),"observation_to_claim_seconds":_seconds(observed,claim),"claim_to_first_useful_seconds":_seconds(claim,first),"due_to_first_useful_seconds":_seconds(scheduled,first),"predecessor_to_first_useful_seconds":_seconds(predecessor,first),"complete_boundary_set":complete,"complete_recovery_boundary_set":recovery_complete,"evidence_valid":evidence_valid,"comparison_eligible":kind=="NORMAL_SCHEDULER" and evidence_valid and complete,"exclusion_reason":sample.get("exclusion_reason")}
+    return {"sample_id":sample.get("sample_id"),"predecessor_run_id":sample.get("predecessor_run_id"),"generation_kind":kind,"recovery_of_sample_id":sample.get("recovery_of_sample_id"),"scheduled_due_at":scheduled,"successor_observed_at":observed,"boot_started_at":boot,"due_to_observation_seconds":_seconds(scheduled,observed),"observation_to_boot_seconds":_seconds(observed,boot),"boot_to_rearm_verified_seconds":_seconds(boot,rearm),"rearm_verified_to_claim_seconds":_seconds(rearm,claim),"observation_to_claim_seconds":_seconds(observed,claim),"claim_to_first_useful_seconds":_seconds(claim,first),"due_to_first_useful_seconds":_seconds(scheduled,first),"predecessor_to_first_useful_seconds":_seconds(predecessor,first),"complete_boundary_set":complete,"complete_recovery_boundary_set":recovery_complete,"evidence_valid":evidence_valid,"comparison_eligible":kind=="NORMAL_SCHEDULER" and evidence_valid and complete,"exclusion_reason":sample.get("exclusion_reason")}
 
 
 def _normal_close_offset_seconds(run: dict) -> int | None:
     ended = run.get("run_ended_at")
     due = run.get("verified_next_fast_due_at") or run.get("next_due_at")
     return _seconds(ended, due)
+
+
+def _run_id(run: dict) -> str | None:
+    observation_id=run.get("observation_id")
+    return observation_id[4:] if observation_id and observation_id.startswith("OBS-") else observation_id
 
 
 def _tail_consecutive(rows: list[dict], predicate) -> list[dict]:
@@ -80,7 +85,7 @@ def summarize(run_lines: list[str], startup: dict) -> dict:
         if not excused: unexcused.append({"observation_id":run.get("observation_id"),"duration_seconds":duration,"short_turn_reason":run.get("short_turn_reason"),"alternatives_checked":run.get("alternatives_checked")})
     normal_continue=[r for r in closed if r.get("turn_outcome")=="CONTINUE" and r.get("end_reason")=="VERIFIED_SAME_CANONICAL_CONTINUATION"]
     p0a_tail=_tail_consecutive(normal_continue, lambda r: (r.get("duration_seconds") if type(r.get("duration_seconds")) is int else _seconds(r.get("run_started_at"),r.get("run_ended_at"))) >= SHORT_SECONDS)
-    p0b_tail=_tail_consecutive(normal_continue, lambda r: _normal_close_offset_seconds(r)==NORMAL_CLOSE_OFFSET_SECONDS)
+    p0b_local_tail=_tail_consecutive(normal_continue, lambda r: _normal_close_offset_seconds(r)==NORMAL_CLOSE_OFFSET_SECONDS)
     raw_samples=list(startup.get("samples",[]))
     if isinstance(startup.get("next_sample"),dict): raw_samples.append(startup["next_sample"])
     gaps=[_startup_gap(sample) for sample in raw_samples]
@@ -88,7 +93,14 @@ def summarize(run_lines: list[str], startup: dict) -> dict:
     operator=[gap for gap in gaps if gap["generation_kind"]=="OPERATOR_RESCHEDULED"]
     one_shot=[gap for gap in gaps if gap["generation_kind"]=="REJECTED_ONE_SHOT_CANARY"]
     recovery=[gap for gap in gaps if gap["generation_kind"] not in {"NORMAL_SCHEDULER","OPERATOR_RESCHEDULED","REJECTED_ONE_SHOT_CANARY"}]
-    return {"v4_closed_turn_count":len(closed),"v4_unexcused_short_close_count":len(unexcused),"v4_unexcused_short_closes":unexcused,"known_useful_seconds_total":sum(known_useful),"known_useful_turn_count":len(known_useful),"unknown_useful_turn_count":len(closed)-len(known_useful),"p0_a_consecutive_normal_turns_gte_10_minutes_600_seconds":len(p0a_tail),"p0_a_tail_observation_ids":[r.get("observation_id") for r in p0a_tail],"p0_b_consecutive_normal_closes_exactly_1_minute_60_seconds":len(p0b_tail),"p0_b_tail_observation_ids":[r.get("observation_id") for r in p0b_tail],"p0_b_requires_explicit_verified_due_timestamp":True,"successor_gap_samples":gaps,"normal_scheduler_gap_samples":normal,"normal_scheduler_comparison_samples":[gap for gap in normal if gap["comparison_eligible"]],"operator_rescheduled_gap_samples":operator,"rejected_one_shot_canary_gap_samples":one_shot,"recovery_gap_samples":recovery,"unknown_policy":"MISSING_USEFUL_OR_BOUNDARY_VALUES_REMAIN_NULL_NOT_ZERO"}
+    fast_boot_by_predecessor={gap.get("predecessor_run_id"):gap for gap in normal if gap.get("predecessor_run_id") and gap.get("scheduled_due_at") and gap.get("boot_started_at")}
+    def local_and_delivered(run: dict) -> bool:
+        if _normal_close_offset_seconds(run)!=NORMAL_CLOSE_OFFSET_SECONDS: return False
+        sample=fast_boot_by_predecessor.get(_run_id(run))
+        due=run.get("verified_next_fast_due_at") or run.get("next_due_at")
+        return bool(sample and sample.get("scheduled_due_at")==due and sample.get("boot_started_at"))
+    p0b_delivered_tail=_tail_consecutive(normal_continue, local_and_delivered)
+    return {"v4_closed_turn_count":len(closed),"v4_unexcused_short_close_count":len(unexcused),"v4_unexcused_short_closes":unexcused,"known_useful_seconds_total":sum(known_useful),"known_useful_turn_count":len(known_useful),"unknown_useful_turn_count":len(closed)-len(known_useful),"p0_a_consecutive_normal_turns_gte_10_minutes_600_seconds":len(p0a_tail),"p0_a_tail_observation_ids":[r.get("observation_id") for r in p0a_tail],"p0_b_consecutive_local_closes_exactly_1_minute_60_seconds":len(p0b_local_tail),"p0_b_local_tail_observation_ids":[r.get("observation_id") for r in p0b_local_tail],"p0_b_consecutive_normal_closes_exactly_1_minute_60_seconds_with_observed_fast_bootstrap":len(p0b_delivered_tail),"p0_b_delivered_tail_observation_ids":[r.get("observation_id") for r in p0b_delivered_tail],"p0_b_requires_explicit_verified_due_timestamp":True,"p0_b_requires_generation_matched_fast_successor_bootstrap_for_delivery_pass":True,"successor_gap_samples":gaps,"normal_scheduler_gap_samples":normal,"normal_scheduler_comparison_samples":[gap for gap in normal if gap["comparison_eligible"]],"operator_rescheduled_gap_samples":operator,"rejected_one_shot_canary_gap_samples":one_shot,"recovery_gap_samples":recovery,"unknown_policy":"MISSING_USEFUL_OR_BOUNDARY_VALUES_REMAIN_NULL_NOT_ZERO"}
 
 
 def main() -> int:
