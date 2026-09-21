@@ -4,7 +4,7 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "authority_epoch": 68,
   "run_id": "RUN-UTIL-20260921-204946",
-  "status": "ACTIVE",
+  "status": "CHECKPOINTED",
   "phase": "PRE_BOOTSTRAP_RECOVERY_GAP",
   "objective_id": "WS-P001-002-PREBOOT-OBSERVABILITY",
   "objective": "Make bootstrap entry and provisional rearm durably distinguishable, classify observed invocations with no startup acknowledgement, and identify the smallest executable independent-wake follow-up.",
@@ -24,9 +24,9 @@
     "Checkpoint and exact END+60 close."
   ],
   "current_substep": 5,
-  "handoff_boundary": "Bootstrap observability, guarded rescue evaluator/workflow gate, and initial three-turn review complete; live event consumer provisioning remains external/unauthorized in this automation turn.",
+  "handoff_boundary": "All epoch-68 chained units complete; MAIN and fixed Startup Watchdog verified for 21:01:19/21:04:19 KST.",
   "early_finish_fallback": "Audit state/WAKE_ARCHITECTURE and event-wake candidate for an actually executable same-canonical wake path; do not mistake detection for recovery.",
-  "created_for_next_wake": false,
+  "created_for_next_wake": true,
   "started_at": "2026-09-21T20:49:46+09:00",
   "last_progress_at": "2026-09-21T20:59:31+09:00",
   "progress_evidence": [
