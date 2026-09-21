@@ -23,7 +23,7 @@
     "final_checkpoint_before_close": true,
     "verify_every_mutation": true,
     "fixed_quarter_cycle_active": false,
-    "note": "For the normal ~10m envelope, arm SAME MAIN recurring due once at wake+11m, normally leave it untouched during work, and replace it at normal close with exact observed END+60. Extend once before collision only if work/close handling will cross the provisional due. Prior +2m SHORT_ROLLING live A/B evidence produced overlap; prior +11m LONG_PROVISIONAL passed. Former +13m/780s horizon is retired as unnecessarily long.",
+    "note": "For the normal 10-minute (600-second) envelope, arm SAME MAIN recurring due once at observed wake + exactly 11 minutes (660 seconds), normally leave it untouched during work, and replace it at normal close with ACTUAL END + exactly 1 minute (60 seconds). This means sixty seconds after observed END, never 60 minutes or the next natural hourly RRULE occurrence. Extend once before collision only if work/close handling will cross the provisional due. Prior 2-minute (120-second) SHORT_ROLLING live A/B evidence produced overlap; prior 11-minute (660-second) LONG_PROVISIONAL passed. Former 13-minute (780-second) horizon is retired as unnecessarily long.",
     "long_provisional_780_seconds_retired": true,
     "provisional_extension_guard_seconds": 90,
     "provisional_extension_offset_seconds": 180,
@@ -42,8 +42,8 @@
     "p0_max_average_non_useful_gap_seconds_for_600s_turn": 42.9,
     "acceptance_target_fraction": 0.9333333333,
     "busywork_for_window_fill_forbidden": true,
-    "after_each_work_unit": "BEFORE_600S_SELECT_NEXT_SAFE_USEFUL_UNIT_OR_DECOMPOSE; AT_OR_AFTER_600S_FINISH_SMALLEST_SAFE_IN_FLIGHT_UNIT_AND_CLOSE",
-    "measurement_rule": "Optimize evidenced wall-clock useful coverage across worker boundaries. Do not substitute the 600s bounded-turn target for the 840s/900s P0 acceptance target.",
+    "after_each_work_unit": "BEFORE_10_MINUTES_600_SECONDS_SELECT_NEXT_SAFE_USEFUL_UNIT_OR_DECOMPOSE; AT_OR_AFTER_10_MINUTES_600_SECONDS_FINISH_SMALLEST_SAFE_IN_FLIGHT_UNIT_AND_CLOSE",
+    "measurement_rule": "Optimize evidenced wall-clock useful coverage across worker boundaries. Do not substitute the 10-minute (600-second) bounded-turn target for the 14-minute (840-second) useful-work target inside the 15-minute (900-second) P0 acceptance window.",
     "minimum_normal_continue_elapsed_seconds": 600,
     "pre_600_voluntary_normal_continue_close_forbidden": true
   },
@@ -125,5 +125,16 @@
     "failed_intervention_requires_new_hypothesis_or_evidence": true,
     "negative_results_must_be_preserved": true,
     "platform_and_security_constraints_still_apply": true
+  },
+  "time_unit_safety": {
+    "required": true,
+    "critical_examples": [
+      "1 minute (60 seconds)",
+      "10 minutes (600 seconds)",
+      "11 minutes (660 seconds)",
+      "12 minutes (720 seconds)",
+      "3 minutes (180 seconds)"
+    ],
+    "bare_time_arithmetic_forbidden": true
   }
 }
