@@ -2,38 +2,34 @@
   "schema_version": "1.1",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "authority_epoch": 75,
-  "run_id": "RUN-UTIL-20260922-001446",
-  "status": "COMPLETE",
-  "phase": "OPERATOR_RESCHEDULED_GENERATION_EVIDENCE_HARDENING",
-  "objective_id": "WS-P001-002-OPERATOR-RESCHEDULE-CLASSIFICATION",
-  "objective": "Prevent explicit operator-rescheduled MAIN generations from contaminating normal END+60 scheduler comparisons while retaining their observed startup-stage evidence.",
+  "authority_epoch": 76,
+  "run_id": "RUN-UTIL-20260922-003010",
+  "status": "IN_PROGRESS",
+  "phase": "ONE_SHOT_CANARY_FAILURE_EVIDENCE_HARDENING",
+  "objective_id": "WS-P001-002-ONE-SHOT-CANARY-REJECTION",
+  "objective": "Preserve the exact one-shot category canary failure as a distinct experimental sample and prevent it from contaminating normal RRULE or emergency-recovery comparisons.",
   "expected_useful_seconds": 300,
   "acceptance_criteria": [
-    "Startup audit recognizes explicit operator-rescheduled generations as preserved but comparison-excluded.",
-    "Turn-close summary reports operator-rescheduled generations separately from normal scheduler and recovery samples.",
-    "Focused fixtures cover complete and partial operator-rescheduled samples.",
-    "Current 00:13:08 generation is durably reconciled without inferred predecessor boundaries."
+    "Startup audit recognizes rejected one-shot canary samples as comparison-excluded.",
+    "Turn-close summary exposes a dedicated one-shot canary bucket.",
+    "Focused fixtures preserve missing BOOT_STARTED/REARM_VERIFIED as unknown.",
+    "STARTUP ledger records the 00:25:53 due and 00:27:31.651380 invocation without inventing receipts."
   ],
   "checkpointable_substeps": [
-    "Add explicit operator-rescheduled generation classification to startup audit.",
-    "Align turn-close summary generation-kind and comparison rules.",
-    "Add focused tests and run them locally.",
-    "Persist current generation evidence and close through exact SAME MAIN END+60."
+    "Add one-shot canary classification to audit and summary.",
+    "Add focused fixtures for incomplete platform-completed one-shot.",
+    "Persist STARTUP-018/019 observed boundaries and accepted useful evidence.",
+    "Close through live-verified SAME MAIN recurring END+60."
   ],
-  "current_substep": 4,
-  "handoff_boundary": "VERIFIED_SAME_MAIN_EXACT_ONE_SHOT_END_PLUS_60",
-  "early_finish_fallback": "Update the live retest evidence table with the operator-rescheduled generation and observed 98-second delivery segment.",
+  "current_substep": 1,
+  "handoff_boundary": "VERIFIED_SAME_MAIN_RECURRING_END_PLUS_60",
+  "early_finish_fallback": "Update the live retest evidence with the rejected category canary and exact observed 99-second delivery segment.",
   "created_for_next_wake": false,
-  "started_at": "2026-09-22T00:14:46+09:00",
-  "last_progress_at": "2026-09-22T00:24:53+09:00",
+  "started_at": "2026-09-22T00:30:10+09:00",
+  "last_progress_at": "2026-09-22T00:32:05+09:00",
   "progress_evidence": [
-    "BOOT_STARTED 00:14:46 for DUE:2026-09-22T00:13:08+09:00",
-    "REARM_VERIFIED 00:17:48; SAME MAIN recurring provisional due 00:27:46 enabled",
-    "Authority epoch 75 claimed without Watchdog.",
-    "Operator-rescheduled generation classification implemented with legacy compatibility.",
-    "Focused exact remote-code checks passed for current and legacy markers.",
-    "Accepted useful evidence WE-20260922-E75-001: 96 observed seconds.",
-    "Fresh v4.1 canary reconciled; live SAME MAIN exact one-shot 00:25:53 enabled with no RRULE."
+    "BOOT_STARTED 00:30:10 for DUE:00:30:39",
+    "REARM_VERIFIED 00:31:29; recurring provisional due 00:43:10 enabled",
+    "Authority epoch 76 claimed without Watchdog."
   ]
 }
