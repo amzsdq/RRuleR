@@ -64,6 +64,20 @@ Useful-work utilization is a first-class objective.
 - Never pad, sleep, split trivial changes, or invent unrelated busywork to consume time or satisfy evidence cadence.
 - Prefer units with safe checkpoint boundaries; as runtime exposure grows, shift toward smaller units rather than idling.
 
+### Forward useful-work evidence capture
+
+`state/WORK_EVIDENCE.json` is a strict acceptance ledger, not an automatic activity feed. A worker that creates qualifying substantive artifacts must keep the ledger current instead of assuming another process will discover the work later.
+
+At a natural observed boundary after materially new substantive work:
+
+1. identify the actual observed start and end boundaries; never infer missing time;
+2. identify the materially new artifact/commit/test/design evidence produced in that interval;
+3. append a non-overlapping `SUBSTANTIVE_ACCEPTED` record using `tools/append_work_evidence.py` semantics (or an equivalent validated write when direct execution is unavailable);
+4. validate the resulting ledger with `tools/validate_work_evidence.py` semantics;
+5. if either boundary is unknown, do not manufacture a record—leave the interval unknown and durably classify the measurement gap instead.
+
+Scheduler mutation, heartbeat-only state, waiting, timestamp-only changes, and evidence bookkeeping alone do not qualify as useful work. Evidence capture must follow useful work; it must never create work merely to improve the metric.
+
 ## Primary turn objective
 
 Before the first substantive action after authority acquisition, persist a primary objective with:
