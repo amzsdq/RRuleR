@@ -5,9 +5,9 @@
   "generation_key": "DUE:2026-09-21T23:52:00+09:00",
   "boot_started_at": "2026-09-21T23:50:45+09:00",
   "boot_started_authority_epoch": 74,
-  "rearm_verified_at": null,
-  "verified_provisional_due_at": null,
-  "status": "BOOT_STARTED",
-  "last_updated_at": "2026-09-21T23:52:04+09:00",
-  "note": "Early recoverable-forward MAIN invocation accepted against the newest live 23:52:00 generation; no substantive owner was active. Provisional same-canonical RRULE verification pending."
+  "rearm_verified_at": "2026-09-21T23:51:45.997376+09:00",
+  "verified_provisional_due_at": "2026-09-22T00:03:45+09:00",
+  "status": "REARM_VERIFIED",
+  "last_updated_at": "2026-09-21T23:51:45.997376+09:00",
+  "note": "Early recoverable-forward MAIN invocation accepted against the newest live 23:52:00 generation. The SAME MAIN canonical is enabled with recurring RRULE and its 00:03:45 provisional crash-insurance DTSTART was live re-read and verified."
 }
