@@ -39,7 +39,7 @@ After continuation is verified, obtain/confirm authority, persist WORKING activi
 
 ## Active scheduler policy
 
-The active mechanism is one same-canonical hourly RRULE under the rolling lifecycle. For a normal ~600-second nonterminal turn, arm the SAME MAIN once at observed wake/arm reference +660 seconds, normally leave it untouched during work, and replace it at normal close with exact observed END+60. Extend the SAME MAIN once before collision only when useful authorized work or required close handling clearly threatens the verified provisional due. The natural hourly recurrence is the built-in cold fallback. Repeated +2-minute rolling refresh and the former +780-second provisional are retired normal strategies. `UTIL-EXP-018` predictive prearm is rolled back and is historical evidence, not active authority.
+The active mechanism is one same-canonical hourly RRULE under the rolling lifecycle. For a normal 10-minute (600-second) nonterminal turn, arm the SAME MAIN once at observed wake/arm reference + exactly 11 minutes (660 seconds), normally leave it untouched during work, and replace it at normal close with ACTUAL END + exactly 1 minute (60 seconds). This means sixty seconds after observed END; it never means 60 minutes and never means the next natural hourly RRULE occurrence. Extend the SAME MAIN once before collision only when useful authorized work or required close handling clearly threatens the verified provisional due. The natural hourly recurrence is the built-in cold fallback. Repeated 2-minute (120-second) rolling refresh and the former 13-minute (780-second) provisional are retired normal strategies. `UTIL-EXP-018` predictive prearm is rolled back and is historical evidence, not active authority.
 
 Startup order:
 
@@ -47,7 +47,7 @@ Startup order:
 FRESH DURABLE STATE
  -> STALE-WAKE / GENERATION FENCE
  -> PERSIST GENERATION-MATCHED BOOT_STARTED
- -> PROVISIONAL SAME MAIN +660s ARM + LIVE VERIFY
+ -> PROVISIONAL SAME MAIN + EXACTLY 11 MINUTES (660 SECONDS) ARM + LIVE VERIFY
  -> PERSIST REARM_VERIFIED
  -> AUTHORITY / ACTIVITY RECONCILIATION
  -> USEFUL WORK
@@ -58,7 +58,7 @@ Normal close:
 ```text
 LATEST CHECKPOINT
  -> OBSERVE ACTUAL END
- -> SHIFT SAME MAIN RECURRING DTSTART TO END+60 EXACTLY
+ -> SHIFT SAME MAIN RECURRING DTSTART TO ACTUAL END + EXACTLY 1 MINUTE (60 SECONDS)
  -> LIVE VERIFY SAME CANONICAL + ENABLED + RECURRENCE + EXACT DTSTART
  -> PERSIST IDENTICAL FAST DUE TO CURRENT / ACTIVITY / HANDOFF
  -> VALIDATE NON-WORKING CLOSE PROJECTION
@@ -123,4 +123,9 @@ Immediately before any normal user-visible final response, freshly read `state/C
 
 ## Durable unit chat trace canary
 
-V5.5 adds direct operator-visible observability without changing close authority. After the SAME MAIN provisional schedule is live-verified and durably recorded, emit one compact schedule trace showing the verified due. Each bounded substantive unit may emit exactly one compact completion trace only after its observed START/END/DURATION and artifact-backed work evidence are durably persisted. The trace is evidence of a persisted unit boundary, not a task boundary, handoff, or permission to stop. While a normal nonterminal CONTINUE turn is below 600 observed elapsed seconds, immediately select and execute the next safe authorized unit after each trace. Mere reads, plans, waits, retries without completion, scheduler mutation alone, and unpersisted partial work must not produce completion traces. After normal close is live-verified on the SAME MAIN at exact observed END+60 and the durable close projection agrees, emit one compact final next-due trace.
+V5.5 adds direct operator-visible observability without changing close authority. After the SAME MAIN provisional schedule is live-verified and durably recorded, emit one compact schedule trace showing the verified due. Each bounded substantive unit may emit exactly one compact completion trace only after its observed START/END/DURATION and artifact-backed work evidence are durably persisted. The trace is evidence of a persisted unit boundary, not a task boundary, handoff, or permission to stop. While a normal nonterminal CONTINUE turn is below 10 minutes (600 observed elapsed seconds), immediately select and execute the next safe authorized unit after each trace. Mere reads, plans, waits, retries without completion, scheduler mutation alone, and unpersisted partial work must not produce completion traces. After normal close is live-verified on the SAME MAIN at ACTUAL END + exactly 1 minute (60 seconds) and the durable close projection agrees, emit one compact final next-due trace.
+
+
+## Time-unit safety
+
+All human-readable timing rules must state explicit units. Critical relay timings must state both the human unit and exact seconds, for example `1 minute (60 seconds)`, `10 minutes (600 seconds)`, `11 minutes (660 seconds)`, `12 minutes (720 seconds)`, and `3 minutes (180 seconds)`. Bare time arithmetic such as `END+60`, `NOW+180`, `+660`, or `600 floor` is forbidden. Numeric machine fields ending in `_seconds` are seconds by schema, but adjacent explanatory prose must still state the unit. `RRULE:FREQ=HOURLY` is recurrence metadata and does not convert explicit second offsets into minutes or hours.
