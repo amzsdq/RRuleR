@@ -3,15 +3,15 @@
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "status": "WORKING",
-  "active_run_id": "RUN-UTIL-20260921-223441",
+  "status": "HANDOFF_READY",
+  "active_run_id": null,
   "authority_epoch": 73,
   "substantive_work_started_at": "2026-09-21T22:36:46+09:00",
   "last_progress_at": "2026-09-21T22:45:51+09:00",
-  "last_progress_kind": "VALIDATED_CLOSE_PROJECTION_AND_RECOVERY_LEDGER",
-  "current_unit": "Close epoch 73 with consistent HANDOFF_READY projection.",
-  "next_wake_due_at": "2026-09-21T22:48:28+09:00",
-  "successor_observed": true,
-  "handoff_ready": false,
-  "operator_ui_note": "Epoch 73 owns substantive work; provisional MAIN and Watchdog protection are verified."
+  "last_progress_kind": "TURN_CLOSED_WITH_VERIFIED_CONTINUATION",
+  "current_unit": "Await generation-matched successor bootstrap.",
+  "next_wake_due_at": "2026-09-21T22:47:28+09:00",
+  "successor_observed": false,
+  "handoff_ready": true,
+  "operator_ui_note": "Epoch 73 is closed; no substantive owner is active. Same MAIN is verified for 22:47:28 and Watchdog for 22:50:28."
 }
