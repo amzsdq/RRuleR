@@ -4,7 +4,7 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "authority_epoch": 75,
   "run_id": "RUN-UTIL-20260922-001446",
-  "status": "IN_PROGRESS",
+  "status": "COMPLETE",
   "phase": "OPERATOR_RESCHEDULED_GENERATION_EVIDENCE_HARDENING",
   "objective_id": "WS-P001-002-OPERATOR-RESCHEDULE-CLASSIFICATION",
   "objective": "Prevent explicit operator-rescheduled MAIN generations from contaminating normal END+60 scheduler comparisons while retaining their observed startup-stage evidence.",
@@ -21,15 +21,19 @@
     "Add focused tests and run them locally.",
     "Persist current generation evidence and close through exact SAME MAIN END+60."
   ],
-  "current_substep": 1,
-  "handoff_boundary": "VERIFIED_SAME_MAIN_END_PLUS_60",
+  "current_substep": 4,
+  "handoff_boundary": "VERIFIED_SAME_MAIN_EXACT_ONE_SHOT_END_PLUS_60",
   "early_finish_fallback": "Update the live retest evidence table with the operator-rescheduled generation and observed 98-second delivery segment.",
   "created_for_next_wake": false,
   "started_at": "2026-09-22T00:14:46+09:00",
-  "last_progress_at": "2026-09-22T00:18:31+09:00",
+  "last_progress_at": "2026-09-22T00:24:53+09:00",
   "progress_evidence": [
     "BOOT_STARTED 00:14:46 for DUE:2026-09-22T00:13:08+09:00",
     "REARM_VERIFIED 00:17:48; SAME MAIN recurring provisional due 00:27:46 enabled",
-    "Authority epoch 75 claimed without Watchdog."
+    "Authority epoch 75 claimed without Watchdog.",
+    "Operator-rescheduled generation classification implemented with legacy compatibility.",
+    "Focused exact remote-code checks passed for current and legacy markers.",
+    "Accepted useful evidence WE-20260922-E75-001: 96 observed seconds.",
+    "Fresh v4.1 canary reconciled; live SAME MAIN exact one-shot 00:25:53 enabled with no RRULE."
   ]
 }
