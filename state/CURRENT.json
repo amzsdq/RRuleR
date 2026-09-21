@@ -30,13 +30,13 @@
       "live SAME MAIN enabled recurring FREQ=HOURLY DTSTART 2026-09-22T01:50:05+09:00"
     ],
     "observation": "The long visible continuation gap was policy-induced rather than a scheduler minimum. The repaired v5.4 path retained crash insurance without the former +780s horizon and completed normal close on the SAME recurring MAIN at exact END+60.",
-    "next_action": "Operator restarted MAIN for the v5.5 durable-unit chat-trace canary. Expected wake 02:01:20 KST. On wake: fresh BOOT_STARTED -> SAME MAIN provisional live verify -> schedule trace -> durably evidenced bounded units with one completion trace each and same-wake continuation -> >=600s -> exact END+60 live verify -> final due trace."
+    "next_action": "Operator restarted MAIN for the v5.5 durable-unit chat-trace canary. Expected wake 02:04:10 KST. On wake: fresh BOOT_STARTED -> SAME MAIN provisional live verify -> schedule trace -> durably evidenced bounded units with one completion trace each and same-wake continuation -> >=600s -> exact END+60 live verify -> final due trace."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_COMPLETION_RELATIVE_MAIN",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-22T02:01:20+09:00",
+    "next_due_at": "2026-09-22T02:04:10+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 600,
     "provisional_safety_margin_seconds": 60,
