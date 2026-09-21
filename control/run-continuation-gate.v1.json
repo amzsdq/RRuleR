@@ -1,6 +1,6 @@
 {
   "policy_id": "RRULER_RUN_CONTINUATION_GATE",
-  "version": 12,
+  "version": 13,
   "status": "ACTIVE",
   "purpose": "Allow normal CONTINUE close only after the current operator-created SAME MAIN recurring schedule is live-verified at exact END+60. Watchdog is not normal continuity.",
   "program_nonterminal_states": [
@@ -30,7 +30,8 @@
     "PLAN_COMPLETE",
     "NO_OBVIOUS_NEXT_TASK",
     "WAITING_FOR_NEXT_WAKE",
-    "SCHEDULE_BOUNDARY"
+    "SCHEDULE_BOUNDARY",
+    "USER_VISIBLE_PROGRESS_TRACE_EMITTED"
   ],
   "bounded_turn_close_rule": {
     "required_before_verified_continuation_end": [
@@ -77,7 +78,9 @@
     "provisional_due_left_after_close_is_incident": "NORMAL_CLOSE_LEFT_PROVISIONAL_DUE",
     "watchdog_as_expected_successor_is_incident": "NORMAL_PATH_DEPENDED_ON_WATCHDOG",
     "normal_path_depends_on_watchdog_forbidden": true,
-    "retired_predecessor_reactivation_forbidden": true
+    "retired_predecessor_reactivation_forbidden": true,
+    "progress_trace_never_authorizes_close": true,
+    "unit_completion_trace_requires_durable_duration_and_work_evidence": true
   },
   "final_response_is_authoritative_side_effect": true,
   "pre_final_authorization": {
@@ -101,6 +104,7 @@
     "order": [
       "Honor operator pause/STOP before work and scheduler mutation.",
       "After each completed bounded unit, choose the next primary, independent fallback, then smallest authorized runnable unit.",
+      "After each bounded substantive unit completes, persist its observed START/END/DURATION and artifact-backed work evidence, emit exactly one compact completion trace, then continue same-wake selection; the trace never authorizes close.",
       "If elapsed <600s and a clear low-risk checkpointable unit fits the remaining platform safety budget, execute it in the same turn.",
       "If elapsed <600s and the obvious next unit is too large, decompose it and execute a smaller safe slice when possible.",
       "A normal nonterminal STATUS=CONTINUE voluntary close before 600s is forbidden. CI pending, local packet/substep/checkpoint completion, secured continuation, or no-obvious-next-task are not close reasons.",
@@ -122,7 +126,8 @@
       "before_target": "Before 600 elapsed seconds, continue authorized work by selecting the next clear low-risk checkpointable unit, independent fallback, residual unit, or smaller decomposed slice. Voluntary normal CONTINUE close is forbidden.",
       "decompose_if_needed": "If the obvious next unit is too large or risky, select a smaller safe slice with an explicit checkpoint.",
       "after_target": "At or after 600 elapsed seconds, do not start a new large unit; finish only the smallest safe in-flight unit, checkpoint, verify continuation, and close.",
-      "soft_ceiling": "Normal operation should close by about 720 elapsed seconds. Exceed only for a genuine in-flight atomicity/safety reason."
+      "soft_ceiling": "Normal operation should close by about 720 elapsed seconds. Exceed only for a genuine in-flight atomicity/safety reason.",
+      "chat_trace": "A completed bounded unit gets one user-visible trace only after durable duration/work evidence exists; then same-wake work selection continues. Progress chat is not a task boundary or close signal."
     },
     "normal_continue_minimum_elapsed_seconds": 600,
     "pre_600_voluntary_continue_close_forbidden": true
