@@ -1,6 +1,80 @@
 {
-  "schema_version":"1.0","repository":"amzsdq/RRuleR","program_id":"RRULER-PROGRAM-001","program_status":"CONTINUE","root_job_id":"RRULER-UTILIZATION-003","root_goal":"P0 sustained evidenced useful-work coverage","status":"CONTINUE","current_owner":null,"authority_epoch":79,"canonical_automation_id":"6ab152b636748191a71873ba4d5ef551","run_state":"HANDOFF_COMMITTED",
-  "checkpoint":{"id":"CP-UTILIZATION-120","state":"CONTINUE","completed":["Fresh-policy sync and 600-second voluntary normal-CONTINUE hard floor aligned across active authority, tests and operational docs.","Pre-v5.2 repository rollback baseline preserved without permitting retired canonical reactivation.","Historical pre-hard-floor runs preserved without retroactive rewriting.","Current MAIN prompt advanced concurrently to v5.3 short rolling provisional; the 600-second hard floor and fresh-policy sync remain intact.","This bounded turn exceeded the 600-second floor and normal-close SAME MAIN was live-verified enabled recurring at exact observed END+60 = 01:30:15 KST."],"evidence":["control/ACTIVE_CONTROLS.json@2.11","control/run-continuation-gate.v1.json@v12","control/relay-policy.v1.json@revision17","planning/evidence/MAIN-V5.2-POLICY-SYNC-ROLLBACK.md","rollback/pre-policy-sync-bootstrap-20260922@e34d0a61483621ac85285d2993fd2737552789d7","MAIN canonical 6ab152b636748191a71873ba4d5ef551 live schedule DTSTART 20260922T013015 Asia/Seoul + RRULE:FREQ=HOURLY"],"observation":"Active authority no longer treats 480/8 minutes as a normal floor or allows voluntary pre-600 normal CONTINUE close. Stale quarter/14+1 operational documentation was superseded. v5.3 short rolling provisional is newer than this turn's initial v5.2 bootstrap and was preserved rather than overwritten.","next_action":"At next SAME MAIN wake, read fresh NOW/ACTIVE_CONTROLS, follow v5.3 short rolling provisional, and resume WS-P001-002 prospective utilization evidence under the 600-second hard floor."},
-  "continuation":{"mechanism":"RRULE_HOURLY_COMPLETION_RELATIVE_MAIN","lifecycle_policy":"control/rolling-rrule-lifecycle.v1.json","rrule_frequency":"HOURLY","next_due_at":"2026-09-22T01:30:15+09:00","target_useful_work_seconds":600,"minimum_continue_work_seconds":600,"provisional_safety_margin_seconds":45,"provisional_due_offset_seconds":120,"final_rearm_offset_seconds":60,"predictive_prearm_active":false,"fixed_quarter_cycle_active":false,"root_completion_is_stop_condition":false,"program_terminal_disabled_required":true,"active_control_registry":"control/ACTIVE_CONTROLS.json","scheduler_fence_policy":"control/scheduler-fence.v1.json","run_continuation_gate_policy":"control/run-continuation-gate.v1.json","normal_continue_due_rule":"ACTUAL_OBSERVED_TURN_END_PLUS_EXACTLY_60_SECONDS","startup_watchdog":{"canonical_id":"6ab11b3af3608191b68dcec5e3fed081","policy_ref":"control/startup-watchdog.v1.json","state_ref":"state/WATCHDOG.json","ack_ref":"state/STARTUP_ACK.json","mode":"DISABLED_BREAK_GLASS_STANDBY","coverage":"NOT_REQUIRED_FOR_NORMAL_CONTINUITY","next_watchdog_due_at":null,"enabled_verified":false,"policy_version":8},"next_due_source":"VERIFIED_EXACT_END_PLUS_60_LIVE_MAIN","cold_fallback":"SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE","provisional_refresh_guard_seconds":45,"provisional_refresh_offset_seconds":120},
-  "safety":{"public_repo":true,"secrets_allowed":false,"reference_repo_amzsdq_R":"READ_ONLY"},"program_goal":{"primary":"Production-oriented autonomous agent runtime/control plane.","p0":"Maximize sustained evidenced useful-work coverage while minimizing normal continuation gaps without weakening cold-rescue safety.","authority_scope":"RRuleR repository changes authorized subject to platform and repository safety constraints."}
+  "schema_version": "1.0",
+  "repository": "amzsdq/RRuleR",
+  "program_id": "RRULER-PROGRAM-001",
+  "program_status": "CONTINUE",
+  "root_job_id": "RRULER-UTILIZATION-003",
+  "root_goal": "P0 sustained evidenced useful-work coverage",
+  "status": "CONTINUE",
+  "current_owner": null,
+  "authority_epoch": 79,
+  "canonical_automation_id": "6ab152b636748191a71873ba4d5ef551",
+  "run_state": "HANDOFF_COMMITTED",
+  "checkpoint": {
+    "id": "CP-UTILIZATION-120",
+    "state": "CONTINUE",
+    "completed": [
+      "Fresh-policy sync and 600-second voluntary normal-CONTINUE hard floor aligned across active authority, tests and operational docs.",
+      "Pre-v5.2 repository rollback baseline preserved without permitting retired canonical reactivation.",
+      "Historical pre-hard-floor runs preserved without retroactive rewriting.",
+      "Current MAIN prompt advanced concurrently to v5.3 short rolling provisional; the 600-second hard floor and fresh-policy sync remain intact.",
+      "This bounded turn exceeded the 600-second floor and normal-close SAME MAIN was live-verified enabled recurring at exact observed END+60 = 01:30:15 KST.",
+      "Rejected temporary v5.3 +2m short-rolling strategy after prior controlled A/B evidence showed overlap; adopted evidence-backed v5.4 +11m adaptive provisional.",
+      "01:30:15 occurrence produced last_run_time around 01:30:17 but no new generation-matched BOOT_STARTED by >01:33; invocation metadata was not promoted to bootstrap success."
+    ],
+    "evidence": [
+      "control/ACTIVE_CONTROLS.json@2.11",
+      "control/run-continuation-gate.v1.json@v12",
+      "control/relay-policy.v1.json@revision17",
+      "planning/evidence/MAIN-V5.2-POLICY-SYNC-ROLLBACK.md",
+      "rollback/pre-policy-sync-bootstrap-20260922@e34d0a61483621ac85285d2993fd2737552789d7",
+      "MAIN canonical 6ab152b636748191a71873ba4d5ef551 live schedule DTSTART 20260922T013015 Asia/Seoul + RRULE:FREQ=HOURLY"
+    ],
+    "observation": "Active authority no longer treats 480/8 minutes as a normal floor or allows voluntary pre-600 normal CONTINUE close. Stale quarter/14+1 operational documentation was superseded. v5.3 short rolling provisional is newer than this turn's initial v5.2 bootstrap and was preserved rather than overwritten.",
+    "next_action": "Wake SAME MAIN at operator-recovery due 01:38:00 KST; require generation-matched BOOT_STARTED, then arm SAME MAIN once at wake+660s and continue under 600s hard floor."
+  },
+  "continuation": {
+    "mechanism": "RRULE_HOURLY_COMPLETION_RELATIVE_MAIN",
+    "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
+    "rrule_frequency": "HOURLY",
+    "next_due_at": "2026-09-22T01:38:00+09:00",
+    "target_useful_work_seconds": 600,
+    "minimum_continue_work_seconds": 600,
+    "provisional_safety_margin_seconds": 60,
+    "provisional_due_offset_seconds": 660,
+    "final_rearm_offset_seconds": 60,
+    "predictive_prearm_active": false,
+    "fixed_quarter_cycle_active": false,
+    "root_completion_is_stop_condition": false,
+    "program_terminal_disabled_required": true,
+    "active_control_registry": "control/ACTIVE_CONTROLS.json",
+    "scheduler_fence_policy": "control/scheduler-fence.v1.json",
+    "run_continuation_gate_policy": "control/run-continuation-gate.v1.json",
+    "normal_continue_due_rule": "ACTUAL_OBSERVED_TURN_END_PLUS_EXACTLY_60_SECONDS",
+    "startup_watchdog": {
+      "canonical_id": "6ab11b3af3608191b68dcec5e3fed081",
+      "policy_ref": "control/startup-watchdog.v1.json",
+      "state_ref": "state/WATCHDOG.json",
+      "ack_ref": "state/STARTUP_ACK.json",
+      "mode": "DISABLED_BREAK_GLASS_STANDBY",
+      "coverage": "NOT_REQUIRED_FOR_NORMAL_CONTINUITY",
+      "next_watchdog_due_at": null,
+      "enabled_verified": false,
+      "policy_version": 8
+    },
+    "next_due_source": "OPERATOR_RECOVERY_AFTER_INVOCATION_WITHOUT_BOOT_ACK",
+    "cold_fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE",
+    "provisional_extension_guard_seconds": 90,
+    "provisional_extension_offset_seconds": 180
+  },
+  "safety": {
+    "public_repo": true,
+    "secrets_allowed": false,
+    "reference_repo_amzsdq_R": "READ_ONLY"
+  },
+  "program_goal": {
+    "primary": "Production-oriented autonomous agent runtime/control plane.",
+    "p0": "Maximize sustained evidenced useful-work coverage while minimizing normal continuation gaps without weakening cold-rescue safety.",
+    "authority_scope": "RRuleR repository changes authorized subject to platform and repository safety constraints."
+  }
 }
