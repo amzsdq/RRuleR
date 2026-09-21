@@ -2,16 +2,16 @@
   "schema_version": "1.0",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
+  "canonical_automation_id": "6ab14f7951848191b65e4b5d4bc979d8",
   "status": "HANDOFF_READY",
   "active_run_id": null,
   "authority_epoch": 76,
   "substantive_work_started_at": "2026-09-22T00:32:05+09:00",
-  "last_progress_at": "2026-09-22T00:39:00+09:00",
-  "last_progress_kind": "ONE_SHOT_REJECTION_AND_CUSTOM_RECURRING_INTEGRATION_COMPLETE",
-  "current_unit": "Await custom recurring category canary successor.",
-  "next_wake_due_at": "2026-09-22T00:41:36+09:00",
+  "last_progress_at": "2026-09-22T00:45:22+09:00",
+  "last_progress_kind": "OPERATOR_CANONICAL_MIGRATION_COMMITTED",
+  "current_unit": "Await operator-created MAIN canonical successor.",
+  "next_wake_due_at": "2026-09-22T01:38:00+09:00",
   "successor_observed": false,
   "handoff_ready": true,
-  "operator_ui_note": "Epoch 76 closed after live-verifying SAME MAIN custom recurring END+60 and enabled=true. Watchdog unused."
+  "operator_ui_note": "Old MAIN retired. New operator-created hourly MAIN is authoritative; Watchdog remains disabled standby."
 }
