@@ -392,6 +392,20 @@
       "qualification": "SUBSTANTIVE_ACCEPTED",
       "basis": "Added a dedicated rejected-one-shot canary class and report bucket so the platform-completed one-shot cannot contaminate normal RRULE, operator-rescheduled, or emergency-recovery comparisons. Missing BOOT_STARTED/REARM_VERIFIED remain unknown. Exact remote-code behavior checks passed. Start is the observed substantive-work boundary persisted with the epoch claim; end is the observed final test commit boundary.",
       "observed_seconds": 91
+    },
+    {
+      "record_id": "WE-20260922-E76-002",
+      "authority_epoch": 76,
+      "run_id": "RUN-UTIL-20260922-003010",
+      "start_at": "2026-09-22T00:33:36+09:00",
+      "end_at": "2026-09-22T00:39:00+09:00",
+      "start_boundary": "OBSERVED",
+      "end_boundary": "OBSERVED",
+      "kind": "schedule_category_canary_result_and_custom_recurring_integration",
+      "artifact": "state/SUCCESSOR_STARTUP.json@9f66357 + state/P0_SCORECARD.json@5f32fd4 + state/EXPERIMENTS.jsonl@6e1440a + planning/evidence/TURN-CLOSE-V4-RETEST.md@15eec87 + control/relay-policy.v1.json@d7fcf40 + control/scheduler-fence.v1.json@f0ebe17 + .github/workflows/validate-control-plane.yml@8933189",
+      "qualification": "SUBSTANTIVE_ACCEPTED",
+      "basis": "Recorded the rejected exact one-shot canary as a distinct observed sample, updated the experiment and P0 scorecard, ran 23 exact-remote-source tests plus the full live-ledger audit, then reconciled relay policy, scheduler fence, and CI to the fresh custom recurring 24-hour-slot canary. All five direct custom-recurring semantic checks passed. Boundaries are observed commit timestamps; no later close time is counted.",
+      "observed_seconds": 324
     }
   ],
   "collection": {
