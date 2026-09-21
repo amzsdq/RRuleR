@@ -1,12 +1,7 @@
 {
-  "schema_version":"1.0",
-  "program_id":"RRULER-PROGRAM-001",
-  "purpose":"Keep scheduler delivery jitter separate from reasoning-worker utilization so P0 diagnosis does not blame the wrong layer.",
-  "observations":[
-    {"expected_due_at":"2026-09-21T00:45:00+09:00","observed_at":"2026-09-21T00:46:08+09:00","delivery_offset_seconds":68,"source":"durable handoff successor_observed_at"},
-    {"expected_due_at":"2026-09-21T01:00:00+09:00","observed_at":"2026-09-21T00:59:19+09:00","delivery_offset_seconds":-41,"source":"automation run context and durable successor observation"}
-  ],
-  "derived":{"sample_count":2,"min_offset_seconds":-41,"max_offset_seconds":68,"range_seconds":109,"absolute_offset_max_seconds":68},
-  "interpretation":"The scheduler boundary is not an exact wall-clock handoff boundary even under exact_schedule. Utilization measurement must use actual worker/successor observations, while expected due remains a fencing/recovery reference. A 60-second handoff margin can be consumed by observed delivery jitter, so faster event/overlap continuation remains strategically important even if the hard continuation gate succeeds.",
-  "next_action":"Append each successor expected/observed pair. After >=10 samples compute median and p90 absolute delivery offset and use it to size scheduled fallback overlap margin without changing the event-driven fast-path goal."
+  "schema_version":"1.1","program_id":"RRULER-PROGRAM-001","purpose":"Keep scheduler/provider delivery jitter separate from reasoning-worker utilization and from the local normal-close offset so P0 diagnosis does not blame the wrong layer.",
+  "observations":[{"expected_due_at":"2026-09-21T00:45:00+09:00","observed_at":"2026-09-21T00:46:08+09:00","delivery_offset_seconds":68,"source":"durable handoff successor_observed_at"},{"expected_due_at":"2026-09-21T01:00:00+09:00","observed_at":"2026-09-21T00:59:19+09:00","delivery_offset_seconds":-41,"source":"automation run context and durable successor observation"},{"authority_epoch":83,"expected_due_at":"2026-09-22T07:07:30+09:00","observed_at":"2026-09-22T07:09:13+09:00","delivery_offset_seconds":103,"human_offset":"1 minute 43 seconds (103 seconds) late","source":"automation run context plus generation-matched BOOT_STARTED"}],
+  "derived":{"sample_count":3,"min_offset_seconds":-41,"max_offset_seconds":103,"range_seconds":144,"absolute_offset_max_seconds":103},
+  "interpretation":"The scheduler/provider boundary is not an exact wall-clock handoff boundary even under exact_schedule. Epoch 83 was observed 1 minute 43 seconds (103 seconds) after its due, which is larger than the local normal-close offset of exactly 1 minute (60 seconds). These are different quantities: the local rearm must remain exact and live-verified, while provider delivery is measured as an external delay. Utilization measurement uses actual worker/successor observations; expected due remains a fencing/recovery reference.",
+  "next_action":"Append comparable normal successor expected/observed pairs. Do not tune from only three heterogeneous samples. Keep P0-B split into local exact rearm correctness and separately observed provider delivery/startup latency."
 }
