@@ -1,0 +1,75 @@
+{
+  "policy_id": "RRULER_STARTUP_WATCHDOG",
+  "version": 1,
+  "status": "ACTIVE",
+  "purpose": "Close the pre-bootstrap availability gap that the MAIN worker's own provisional rearm cannot cover.",
+  "role": "LIVENESS_AND_PREBOOTSTRAP_RECOVERY_ONLY",
+  "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
+  "watchdog_canonical_id": "6ab11b3af3608191b68dcec5e3fed081",
+  "scheduler_mode": "ONE_SHOT_SELF_RELAY",
+  "substantive_work_forbidden": true,
+  "source_of_truth": "FRESH_GITHUB_DURABLE_STATE",
+  "normal_monitoring": {
+    "watchdog_due_rule": "FRESH_MAIN_EXPECTED_DUE_PLUS_180_SECONDS",
+    "startup_grace_seconds": 180,
+    "recovery_recheck_seconds": 240,
+    "main_recovery_due_offset_seconds": 60,
+    "rationale": "Allow ordinary provider delivery jitter while bounding a missing-bootstrap hole far below the hourly RRULE fallback."
+  },
+  "startup_receipts": {
+    "path": "state/STARTUP_ACK.json",
+    "required": [
+      "BOOT_STARTED",
+      "REARM_VERIFIED"
+    ],
+    "boot_started_rule": "MAIN writes BOOT_STARTED immediately after minimum fresh NOW/CURRENT/canonical/fence validation and before provisional arm/full restore/substantive work.",
+    "rearm_verified_rule": "MAIN writes REARM_VERIFIED immediately after same-canonical provisional continuation is successfully mutated and verified.",
+    "generation_key": "main_expected_due_at plus newest durable schedule/authority generation available at bootstrap; missing data must remain unknown rather than inferred."
+  },
+  "classifications": {
+    "HEALTHY_BOOTSTRAP": "Generation-matched BOOT_STARTED and REARM_VERIFIED exist, or newer unambiguous durable state proves bootstrap and continuation succeeded.",
+    "STARTUP_ACK_MISSING": "now >= MAIN expected_due + 180s and no generation-matched BOOT_STARTED/equivalent newer bootstrap evidence exists.",
+    "BOOTSTRAP_REARM_MISSING": "BOOT_STARTED exists but REARM_VERIFIED/newer verified continuation does not exist after the configured grace.",
+    "WATCHDOG_AMBIGUOUS": "Pause/terminal state, authority, due generation, receipts, or live MAIN metadata conflict enough that mutation cannot be proven safe."
+  },
+  "actions": {
+    "HEALTHY_BOOTSTRAP": [
+      "DO_NOT_MUTATE_MAIN",
+      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_FRESH_MAIN_EXPECTED_DUE_PLUS_180S"
+    ],
+    "STARTUP_ACK_MISSING": [
+      "REARM_SAME_MAIN_CANONICAL_TO_NOW_PLUS_60S",
+      "VERIFY_MAIN_ENABLED_AND_DUE",
+      "PERSIST_WATCHDOG_RECOVERY",
+      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S"
+    ],
+    "BOOTSTRAP_REARM_MISSING": [
+      "REARM_SAME_MAIN_CANONICAL_TO_NOW_PLUS_60S_WHEN_FENCE_PERMITS",
+      "VERIFY_MAIN_ENABLED_AND_DUE",
+      "PERSIST_WATCHDOG_RECOVERY",
+      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S"
+    ],
+    "WATCHDOG_AMBIGUOUS": [
+      "FAIL_CLOSED_ON_MAIN_MUTATION",
+      "PERSIST_AMBIGUITY",
+      "UPDATE_SAME_WATCHDOG_ONE_SHOT_TO_NOW_PLUS_240S"
+    ]
+  },
+  "main_sync_contract": {
+    "normal_close": "After MAIN verifies its own END+60 successor and persists the fresh expected due, MAIN must pull the SAME Watchdog one-shot to MAIN expected_due +180s and persist the Watchdog due.",
+    "failure_semantics": "Watchdog sync failure does not invalidate an already verified MAIN continuation, but must be recorded as DEGRADED_WATCHDOG_COVERAGE and retried once when safe.",
+    "pause_terminal": "Explicit operator PAUSED/STOP or durable program terminal prevents Watchdog from waking MAIN."
+  },
+  "prompt_sync_contract": {
+    "rule": "GitHub policy is authoritative. Each Watchdog wake applies fresh policy first. If the embedded stable kernel materially differs, update the SAME Watchdog prompt in that run. MAIN prompt must carry the same startup-receipt and Watchdog-sync kernel.",
+    "replacement_forbidden": true,
+    "rrule_for_watchdog_forbidden": true
+  },
+  "safety": {
+    "duplicate_substantive_work_forbidden": true,
+    "watchdog_never_claims_substantive_authority": true,
+    "replacement_main_forbidden": true,
+    "replacement_watchdog_forbidden": true,
+    "stale_generation_rollback_forbidden": true
+  }
+}
