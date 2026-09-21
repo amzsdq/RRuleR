@@ -7,11 +7,11 @@
   "active_run_id": "RUN-UTIL-20260921-215434",
   "authority_epoch": 71,
   "substantive_work_started_at": "2026-09-21T21:56:39+09:00",
-  "last_progress_at": "2026-09-21T22:05:25+09:00",
-  "last_progress_kind": "ARTIFACT_BACKED_IMPLEMENTATION",
-  "current_unit": "Checkpoint complete; exact END+60 MAIN and enabled Watchdog continuation verification in progress.",
-  "next_wake_due_at": "2026-09-21T22:09:11+09:00",
+  "last_progress_at": "2026-09-21T22:06:23+09:00",
+  "last_progress_kind": "TURN_CLOSED_VERIFIED_CONTINUATION",
+  "current_unit": "Closed; successor due 22:07:23 KST.",
+  "next_wake_due_at": "2026-09-21T22:07:23+09:00",
   "successor_observed": true,
-  "handoff_ready": false,
-  "operator_ui_note": "Epoch 71 completed recovery reporting and receipt identity fencing; continuation close is in progress."
+  "handoff_ready": true,
+  "operator_ui_note": "Epoch 71 closed after 709s; same MAIN and Watchdog enabled and verified."
 }
