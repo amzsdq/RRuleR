@@ -29,21 +29,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
         run: |
-          python - <<'PY'
-          import json, os, urllib.request
-          from datetime import datetime, timezone
-          def get(path):
-              req=urllib.request.Request(f'https://api.github.com/repos/{os.environ["REPO"]}/contents/{path}?ref=main',headers={'Authorization':f'Bearer {os.environ["GH_TOKEN"]}','Accept':'application/vnd.github.raw+json'})
-              with urllib.request.urlopen(req) as r: return json.load(r)
-          current=get('state/CURRENT.json'); activity=get('state/ACTIVITY.json'); ledger=get('state/EVENT_WAKE_LEDGER.json')
-          enabled=ledger.get('status')=='ACTIVE' and current.get('program_status') in {'CONTINUE','DEGRADED_CONTINUATION'}
-          stale=False
-          if enabled and activity.get('last_progress_at'):
-              t=datetime.fromisoformat(activity['last_progress_at']); stale=(datetime.now(timezone.utc)-t.astimezone(timezone.utc)).total_seconds() >= 180
-          outstanding=ledger.get('outstanding_generation'); emit=enabled and stale and outstanding in (None,0)
-          with open(os.environ['GITHUB_OUTPUT'],'a') as f: f.write(f'emit={str(emit).lower()}\n')
-          print(json.dumps({'enabled':enabled,'stale':stale,'outstanding_generation':outstanding,'emit':emit}))
-          PY
+          set -euo pipefail
+          mkdir -p /tmp/rruler/tools /tmp/rruler/state
+          fetch() { curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/$1?ref=main" -o "/tmp/rruler/$1"; }
+          for p in state/CURRENT.json state/ACTIVITY.json state/EVENT_WAKE_LEDGER.json state/SUCCESSOR_STARTUP.json; do fetch "$p"; done
+          fetch tools/evaluate_event_rescue.py
+          result=$(python /tmp/rruler/tools/evaluate_event_rescue.py /tmp/rruler/state/CURRENT.json /tmp/rruler/state/ACTIVITY.json /tmp/rruler/state/EVENT_WAKE_LEDGER.json /tmp/rruler/state/SUCCESSOR_STARTUP.json --as-of "$(date -Iseconds)")
+          emit=$(jq -r '.emit' <<<"$result")
+          reason=$(jq -r '.event_reason // ""' <<<"$result")
+          printf 'emit=%s\\nreason=%s\\n' "$emit" "$reason" >> "$GITHUB_OUTPUT"
+          printf '%s\\n' "$result"
       - name: Emit one bounded PR-lane event
         if: steps.gate.outputs.emit == 'true'
         shell: bash
@@ -57,7 +52,7 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           mkdir -p .rruler-event-lane
-          printf '{"producer":"ACTIONS_RESCUE_PULSE","emitted_at":"%s","reason":"STALE_ACTIVE_OWNER"}\n' "$(date -u +%FT%TZ)" > .rruler-event-lane/rescue-pulse.json
+          printf '{"producer":"ACTIONS_RESCUE_PULSE","emitted_at":"%s","reason":"${{ steps.gate.outputs.reason }}"}\n' "$(date -u +%FT%TZ)" > .rruler-event-lane/rescue-pulse.json
           git add .rruler-event-lane/rescue-pulse.json
           git commit -m 'event-wake: guarded stale-owner rescue pulse'
           git push origin HEAD:event-wake-lab
