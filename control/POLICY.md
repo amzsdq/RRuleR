@@ -131,3 +131,8 @@ RRuleR is public-safe durable state. Never persist credentials, cookies, private
 ## Pre-final authorization gate
 
 Immediately before any normal user-visible final response, freshly read `state/CURRENT.json`, `state/HANDOFF.json`, and `control/run-continuation-gate.v1.json`. If the program is non-terminal and no allowlisted run-end condition exists, final response and voluntary run end are forbidden; select and execute the next useful admissible unit instead.
+
+
+## Durable unit chat trace canary
+
+V5.5 adds direct operator-visible observability without changing close authority. After the SAME MAIN provisional schedule is live-verified and durably recorded, emit one compact schedule trace showing the verified due. Each bounded substantive unit may emit exactly one compact completion trace only after its observed START/END/DURATION and artifact-backed work evidence are durably persisted. The trace is evidence of a persisted unit boundary, not a task boundary, handoff, or permission to stop. While a normal nonterminal CONTINUE turn is below 600 observed elapsed seconds, immediately select and execute the next safe authorized unit after each trace. Mere reads, plans, waits, retries without completion, scheduler mutation alone, and unpersisted partial work must not produce completion traces. After normal close is live-verified on the SAME MAIN at exact observed END+60 and the durable close projection agrees, emit one compact final next-due trace.
