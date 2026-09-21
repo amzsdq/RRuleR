@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
   "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "current_expected_due_at": "2026-09-21T22:07:23+09:00",
-  "generation_key": "DUE:2026-09-21T22:07:23+09:00",
+  "current_expected_due_at": "2026-09-21T22:13:24+09:00",
+  "generation_key": "DUE:2026-09-21T22:13:24+09:00",
   "boot_started_at": null,
   "boot_started_authority_epoch": null,
   "rearm_verified_at": null,
   "verified_provisional_due_at": null,
-  "status": "EXPECTED",
-  "last_updated_at": "2026-09-21T22:06:23+09:00",
-  "note": "Epoch 71 closed with same MAIN enabled at exact END+60. Successor must write generation-matched BOOT_STARTED and REARM_VERIFIED; no receipt is inferred."
+  "status": "RECOVERY_EXPECTED",
+  "last_updated_at": "2026-09-21T22:12:24+09:00",
+  "note": "STARTUP_ACK_MISSING for the 22:07:23 generation. Same MAIN canonical rearmed enabled for 22:13:24; successor must write fresh generation-matched receipts."
 }
