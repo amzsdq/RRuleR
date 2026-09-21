@@ -2,37 +2,37 @@
   "schema_version": "1.1",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "authority_epoch": 79,
-  "run_id": "RUN-UTIL-20260922-011852",
+  "authority_epoch": 80,
+  "run_id": "RUN-UTIL-20260922-013717",
   "status": "ACTIVE",
-  "phase": "V5_2_POLICY_SYNC_AND_600S_HARD_FLOOR_RECONCILIATION",
-  "objective_id": "WS-P001-002-POLICY-SYNC-HARD-FLOOR",
-  "objective": "Make the reservation bootstrap and fresh durable controls agree that dynamic policy is reloaded every wake and a normal nonterminal CONTINUE cannot voluntarily close before 600 observed elapsed seconds.",
+  "phase": "V5_4_ADAPTIVE_PROVISIONAL_LIVE_VERIFICATION",
+  "objective_id": "WS-P001-002-V5.4-PROVISIONAL",
+  "objective": "Verify the repaired SAME-MAIN provisional horizon in live operation: +660s once for a normal 600s turn, no routine +2m rolling refresh, exact END+60 normal close, and no regression of the 600s hard floor.",
   "expected_useful_seconds": 600,
   "acceptance_criteria": [
-    "Current MAIN bootstrap explicitly performs fresh ACTIVE_CONTROLS policy sync before substantive work.",
-    "run-continuation-gate and utilization envelope encode a 600-second normal CONTINUE hard floor.",
-    "AGENTS and active WS-P001-002 contain no 8-minute normal-floor or pre-600 normal-CONTINUE exception semantics.",
-    "Rollback baseline remains available at rollback/pre-policy-sync-bootstrap-20260922.",
-    "Normal close still requires same MAIN exact END+60 with recurrence preserved."
+    "Generation-matched BOOT_STARTED and REARM_VERIFIED are durable for the 01:38 generation.",
+    "Live authoritative MAIN is enabled recurring FREQ=HOURLY at verified provisional due 01:48:17 KST.",
+    "Fresh ACTIVE_CONTROLS and lifecycle policy agree on +660s provisional and 600s normal CONTINUE hard floor.",
+    "No routine mid-turn schedule mutation occurs unless the verified provisional due is genuinely threatened.",
+    "Normal close uses SAME MAIN exact observed END+60 and persists the same due to CURRENT/ACTIVITY/HANDOFF."
   ],
   "checkpointable_substeps": [
-    "Persist generation-matched v5.2 BOOT_STARTED/REARM_VERIFIED and provisional same-MAIN recurring fallback.",
-    "Reconcile active machine controls to 600-second hard floor.",
-    "Reconcile AGENTS and active work spec prose to the same semantics.",
-    "Search remaining active controls/state for stale 480/8-minute close authority and classify historical-only references separately.",
-    "Checkpoint evidence and close through same MAIN exact END+60 after the 600-second minimum."
+    "Persist generation-matched bootstrap and provisional rearm receipts.",
+    "Audit fresh active controls and state for stale +780s or short-rolling default authority.",
+    "Continue prospective utilization evidence/corrective work while before the 600s voluntary floor.",
+    "At >=600s finish smallest safe unit, checkpoint, exact END+60 rearm, live verify and persist close projection."
   ],
-  "current_substep": 4,
-  "handoff_boundary": "POLICY_SYNC_AND_HARD_FLOOR_RECONCILIATION_IN_PROGRESS",
-  "early_finish_fallback": "Before 600 observed elapsed seconds, continue with active-policy drift search or another safe authorized residual unit; CI pending or local completion does not authorize normal CONTINUE close.",
+  "current_substep": 2,
+  "handoff_boundary": "V5_4_LIVE_VERIFICATION_IN_PROGRESS",
+  "early_finish_fallback": "Before 600 observed elapsed seconds, continue with active-policy drift search, prospective utilization evidence, or another safe authorized residual unit; do not pad and do not voluntarily close CONTINUE.",
   "created_for_next_wake": false,
-  "started_at": "2026-09-22T01:18:52+09:00",
-  "last_progress_at": "2026-09-22T01:24:00+09:00",
+  "started_at": "2026-09-22T01:37:17+09:00",
+  "last_progress_at": "2026-09-22T01:38:20+09:00",
   "progress_evidence": [
-    "Operator-created MAIN prompt upgraded to v5.2 with fresh-policy sync and explicit 600-second voluntary CONTINUE hard floor.",
-    "Rollback baseline branch rollback/pre-policy-sync-bootstrap-20260922 points to pre-change main e34d0a61483621ac85285d2993fd2737552789d7.",
-    "Fresh run-continuation-gate v12 and state/UTILIZATION now encode 600-second minimum and pre-600 voluntary CONTINUE prohibition.",
-    "AGENTS and WS-P001-002 reconciled away from 8-minute-floor/pre-600 exception wording."
+    "Fresh NOW is ACTIVE and points to WS-P001-002 sustained utilization work.",
+    "Generation-matched BOOT_STARTED persisted at 01:37:17 KST.",
+    "SAME MAIN live metadata verified enabled recurring FREQ=HOURLY at provisional DTSTART 01:48:17 KST.",
+    "REARM_VERIFIED persisted for the same generation; retired predecessors remain disabled.",
+    "Fresh ACTIVE_CONTROLS and rolling lifecycle both encode +660s provisional, 600s hard floor, and retirement of routine short rolling."
   ]
 }
