@@ -18,7 +18,7 @@ Fresh durable state was materially stale relative to this wake. `state/NOW.json`
 
 This is direct negative evidence for the previous generation's P0-A/P0-B acceptance: epoch 82 cannot be counted as a valid normal 10-minute (600-second) close and cannot be credited with an exact ACTUAL END + 1 minute (60 seconds) verified handoff. Missing boundaries remain unknown rather than inferred as useful work.
 
-The failure class is therefore `STALE_WORKING_GENERATION_WITHOUT_VERIFIED_NORMAL_CLOSE`. The current wake must recover forward by claiming a strictly newer authority epoch; it must not restore epoch 82's old due or pretend that epoch 82 closed normally.
+Existing runtime-continuity policy already defines this family as `RUNTIME_INVOCATION_ENDED_EARLY`; epoch 82 is therefore treated as that existing failure class with the observed subtype `STALE_WORKING_GENERATION_WITHOUT_VERIFIED_NORMAL_CLOSE`, rather than inventing a competing recovery mechanism.
 
 ## Completed bounded unit 1 — stale generation + scorecard repair
 
@@ -27,7 +27,6 @@ Observed unit END: `2026-09-22 07:11:37 KST`
 Observed duration: `1 minute 41 seconds (101 seconds)`
 
 Material outputs:
-
 - Claimed epoch 83 in CURRENT/ACTIVITY/HANDOFF/TURN_PLAN/NOW after explicitly classifying epoch 82 as incomplete rather than silently overwriting its missing close.
 - Audited `state/P0_SCORECARD.json` and found a stale active threshold: `minimum_continue_turn_seconds=480`, contradicting the operator-locked 10-minute (600-second) floor and fresh control policy.
 - Repaired the scorecard to schema 2.4 with `minimum_continue_turn_seconds=600`, explicit `10 minutes (600 seconds)` human semantics, explicit `1 minute (60 seconds)` P0-B close semantics, epoch 83 as current, epoch 82 as incomplete, and consecutive pair gates reset rather than falsely inherited.
@@ -40,15 +39,26 @@ Observed unit END: `2026-09-22 07:13:24 KST`
 Observed duration: `1 minute 46 seconds (106 seconds)`
 
 Material outputs:
-
 - Added `.github/workflows/validate-p0-scorecard.yml` to cross-check the P0 scorecard, operator-locked goals, continuation gate, and rolling lifecycle for the exact 10-minute (600-second) work floor and 1-minute (60-second) final rearm.
-- First live workflow attempt failed before validation because repository policy forbids unpinned third-party Actions; the failure was diagnosed from runner logs rather than treated as a product failure.
-- Removed `actions/checkout@v4` entirely and changed the validator to fetch the exact commit through GitHub's authenticated contents API, matching the repository's existing validation pattern.
+- First live workflow attempt failed before validation because repository policy forbids unpinned third-party Actions; runner logs identified the cause.
+- Removed `actions/checkout@v4` and changed the validator to fetch the exact commit through GitHub's authenticated contents API.
 - Live run `35661517829` then completed with conclusion `success`.
-- Promoted `state/P0_SCORECARD.json` to `mandatory_on_wake` and the new validator to `mandatory_policy_sync_surfaces`, so this stale projection cannot remain an optional pre-experiment read.
-- Added epoch 83 to `state/STARTUP_BUDGET.json`: provider delivery `1 minute 43 seconds (103 seconds)`, post-observation startup `43 seconds`, total prework loss `2 minutes 26 seconds (146 seconds)`. These are explicitly separate from the local normal-close offset of exactly 1 minute (60 seconds).
+- Promoted `state/P0_SCORECARD.json` to `mandatory_on_wake` and the new validator to `mandatory_policy_sync_surfaces`.
+- Added epoch 83 to `state/STARTUP_BUDGET.json`: provider delivery `1 minute 43 seconds (103 seconds)`, post-observation startup `43 seconds`, total prework loss `2 minutes 26 seconds (146 seconds)`.
 
-Evidence commits: `a15126014ad0133cae68b0ba824608489b2aa58f`, `69c751eeb18a0b35e6805c5222cd090cb6b7b710`, `21ef707800a0e35a4c9c9245365e4366eec5cb18`, `59ec9fed09c7b500ba329a16d8216e3a1b8674b1`.
+## Completed bounded unit 3 — reconcile legacy enforcement and P0-B evidence separation
+
+Observed unit START: `2026-09-22 07:13:25 KST`  
+Observed unit END: `2026-09-22 07:15:06 KST`  
+Observed duration: `1 minute 41 seconds (101 seconds)`
+
+Material outputs:
+- Integrated control-plane validation exposed a pre-existing mirror mismatch: enforcement still asserted the retired predictive-prearm no-dual-authority fence at `recovery_classes.PREDICTIVE_PREARM_OVERLAP`, while policy had moved it only to a historical map. Restored a retired compatibility fence in the expected map without reactivating predictive prearm.
+- Integrated enforcement also still expects aggregate `GOAL-UTILIZATION-P0`. Restored that goal as an explicit compatibility/regression objective while retaining the operator-locked execution order `P0-A -> P0-B`; it does not displace the two immediate runtime goals.
+- Appended epoch 83 to `state/SCHEDULER_OBSERVATIONS.json`: delivery was `1 minute 43 seconds (103 seconds)` late. The three-sample observed range is now -41 to +103 seconds; no tuning is promoted from this small heterogeneous sample.
+- Added `state/SCHEDULER_OBSERVATIONS.json` and `state/STARTUP_BUDGET.json` to mandatory pre-corrective-experiment evidence so future timing experiments must separate local rearm correctness, provider delivery, and post-observation startup.
+
+Evidence commits: `482d4837ad78793f91457a1d93e4a3d1e68bfa2e`, `40ca0dd83b71c8b59bae0cefdc7b05ee7293974d`, `044481bfc47c3f849daa16d1188b30aa9f541bc2`, `f6a16343e96a87b4f4012a033fa63ecf97b77130`.
 
 ## Active P0 action
 
