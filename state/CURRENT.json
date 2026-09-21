@@ -6,39 +6,31 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "root_goal": "P0 sustained evidenced useful-work coverage",
   "status": "CONTINUE",
-  "current_owner": "RUN-UTIL-20260921-235045",
-  "authority_epoch": 74,
+  "current_owner": "RUN-UTIL-20260922-001446",
+  "authority_epoch": 75,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "HANDOFF_COMMITTED",
+  "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-112",
-    "state": "COMPLETE",
+    "id": "CP-UTILIZATION-113",
+    "state": "IN_PROGRESS",
     "completed": [
-      "Persisted generation-matched BOOT_STARTED for DUE:2026-09-21T23:52:00+09:00.",
-      "Live-verified SAME MAIN recurring provisional RRULE at 2026-09-22T00:03:45+09:00 and persisted REARM_VERIFIED.",
-      "Claimed authority epoch 74 for MAIN self-reliant policy alignment.",
-      "Removed stale mandatory Watchdog dependency from active controls, recovery policy, runtime policy, wake architecture, and recovery SLO.",
-      "Added control-plane CI assertions for SAME MAIN self-reliance and disabled Watchdog standby.",
-      "Passed 24 direct semantic consistency checks and zero-match stale dependency searches."
+      "Observed operator-rescheduled SAME MAIN generation due 2026-09-22T00:13:08+09:00 at turn start 00:14:46.",
+      "Persisted generation-matched BOOT_STARTED.",
+      "Live-verified SAME MAIN recurring provisional RRULE at 2026-09-22T00:27:46+09:00 and persisted REARM_VERIFIED.",
+      "Claimed authority epoch 75 without Watchdog."
     ],
     "evidence": [
-      "state/STARTUP_ACK.json@be3b752",
-      "state/TURN_PLAN.json@a09e90d",
-      "live SAME MAIN metadata: enabled recurring DTSTART 2026-09-22T00:03:45+09:00",
-      "control/ACTIVE_CONTROLS.json@4a893090",
-      "control/handoff-recovery.v1.json@6bc5790",
-      ".github/workflows/validate-control-plane.yml@86ca3f5",
-      "state/WAKE_ARCHITECTURE.json@4324c2f",
-      "state/WORK_EVIDENCE.json#WE-20260921-E74-001"
+      "state/STARTUP_ACK.json@daac2d0",
+      "live SAME MAIN metadata: enabled recurring DTSTART 2026-09-22T00:27:46+09:00"
     ],
-    "observation": "Epoch 74 completed the MAIN self-reliance alignment. Watchdog is disabled standby; normal close live-verified SAME MAIN recurring RRULE at exact END+60.",
-    "next_action": "Await generation-matched BOOT_STARTED for DUE:2026-09-22T00:02:08+09:00; the successor must provisional-arm SAME MAIN, work, and close through the same hard gate."
+    "observation": "The operator-rescheduled 00:13:08 generation supersedes stale 00:02:08 durable projections. Delivery-to-turn-start was 98 seconds.",
+    "next_action": "Harden startup audit/summary semantics for operator-rescheduled generations, preserve raw boundaries, and exclude them from normal scheduler comparison."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-22T00:02:08+09:00",
+    "next_due_at": "2026-09-22T00:27:46+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -64,7 +56,7 @@
       "enabled_verified": false,
       "policy_version": 6
     },
-    "next_due_source": "VERIFIED_NORMAL_END_PLUS_60_SECONDS",
+    "next_due_source": "VERIFIED_IN_FLIGHT_PROVISIONAL_CRASH_INSURANCE",
     "cold_fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE"
   },
   "safety": {
