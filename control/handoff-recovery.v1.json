@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_HANDOFF_RECOVERY",
-  "version": 6,
+  "version": 7,
   "status": "ACTIVE",
-  "purpose": "Recover or transfer authority without duplicating substantive work. Normal continuation, predictive overlap, abrupt owner loss, and invoked-without-bootstrap-acknowledgement are distinct classes.",
+  "purpose": "Recover or transfer authority without duplicating work. Normal continuation and cold fallback both reuse the SAME MAIN; Watchdog is disabled break-glass standby.",
   "active_runtime_mode": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE",
   "normal_path": "On a valid same-canonical rolling wake after a committed normal close, verify newest schedule generation, provisionally rearm, reconstruct exact durable checkpoint, then claim a fresh authority epoch.",
   "recovery_classes": {
@@ -36,18 +36,29 @@
     "STARTUP_ACK_MISSING": {
       "requires_committed_close": false,
       "stale_grace_required": false,
-      "detection": "MAIN expected_due + startup_watchdog grace elapsed with no generation-matched BOOT_STARTED/equivalent newer bootstrap evidence.",
-      "recovery": "Fixed Watchdog rearms SAME MAIN canonical to now+60s when fresh fencing permits, verifies it, then rechecks Watchdog at now+240s.",
-      "substantive_authority_for_watchdog": false,
-      "rationale": "Covers failures before MAIN can establish its own provisional rescue."
+      "detection": "A shifted SAME MAIN wake has no generation-matched BOOT_STARTED or newer bootstrap evidence.",
+      "recovery": "Do not depend on Watchdog. Preserve the SAME MAIN recurring RRULE; its next natural occurrence performs MAIN_COLD_FALLBACK_RECOVERY from fresh durable state.",
+      "cold_fallback": "SAME_MAIN_NATURAL_RECURRING_RRULE_OCCURRENCE",
+      "watchdog_required": false,
+      "substantive_authority_granted_by_detection": false,
+      "rationale": "A lost fast wake must not destroy continuity or require a second scheduler actor."
     },
     "BOOTSTRAP_REARM_MISSING": {
       "requires_committed_close": false,
       "stale_grace_required": false,
-      "detection": "BOOT_STARTED exists but generation-matched REARM_VERIFIED/newer verified continuation is absent beyond policy grace.",
-      "recovery": "Fixed Watchdog rearms SAME MAIN canonical to now+60s when safe; Watchdog never continues substantive work itself.",
-      "substantive_authority_for_watchdog": false,
-      "rationale": "Distinguishes bootstrap entry from successful self-protection."
+      "detection": "BOOT_STARTED exists but generation-matched REARM_VERIFIED or a newer verified SAME MAIN continuation is absent.",
+      "recovery": "Recover on the next verified SAME MAIN recurring occurrence; fence against any live owner before authority claim.",
+      "cold_fallback": "SAME_MAIN_NATURAL_RECURRING_RRULE_OCCURRENCE",
+      "watchdog_required": false,
+      "substantive_authority_granted_by_detection": false
+    },
+    "MAIN_COLD_FALLBACK_RECOVERY": {
+      "requires_committed_close": false,
+      "stale_grace_required": false,
+      "trigger": "Natural recurring occurrence of the SAME MAIN after a prior shifted wake failed before durable bootstrap or rearm.",
+      "action": "Read fresh durable state, classify the missing generation, preserve newest schedule/authority, write fresh receipts, provisional-arm SAME MAIN, then claim only if nonconflicting.",
+      "replacement_main_forbidden": true,
+      "watchdog_required": false
     }
   },
   "stale_path": {
@@ -66,10 +77,10 @@
     }
   },
   "recovery_sequence": [
-    "RE_READ_NOW_CURRENT_STARTUP_ACK_WATCHDOG_ACTIVITY_HANDOFF",
-    "VERIFY_NEWEST_SCHEDULE_GENERATION_AND_PROGRAM_NONTERMINAL",
-    "CLASSIFY_NORMAL_CONTINUATION_VS_STARTUP_ACK_MISSING_VS_BOOTSTRAP_REARM_MISSING_VS_PREDICTIVE_PREARM_VS_ABRUPT_LOSS",
-    "IF_WATCHDOG_CLASS_FAIL_CLOSED_ON_SUBSTANTIVE_AUTHORITY_AND_ONLY_REARM_SAME_MAIN_WHEN_SAFE",
+    "RE_READ_NOW_CURRENT_STARTUP_ACK_ACTIVITY_HANDOFF",
+    "VERIFY_NEWEST_SAME_MAIN_SCHEDULE_GENERATION_AND_PROGRAM_NONTERMINAL",
+    "CLASSIFY_NORMAL_CONTINUATION_VS_MAIN_COLD_FALLBACK_RECOVERY_VS_PREDICTIVE_PREARM_VS_ABRUPT_LOSS",
+    "NEVER_REQUIRE_OR_AUTO_ARM_WATCHDOG_FOR_NORMAL_RECOVERY",
     "IF_PREDICTIVE_AND_PREDECESSOR_FRESH_DO_NOT_CLAIM_SUBSTANTIVE_AUTHORITY",
     "VERIFY_PREDECESSOR_STALE_WHEN_ABRUPT_LOSS",
     "ADVANCE_AUTHORITY_EPOCH_ONLY_WHEN_TAKEOVER_IS_SAFE",
