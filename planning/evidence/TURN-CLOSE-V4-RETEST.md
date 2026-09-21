@@ -41,7 +41,7 @@ Collect at least three valid completed post-repair turns with runnable backlog. 
 |---|---|---:|---:|---:|---:|---|---|---|---|---|---|
 | OBS-RUN-UTIL-20260921-184232 | 18:42:32 → 18:51:46 KST | 554s | UNKNOWN | UNKNOWN | 387s (valid STARTUP-003) | BUDGET_EXHAUSTED; verified same-canonical continuation | CI result unavailable; STARTUP-003 future boundary; 900s window did not fit | ELIGIBLE CLOSED TURN; run validator passed; no pause/forced termination | reporting/audit tools, focused assertions, CI integration; Actions result not yet observed | useful-work measurement incomplete; elapsed improvement alone is not efficacy proof | correct end→due timing with exact-second +60s rearm; append prospective artifact-backed WORK_EVIDENCE |
 
-Eligible completed live turns recorded here: **1**. Continuous collection has no fixed sample-count limit.
+| OBS-RUN-UTIL-20260921-185559 | 18:55:59 → 19:04:23 KST | 504s | 368s | UNKNOWN | UNKNOWN total; due→invocation 30s observed, claim/first-useful missing | BUDGET_EXHAUSTED; verified same-canonical continuation | Actions result unavailable; own review required successor; 900s window did not fit | ELIGIBLE CLOSED TURN; run validator passed; successor sample incomplete | 3 accepted WORK_EVIDENCE intervals; exact-second helper/policy; validity-aware review; blob-verified CI wiring | successor invoked but left no durable claim/useful progress; provider delivery itself was 30s | add missing-successor-progress diagnostic; collect a clean normal END+60 sample |\n\nEligible completed live turns recorded here: **2**. Continuous collection has no fixed sample-count limit.
 
 Status: continuous relay and measurement active; initial review after three eligible turns, then rolling review indefinitely.
 
