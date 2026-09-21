@@ -33,9 +33,10 @@ def _seconds(start: str | None, end: str | None) -> int | None:
 def _generation_kind(sample: dict) -> str:
     if (
         sample.get("operator_rescheduled") is True
-        or sample.get("validity") == "EXCLUDED_OPERATOR_RESCHEDULED"
+        or sample.get("validity")
+        in {"EXCLUDED_OPERATOR_RESCHEDULED", "EXCLUDED_OPERATOR_MAINTENANCE_RECOVERY"}
         or sample.get("exclusion_reason")
-        in {"OPERATOR_RESCHEDULED_GENERATION", "EXPLICIT_OPERATOR_RESCHEDULE"}
+        in {"OPERATOR_RESCHEDULED_GENERATION", "EXPLICIT_OPERATOR_RESCHEDULE", "OPERATOR_SCHEDULE_RESET"}
     ):
         return "OPERATOR_RESCHEDULED"
     if sample.get("recovery_kind"):
