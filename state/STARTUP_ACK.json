@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
   "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "current_expected_due_at": "2026-09-21T21:11:09+09:00",
-  "generation_key": "DUE:2026-09-21T21:11:09+09:00",
-  "boot_started_at": "2026-09-21T21:14:36+09:00",
-  "boot_started_authority_epoch": 68,
-  "rearm_verified_at": "2026-09-21T21:15:12+09:00",
-  "verified_provisional_due_at": "2026-09-21T21:27:36+09:00",
-  "status": "REARM_VERIFIED",
-  "last_updated_at": "2026-09-21T21:15:12+09:00",
-  "note": "STARTUP-009 BOOT_STARTED and same-canonical hourly RRULE provisional rearm were both observed and verified; authority claim and substantive work remain pending."
+  "current_expected_due_at": "2026-09-21T21:27:36+09:00",
+  "generation_key": "DUE:2026-09-21T21:27:36+09:00",
+  "boot_started_at": "2026-09-21T21:28:24+09:00",
+  "boot_started_authority_epoch": 69,
+  "rearm_verified_at": null,
+  "verified_provisional_due_at": null,
+  "status": "BOOT_STARTED",
+  "last_updated_at": "2026-09-21T21:28:24+09:00",
+  "note": "Generation-matched BOOT_STARTED for provisional cold-rescue wake after epoch 69 became stale before first durable useful work; no boundary is inferred."
 }
