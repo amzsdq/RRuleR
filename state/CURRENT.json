@@ -6,33 +6,37 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "root_goal": "P0 sustained evidenced useful-work coverage",
   "status": "CONTINUE",
-  "current_owner": null,
-  "authority_epoch": 78,
+  "current_owner": "RUN-UTIL-20260922-011852",
+  "authority_epoch": 79,
   "canonical_automation_id": "6ab152b636748191a71873ba4d5ef551",
-  "run_state": "HANDOFF_COMMITTED",
+  "run_state": "WORKING",
   "checkpoint": {
-    "id": "CP-UTILIZATION-118",
+    "id": "CP-UTILIZATION-119",
     "state": "CONTINUE",
     "completed": [
-      "Generation-matched BOOT_STARTED and REARM_VERIFIED were persisted for clean MAIN wake due 01:07:52.",
-      "Diagnosed durable drift: minimum_continue_work_seconds remained 480 despite operator/bootstrap 600-second minimum intent.",
-      "Run validator now rejects every normal CONTINUE close before 600 seconds unless an allowlisted EXCEPTION is explicitly recorded.",
-      "Validator now recognizes current same-canonical exact-one-shot/custom-recurring continuation end reasons instead of falsely failing historical current-era records.",
-      "Regression tests cover 599-second early handoff rejection, pre-600 budget-close rejection, documented exception acceptance, and current custom-recurring continuation acceptance."
+      "MAIN bootstrap upgraded to v5.2 with fresh ACTIVE_CONTROLS policy sync and explicit 600-second voluntary CONTINUE hard floor.",
+      "Rollback baseline preserved at rollback/pre-policy-sync-bootstrap-20260922 from main e34d0a61483621ac85285d2993fd2737552789d7.",
+      "run-continuation-gate, relay policy and utilization envelope now encode 600-second normal CONTINUE minimum and pre-600 voluntary-close prohibition.",
+      "AGENTS and active WS-P001-002 were reconciled away from 8-minute-floor/pre-600 normal-CONTINUE exception semantics.",
+      "Run-record validator permits pre-600 CONTINUE only for platform-enforced termination; regression tests were aligned accordingly.",
+      "Continuation-policy CI now asserts the 600-second hard floor across gate, CURRENT and UTILIZATION."
     ],
     "evidence": [
-      "tools/validate_run_records.py@399a950",
-      "tests/test_run_records.py@7a0459f",
-      "state/STARTUP_ACK.json@c1d3183"
+      "control/run-continuation-gate.v1.json@v12",
+      "control/relay-policy.v1.json@revision17",
+      "state/UTILIZATION.json@schema1.7",
+      "tests/test_run_records.py@e90368b",
+      ".github/workflows/validate-continuation-policy.yml@d151f0f",
+      "planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md@be61d0f"
     ],
-    "observation": "Previous CI failure at epoch-78 close was not a substantive control-plane failure: validate_run_records rejected lines 19-20 because its valid end-reason allowlist lagged the exact-one-shot/custom-recurring lifecycle. The validator drift and the 480s minimum drift were repaired together.",
-    "next_action": "Observe integrated CI for the 600-second hard-gate patch. If PASS, continue WS-P001-002 prospective utilization evidence; normal CONTINUE must not close before 600 elapsed seconds except an explicit allowlisted exception."
+    "observation": "A stale regression test still expected the retired NO_SAFE_RUNNABLE_WORK pre-600 CONTINUE exception and was corrected. Earlier control-plane CI failures/cancellations during the write sequence are not final validation results; latest CI is still being observed.",
+    "next_action": "Continue active-policy drift scan and observe the latest integrated CI. Do not voluntarily close normal CONTINUE before 600 observed elapsed seconds."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_COMPLETION_RELATIVE_MAIN",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-22T01:23:00+09:00",
+    "next_due_at": "2026-09-22T01:33:00+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 600,
     "provisional_safety_margin_seconds": 180,
@@ -60,14 +64,6 @@
     "next_due_source": "VERIFIED_PROVISIONAL_CRASH_INSURANCE_PENDING_NORMAL_END_PLUS_60_CLOSE",
     "cold_fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE"
   },
-  "safety": {
-    "public_repo": true,
-    "secrets_allowed": false,
-    "reference_repo_amzsdq_R": "READ_ONLY"
-  },
-  "program_goal": {
-    "primary": "Production-oriented autonomous agent runtime/control plane.",
-    "p0": "Maximize sustained evidenced useful-work coverage while minimizing normal continuation gaps without weakening cold-rescue safety.",
-    "authority_scope": "RRuleR repository changes authorized subject to platform and repository safety constraints."
-  }
+  "safety": {"public_repo": true, "secrets_allowed": false, "reference_repo_amzsdq_R": "READ_ONLY"},
+  "program_goal": {"primary": "Production-oriented autonomous agent runtime/control plane.", "p0": "Maximize sustained evidenced useful-work coverage while minimizing normal continuation gaps without weakening cold-rescue safety.", "authority_scope": "RRuleR repository changes authorized subject to platform and repository safety constraints."}
 }
