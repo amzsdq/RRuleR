@@ -19,8 +19,14 @@ class RunValidationTests(unittest.TestCase):
     def test_documented_exception(self):
         r=self.record(); r.update(run_ended_at='2026-09-21T10:02:00+00:00', duration_seconds=120, close_decision='EXCEPTION', short_turn_reason='NO_SAFE_RUNNABLE_WORK_AFTER_EXPLICIT_SCAN', alternatives_checked=['Primary awaits external evidence; fallback blocked by same lease; residual task already accepted.'])
         validate(r)
-    def test_budget_close(self):
+    def test_budget_close_before_600_rejected(self):
         r=self.record(); r.update(run_ended_at='2026-09-21T10:09:00+00:00', duration_seconds=540, close_decision='BUDGET_EXHAUSTED', close_reserve_seconds=60, alternatives_checked=['Smallest remaining task takes 90 seconds plus measured close reserve.'])
+        with self.assertRaises(ValueError): validate(r)
+    def test_early_handoff_without_exception_rejected(self):
+        r=self.record(); r.update(run_ended_at='2026-09-21T10:09:59+00:00', duration_seconds=599, close_decision='HANDOFF', alternatives_checked=['Independent fallback exists.'])
+        with self.assertRaises(ValueError): validate(r)
+    def test_custom_recurring_end_reason_accepted_at_600(self):
+        r=self.record(); r['end_reason']='VERIFIED_SAME_CANONICAL_CUSTOM_RECURRING_CONTINUATION'
         validate(r)
     def test_legacy_preserved(self):
         validate(dict(run_started_at='2026-09-20T10:00:00+00:00',run_ended_at='2026-09-20T10:02:00+00:00'))
