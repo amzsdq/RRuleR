@@ -28,13 +28,13 @@ All must be satisfied:
 | Work spec | Status | Acceptance progress | Purpose |
 |---|---|---:|---|
 | [WS-P001-001 — Strategic Planning Spine](../work-specs/WS-P001-001-STRATEGIC-PLANNING-SPINE.md) | **DONE** | 5 / 5 | Prevent local optimization by binding work to program/project/spec/NOW |
-| [WS-P001-002 — Sustained Turn Utilization](../work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md) | **READY / operator-paused** | 0 / 6 | Raise real useful-work occupancy and repair evidence freshness |
+| [WS-P001-002 — Sustained Turn Utilization](../work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md) | **ACTIVE** | 1 / 6 | Raise real useful-work occupancy and repair evidence freshness |
 | WS-P001-003 — P0 Acceptance & Regression SLO | BACKLOG | 0 / TBD | Prove sustained P0 and preserve it while advancing the roadmap |
 
-Project progress: **1 / 3 committed work specs DONE**.
+Project progress: **1 / 3 committed work specs DONE**; active spec **1 / 6 acceptance items satisfied**.
 
 ## Current decision
 
 Do not continue control-plane simplification merely because it is nearby. It is subordinate work and should be resumed only when it has higher expected effect on P001 than direct utilization/evidence work.
 
-On operator resume, the default active work spec is **WS-P001-002**.
+The active work spec is **WS-P001-002**. Evidence freshness has been repaired for the resumed epoch; next priority is a trustworthy current baseline and measured cause ranking.
