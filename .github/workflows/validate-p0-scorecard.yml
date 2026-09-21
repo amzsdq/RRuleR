@@ -25,10 +25,21 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Reject stale P0 timing projection
+      - name: Fetch exact commit and reject stale P0 timing projection
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
         run: |
+          set -euo pipefail
+          mkdir -p /tmp/rruler/state /tmp/rruler/control
+          fetch() { curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/$1?ref=$SHA" -o "/tmp/rruler/$1"; }
+          fetch state/P0_SCORECARD.json
+          fetch state/PROGRAM_GOALS.json
+          fetch control/run-continuation-gate.v1.json
+          fetch control/rolling-rrule-lifecycle.v1.json
+          cd /tmp/rruler
           python - <<'PY'
           import json
           from pathlib import Path
