@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import copy
 import sys
 from pathlib import Path
 
@@ -61,6 +60,17 @@ def test_overlap_is_rejected():
         assert "overlap" in str(exc)
     else:
         raise AssertionError("overlapping interval accepted")
+
+
+def test_backward_authority_epoch_is_rejected():
+    data = append_record(ledger(), build_record(args()))
+    backward = build_record(args(record_id="WE-TEST-002", authority_epoch=58, start_at="2026-09-21T15:52:00+09:00", end_at="2026-09-21T15:53:00+09:00"))
+    try:
+        append_record(data, backward)
+    except ValueError as exc:
+        assert "backward" in str(exc)
+    else:
+        raise AssertionError("backward authority epoch accepted")
 
 
 def test_naive_timestamp_is_rejected():
