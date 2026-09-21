@@ -124,6 +124,34 @@ A non-terminal owner MUST NOT voluntarily end its turn.
 
 Only an allowlisted condition in `control/run-continuation-gate.v1.json` may authorize run end. Canonical disable requires durable program terminal state or explicit operator STOP.
 
+## Mandatory turn status
+
+Every execution turn must leave a compact, directly observable status record.
+
+At actual substantive turn start, capture the real start timestamp. At turn close, capture the real end timestamp and derive duration from the two observed timestamps.
+
+Normal user-visible footer:
+
+```text
+[TURN STATUS]
+START=<YYYY-MM-DD HH:MM:SS KST>
+END=<YYYY-MM-DD HH:MM:SS KST>
+DURATION=<Xm Ys or Xs>
+STATUS=<CONTINUE|COMPLETE|BLOCKED|PAUSED>
+```
+
+Semantics:
+- `CONTINUE` — useful authorized work remains; durable resume target/continuation is preserved.
+- `COMPLETE` — the active program is durably terminal; do not use merely because a packet, CI run, work spec, project, or local objective finished.
+- `BLOCKED` — a genuine blocker prevents safe useful continuation and internal alternatives are exhausted.
+- `PAUSED` — explicit operator pause/stop governs execution.
+
+Use actual observed timestamps only; never backfill or fabricate time to improve utilization.
+
+Persist equivalent durable evidence in `state/RUNS.jsonl` for every new bounded turn when repository write authority is available. New records should include `run_started_at`, `run_ended_at`, derived `duration_seconds`, and `turn_outcome`, plus existing detailed classification/evidence fields as applicable.
+
+The compact footer is for operator readability. Detailed machine evidence remains in GitHub.
+
 ## Pre-final authorization gate
 
 Immediately before emitting ANY normal user-visible final response, freshly read:
