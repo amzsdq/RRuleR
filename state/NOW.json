@@ -6,13 +6,14 @@
   "project_ref": "planning/projects/P001-SUSTAINED-UTILIZATION.md",
   "work_spec_id": "WS-P001-002",
   "work_spec_ref": "planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md",
-  "execution_status": "PAUSED",
-  "pause_reason": "Operator-authorized maintenance: stop new work and self-rearm; checkpoint current safe unit only. Resume only after maintenance hold is cleared.",
+  "execution_status": "ACTIVE",
+  "pause_reason": null,
   "resume_target": {
     "step": "Execute planning/evidence/TURN-CLOSE-V4-RETEST.md within WS-P001-002; use concrete runnable primary/fallback/residual items and the unified v4 close decision.",
     "selection_rule": "First reconcile operator-maintenance interruption without inventing successor timestamps. Keep existing authority fences, skip completed work, and collect three prospective valid turns before claiming utilization improvement."
   },
   "turn_plan_role": "TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec.",
-  "updated_at": "2026-09-21T09:40:19.050Z",
-  "resumed_by_operator_at": "2026-09-21T06:47:45.338Z"
+  "updated_at": "2026-09-21T09:40:32.149Z",
+  "resumed_by_operator_at": "2026-09-21T09:40:32.149Z",
+  "maintenance_repair_ref": "planning/evidence/TURN-CLOSE-V4-RETEST.md"
 }
