@@ -90,7 +90,7 @@
     "scheduled_due_at": "2026-09-21T19:37:36+09:00",
     "successor_observed_at": "2026-09-21T19:38:45+09:00",
     "authority_claim_at": "2026-09-21T19:39:57+09:00",
-    "first_durable_useful_at": null,
+    "first_durable_useful_at": "2026-09-21T19:41:47+09:00",
     "due_to_observation_seconds": 69,
     "observation_to_claim_seconds": 72,
     "validity": "DELIVERY_ONLY_PENDING_FIRST_USEFUL",
@@ -102,7 +102,9 @@
       "authority_claim_at",
       "first_durable_useful_at"
     ],
-    "rule": "Use this sample for provider due-to-invocation and post-invocation startup only. Do not use it for END+60 local compliance because the schedule generation was operator-reset at 19:36:58 KST and has no comparable immediately preceding turn end."
+    "rule": "Use this sample for provider due-to-invocation and post-invocation startup only. Do not use it for END+60 local compliance because the schedule generation was operator-reset at 19:36:58 KST and has no comparable immediately preceding turn end.",
+    "claim_to_first_useful_seconds": 110,
+    "due_to_first_useful_seconds": 251
   },
-  "decision_rule": "STARTUP-004 proves provider delivery of the 19:05:06 due at 19:05:35.566381 (about 30s) but lacks durable claim/useful progress. STARTUP-005 measures the operator-rescheduled generation separately. The next normal close must create a clean END+60 sample."
+  "decision_rule": "STARTUP-004 preserves a 30s provider delivery segment but lacks durable progress. STARTUP-005 operator-rescheduled wake measured due->invocation=69s, invocation->claim=72s, claim->first-useful=110s; exclude it from normal END+60 compliance. Next normal close must create a clean comparable sample."
 }
