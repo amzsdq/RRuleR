@@ -9,31 +9,36 @@
   "current_owner": "RUN-UTIL-20260921-184232",
   "authority_epoch": 65,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "WORKING",
+  "run_state": "CHECKPOINTED",
   "checkpoint": {
-    "id": "CP-UTILIZATION-098",
+    "id": "CP-UTILIZATION-099",
     "state": "CONTINUE",
     "completed": [
       "Reconciled the operator-requested immediate post-maintenance run without treating it as a scheduler-delivery sample.",
       "Implemented strict v4 turn-close reporting with unknown useful time and missing successor boundaries preserved as unknown.",
       "Implemented STARTUP boundary consistency auditing that excludes maintenance-interrupted samples from scheduler comparison while retaining raw evidence.",
-      "Integrated both audit paths and focused tests into control-plane CI."
+      "Integrated both audit paths and focused tests into control-plane CI.",
+      "Found and excluded STARTUP-002 boundary inconsistency without rewriting raw timestamps.",
+      "Updated close summary so invalid samples remain visible but are not comparison-eligible."
     ],
     "evidence": [
       "tools/summarize_turn_close.py@929d92154d2f0f7f4a69a1f4c73123ee5e0f6c34",
       "tests/test_summarize_turn_close.py@36977f9b17a4b3869d5c384753bb9eb123951f32",
       "tools/audit_startup_boundaries.py@240c8a3e6d510b68ae95135118a52fd602a8a1f0",
       "tests/test_audit_startup_boundaries.py@ba3d7dba2945fe440f57728c91090fdceaad3fcf",
-      ".github/workflows/validate-control-plane.yml@744eeeda5e3351ddb84bff95951c0ebe2061257a"
+      ".github/workflows/validate-control-plane.yml@744eeeda5e3351ddb84bff95951c0ebe2061257a",
+      "state/SUCCESSOR_STARTUP.json@bcababde7ee6c595f067cebe136d7c61eb6bfaf7",
+      "planning/evidence/TURN-CLOSE-V4-RETEST.md@7d4ab999b80d97c859dee660017dcbe3c9780ec7",
+      "tools/summarize_turn_close.py@fdd292ea1a068e9b98d9fd09ec8a548ae67f5174"
     ],
     "observation": "Six focused assertions passed locally through direct function invocation; pytest is unavailable in the execution image. GitHub Actions remains the integrated independent check.",
-    "next_action": "Inspect integrated CI and actual summary output; then close this bounded turn with observed run evidence and a verified same-canonical continuation."
+    "next_action": "On the 18:54 KST eligible scheduled successor, capture STARTUP-003 observation/claim/first-useful boundaries, validate the closed run, and count it toward the three-turn live retest only if all v4 conditions pass."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T18:53:00+09:00",
+    "next_due_at": "2026-09-21T18:54:00+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
