@@ -27,6 +27,6 @@
   "early_finish_fallback": "If the obvious unit finishes or becomes externally wait-bound before 600s, select an independent authorized fallback/residual unit or decompose the next safe unit. Do not close merely because a trace was emitted.",
   "handoff_boundary": "ONLY_AFTER_600S_NORMAL_FLOOR_AND_EXACT_END_PLUS_60_LIVE_VERIFICATION",
   "created_for_next_wake": true,
-  "expected_wake_at": "2026-09-22T02:01:20+09:00",
+  "expected_wake_at": "2026-09-22T02:02:43+09:00",
   "progress_evidence": []
 }
