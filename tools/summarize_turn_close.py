@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Summarize post-v4 bounded-turn close evidence without converting unknowns to zero."""
+"""Summarize bounded-turn and startup evidence without imputing unknown time."""
 from __future__ import annotations
 
 import json
@@ -28,6 +28,57 @@ def _seconds(start: str | None, end: str | None) -> int | None:
     if not start or not end:
         return None
     return int((_ts(end) - _ts(start)).total_seconds())
+
+
+def _generation_kind(sample: dict) -> str:
+    if sample.get("recovery_kind"):
+        return sample["recovery_kind"]
+    if sample.get("recovery_of_sample_id"):
+        return "WATCHDOG_RECOVERY"
+    validity = str(sample.get("validity", ""))
+    classification = str(sample.get("classification", ""))
+    if "HOURLY_FALLBACK" in validity or "HOURLY_FALLBACK" in classification:
+        return "HOURLY_FALLBACK_RECOVERY"
+    return "NORMAL_SCHEDULER"
+
+
+def _startup_gap(sample: dict) -> dict:
+    scheduled = sample.get("scheduled_due_at")
+    observed = sample.get("successor_observed_at")
+    boot = sample.get("boot_started_at")
+    rearm = sample.get("rearm_verified_at")
+    claim = sample.get("authority_claim_at")
+    first = sample.get("first_durable_useful_at")
+    predecessor = sample.get("predecessor_last_useful_at")
+    kind = _generation_kind(sample)
+    validity = sample.get("validity")
+    evidence_valid = validity not in {
+        "INVALID",
+        "INCOMPLETE",
+        "EXCLUDED_OPERATOR_RESCHEDULED",
+        "EXCLUDED_HOURLY_FALLBACK_RECOVERY",
+    }
+    complete = all((scheduled, observed, claim, first, predecessor))
+    recovery_complete = all((scheduled, observed, boot, rearm, claim, first))
+    comparison_eligible = kind == "NORMAL_SCHEDULER" and evidence_valid and complete
+    return {
+        "sample_id": sample.get("sample_id"),
+        "generation_kind": kind,
+        "recovery_of_sample_id": sample.get("recovery_of_sample_id"),
+        "due_to_observation_seconds": _seconds(scheduled, observed),
+        "observation_to_boot_seconds": _seconds(observed, boot),
+        "boot_to_rearm_verified_seconds": _seconds(boot, rearm),
+        "rearm_verified_to_claim_seconds": _seconds(rearm, claim),
+        "observation_to_claim_seconds": _seconds(observed, claim),
+        "claim_to_first_useful_seconds": _seconds(claim, first),
+        "due_to_first_useful_seconds": _seconds(scheduled, first),
+        "predecessor_to_first_useful_seconds": _seconds(predecessor, first),
+        "complete_boundary_set": complete,
+        "complete_recovery_boundary_set": recovery_complete,
+        "evidence_valid": evidence_valid,
+        "comparison_eligible": comparison_eligible,
+        "exclusion_reason": sample.get("exclusion_reason"),
+    }
 
 
 def summarize(run_lines: list[str], startup: dict) -> dict:
@@ -69,21 +120,12 @@ def summarize(run_lines: list[str], startup: dict) -> dict:
                 "alternatives_checked": alternatives,
             })
 
-    gaps = []
-    for sample in startup.get("samples", []):
-        scheduled = sample.get("scheduled_due_at")
-        observed = sample.get("successor_observed_at")
-        claim = sample.get("authority_claim_at")
-        first = sample.get("first_durable_useful_at")
-        predecessor = sample.get("predecessor_last_useful_at")
-        gaps.append({
-            "sample_id": sample.get("sample_id"),
-            "due_to_observation_seconds": _seconds(scheduled, observed),
-            "observation_to_claim_seconds": _seconds(observed, claim),
-            "claim_to_first_useful_seconds": _seconds(claim, first),
-            "predecessor_to_first_useful_seconds": _seconds(predecessor, first),
-            "complete_boundary_set": all((scheduled, observed, claim, first, predecessor)),
-        })
+    raw_samples = list(startup.get("samples", []))
+    if isinstance(startup.get("next_sample"), dict):
+        raw_samples.append(startup["next_sample"])
+    gaps = [_startup_gap(sample) for sample in raw_samples]
+    normal = [gap for gap in gaps if gap["generation_kind"] == "NORMAL_SCHEDULER"]
+    recovery = [gap for gap in gaps if gap["generation_kind"] != "NORMAL_SCHEDULER"]
 
     return {
         "v4_closed_turn_count": len(closed),
@@ -93,6 +135,9 @@ def summarize(run_lines: list[str], startup: dict) -> dict:
         "known_useful_turn_count": len(known_useful),
         "unknown_useful_turn_count": len(closed) - len(known_useful),
         "successor_gap_samples": gaps,
+        "normal_scheduler_gap_samples": normal,
+        "normal_scheduler_comparison_samples": [gap for gap in normal if gap["comparison_eligible"]],
+        "recovery_gap_samples": recovery,
         "unknown_policy": "MISSING_USEFUL_OR_BOUNDARY_VALUES_REMAIN_NULL_NOT_ZERO",
     }
 
