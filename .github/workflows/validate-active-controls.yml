@@ -34,14 +34,18 @@ jobs:
           fetch() { curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/$1?ref=$SHA" -o "$2"; }
           fetch control/ACTIVE_CONTROLS.json /tmp/controls.json
           fetch state/CURRENT.json /tmp/current.json
+          fetch control/run-continuation-gate.v1.json /tmp/run-gate.json
           python - <<'PY'
           import json, os, urllib.request
-          controls=json.load(open('/tmp/controls.json')); current=json.load(open('/tmp/current.json'))
+          controls=json.load(open('/tmp/controls.json')); current=json.load(open('/tmp/current.json')); gate=json.load(open('/tmp/run-gate.json'))
           assert controls['status']=='ACTIVE'
           assert current['continuation']['active_control_registry']=='control/ACTIVE_CONTROLS.json'
           required={'control/run-continuation-gate.v1.json','control/scheduler-fence.v1.json','control/handoff-recovery.v1.json','state/CURRENT.json','state/ACTIVITY.json','state/HANDOFF.json','state/TURN_PLAN.json','state/UTILIZATION.json'}
           assert required <= set(controls['mandatory_on_wake'])
-          assert 'NONTERMINAL_OWNER_MUST_CONTINUE_USEFUL_WORK_UNTIL_AUTHORITY_TRANSFER' in controls['hard_invariants']
+          assert 'NONTERMINAL_PROGRAM_MUST_RETAIN_VERIFIED_CONTINUATION' in controls['hard_invariants']
+          assert gate['status']=='ACTIVE'
+          assert gate['default_for_nonterminal_owner']=='MUST_CONTINUE_USEFUL_WORK'
+          assert gate['nonterminal_no_handoff_rule']['run_end']=='FORBIDDEN'
           token=os.environ['GH_TOKEN']; repo=os.environ['REPO']; sha=os.environ['SHA']
           for path in controls['mandatory_on_wake']:
               req=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{path}?ref={sha}',headers={'Authorization':f'Bearer {token}','Accept':'application/vnd.github+json'})
