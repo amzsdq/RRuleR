@@ -1,15 +1,15 @@
 {
   "schema_version":"1.0",
   "main_canonical_id":"6ab152b636748191a71873ba4d5ef551",
-  "current_expected_due_at":"2026-09-22T02:57:43+09:00",
-  "generation_key":"DUE:2026-09-22T02:57:43+09:00",
-  "boot_started_at":"2026-09-22T03:00:15+09:00",
-  "boot_started_authority_epoch":"DUE:2026-09-22T02:57:43+09:00",
-  "rearm_verified_at":"2026-09-22T03:00:22+09:00",
-  "verified_provisional_due_at":"2026-09-22T03:11:15+09:00",
+  "current_expected_due_at":"2026-09-22T07:07:30+09:00",
+  "generation_key":"DUE:2026-09-22T07:07:30+09:00",
+  "boot_started_at":"2026-09-22T07:09:13+09:00",
+  "boot_started_authority_epoch":"DUE:2026-09-22T07:07:30+09:00",
+  "rearm_verified_at":"2026-09-22T07:09:21+09:00",
+  "verified_provisional_due_at":"2026-09-22T07:20:13+09:00",
   "status":"REARM_VERIFIED",
-  "last_updated_at":"2026-09-22T03:00:22+09:00",
-  "provider_delivery_delay_seconds":152,
+  "last_updated_at":"2026-09-22T07:09:21+09:00",
+  "provider_delivery_delay_seconds":103,
   "provisional_extension_count":0,
-  "note":"Epoch 82 bootstrap entry observed at 03:00:15 KST. SAME MAIN recurring provisional rearm live-verified for exactly 11 minutes (660 seconds) after observed wake reference, due 03:11:15 KST."
+  "note":"Bootstrap entry observed at 07:09:13 KST. SAME MAIN recurring provisional rearm live-verified for exactly 11 minutes (660 seconds) after observed wake reference, due 07:20:13 KST."
 }
