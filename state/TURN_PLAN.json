@@ -4,7 +4,7 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "authority_epoch": 74,
   "run_id": "RUN-UTIL-20260921-235045",
-  "status": "IN_PROGRESS",
+  "status": "ACTIVE",
   "phase": "MAIN_SELF_RELIANT_POLICY_ALIGNMENT",
   "objective_id": "WS-P001-002-MAIN-SELF-RELIANT-V4",
   "objective": "Make SAME MAIN RRULE the complete normal continuation path and retain Watchdog only as disabled explicit emergency standby.",
@@ -23,14 +23,15 @@
     "Search for stale normal-path Watchdog requirements and reconcile material conflicts.",
     "Checkpoint and close with live-verified SAME MAIN END+60."
   ],
-  "current_substep": 2,
+  "current_substep": 3,
   "handoff_boundary": null,
   "early_finish_fallback": "Add a deterministic policy-consistency check that rejects normal-close Watchdog requirements.",
   "created_for_next_wake": false,
   "started_at": "2026-09-21T23:50:45+09:00",
-  "last_progress_at": "2026-09-21T23:52:20+09:00",
+  "last_progress_at": "2026-09-21T23:57:30+09:00",
   "progress_evidence": [
     "BOOT_STARTED 23:50:45 for DUE:2026-09-21T23:52:00+09:00",
-    "REARM_VERIFIED 23:51:45.997376; SAME MAIN recurring provisional due 00:03:45 enabled"
+    "REARM_VERIFIED 23:51:45.997376; SAME MAIN recurring provisional due 00:03:45 enabled",
+    "Claimed epoch 74 and found stale independent-Watchdog dependency in ACTIVE_CONTROLS/handoff recovery/CI."
   ]
 }
