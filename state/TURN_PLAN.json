@@ -2,41 +2,35 @@
   "schema_version": "1.1",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "authority_epoch": 70,
-  "run_id": "RUN-UTIL-20260921-212747",
+  "authority_epoch": 71,
+  "run_id": "RUN-UTIL-20260921-215434",
   "status": "ACTIVE",
-  "phase": "POST_BOOTSTRAP_PROVISIONAL_RECOVERY",
-  "objective_id": "WS-P001-002-RECOVERY-LINEAGE-AUDIT",
-  "objective": "Repair the non-executable startup-boundary auditor and validate both fixed-Watchdog and provisional cold-rescue generation lineage without promoting incomplete samples.",
+  "phase": "WATCHDOG_RECOVERY_OBSERVABILITY",
+  "objective_id": "WS-P001-002-RECOVERY-SEGMENT-REPORTING",
+  "objective": "Expose Watchdog recovery segments in turn-close summaries without collapsing missing boundaries to zero or comparing recovery generations as normal scheduler samples.",
   "expected_useful_seconds": 600,
   "acceptance_criteria": [
-    "Audit tool executes without undefined-symbol failures.",
-    "Known boundary inconsistency remains visible but acknowledged invalid data does not fail the whole audit.",
-    "Watchdog recovery generations require a valid STARTUP_ACK_MISSING source and matching due generation.",
-    "Recovery generations remain excluded from normal scheduler comparison.",
-    "Focused tests pass against actual STARTUP/RUNS ledgers."
+    "Summary distinguishes normal scheduler delivery from Watchdog recovery delay.",
+    "Missing recovery boundaries remain UNKNOWN rather than zero.",
+    "Recovery generations are labeled and excluded from normal scheduler comparison.",
+    "Focused fixtures cover complete and incomplete Watchdog recovery paths."
   ],
   "checkpointable_substeps": [
-    "Recover authority from stale epoch 69 without replay.",
-    "Commit execution repair and recovery-lineage checks.",
-    "Run focused unit tests and actual-ledger audit.",
-    "Record STARTUP-010 first useful and update review/checkpoint.",
-    "Close at >=600s safe boundary with synchronized MAIN and Watchdog."
+    "Claim epoch 71 after verified recovery bootstrap without replaying stale epoch 70.",
+    "Inspect current summarize_turn_close data model and fixtures.",
+    "Implement recovery-segment fields and focused tests.",
+    "Run focused tests against fixtures and actual ledgers.",
+    "Close at >=600s safe boundary with exact END+60 MAIN and enabled Watchdog."
   ],
-  "current_substep": 4,
-  "handoff_boundary": "Epoch 70 active after verified provisional cold-rescue bootstrap.",
-  "early_finish_fallback": "Add recovery-segment reporting to summarize_turn_close while preserving unknown boundaries.",
+  "current_substep": 2,
+  "handoff_boundary": "Epoch 71 active after Watchdog recovery and verified provisional protection.",
+  "early_finish_fallback": "Add canonical-ID consistency validation for STARTUP_ACK recovery generations.",
   "created_for_next_wake": false,
-  "started_at": "2026-09-21T21:27:47+09:00",
-  "last_progress_at": "2026-09-21T21:30:51+09:00",
+  "started_at": "2026-09-21T21:54:34+09:00",
+  "last_progress_at": "2026-09-21T21:56:39+09:00",
   "progress_evidence": [
-    "epoch69 post-bootstrap progress loss preserved without inferred work",
-    "STARTUP-010 BOOT_STARTED=2026-09-21T21:28:24+09:00",
-    "STARTUP-010 REARM_VERIFIED=2026-09-21T21:28:51+09:00",
-    "verified provisional due=2026-09-21T21:41:24+09:00",
-    "tools/audit_startup_boundaries.py execution repair committed",
-    "7 focused audit tests passed without pytest dependency",
-    "actual STARTUP/RUNS audit valid=true; recovery samples excluded from normal scheduler comparison",
-    "STARTUP-010 first useful=2026-09-21T21:30:51+09:00"
+    "Watchdog recovery generation 21:54:52 entered BOOT_STARTED and REARM_VERIFIED",
+    "MAIN provisional due 22:09:11 enabled and verified",
+    "Watchdog due 22:12:11 enabled and verified"
   ]
 }
