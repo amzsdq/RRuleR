@@ -6,6 +6,9 @@ A ChatGPT session is disposable. Fresh durable GitHub state is authoritative.
 
 ## Mandatory startup
 
+Read `state/NOW.json` first. If execution_status is PAUSED, do not start substantive work or rearm; preserve a safe checkpoint and report PAUSED. Recheck this flag before each write batch and scheduler mutation.
+
+
 1. Read `control/ACTIVE_CONTROLS.json`, then all artifacts it marks mandatory on wake.
 2. Read `planning/PROGRAM.md` and `state/NOW.json`. Follow NOW's project and work-spec references and reconstruct the full PROGRAM -> PROJECT -> WORK SPEC chain.
 3. Read `state/CURRENT.json`, `state/ACTIVITY.json`, `state/HANDOFF.json`, and `state/TURN_PLAN.json`.
@@ -63,7 +66,7 @@ Useful-work utilization is a first-class objective.
 - Keep checkpoints current enough for cold resume without fabricating activity.
 - Never pad, sleep, split trivial changes, or invent unrelated busywork to consume time or satisfy evidence cadence.
 - Prefer units with safe checkpoint boundaries; as runtime exposure grows, shift toward smaller units rather than idling.
-- A CONTINUE turn has a **minimum useful-work floor of 8 minutes** unless a real stop condition applies. Finishing one experiment setup, scheduler mutation, measurement capture, CI check, or bounded substep before 8 minutes is not permission to end.
+- A CONTINUE turn has a **short-turn diagnostic threshold of 8 elapsed minutes** unless a real stop condition applies. Finishing one experiment setup, scheduler mutation, measurement capture, CI check, or bounded substep before 8 minutes is not permission to end.
 - If the current substep becomes wait-bound, immediately switch to another safe authorized runnable item from the same work spec/project rather than ending the turn. Waiting for a future observation is not a blocker while other useful work exists.
 - A short CONTINUE turn (<8 minutes) is an exception that MUST record a concrete `short_turn_reason` and the exhausted alternatives. Acceptable reasons are limited to: actual platform-enforced termination, explicit operator intervention, authority/fencing failure closed, or no safe runnable work anywhere in the active work spec/project after an explicit scan.
 
@@ -135,7 +138,7 @@ A root-level COMPLETE is not automatically a program exit state.
 
 ## Hard no-self-termination invariant
 
-A non-terminal owner MUST NOT voluntarily end its turn.
+A non-terminal owner MUST continue until the single decision procedure in control/run-continuation-gate.v1.json authorizes bounded close or a documented exception.
 
 `CONTINUE`, `WORKING`, `DEGRADED_CONTINUATION`, checkpoint completion, CI success, document completion, root completion, plan completion, "nothing immediately obvious", or waiting for a future cold-rescue wake are not permission to end.
 
@@ -182,8 +185,18 @@ Immediately before emitting ANY normal user-visible final response, freshly read
 - `state/HANDOFF.json`;
 - `control/run-continuation-gate.v1.json`.
 
-If the program is `CONTINUE` or `DEGRADED_CONTINUATION` and no committed successor handoff, explicit operator stop, or actual platform-enforced termination exists, FINAL IS FORBIDDEN. Immediately execute the next useful admissible unit instead. A stale earlier check cannot authorize final after additional work or state mutation.
+Apply `turn_decision` in `control/run-continuation-gate.v1.json` as the single close decision. Verified continuation permits final only after its bounded-close requirements are satisfied. An operator pause in `state/NOW.json` overrides continuation: checkpoint, do not rearm, and report PAUSED. A stale earlier check cannot authorize final after additional work or state mutation.
 
 ## Public repository rule
 
 Never write secrets or private source material here. Store only public-safe state or references.
+
+## Runnable selection and measured close (v4)
+
+Use the existing TURN_PLAN, not another planning system. Before work, identify a primary item, a dependency-independent fallback, and a small residual-budget item within the active work spec/project. Each item must name its target artifact, acceptance result, dependencies, authority/conflict domain, estimated duration, and safe checkpoint. Mark a future observation WAITING; never select it as a currently runnable item. If a queue item is already complete, skip it and choose the next acceptance item.
+
+After every useful unit, select the next runnable item immediately. Refresh mutable authority/pause state before writes; immutable policy need not be reloaded after every tiny step when its version is unchanged. A completed packet or a secured next wake is not a close decision.
+
+Observe wake/start/end separately. START-to-END is elapsed duration including control and close overhead, never automatically productive_substantive_seconds. Keep unknown useful time null. Start closing in time to respect the 10-minute work envelope and the existing platform safety limit; never reset the safety clock after slow bootstrap.
+
+For every newly closed run, supply observed start/end, derived duration_seconds, turn_outcome, end_reason, program_status_at_end, and close_decision. Run `python tools/validate_run_records.py state/RUNS.jsonl` before normal close. This checks records written after the v4 migration boundary; historical invalid records remain unchanged and visible. A validator failure is a repair task, not permission to fabricate time or exception evidence.

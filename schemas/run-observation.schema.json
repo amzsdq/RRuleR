@@ -1,34 +1,253 @@
 {
-  "$schema":"https://json-schema.org/draft/2020-12/schema",
-  "$id":"https://github.com/amzsdq/RRuleR/schemas/run-observation.schema.json",
-  "title":"RRuleR Run Observation",
-  "type":"object",
-  "required":["observation_id","root_job_id","canonical_automation_id","run_started_at","classification"],
-  "properties":{
-    "observation_id":{"type":"string","minLength":1},
-    "root_job_id":{"type":"string","minLength":1},
-    "canonical_automation_id":{"type":"string","minLength":1},
-    "run_started_at":{"type":"string","minLength":1},
-    "run_ended_at":{"type":["string","null"]},
-    "end_reason":{"type":["string","null"],"enum":[null,"PROGRAM_COMPLETE","BLOCKED_EXTERNAL","VERIFIED_SAME_CANONICAL_CONTINUATION","COMMITTED_SUCCESSOR_HANDOFF","EXPLICIT_OPERATOR_STOP","PLATFORM_ENFORCED_TERMINATION"]},
-    "program_status_at_end":{"type":["string","null"]},
-    "successor_observed_at":{"type":["string","null"]},
-    "productive_substantive_seconds":{"type":["integer","null"],"minimum":0},
-    "checkpoint_seconds":{"type":["integer","null"],"minimum":0},
-    "handoff_seconds":{"type":["integer","null"],"minimum":0},
-    "relay_idle_gap_seconds":{"type":["integer","null"],"minimum":0},
-    "successor_wait_seconds":{"type":["integer","null"],"minimum":0},
-    "classification":{"enum":["ACTIVE","HANDOFF","COMPLETE","BLOCKED_EXTERNAL","PLATFORM_ENDED","DEGRADED_CONTINUATION"]},
-    "notes":{"type":"string"},
-    "duration_seconds":{"type":["integer","null"],"minimum":0},
-    "turn_outcome":{"type":["string","null"],"enum":[null,"CONTINUE","COMPLETE","BLOCKED","PAUSED"]},
-    "short_turn_reason":{"type":["string","null"],"enum":[null,"PLATFORM_ENFORCED_TERMINATION","EXPLICIT_OPERATOR_INTERVENTION","AUTHORITY_OR_FENCING_FAIL_CLOSED","NO_SAFE_RUNNABLE_WORK_AFTER_EXPLICIT_SCAN"]},
-    "alternatives_checked":{"type":"array","items":{"type":"string","minLength":1},"minItems":1,"uniqueItems":true}
-  },
-  "allOf":[
-    {"if":{"properties":{"run_ended_at":{"type":"string"}},"required":["run_ended_at"]},"then":{"required":["end_reason","program_status_at_end"]}},
-    {"if":{"properties":{"end_reason":{"const":"COMMITTED_SUCCESSOR_HANDOFF"}}},"then":{"required":["successor_observed_at"],"properties":{"successor_observed_at":{"type":"string"}}}},
-    {"if":{"properties":{"turn_outcome":{"const":"CONTINUE"},"duration_seconds":{"type":"integer","maximum":479}},"required":["turn_outcome","duration_seconds"]},"then":{"required":["short_turn_reason","alternatives_checked"],"properties":{"short_turn_reason":{"type":"string"}}}}
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/amzsdq/RRuleR/schemas/run-observation.schema.json",
+  "title": "RRuleR Run Observation",
+  "type": "object",
+  "required": [
+    "observation_id",
+    "root_job_id",
+    "canonical_automation_id",
+    "run_started_at",
+    "classification"
   ],
-  "additionalProperties":false
+  "properties": {
+    "observation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "root_job_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "canonical_automation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_started_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_ended_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "end_reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        null,
+        "PROGRAM_COMPLETE",
+        "BLOCKED_EXTERNAL",
+        "VERIFIED_SAME_CANONICAL_CONTINUATION",
+        "COMMITTED_SUCCESSOR_HANDOFF",
+        "EXPLICIT_OPERATOR_STOP",
+        "PLATFORM_ENFORCED_TERMINATION"
+      ]
+    },
+    "program_status_at_end": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "successor_observed_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "productive_substantive_seconds": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "checkpoint_seconds": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "handoff_seconds": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "relay_idle_gap_seconds": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "successor_wait_seconds": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "classification": {
+      "enum": [
+        "ACTIVE",
+        "HANDOFF",
+        "COMPLETE",
+        "BLOCKED_EXTERNAL",
+        "PLATFORM_ENDED",
+        "DEGRADED_CONTINUATION"
+      ]
+    },
+    "notes": {
+      "type": "string"
+    },
+    "duration_seconds": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "turn_outcome": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        null,
+        "CONTINUE",
+        "COMPLETE",
+        "BLOCKED",
+        "PAUSED"
+      ]
+    },
+    "short_turn_reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        null,
+        "PLATFORM_ENFORCED_TERMINATION",
+        "EXPLICIT_OPERATOR_INTERVENTION",
+        "AUTHORITY_OR_FENCING_FAIL_CLOSED",
+        "NO_SAFE_RUNNABLE_WORK_AFTER_EXPLICIT_SCAN"
+      ]
+    },
+    "alternatives_checked": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "close_decision": {
+      "enum": [
+        "TIME_BOUNDARY",
+        "BUDGET_EXHAUSTED",
+        "EXCEPTION",
+        "HANDOFF",
+        "TERMINAL"
+      ]
+    },
+    "close_reserve_seconds": {
+      "type": "number",
+      "minimum": 0
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "run_ended_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_ended_at"
+        ]
+      },
+      "then": {
+        "required": [
+          "end_reason",
+          "program_status_at_end",
+          "duration_seconds",
+          "turn_outcome",
+          "close_decision"
+        ],
+        "properties": {
+          "duration_seconds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "turn_outcome": {
+            "type": "string"
+          },
+          "close_decision": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "end_reason": {
+            "const": "COMMITTED_SUCCESSOR_HANDOFF"
+          }
+        },
+        "required": [
+          "end_reason"
+        ]
+      },
+      "then": {
+        "required": [
+          "successor_observed_at"
+        ],
+        "properties": {
+          "successor_observed_at": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "turn_outcome": {
+            "const": "CONTINUE"
+          },
+          "duration_seconds": {
+            "type": "integer",
+            "maximum": 479
+          }
+        },
+        "required": [
+          "turn_outcome",
+          "duration_seconds"
+        ]
+      },
+      "then": {
+        "required": [
+          "short_turn_reason",
+          "alternatives_checked"
+        ],
+        "properties": {
+          "short_turn_reason": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
 }
