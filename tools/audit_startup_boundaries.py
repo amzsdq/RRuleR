@@ -27,7 +27,7 @@ def audit(startup: dict, run_lines: list[str]) -> dict:
     for sample in startup.get("samples", []):
         errors = []
         predecessor_id = sample.get("predecessor_run_id")
-        run = runs.get(predecessor_id)
+        run = find_run(predecessor_id)
         predecessor_end = run.get("run_ended_at") if run else None
         last_useful = sample.get("predecessor_last_useful_at")
         if predecessor_end and last_useful and _ts(last_useful) > _ts(predecessor_end):
