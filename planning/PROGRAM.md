@@ -23,7 +23,12 @@ RRuleR is judged on outcomes, not feature count:
 - Governance and security
 - Usability and reproducibility
 
-The current program P0 is **useful-work utilization**. Existing safety and correctness constraints remain guardrails, but should not consume the roadmap unless they materially advance the north-star outcome.
+The current program has two operator-locked co-equal P0 blockers:
+
+1. **P0-A — Turn worktime / sustained useful work:** normal nonterminal `CONTINUE` turns must sustain at least **10 minutes (600 observed elapsed seconds)** of chained authorized work unless a truthful early-exit exception applies, while useful-work evidence remains distinct from elapsed time.
+2. **P0-B — Exact schedule rearm / continuation latency:** normal close must mutate the **SAME enabled recurring MAIN** to **ACTUAL END + exactly 1 minute (60 seconds)**, live-verify the exact `DTSTART`, persist the same due across durable projections, and measure provider delivery/startup latency separately.
+
+Until both are stably proven and retained as regression gates, other product/runtime expansion is secondary unless it directly improves one of these two P0s or preserves required safety/correctness.
 
 ## Project roadmap
 
@@ -42,14 +47,20 @@ Project ordering after P001 may change if evidence shows a different remaining d
 
 **P001 — Sustained Utilization & Continuous Execution**
 
-Reason: the runtime is not SaaS-competitive if scheduled availability exists but useful work occupies only a small fraction of it. Utilization is therefore the current bottleneck and must be solved before expanding feature breadth.
+Reason: the current dominant defects are not feature breadth. They are (A) insufficient or prematurely terminated work inside a wake and (B) incorrect/ambiguous next-wake timing after close. P001 therefore treats sustained turn worktime and exact completion-relative schedule rearm as the two highest-priority runtime outcomes before broader productization.
 
 ## Next project
 
-Default: **P002 — Durable Recovery & Cold Resume Hardening**.
+Default after both active P0 gates pass: **P002 — Durable Recovery & Cold Resume Hardening**.
 
 This is a default, not a sacred rule. At P001 exit, re-score the competitive dimensions and select the highest expected-effect project. If the evidence says another project is more valuable, update this roadmap.
 
 ## Program completion
 
 PROGRAM_COMPLETE requires credible evidence across the success dimensions above. Completing one project, CI suite, document, experiment, or architecture layer is not program completion.
+
+## Product-direction discipline
+
+Product/runtime design ideas are evaluated by expected effect on active goals, not by feature count. The current recursive-development loop is: observe a measured bottleneck -> check prior art / existing mechanisms -> generate a reversible candidate -> estimate benefit/cost/risk -> test -> verify against fixed evidence -> ADOPT / REVISE / ROLLBACK / REJECT. Stable objectives must not be rewritten merely to make an experiment pass.
+
+Natural-language turn reporting is a **distribution UX contract**, not a replacement for precise internal telemetry. During runtime debugging/canaries, evidence-bound machine-style traces may remain visible. The eventual distribution renderer should summarize observed work time, completed work, status, and next action in natural language while preserving exact machine evidence underneath.
