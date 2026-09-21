@@ -2,38 +2,35 @@
   "schema_version": "1.1",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "authority_epoch": 71,
-  "run_id": "RUN-UTIL-20260921-215434",
-  "status": "COMPLETED",
+  "authority_epoch": 72,
+  "run_id": "RUN-UTIL-20260921-221537",
+  "status": "IN_PROGRESS",
   "phase": "WATCHDOG_RECOVERY_OBSERVABILITY",
-  "objective_id": "WS-P001-002-RECOVERY-SEGMENT-REPORTING",
-  "objective": "Expose Watchdog recovery segments in turn-close summaries without collapsing missing boundaries to zero or comparing recovery generations as normal scheduler samples.",
+  "objective_id": "WS-P001-002-RECOVERY-LIVE-EVIDENCE",
+  "objective": "Persist the live 22:07:23 startup failure and 22:13:24 fixed-Watchdog recovery as separate generations, and ensure the audit covers the active next_sample.",
   "expected_useful_seconds": 600,
   "acceptance_criteria": [
-    "Summary distinguishes normal scheduler delivery from Watchdog recovery delay.",
-    "Missing recovery boundaries remain UNKNOWN rather than zero.",
-    "Recovery generations are labeled and excluded from normal scheduler comparison.",
-    "Focused fixtures cover complete and incomplete Watchdog recovery paths."
+    "Failed normal generation retains missing bootstrap/useful boundaries as null.",
+    "Recovery generation has explicit lineage and is excluded from normal scheduler comparison.",
+    "Audit validates next_sample instead of silently ignoring the newest live generation.",
+    "Focused tests and actual-ledger audit pass."
   ],
   "checkpointable_substeps": [
-    "Claim epoch 71 after verified recovery bootstrap without replaying stale epoch 70.",
-    "Inspect current summarize_turn_close data model and fixtures.",
-    "Implement recovery-segment fields and focused tests.",
-    "Run focused tests against fixtures and actual ledgers.",
-    "Close at >=600s safe boundary with exact END+60 MAIN and enabled Watchdog."
+    "Claim epoch 72 after verified recovery bootstrap.",
+    "Append failed and recovery generations to SUCCESSOR_STARTUP.",
+    "Update audit to include next_sample and add regression coverage.",
+    "Run focused and actual-ledger validation.",
+    "Close with exact END+60 MAIN and enabled Watchdog."
   ],
-  "current_substep": 5,
-  "handoff_boundary": "Epoch 71 active after Watchdog recovery and verified provisional protection.",
-  "early_finish_fallback": "Add canonical-ID consistency validation for STARTUP_ACK recovery generations.",
+  "current_substep": 2,
+  "handoff_boundary": "Epoch 72 active after fixed-Watchdog recovery and verified provisional protection.",
+  "early_finish_fallback": "Add exact paired-generation summary assertions or repair stale ACTIVITY close semantics.",
   "created_for_next_wake": false,
-  "started_at": "2026-09-21T21:54:34+09:00",
-  "last_progress_at": "2026-09-21T22:06:23+09:00",
+  "started_at": "2026-09-21T22:15:37+09:00",
+  "last_progress_at": "2026-09-21T22:19:35+09:00",
   "progress_evidence": [
-    "Watchdog recovery generation 21:54:52 entered BOOT_STARTED and REARM_VERIFIED",
-    "MAIN provisional due 22:09:11 enabled and verified",
-    "Watchdog due 22:12:11 enabled and verified",
-    "Recovery segment summary implemented; 6 focused tests passed.",
-    "STARTUP_ACK canonical identity validation implemented; 9 focused tests passed.",
-    "RUNS validation passed; MAIN due 22:07:23 and Watchdog due 22:10:23 live-verified enabled."
+    "BOOT_STARTED 22:16:29 for DUE:2026-09-21T22:13:24+09:00",
+    "REARM_VERIFIED 22:17:18; MAIN due 22:29:29 enabled",
+    "Watchdog due 22:32:29 enabled and exact one-shot"
   ]
 }
