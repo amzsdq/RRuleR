@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_RUN_CONTINUATION_GATE",
-  "version": 13,
+  "version": 14,
   "status": "ACTIVE",
-  "purpose": "Allow normal CONTINUE close only after the current operator-created SAME MAIN recurring schedule is live-verified at exact END+60. Watchdog is not normal continuity.",
+  "purpose": "Allow normal CONTINUE close only after the current operator-created SAME MAIN recurring schedule is live-verified at ACTUAL END + exactly 1 minute (60 seconds). Watchdog is not normal continuity.",
   "program_nonterminal_states": [
     "CONTINUE",
     "DEGRADED_CONTINUATION"
@@ -38,7 +38,7 @@
       "NORMAL_CONTINUE_MINIMUM_600S_REACHED_OR_NONCONTINUE_STOP_PAUSE_TERMINAL_BLOCKED_OR_PLATFORM_TERMINATION",
       "LATEST_CHECKPOINT_PERSISTED",
       "ACTUAL_END_OBSERVED",
-      "SAME_MAIN_MUTATED_TO_EXACT_END_PLUS_60_SECONDS",
+      "SAME_MAIN_MUTATED_TO_ACTUAL_END_PLUS_EXACTLY_1_MINUTE_60_SECONDS",
       "LIVE_MAIN_REREAD_PROVES_SAME_CANONICAL_ENABLED_RECURRING_EXACT_DSTART",
       "DURABLE_EXPECTED_FAST_DUE_PERSISTED",
       "NON_WORKING_CURRENT_ACTIVITY_HANDOFF_PROJECTION_VALIDATED",
@@ -92,7 +92,7 @@
       "state/NOW.json"
     ],
     "check_immediately_before_user_visible_final": true,
-    "authorization_rule": "Honor operator pause and terminal states first. For normal CONTINUE, final is authorized only after the fresh CURRENT MAIN canonical is live-verified enabled with recurrence at exact END+60 and the non-WORKING close projection is consistent. A retired predecessor canonical can never satisfy the gate.",
+    "authorization_rule": "Honor operator pause and terminal states first. For normal CONTINUE, final is authorized only after the fresh CURRENT MAIN canonical is live-verified enabled with recurrence at ACTUAL END + exactly 1 minute (60 seconds) and the non-WORKING close projection is consistent. This means sixty seconds after observed END, never 60 minutes or the next hourly RRULE occurrence. A retired predecessor canonical can never satisfy the gate.",
     "if_denied": "DO_NOT_EMIT_FINAL_CONTINUE_USEFUL_WORK",
     "stale_prior_check_forbidden": true,
     "normal_status_report_does_not_authorize_final": true
@@ -105,15 +105,15 @@
       "Honor operator pause/STOP before work and scheduler mutation.",
       "After each completed bounded unit, choose the next primary, independent fallback, then smallest authorized runnable unit.",
       "After each bounded substantive unit completes, persist its observed START/END/DURATION and artifact-backed work evidence, emit exactly one compact completion trace, then continue same-wake selection; the trace never authorizes close.",
-      "If elapsed <600s and a clear low-risk checkpointable unit fits the remaining platform safety budget, execute it in the same turn.",
-      "If elapsed <600s and the obvious next unit is too large, decompose it and execute a smaller safe slice when possible.",
-      "A normal nonterminal STATUS=CONTINUE voluntary close before 600s is forbidden. CI pending, local packet/substep/checkpoint completion, secured continuation, or no-obvious-next-task are not close reasons.",
+      "If elapsed <10 minutes (600 seconds) and a clear low-risk checkpointable unit fits the remaining platform safety budget, execute it in the same turn.",
+      "If elapsed <10 minutes (600 seconds) and the obvious next unit is too large, decompose it and execute a smaller safe slice when possible.",
+      "A normal nonterminal STATUS=CONTINUE voluntary close before 10 minutes (600 seconds) is forbidden. CI pending, local packet/substep/checkpoint completion, secured continuation, or no-obvious-next-task are not close reasons.",
       "If an earlier end is unavoidable, it must be explicit operator STOP/PAUSE, durable program terminal, genuine BLOCKED/fail-closed authority or safety state with no safe authorized work, or platform-enforced termination; record the corresponding status/reason instead of normal CONTINUE.",
-      "At elapsed >=600s, do not start a new large unit; finish only the smallest safe in-flight unit.",
-      "Aim to close by ~720s; exceeding that soft ceiling requires an actual in-flight safety/atomicity reason.",
-      "Checkpoint, observe actual END, live-verify the fresh CURRENT SAME MAIN recurring schedule at END+60 with enabled=true and exact DTSTART, persist the exact fast due and non-WORKING handoff projection, then report."
+      "At elapsed >=10 minutes (600 seconds), do not start a new large unit; finish only the smallest safe in-flight unit.",
+      "Aim to close by about 12 minutes (720 seconds); exceeding that soft ceiling requires an actual in-flight safety/atomicity reason.",
+      "Checkpoint, observe actual END, live-verify the fresh CURRENT SAME MAIN recurring schedule at ACTUAL END + exactly 1 minute (60 seconds) with enabled=true and exact DTSTART, persist the exact fast due and non-WORKING handoff projection, then report."
     ],
-    "close_reserve_rule": "Use measured close cost only to avoid overrunning the platform safety budget after the 600-second minimum. Close reserve never authorizes a voluntary normal CONTINUE close before 600s. Never pad.",
+    "close_reserve_rule": "Use measured close cost only to avoid overrunning the platform safety budget after the 10-minute (600-second) minimum. Close reserve never authorizes a voluntary normal CONTINUE close before 10 minutes (600 seconds). Never pad.",
     "normal_close_evidence": [
       "close_decision",
       "proof that normal CONTINUE elapsed reached at least 600 seconds",
@@ -123,13 +123,20 @@
     "pause_rule": "state/NOW.json execution_status=PAUSED forbids new work and self-rearm; checkpoint only and report PAUSED.",
     "normal_soft_ceiling_seconds": 720,
     "work_unit_chaining": {
-      "before_target": "Before 600 elapsed seconds, continue authorized work by selecting the next clear low-risk checkpointable unit, independent fallback, residual unit, or smaller decomposed slice. Voluntary normal CONTINUE close is forbidden.",
+      "before_target": "Before 10 minutes (600 elapsed seconds), continue authorized work by selecting the next clear low-risk checkpointable unit, independent fallback, residual unit, or smaller decomposed slice. Voluntary normal CONTINUE close is forbidden.",
       "decompose_if_needed": "If the obvious next unit is too large or risky, select a smaller safe slice with an explicit checkpoint.",
-      "after_target": "At or after 600 elapsed seconds, do not start a new large unit; finish only the smallest safe in-flight unit, checkpoint, verify continuation, and close.",
-      "soft_ceiling": "Normal operation should close by about 720 elapsed seconds. Exceed only for a genuine in-flight atomicity/safety reason.",
+      "after_target": "At or after 10 minutes (600 elapsed seconds), do not start a new large unit; finish only the smallest safe in-flight unit, checkpoint, verify continuation, and close.",
+      "soft_ceiling": "Normal operation should close by about 12 minutes (720 elapsed seconds). Exceed only for a genuine in-flight atomicity/safety reason.",
       "chat_trace": "A completed bounded unit gets one user-visible trace only after durable duration/work evidence exists; then same-wake work selection continues. Progress chat is not a task boundary or close signal."
     },
     "normal_continue_minimum_elapsed_seconds": 600,
     "pre_600_voluntary_continue_close_forbidden": true
+  },
+  "time_unit_safety": {
+    "required": true,
+    "normal_close_offset": "1 minute (60 seconds)",
+    "minimum_continue": "10 minutes (600 seconds)",
+    "soft_ceiling": "12 minutes (720 seconds)",
+    "rule": "Bare time arithmetic such as END+60 is forbidden in human-readable policy text."
   }
 }
