@@ -3,11 +3,11 @@
   "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
   "current_expected_due_at": "2026-09-21T23:52:00+09:00",
   "generation_key": "DUE:2026-09-21T23:52:00+09:00",
-  "boot_started_at": null,
-  "boot_started_authority_epoch": null,
-  "rearm_verified_at": null,
-  "verified_provisional_due_at": null,
-  "status": "AWAITING_BOOT_STARTED",
-  "last_updated_at": "2026-09-21T23:50:28+09:00",
-  "note": "Self-reliant MAIN v4.0 generation. Watchdog is disabled standby; same MAIN RRULE is cold fallback."
+  "boot_started_at": "2026-09-21T23:50:45+09:00",
+  "boot_started_authority_epoch": 74,
+  "rearm_verified_at": "2026-09-21T23:51:45.997376+09:00",
+  "verified_provisional_due_at": "2026-09-22T00:03:45+09:00",
+  "status": "REARM_VERIFIED",
+  "last_updated_at": "2026-09-21T23:53:14+09:00",
+  "note": "Generation-matched MAIN v4 startup receipts restored after concurrent operator policy synchronization. SAME MAIN recurring provisional DTSTART 00:03:45 remains live-verified; Watchdog is disabled standby."
 }
