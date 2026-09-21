@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.12",
+  "schema_version": "2.13",
   "program_id": "RRULER-PROGRAM-001",
   "status": "ACTIVE",
   "purpose": "Single machine-readable registry of control artifacts that every fresh worker must load before substantive work.",
@@ -59,7 +59,7 @@
     "SAME_MAIN_RECURRING_RRULE_IS_COLD_FALLBACK",
     "RETIRED_MAIN_CANONICAL_MUST_NEVER_REACTIVATE",
     "ALL_RETIRED_MAIN_CANONICALS_MUST_NEVER_REACTIVATE",
-    "SAME_MAIN_PROVISIONAL_IS_SHORT_ROLLING_NOT_LONG_TARGET_PLUS_MARGIN"
+    "SAME_MAIN_PROVISIONAL_MATCHES_BOUNDED_ENVELOPE_AND_AVOIDS_SHORT_ROLLING_COLLISION"
   ],
-  "conflict_rule": "Every wake reloads fresh ACTIVE_CONTROLS and mandatory artifacts; prior-wake cached policy cannot override them. If mandatory artifacts conflict, fail closed only for the disputed side effect and reconcile durably. Normal nonterminal CONTINUE cannot voluntarily close before 600 observed elapsed seconds. The fresh CURRENT canonical is the sole normal MAIN. Current clean MAIN=6ab152b636748191a71873ba4d5ef551. During active work its provisional recurring due is short rolling NOW+120s and is refreshed when <=45s remains; the retired +780s target+margin provisional must not be restored. Normal close shifts only THIS SAME MAIN to exact END+60. Never reactivate retired MAIN canonicals 6ab14f7951848191b65e4b5d4bc979d8 or 6aaf8a993eb08191b8d0ab1d9662e4b2. Watchdog remains disabled standby."
+  "conflict_rule": "Every wake reloads fresh ACTIVE_CONTROLS and mandatory artifacts; prior-wake cached policy cannot override them. If mandatory artifacts conflict, fail closed only for the disputed side effect and reconcile durably. Normal nonterminal CONTINUE cannot voluntarily close before 600 observed elapsed seconds. Current clean MAIN=6ab152b636748191a71873ba4d5ef551. For the normal ~10m envelope, provisional recurrence is armed once at observed wake +660s (~11m); repeated +2m rolling refresh is forbidden as the normal strategy because prior live A/B evidence showed overlap. The former +780s/13m provisional is also retired as unnecessarily long. Extend SAME MAIN only if work/close handling clearly threatens the +11m due. Normal close shifts only THIS SAME MAIN to exact END+60. Never reactivate retired MAIN canonicals 6ab14f7951848191b65e4b5d4bc979d8 or 6aaf8a993eb08191b8d0ab1d9662e4b2. Watchdog remains disabled standby."
 }
