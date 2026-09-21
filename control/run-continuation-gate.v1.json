@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_RUN_CONTINUATION_GATE",
-  "version": 4,
+  "version": 5,
   "status": "ACTIVE",
-  "purpose": "Require an active worker to keep performing useful work while the program remains non-terminal until the bounded turn closes with a verified same-canonical continuation or authority is otherwise safely transferred.",
+  "purpose": "Keep non-terminal owners doing useful work by chaining bounded work units until the 10-minute target, then close at the next safe boundary with a verified same-canonical continuation.",
   "program_nonterminal_states": [
     "CONTINUE",
     "DEGRADED_CONTINUATION"
@@ -90,18 +90,28 @@
     "clock": "Observed authorized work start through close; elapsed is NOT useful-work duration. Capture wake time separately; startup must not reset the platform safety budget.",
     "order": [
       "Honor operator pause/STOP before work and scheduler mutation.",
-      "After each unit choose primary, independent fallback, then smallest authorized runnable unit.",
-      "Continue if a candidate plus measured close reserve fits the remaining turn budget.",
-      "Close normally only at the target boundary, or after 480 seconds when no smaller safe unit fits plus close reserve; record candidates and estimates.",
-      "Before 480 seconds close only for an allowlisted concrete short_turn_reason with alternatives_checked.",
-      "Checkpoint, verify continuation unless paused/terminal, validate the new run record, then report."
+      "After each completed bounded unit, choose the next primary, independent fallback, then smallest authorized runnable unit.",
+      "If elapsed <600s and a clear low-risk checkpointable unit fits the remaining platform safety budget, execute it in the same turn.",
+      "If elapsed <600s and the obvious next unit is too large, decompose it and execute a smaller safe slice when possible.",
+      "A CONTINUE close below 600s requires a concrete documented reason and alternatives_checked; below 480s additionally requires an allowlisted short-turn exception.",
+      "At elapsed >=600s, do not start a new large unit; finish only the smallest safe in-flight unit.",
+      "Aim to close by ~720s; exceeding that soft ceiling requires an actual in-flight safety/atomicity reason.",
+      "Checkpoint, set normal same-canonical due to actual END+60s unless an explicit durable exception applies, validate the run record, then report."
     ],
-    "close_reserve_rule": "Estimate from observed recent close cost; never use an arbitrary large reserve to justify early exit. Never pad or extend work to meet a useful-seconds quota.",
+    "close_reserve_rule": "Use measured close cost only to avoid overrunning the platform safety budget. Do not use reserve as a reason to stop before 600s when another small safe unit fits. Never pad.",
     "normal_close_evidence": [
       "close_decision",
-      "alternatives_checked when closing below target",
-      "close_reserve_seconds when BUDGET_EXHAUSTED"
+      "alternatives_checked and short_turn_reason when closing below 600 seconds",
+      "allowlisted exception evidence when closing below 480 seconds",
+      "soft_ceiling_exception_reason when closing above 720 seconds"
     ],
-    "pause_rule": "state/NOW.json execution_status=PAUSED forbids new work and self-rearm; checkpoint only and report PAUSED."
+    "pause_rule": "state/NOW.json execution_status=PAUSED forbids new work and self-rearm; checkpoint only and report PAUSED.",
+    "normal_soft_ceiling_seconds": 720,
+    "work_unit_chaining": {
+      "before_target": "When a bounded unit completes before 600 elapsed seconds, start the next clear low-risk checkpointable authorized unit if it fits the remaining platform safety budget.",
+      "decompose_if_needed": "If the obvious next unit is too large or risky, select a smaller safe slice with an explicit checkpoint.",
+      "after_target": "At or after 600 elapsed seconds, do not start a new large unit; finish only the smallest safe in-flight unit, checkpoint, verify continuation, and close.",
+      "soft_ceiling": "Normal operation should close by about 720 elapsed seconds. Exceed only for a genuine in-flight atomicity/safety reason."
+    }
   }
 }
