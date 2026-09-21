@@ -2,40 +2,33 @@
   "schema_version": "1.1",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "authority_epoch": 65,
-  "run_id": "RUN-UTIL-20260921-184232",
-  "status": "CHECKPOINTED",
-  "phase": "TURN_CLOSE_V4_LIVE_RETEST",
+  "authority_epoch": 66,
+  "run_id": "RUN-UTIL-20260921-185559",
+  "status": "ACTIVE",
+  "phase": "TURN_CLOSE_V4_LIVE_RETEST_2",
   "objective_id": "WS-P001-002-TURN-CLOSE-V4-RETEST",
-  "objective": "Implement and verify strict v4 close reporting plus STARTUP boundary audit, then close one valid bounded turn without misclassifying the maintenance wake.",
+  "objective": "Validate and review the first eligible post-repair turn, complete STARTUP-003 prospectively, and advance the multi-turn live retest without inferring useful time.",
   "expected_useful_seconds": 600,
   "acceptance_criteria": [
-    "Unknown useful time and missing successor boundaries remain null, never zero.",
-    "Unexcused CONTINUE closes below 480 seconds are reported.",
-    "Maintenance-interrupted STARTUP samples are retained but excluded from scheduler comparison.",
-    "Focused tests and integrated CI execute the new audit paths.",
-    "Turn closes at the bounded-time decision with verified same-canonical continuation."
+    "Predecessor RUNS record passes the validator.",
+    "A readable review row is appended with UNKNOWN fields preserved.",
+    "STARTUP-003 boundaries are recorded prospectively and invalid samples remain excluded.",
+    "Integrated CI evidence is inspected or a concrete independent verification is completed.",
+    "Current turn reaches the bounded close rule with verified continuation."
   ],
   "checkpointable_substeps": [
-    "Implement strict turn-close summarizer and focused fixtures.",
-    "Implement independent STARTUP boundary consistency audit and fixtures.",
-    "Integrate both paths into control-plane CI.",
-    "Inspect CI/actual output and persist observed close evidence."
+    "Validate predecessor RUNS and derive its review row only from durable evidence.",
+    "Append the first operator review row and record STARTUP-003 first useful boundary.",
+    "Inspect integrated CI or execute equivalent repository-data verification.",
+    "Use remaining budget on the next unaccepted live-retest evidence item."
   ],
-  "current_substep": 4,
-  "handoff_boundary": "Two reporting/audit tools, CI integration, eight focused assertions, actual-ledger invalid-sample classification, and retest evidence are durable. Same-canonical successor is armed for 18:54 KST.",
-  "early_finish_fallback": "Update the v4 retest evidence with exact commits and separate local assertion results from Actions/live behavior.",
+  "current_substep": 1,
+  "handoff_boundary": "Authority epoch 66 claimed; no substantive artifact committed yet.",
+  "early_finish_fallback": "Extend reporting tests to generate validity-aware operator review rows from durable ledgers, then integrate into CI.",
   "created_for_next_wake": false,
-  "started_at": "2026-09-21T18:42:32+09:00",
-  "last_progress_at": "2026-09-21T18:50:37+09:00",
+  "started_at": "2026-09-21T18:55:59+09:00",
+  "last_progress_at": "2026-09-21T18:55:59+09:00",
   "progress_evidence": [
-    "tools/summarize_turn_close.py@929d92154d2f0f7f4a69a1f4c73123ee5e0f6c34",
-    "tests/test_summarize_turn_close.py@36977f9b17a4b3869d5c384753bb9eb123951f32",
-    "tools/audit_startup_boundaries.py@240c8a3e6d510b68ae95135118a52fd602a8a1f0",
-    "tests/test_audit_startup_boundaries.py@ba3d7dba2945fe440f57728c91090fdceaad3fcf",
-    ".github/workflows/validate-control-plane.yml@744eeeda5e3351ddb84bff95951c0ebe2061257a",
-    "state/SUCCESSOR_STARTUP.json@bcababde7ee6c595f067cebe136d7c61eb6bfaf7",
-    "planning/evidence/TURN-CLOSE-V4-RETEST.md@7d4ab999b80d97c859dee660017dcbe3c9780ec7",
-    "tools/summarize_turn_close.py@fdd292ea1a068e9b98d9fd09ec8a548ae67f5174"
+    "state/RUNS.jsonl@7daba51d74f994e836b0ea77f72d144053f7d837"
   ]
 }
