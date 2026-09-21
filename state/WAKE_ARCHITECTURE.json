@@ -1,60 +1,13 @@
 {
-  "schema_version": "2.0",
-  "program_id": "RRULER-PROGRAM-001",
-  "status": "SAME_MAIN_SELF_RELIANT_ACTIVE",
-  "goal": "Minimize reasoning dead time without paid API or always-on user PC while preserving disposable-worker semantics and single substantive authority.",
-  "layers": [
-    {
-      "priority": 1,
-      "id": "SAME_MAIN_FAST_SHIFT",
-      "role": "NORMAL_PRIMARY_CONTINUATION",
-      "target_latency": "predecessor END + 60s due plus measured scheduler jitter",
-      "mechanism": "Normal close mutates only this SAME MAIN recurring RRULE DTSTART to exact observed END+60 and live-verifies it.",
-      "active": true,
-      "fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE"
-    },
-    {
-      "priority": 2,
-      "id": "SAME_MAIN_NATURAL_HOURLY_RRULE",
-      "role": "BUILT_IN_COLD_FALLBACK",
-      "target_latency": "next natural hourly recurrence after a lost shifted wake",
-      "mechanism": "The recurring RRULE remains enabled. A later occurrence reads fresh GitHub, classifies MAIN_COLD_FALLBACK_RECOVERY, and repairs forward without a replacement actor.",
-      "active": true,
-      "watchdog_required": false
-    },
-    {
-      "priority": 3,
-      "id": "WORKER_EVENT_CHAIN",
-      "role": "OPTIONAL_FUTURE_LATENCY_OPTIMIZATION",
-      "target_latency": "event-driven; measure",
-      "mechanism": "Optional future independent handoff research. It is not required for current correctness.",
-      "active": false,
-      "implementation": "control/event-wake-candidate.v1.json + draft PR #1 + state/EVENT_WAKE_LEDGER.json",
-      "fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE"
-    },
-    {
-      "priority": 4,
-      "id": "EMERGENCY_WATCHDOG",
-      "role": "DISABLED_BREAK_GLASS_STANDBY",
-      "active": false,
-      "activation": "Explicit operator or durable emergency decision only after both SAME MAIN fast and natural recurring paths are diagnosed insufficient."
-    }
+  "schema_version":"2.1","program_id":"RRULER-PROGRAM-001","status":"SAME_MAIN_SELF_RELIANT_ACTIVE","goal":"Minimize reasoning dead time without paid API or always-on user PC while preserving disposable-worker semantics and single substantive authority.",
+  "layers":[
+    {"priority":1,"id":"SAME_MAIN_FAST_SHIFT","role":"NORMAL_PRIMARY_CONTINUATION","target_latency":"predecessor ACTUAL END + exactly 1 minute (60 seconds) due plus measured provider delivery/startup delay","mechanism":"Normal close mutates only this SAME MAIN recurring RRULE DTSTART to exact observed ACTUAL END + 1 minute (60 seconds) and live-verifies it. Local mutation success is not delivery success; generation-matched successor BOOT_STARTED is required before the fast path counts as delivered.","active":true,"fallback":"SAME_MAIN_NATURAL_HOURLY_RRULE"},
+    {"priority":2,"id":"SAME_MAIN_NATURAL_HOURLY_RRULE","role":"BUILT_IN_COLD_FALLBACK","target_latency":"next natural hourly recurrence after a lost shifted wake","mechanism":"The recurring RRULE remains enabled. A later occurrence reads fresh GitHub, classifies SAME_MAIN_NATURAL_HOURLY_COLD_FALLBACK_AFTER_MISSED_FAST_SHIFT when appropriate, and repairs forward without a replacement actor.","active":true,"watchdog_required":false},
+    {"priority":3,"id":"WORKER_EVENT_CHAIN","role":"OPTIONAL_FUTURE_LATENCY_OPTIMIZATION","target_latency":"event-driven; measure","mechanism":"Optional future independent handoff research. It is not required for current correctness and must not displace P0-A/P0-B work.","active":false,"implementation":"control/event-wake-candidate.v1.json + draft PR #1 + state/EVENT_WAKE_LEDGER.json","fallback":"SAME_MAIN_NATURAL_HOURLY_RRULE"},
+    {"priority":4,"id":"EMERGENCY_WATCHDOG","role":"DISABLED_BREAK_GLASS_STANDBY","active":false,"activation":"Explicit operator or durable emergency decision only after both SAME MAIN fast and natural recurring paths are diagnosed insufficient."}
   ],
-  "nonnegotiable_invariants": [
-    "GitHub main is durable source of truth",
-    "reasoning workers are disposable",
-    "authority epoch monotonic",
-    "duplicate wake never implies duplicate substantive side effect",
-    "same MAIN canonical remains enabled until program terminal or explicit operator stop",
-    "normal close requires live exact END+60 SAME MAIN verification",
-    "same MAIN recurring RRULE is the cold fallback",
-    "Watchdog is disabled standby and not a normal dependency"
-  ],
-  "capability_evidence": {
-    "rolling_rrule": "Controlled +2m canary PASS plus production completion-relative automatic reentry; one scheduler-delay sample approximately 64s after due.",
-    "epoch59_execution": "557 strict useful seconds over 626 wall seconds, showing in-turn execution improved enough for cross-turn latency to become the dominant measured constraint.",
-    "p0_budget": "840/900 requires 93.33% useful coverage; a 600s turn permits about 42.9s average non-useful cross-turn loss."
-  },
-  "current_blocker": "Scheduled invocation can be recorded without durable BOOT_STARTED. MAIN v4 minimizes the bootstrap kernel and relies on its own recurring RRULE for cold recovery; collect observed delivery-to-bootstrap segments without inferring missing boundaries.",
-  "next_test": "Complete epoch 74 under MAIN v4, verify exact END+60 close without Watchdog mutation, then observe whether the next shifted SAME MAIN writes BOOT_STARTED and REARM_VERIFIED."
+  "nonnegotiable_invariants":["GitHub main is durable source of truth","reasoning workers are disposable","authority epoch monotonic","duplicate wake never implies duplicate substantive side effect","same MAIN canonical remains enabled until program terminal or explicit operator stop","normal close requires live exact ACTUAL END + 1 minute (60 seconds) SAME MAIN verification","local live schedule verification alone never proves fast successor delivery","generation-matched successor bootstrap is required for delivered-fast-path evidence","same MAIN recurring RRULE is the cold fallback","Watchdog is disabled standby and not a normal dependency"],
+  "capability_evidence":{"epoch81_pair":"One known single P0 pair pass: 678-second turn plus exact 1-minute (60-second) SAME MAIN local close; not a consecutive gate.","epoch83_local_close":"Observed 616-second turn; bounded-unit evidence 569 seconds, so useful-work promotion withheld. SAME MAIN local due 07:20:29 KST live-verified exactly 1 minute (60 seconds) after 07:19:29 KST END.","epoch84_delivery_failure":"No generation-matched durable bootstrap appeared at the epoch 83 fast due. Next observed bootstrap was 08:18:39 KST, 58 minutes 10 seconds (3490 seconds) after 07:20:29 KST, consistent with natural-hourly cold fallback after a missed shifted occurrence.","p0_budget":"840/900 requires 93.33% useful coverage; a 600-second turn permits about 42.9 seconds average non-useful cross-turn loss."},
+  "current_blocker":"The SAME MAIN local fast shift can be live-verified correctly yet fail to produce durable bootstrap at the shifted occurrence. This is a provider-execution/delivery problem separate from the local exact 1-minute (60-second) arithmetic.",
+  "next_test":"Complete epoch 84 after at least 10 minutes (600 seconds) observed normal work, live-verify SAME MAIN at ACTUAL END + exactly 1 minute (60 seconds), then require the next generation-matched BOOT_STARTED before counting P0-B fast delivery as a pass. If the natural hourly recurrence recovers instead, classify it as cold fallback and keep the local close rule unchanged."
 }
