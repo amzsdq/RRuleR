@@ -11,7 +11,7 @@
   "successor_observed_at": "2026-09-21T18:54:48+09:00",
   "predecessor_last_progress_at": "2026-09-21T18:50:37+09:00",
   "recovery_basis": "Operator-requested immediate post-maintenance run. Do not use this invocation as an ordinary scheduler due-to-observation sample. Preserve forward-only generation and collect STARTUP-003 only from the next eligible scheduled handoff.",
-  "active_unit": "Validate and review predecessor v4 turn, then continue WS-P001-002 live retest.",
+  "active_unit": "Implement exact-second completion-relative rearm correction and continue bounded live retest.",
   "checkpoint_id": "CP-UTILIZATION-099",
-  "next_action": "Commit the first substantive review artifact, record first-useful boundary, then execute CI/evidence fallback work."
+  "next_action": "Use observed close plus exact 60-second DTSTART for the next final rearm; preserve STARTUP-004 segment boundaries."
 }
