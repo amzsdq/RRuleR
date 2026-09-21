@@ -1,36 +1,7 @@
 {
-  "policy_id": "RRULER_RUNTIME_MODE",
-  "version": 4,
-  "status": "ACTIVE",
-  "mode": "LONG_RUN_WITH_SELF_RELIANT_SAME_MAIN_RRULE",
-  "basis": "Normal continuation is SAME MAIN at observed END+60. The same recurring hourly RRULE is the built-in cold fallback; predictive prearm is rolled back and Watchdog is disabled standby.",
-  "owner_behavior": [
-    "WORK_CONTINUOUSLY_WHILE_PROGRAM_NONTERMINAL_AND_RUNTIME_ALIVE",
-    "DO_NOT_TREAT_SCHEDULE_BOUNDARY_AS_HANDOFF",
-    "PROVISIONAL_ARM_SAME_CANONICAL_BEFORE_FULL_RESTORE_OR_SUBSTANTIVE_WORK",
-    "KEEP_CHECKPOINT_SAFE_UNITS_AS PROVISIONAL_DUE_APPROACHES",
-    "EARLY_SUCCESSOR_MUST_NOT_CLAIM_CONFLICTING_SUBSTANTIVE_AUTHORITY",
-    "PERSIST_FRESH_PROGRESS_AND_EXACT_CONTINUATION",
-    "FALL_BACK_TO_VERIFIED_COMPLETION_RELATIVE_REARM_ON_CANARY_FAILURE",
-    "NEVER_DISABLE_CANONICAL_WHILE_PROGRAM_NONTERMINAL",
-    "NORMAL_CLOSE_REQUIRES_LIVE_SAME_MAIN_END_PLUS_60",
-    "SAME_MAIN_NATURAL_RRULE_IS_COLD_FALLBACK",
-    "DO_NOT_ARM_OR_REQUIRE_WATCHDOG_DURING_NORMAL_OPERATION"
-  ],
-  "scheduler_role": "ACTIVE_FAST_CONTINUATION_PLUS_SAME_MAIN_RECURRING_COLD_FALLBACK",
-  "same_canonical_overlap_assumption": "Newest verified future DTSTART wins. Stale occurrences recover forward and may not roll state or authority backward.",
-  "fallback_guarantee_target": "A lost shifted wake remains recoverable by the SAME MAIN natural hourly RRULE occurrence without Watchdog.",
-  "independent_fast_wake_upgrade": {
-    "required_for_saas_grade_resilience": false,
-    "preferred": "CHATGPT_WORK_GITHUB_EVENT_TRIGGER",
-    "activation_gate": "EVENT_WORKER_WRITE_SURFACE_PROBE_PASS",
-    "fallback_remains": "SAME_CANONICAL_RECURRING_RRULE",
-    "status": "OPTIONAL_FUTURE_LATENCY_OPTIMIZATION_NOT_CORRECTNESS_DEPENDENCY"
-  },
-  "measurement": {
-    "live_run_useful_span": "Measure observed substantive boundaries; never infer hidden work.",
-    "recovery_gap": "Measure last meaningful predecessor progress to first meaningful replacement progress for abrupt loss.",
-    "normal_continuation_gap": "During predictive prearm, measure predecessor last useful boundary to successor first useful boundary and separately record predictive due to successor observation.",
-    "product_slo": "Optimize wall-clock useful-work coverage union, not nominal turn count."
-  }
+  "policy_id":"RRULER_RUNTIME_MODE","version":5,"status":"ACTIVE","mode":"LONG_RUN_WITH_SELF_RELIANT_SAME_MAIN_RRULE","basis":"Normal continuation is SAME MAIN at observed END+60. The same recurring hourly RRULE is the built-in cold fallback; active work uses one verified +660s provisional with at most one guarded extension. Predictive prearm is rolled back and Watchdog is disabled standby.",
+  "owner_behavior":["WORK_CONTINUOUSLY_WHILE_PROGRAM_NONTERMINAL_AND_RUNTIME_ALIVE","DO_NOT_TREAT_SCHEDULE_BOUNDARY_AS_HANDOFF","PERSIST_GENERATION_MATCHED_BOOT_STARTED_BEFORE_BROAD_RESTORE","PROVISIONAL_ARM_SAME_CANONICAL_AT_WAKE_PLUS_660_AND_LIVE_VERIFY","PERSIST_REARM_VERIFIED_BEFORE_SUBSTANTIVE_WORK","KEEP_CHECKPOINT_SAFE_UNITS_AS_PROVISIONAL_DUE_APPROACHES","EXTEND_SAME_MAIN_ONCE_ONLY_IF_USEFUL_WORK_OR_CLOSE_HANDLING_THREATENS_PROVISIONAL_DUE","PERSIST_FRESH_PROGRESS_AND_EXACT_CONTINUATION","NEVER_DISABLE_CANONICAL_WHILE_PROGRAM_NONTERMINAL","NORMAL_CLOSE_REQUIRES_LIVE_SAME_MAIN_END_PLUS_60","SAME_MAIN_NATURAL_RRULE_IS_COLD_FALLBACK","DO_NOT_ARM_OR_REQUIRE_WATCHDOG_DURING_NORMAL_OPERATION"],
+  "scheduler_role":"ACTIVE_FAST_CONTINUATION_PLUS_SAME_MAIN_RECURRING_COLD_FALLBACK","same_canonical_overlap_assumption":"Newest verified future DTSTART wins. Stale occurrences recover forward and may not roll state or authority backward.","fallback_guarantee_target":"A lost shifted wake remains recoverable by the SAME MAIN natural hourly RRULE occurrence without Watchdog.",
+  "independent_fast_wake_upgrade":{"required_for_saas_grade_resilience":false,"preferred":"CHATGPT_WORK_GITHUB_EVENT_TRIGGER","activation_gate":"EVENT_WORKER_WRITE_SURFACE_PROBE_PASS","fallback_remains":"SAME_CANONICAL_RECURRING_RRULE","status":"OPTIONAL_FUTURE_LATENCY_OPTIMIZATION_NOT_CORRECTNESS_DEPENDENCY"},
+  "measurement":{"live_run_useful_span":"Measure observed substantive boundaries; never infer hidden work.","recovery_gap":"Measure last meaningful predecessor progress to first meaningful replacement progress for abrupt loss.","normal_continuation_gap":"Measure actual predecessor END/last useful boundary, scheduled fast due, successor observation/BOOT_STARTED, and successor first useful boundary separately.","product_slo":"Optimize wall-clock useful-work coverage union, not nominal turn count."}
 }
