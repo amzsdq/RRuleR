@@ -52,7 +52,17 @@ def test_valid_watchdog_recovery_lineage_is_not_normal_scheduler_sample():
     assert result["startup_receipt_complete"] is True
     assert result["recovery_lineage_valid"] is True
     assert result["scheduler_comparison_eligible"] is False
-    assert result["scheduler_comparison_exclusion"] == "WATCHDOG_RECOVERY_GENERATION"
+    assert result["recovery_kind"] == "FIXED_WATCHDOG_PREBOOTSTRAP"
+    assert result["scheduler_comparison_exclusion"] == "FIXED_WATCHDOG_PREBOOTSTRAP_GENERATION"
+
+
+def test_valid_provisional_cold_rescue_lineage_is_separate():
+    stalled = {"sample_id":"S0","exclusion_reason":"MISSING_DURABLE_FIRST_USEFUL_AFTER_VERIFIED_BOOTSTRAP","validity":"INCOMPLETE"}
+    recovered = {"sample_id":"S1","recovery_of_sample_id":"S0","recovery_kind":"PROVISIONAL_COLD_RESCUE","scheduled_due_at":"2026-09-21T10:05:00+00:00","generation_key":"DUE:2026-09-21T10:05:00+00:00","successor_observed_at":"2026-09-21T10:05:20+00:00","boot_started_at":"2026-09-21T10:05:30+00:00","rearm_verified_at":"2026-09-21T10:05:40+00:00","authority_claim_at":"2026-09-21T10:05:50+00:00","first_durable_useful_at":"2026-09-21T10:06:00+00:00"}
+    result = audit({"samples":[stalled,recovered]}, [])["results"][1]
+    assert result["recovery_lineage_valid"] is True
+    assert result["recovery_kind"] == "PROVISIONAL_COLD_RESCUE"
+    assert result["scheduler_comparison_exclusion"] == "PROVISIONAL_COLD_RESCUE_GENERATION"
 
 
 def test_recovery_generation_fails_closed_on_wrong_source_or_generation():
@@ -60,4 +70,4 @@ def test_recovery_generation_fails_closed_on_wrong_source_or_generation():
     recovered = {"sample_id":"S1","recovery_of_sample_id":"S0","scheduled_due_at":"2026-09-21T10:05:00+00:00","generation_key":"DUE:2026-09-21T10:06:00+00:00","successor_observed_at":"2026-09-21T10:05:20+00:00"}
     out = audit({"samples":[source,recovered]}, [])
     assert out["valid"] is False
-    assert out["results"][1]["errors"] == ["GENERATION_KEY_DUE_MISMATCH", "RECOVERY_SOURCE_NOT_STARTUP_ACK_MISSING"]
+    assert out["results"][1]["errors"] == ["GENERATION_KEY_DUE_MISMATCH", "RECOVERY_KIND_UNKNOWN"]
