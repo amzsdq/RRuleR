@@ -1,9 +1,9 @@
 {
-  "schema_version": "2.2",
+  "schema_version": "2.3",
   "program_id": "RRULER-PROGRAM-001",
   "goal": "Sustained wall-clock useful-work coverage >=93.33% with substantive durable-evidence gaps <=120s.",
-  "status": "CONTINUOUS_RELAY_MAIN_V4_ACTIVE_ZERO_ACCEPTED_WINDOWS",
-  "current_epoch": 74,
+  "status": "CONTINUOUS_RELAY_RRULE_PRIMARY_RESTORED_ZERO_ACCEPTED_WINDOWS",
+  "current_epoch": 76,
   "metrics": {
     "evaluation_window_seconds": 900,
     "target_useful_seconds": 840,
@@ -15,13 +15,19 @@
     "minimum_continue_turn_seconds": 480,
     "p0_max_average_non_useful_gap_seconds_for_600s_turn": 42.9,
     "verified_fallback_final_rearm_offset_seconds": 60,
-    "latest_complete_startup_sample": "STARTUP-002",
-    "latest_due_to_observation_seconds": 155,
-    "latest_observation_to_claim_seconds": 21,
-    "latest_claim_to_first_useful_seconds": 0,
+    "latest_complete_startup_sample": "STARTUP-019",
+    "latest_due_to_observation_seconds": -29,
+    "latest_observation_to_claim_seconds": 115,
+    "latest_claim_to_first_useful_seconds": 88,
     "epoch59_wall_seconds": 626,
     "epoch59_strict_useful_seconds": 557,
-    "epoch59_strict_wall_coverage_ratio": 0.8898
+    "epoch59_strict_wall_coverage_ratio": 0.8898,
+    "latest_normal_comparison_sample": "STARTUP-003",
+    "startup_sample_count": 19,
+    "startup_audit_unacknowledged_error_count": 0,
+    "operator_rescheduled_sample_count": 4,
+    "rejected_one_shot_canary_count": 1,
+    "strict_normal_scheduler_comparison_sample_count": 1
   },
   "active_interventions": [
     {
@@ -46,7 +52,7 @@
     },
     {
       "id": "UTIL_EXP_019_STARTUP_SEGMENTATION",
-      "state": "STARTUP_003_ACTIVE",
+      "state": "STARTUP_019_ACTIVE",
       "expected_effect": "Separate scheduler delivery from post-observation startup and optimize the largest measured segment."
     },
     {
@@ -56,17 +62,24 @@
     },
     {
       "id": "MAIN_SELF_RELIANT_V4",
-      "state": "ACTIVE_FIRST_LIVE_TURN",
-      "expected_effect": "Make SAME MAIN END+60 the only normal successor and use the SAME MAIN natural hourly RRULE as cold fallback, with Watchdog disabled standby."
+      "state": "RRULE_PRIMARY_RESTORED_AFTER_ONE_SHOT_CANARY_REJECTION",
+      "expected_effect": "Keep SAME MAIN recurring RRULE as normal END+60 continuation and built-in cold fallback, with Watchdog disabled standby."
+    },
+    {
+      "id": "UTIL_EXP_020_SCHEDULE_CATEGORY_ONE_SHOT",
+      "state": "REJECTED_AFTER_FIRST_LIVE_CANARY",
+      "expected_effect": "Test whether removing the recurring category reduces long gaps.",
+      "observed_result": "One-shot due 00:25:53 invoked at 00:27:31.651380, then platform completion did not preserve a future DTSTART; no generation-matched BOOT_STARTED or REARM_VERIFIED was observed.",
+      "decision": "Do not use exact one-shot self-update as normal continuity without materially new platform evidence. Restore SAME MAIN recurring RRULE."
     }
   ],
-  "live_interpretation": "Predictive prearm remains rolled back. MAIN v4 is the active correction: compact early BOOT_STARTED/REARM_VERIFIED, exact END+60 hard close, SAME MAIN recurring hourly cold fallback, and no normal Watchdog dependency. Epoch 74 is the first live validation turn; no P0 pass is claimed.",
+  "live_interpretation": "MAIN v4.2 is active: SAME MAIN recurring RRULE is primary and its natural recurrence is the built-in cold fallback; Watchdog remains disabled break-glass standby. The exact one-shot category canary is rejected because execution completion did not preserve a future DTSTART. Epoch 76 has restored and live-verified a recurring provisional fallback; no P0 pass is claimed.",
   "dominant_risks": [
     "No fixed 900-second utilization window is accepted yet.",
     "Scheduled invocation can occur without durable BOOT_STARTED.",
-    "Scheduler delivery and bootstrap reliability remain sparsely characterized.",
-    "SAME MAIN hourly cold fallback limits worst-case recovery but does not meet a <=120s abrupt-loss target.",
-    "Duplicate/conflicting authority must remain fenced on stale or natural recurrence."
+    "Only one startup sample currently satisfies the strict normal-comparison boundary set.",
+    "RRULE category may show long UI intervals, but one-shot self-update failed continuity and is not a safe replacement.",
+    "SAME MAIN hourly cold fallback limits worst-case recovery but does not meet a <=120s abrupt-loss target."
   ],
-  "next_decision": "Close epoch 74 only after exact live SAME MAIN END+60 verification, then observe the next fast wake's BOOT_STARTED/REARM_VERIFIED. If it fails, preserve missing boundaries and classify the later natural recurring wake as MAIN_COLD_FALLBACK_RECOVERY."
+  "next_decision": "Close epoch 76 only after live-verifying SAME MAIN recurring END+60 and consistent non-WORKING durable projection. Observe the next RRULE fast wake without operator reschedule; keep one-shot canary excluded and collect a second strict normal-comparison sample."
 }
