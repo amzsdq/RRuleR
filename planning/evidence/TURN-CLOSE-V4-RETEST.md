@@ -35,3 +35,20 @@ These are implementation candidates, not duplicate-work mandates. Record actual 
 Collect at least three valid completed post-repair turns with runnable backlog. Report each observed elapsed duration, known useful duration (or unknown), exception evidence, control/close overhead where observed, and successor gap where observed. Explicit pauses and forced termination are exclusions, not successes. No unexcused early CONTINUE close is allowed; do not call the repair effective solely because elapsed duration grew. Useful output must increase without duplicate/conflicting writes. Scheduler latency remains a separate outcome. Retain the 10-minute envelope and existing ownership fences. Do not promote scheduler timing from this repair.
 
 Status: focused local tests passed; live retest pending.
+
+## Operator review contract: elapsed, useful work, and failure attribution
+
+Continue the authorized relay and collect at least three valid completed turns; do not stop the program when the sample count is reached. Append a readable per-turn review table here after each closed turn and update the conclusion after three eligible turns. Columns: run reference, observed start/end, elapsed seconds, accepted useful seconds or UNKNOWN, observed control/close seconds or UNKNOWN, observed successor gap or UNKNOWN, close reason, runnable alternatives, validity/exclusion, artifact/CI evidence, dominant supported cause, next corrective action. Never infer idle time by subtracting incomplete useful-work evidence from elapsed time.
+
+Raw sources remain authoritative:
+- state/RUNS.jsonl: start/end, elapsed duration, outcome, close decision and exceptions.
+- state/WORK_EVIDENCE.json: prospective accepted useful intervals linked to actual artifacts; append during natural work boundaries, not only at final close.
+- state/SUCCESSOR_STARTUP.json: scheduled due, observed invocation, authority claim and first useful boundary, including exclusions.
+- state/TURN_PLAN.json and state/ACTIVITY.json: current stage and last observed progress.
+- tools/validate_run_records.py: new closed-record validity; tools/summarize_turn_close.py and tools/audit_startup_boundaries.py: review helpers, not proof of work by themselves.
+
+Attribute failures separately: premature voluntary close; runnable backlog exhausted; external dependency wait; scheduler delivery; bootstrap/authority acquisition; control/checkpoint overhead; operator interruption; platform termination if actually evidenced; missing/inconsistent measurement. A missing record is a measurement gap, not proof of idle time. Commit timestamps alone do not prove continuous active work between commits. Preserve unknown time.
+
+Before accepting a summary, ensure it preserves validity/exclusion fields and excludes INVALID or maintenance-interrupted samples from comparison; merely printing every sample's numeric gap is insufficient. STARTUP-002 is currently invalid due to predecessor boundary inconsistency, so its 155-second figure must not drive scheduler promotion.
+
+At close, persist the run and accepted useful evidence, run the validators, then append the readable result. If a write fails, state exactly which record is missing and leave the interval unknown. Keep historical raw evidence intact. Every successor checks whether its predecessor's close record is missing and flags that gap without inventing an end time. If normal close bookkeeping cannot include its own final timestamp, label the measured boundary accurately rather than claiming an exact later response-delivery time.
