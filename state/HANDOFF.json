@@ -2,16 +2,16 @@
   "schema_version": "1.2",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
-  "handoff_state": "SUCCESSOR_ARMED",
+  "handoff_state": "SUCCESSOR_WORKING",
   "handoff_mode": "COMPLETION_RELATIVE_SAME_CANONICAL",
   "predecessor_run_id": "RUN-UTIL-20260921-184232",
   "predecessor_authority_epoch": 65,
-  "successor_run_id": null,
+  "successor_run_id": "RUN-UTIL-20260921-185559",
   "successor_expected_at": "2026-09-21T18:54:00+09:00",
-  "successor_observed_at": null,
+  "successor_observed_at": "2026-09-21T18:54:48+09:00",
   "predecessor_last_progress_at": "2026-09-21T18:50:37+09:00",
   "recovery_basis": "Operator-requested immediate post-maintenance run. Do not use this invocation as an ordinary scheduler due-to-observation sample. Preserve forward-only generation and collect STARTUP-003 only from the next eligible scheduled handoff.",
-  "active_unit": "Complete v4 reporting/audit live retest and bounded durable close.",
+  "active_unit": "Validate and review predecessor v4 turn, then continue WS-P001-002 live retest.",
   "checkpoint_id": "CP-UTILIZATION-099",
-  "next_action": "Successor records observed invocation, nonconflicting epoch claim, and first durable useful mutation for STARTUP-003. Do not reuse invalid STARTUP-002 scheduler estimate."
+  "next_action": "Commit the first substantive review artifact, record first-useful boundary, then execute CI/evidence fallback work."
 }
