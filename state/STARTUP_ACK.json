@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
   "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "current_expected_due_at": "2026-09-22T00:25:53+09:00",
-  "generation_key": "DUE:2026-09-22T00:25:53+09:00",
-  "boot_started_at": null,
-  "boot_started_authority_epoch": null,
+  "current_expected_due_at": "2026-09-22T00:30:39+09:00",
+  "generation_key": "DUE:2026-09-22T00:30:39+09:00",
+  "boot_started_at": "2026-09-22T00:30:10+09:00",
+  "boot_started_authority_epoch": 76,
   "rearm_verified_at": null,
   "verified_provisional_due_at": null,
-  "status": "AWAITING_BOOT_STARTED",
-  "last_updated_at": "2026-09-22T00:25:36+09:00",
-  "note": "Fresh v4.1 exact one-shot category canary superseded the in-flight v4.0 RRULE close rule. SAME MAIN one-shot at exact predecessor END+60 was live-verified enabled; Watchdog was not used."
+  "status": "BOOT_STARTED",
+  "last_updated_at": "2026-09-22T00:32:00+09:00",
+  "note": "Operator-driven v4.2 RRULE restoration generation began 29 seconds before its scheduled DTSTART. Preserve as an operator-rescheduled generation; one-shot canary is rejected and Watchdog is unused."
 }
