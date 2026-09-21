@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 10,
+  "version": 11,
   "status": "ACTIVE",
-  "purpose": "Use one same-canonical hourly RRULE as bounded cold rescue with a strict normal CONTINUE fast continuation of actual observed turn END + 60 seconds; predictive prearm remains evidence-gated.",
+  "purpose": "Normal continuation is MAIN->MAIN at actual observed END + exactly 60 seconds. The ~13-minute provisional MAIN due exists only as in-flight crash insurance, and the Startup Watchdog is emergency-only pre-bootstrap recovery; neither may substitute for normal post-close chaining.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
   "startup_order": [
     "READ_MINIMUM_FENCE_CURRENT_AND_CANONICAL_AUTHORITY",
@@ -65,7 +65,7 @@
     ],
     "due": "actual observed turn END timestamp + exactly 60 seconds, preserving seconds exactly; minute rounding is forbidden",
     "verification_required": true,
-    "status": "ACTIVE_FALLBACK",
+    "status": "REQUIRED_NORMAL_PATH",
     "computation_tool": "tools/compute_completion_due.py",
     "precision_rule": "Pass local_dtstart with YYYYMMDDTHHMMSS under the canonical timezone. Do not truncate or round seconds.",
     "exception_rule": "Any delay other than +60 seconds on a normal CONTINUE close requires a fresh durable platform/safety/task constraint and an explicit exception_reason recorded with the run. Do not add extra local slack merely because scheduler delivery itself may be late.",
@@ -98,6 +98,20 @@
         "different expected due across CURRENT, ACTIVITY, and HANDOFF"
       ],
       "validator": "tools/validate_close_projection.py"
+    },
+    "hard_close_gate": {
+      "normal_continue_final_forbidden_until": [
+        "ACTUAL_END_OBSERVED",
+        "LATEST_CHECKPOINT_PERSISTED",
+        "SAME_MAIN_MUTATED_TO_END_PLUS_EXACTLY_60_SECONDS",
+        "LIVE_MAIN_REREAD_SAME_CANONICAL_ENABLED_RECURRING_EXACT_DSTART",
+        "EXACT_FAST_DUE_PERSISTED_TO_CURRENT_ACTIVITY_HANDOFF",
+        "NON_WORKING_CLOSE_PROJECTION_VALIDATED"
+      ],
+      "provisional_due_cannot_satisfy_gate": true,
+      "watchdog_coverage_cannot_satisfy_gate": true,
+      "retry_rule": "Retry MAIN fast rearm once when safe. If exact live verification still fails, classify DEGRADED_CONTINUATION; do not claim a normal CONTINUE close.",
+      "final_response_rule": "Normal STATUS=CONTINUE final is forbidden until the exact END+60 MAIN continuation is proven live."
     }
   },
   "predictive_prearm_canary": {
@@ -150,7 +164,7 @@
     "policy_ref": "control/startup-watchdog.v1.json",
     "ack_ref": "state/STARTUP_ACK.json",
     "state_ref": "state/WATCHDOG.json",
-    "protection_boundary": "Independent Watchdog protects missing bootstrap before MAIN provisional arm; provisional arm protects failures after bootstrap rearm verification.",
+    "protection_boundary": "Emergency only: Watchdog protects a missing MAIN bootstrap before provisional arm; provisional arm protects an already-started turn after bootstrap. Normal continuation remains MAIN->MAIN END+60.",
     "normal_watchdog_due_offset_seconds": 180,
     "recovery_main_offset_seconds": 60,
     "recovery_recheck_seconds": 240,
@@ -161,6 +175,17 @@
     "idle_distant_due_extra_slack_seconds": 120,
     "idle_distant_due_expected_fast_due_rule": "LATEST_OBSERVED_CLOSED_TURN_END_PLUS_60S",
     "idle_distant_due_active_work_exemption": true,
-    "idle_distant_due_recovery_main_offset_seconds": 60
+    "idle_distant_due_recovery_main_offset_seconds": 60,
+    "normal_path_dependency": "Watchdog must be armed only after the normal MAIN END+60 successor is live-verified. Watchdog is not a normal scheduler hop."
+  },
+  "normal_path_invariant": {
+    "expected_path": "MAIN_NORMAL_CLOSE -> SAME_MAIN_END_PLUS_60 -> NEXT_MAIN",
+    "provisional_role": "IN_FLIGHT_CRASH_INSURANCE_ONLY",
+    "watchdog_role": "PRE_BOOTSTRAP_EMERGENCY_ONLY",
+    "forbidden_substitutions": [
+      "NORMAL_CLOSE_WITH_PROVISIONAL_DUE_LEFT_AS_SUCCESSOR",
+      "NORMAL_CLOSE_RELYING_ON_WATCHDOG_AS_EXPECTED_SUCCESSOR",
+      "FINAL_RESPONSE_BEFORE_LIVE_END_PLUS_60_MAIN_VERIFICATION"
+    ]
   }
 }
