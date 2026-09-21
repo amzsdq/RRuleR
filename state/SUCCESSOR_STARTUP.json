@@ -64,6 +64,13 @@
   ],
   "next_sample": {
     "sample_id": "STARTUP-004",
+    "predecessor_run_id": "RUN-UTIL-20260921-185559",
+    "predecessor_last_useful_at": "2026-09-21T19:02:56+09:00",
+    "predecessor_run_ended_at": "2026-09-21T19:04:23+09:00",
+    "scheduled_due_at": "2026-09-21T19:05:06+09:00",
+    "successor_observed_at": null,
+    "authority_claim_at": null,
+    "first_durable_useful_at": null,
     "required_fields": [
       "predecessor_last_useful_at",
       "scheduled_due_at",
@@ -71,7 +78,7 @@
       "authority_claim_at",
       "first_durable_useful_at"
     ],
-    "rule": "Record only observed boundaries. Apply the highest-effect correction from valid STARTUP-003: final rearm from observed close with exact seconds, then compare segment boundaries without inference."
+    "rule": "Record only observed boundaries. This sample tests exact-second completion-relative +60s rearm from close reference 19:04:06; compare end-to-due and total gap against valid STARTUP-003."
   },
   "decision_rule": "STARTUP-003 is the first valid complete sample after STARTUP-002 invalidation. The largest measured avoidable segment is predecessor end-to-due=134s (last-useful-to-due=203s), followed by observation-to-claim=71s and claim-to-first-useful=65s. Test exact-second completion-relative rearm from observed close before revisiting predictive prearm."
 }
