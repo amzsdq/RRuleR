@@ -16,14 +16,20 @@
     "completed": [
       "Reconciled STARTUP-006 with observed automation invocation at 19:50:28.457228 KST; no durable bootstrap/claim/useful progress exists for that invocation.",
       "Preserved the hourly fallback occurrence and advanced the same canonical provisional due to 21:02:29 KST without schedule rollback.",
-      "Claimed nonconflicting authority epoch 68."
+      "Claimed nonconflicting authority epoch 68.",
+      "Added BOOT_STARTED and REARM_VERIFIED lifecycle boundaries with distinct STARTUP_ACK_MISSING classification.",
+      "Expanded successor-progress audit to distinguish missing bootstrap, missing rearm verification, missing authority, and missing useful progress; eight tests passed."
     ],
     "evidence": [
       "automation last_run_time=2026-09-21T10:50:28.457228+00:00",
-      "same canonical provisional DTSTART=20260921T210229"
+      "same canonical provisional DTSTART=20260921T210229",
+      "tools/audit_successor_progress.py@a0be8d6287796440b8aa54e9b05b598e0c92768b",
+      "tests/test_audit_successor_progress.py@c29afff2091224b69d43e6e53a06a3367d2a7b25",
+      "control/handoff-recovery.v1.json@d81c6f3dd1da972222b32ba2fe06a472d655880d",
+      "control/rolling-rrule-lifecycle.v1.json@590b8a1ee5cb16f5b077ed68475ea0a47916a7ad"
     ],
     "observation": "STARTUP-006 proves END+60 local scheduling and 73s provider delivery, but the invoked occurrence left no BOOT_STARTED, REARM_VERIFIED, authority claim, or useful progress. The current hourly fallback wake is STARTUP-007 and is not a normal END+60 sample.",
-    "next_action": "Implement durable BOOT_STARTED/REARM_VERIFIED boundaries and STARTUP_ACK_MISSING recovery classification; evaluate executable independent wake transport separately from observability."
+    "next_action": "Integrate bootstrap acknowledgement invariants into CI, then inspect the event-wake candidate and select the smallest executable independent recovery transport slice."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
