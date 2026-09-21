@@ -27,6 +27,7 @@ Machine-readable active controls and fresh durable state govern execution. If pr
 12. Scheduled time is not a voluntary stop signal.
 13. Root completion is not automatically program completion.
 14. A non-terminal program must retain a verified recoverable continuation path.
+15. Predictive wake overlap never grants dual substantive authority.
 
 ## Authority and continuous work
 
@@ -36,20 +37,21 @@ After continuation is verified, obtain/confirm authority, persist WORKING activi
 
 ## Active scheduler policy
 
-The active mechanism is `RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE` on one same canonical automation.
+The active mechanism is one same-canonical hourly RRULE under the rolling lifecycle. The verified fallback is completion-relative rearm; `UTIL-EXP-018` additionally authorizes a guarded predictive-prearm canary for normal continuation latency hiding.
 
 Startup order:
 
 ```text
 FRESH DURABLE STATE
  -> STALE-WAKE / GENERATION FENCE
+ -> CLASSIFY NORMAL VS PREDICTIVE VS RECOVERY
  -> PRESERVE NEWEST VERIFIED SAME-CANONICAL CONTINUATION
- -> PROVISIONAL ARM + VERIFY
+ -> PROVISIONAL COLD-RESCUE ARM + VERIFY WHEN SAFE
  -> AUTHORITY / ACTIVITY RECONCILIATION
  -> USEFUL WORK
 ```
 
-Normal close order:
+Normal fallback close:
 
 ```text
 LATEST CHECKPOINT
@@ -58,13 +60,26 @@ LATEST CHECKPOINT
  -> PERSIST VERIFIED DUE
 ```
 
-The provisional rescue horizon and final close offset are tunables declared by active machine controls; they are not utilization acceptance thresholds. Never create a replacement canonical merely to continue this actor and never convert the canonical to one-shot for normal continuation.
+Predictive-prearm canary path:
 
-Fixed quarter-hour BYMINUTE rotation and predecessor/successor quarter-cycle choreography are retired scheduler semantics. Historical evidence produced under that mechanism remains history, not an active instruction.
+```text
++780s PROVISIONAL COLD RESCUE REMAINS INTACT
+ -> NEAR TARGET CLOSE, ARM SAME CANONICAL BEFORE CLOSE
+ -> PREDECESSOR CONTINUES USEFUL WORK
+ -> EARLY SUCCESSOR FENCES / OBSERVES ONLY WHILE PREDECESSOR IS FRESH+CONFLICTING
+ -> SUBSTANTIVE AUTHORITY TRANSFERS ONLY AFTER SAFE DURABLE CLOSE/TRANSFER
+ -> MEASURE LAST-PREDECESSOR-USEFUL TO FIRST-SUCCESSOR-USEFUL GAP
+```
+
+The canary exists because 840/900 requires 93.33% useful coverage, while a 600-second turn plus a nominal 60-second post-close gap has only a 90.91% idealized ceiling before scheduler jitter/startup. The canary attempts to hide scheduler latency under predecessor useful work; it does not weaken the P0 target.
+
+The provisional rescue horizon and fallback final-close offset are tunables declared by active machine controls; they are not utilization acceptance thresholds. Never create a replacement canonical merely to continue this actor and never convert the canonical to one-shot for normal continuation.
+
+Fixed quarter-hour BYMINUTE rotation and predecessor/successor quarter-cycle choreography are retired scheduler semantics. Historical evidence remains history, not active instruction.
 
 ## Handoff and recovery
 
-The rolling cold successor reconstructs from GitHub. A future wake existing by itself does not authorize a healthy current owner to stop. Normal run end requires an allowlisted condition from `control/run-continuation-gate.v1.json`, including committed successor handoff, explicit operator stop, or platform-enforced termination. Program end additionally requires durable terminal evidence such as `PROGRAM_COMPLETE` or proven `BLOCKED_EXTERNAL`.
+A future wake existing by itself does not authorize a healthy current owner to stop. During predictive prearm, a successor may arrive while the predecessor is still fresh; that successor must not claim conflicting substantive authority or replay side effects. It may fence/read/observe until fresh durable state proves a safe transfer/close boundary.
 
 If a wake is stale relative to the newest verified schedule generation, recover forward. Do not restore an older DTSTART, prompt, title, authority epoch, or checkpoint. Ambiguous irreversible side effects must reconcile before replay.
 
@@ -76,16 +91,16 @@ Prefer meaningful medium-sized work over unrelated microtasks. If the objective 
 
 ## Utilization evidence and P0 acceptance
 
-P0 is sustained evidenced useful-work coverage. The current acceptance target is:
+P0 is sustained evidenced useful-work coverage:
 
-- intended evaluation window: 900 seconds;
+- fixed evaluation window: 900 seconds;
 - evidenced useful-work target: at least 840 seconds;
 - no unexplained internal durable-progress gap greater than 120 seconds;
-- at least 3 valid completed windows with rolling mean at least 840 seconds.
+- at least 3 consecutive valid completed windows with selected rolling mean at least 840 seconds.
 
-The active rolling scheduler may use a shorter provisional rescue planning horizon. That horizon is operational safety, not permission to redefine the 840/900 acceptance gate.
+The bounded turn and provisional rescue horizons are operational safety/execution parameters, not permission to redefine the 840/900 acceptance gate.
 
-Substantive evidence follows `control/evidence-policy.v1.json`. Heartbeat-only, timestamp-only, waiting, scheduler mutation alone, CI polling without a new result, reformatting, and duplicate checkpoint prose do not independently prove useful work. Missing timestamps or unexplained intervals must remain unknown rather than inferred.
+Substantive evidence follows `control/evidence-policy.v1.json`. Heartbeat-only, timestamp-only, waiting, scheduler mutation alone, CI polling without a new result, reformatting, and duplicate checkpoint prose do not independently prove useful work. Missing timestamps or unexplained intervals remain unknown rather than inferred.
 
 Each valid completed sample follows:
 
@@ -97,7 +112,7 @@ Do not repeat a failed intervention without new evidence.
 
 ## Runtime-safe continuity
 
-Keep work checkpointable. As runtime exposure grows, prefer smaller safe units rather than voluntarily idling. A cold-rescue wake is a safety mechanism, not authority for a healthy owner to terminate. If the future wake becomes too near while useful authorized work remains and active lifecycle policy permits, refresh it before collision.
+Keep work checkpointable. As runtime exposure grows, prefer smaller safe units rather than voluntarily idling. A cold-rescue wake is a safety mechanism, not authority for a healthy owner to terminate. Predictive prearm is latency hiding, not permission to stop early.
 
 ## Program goals and autonomous R&D authority
 
