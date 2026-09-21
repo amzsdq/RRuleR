@@ -3,7 +3,7 @@
 
 This helper intentionally does not discover or infer work time. The caller must supply
 both observed boundaries and a materially-new artifact reference. It computes duration,
-rejects overlap/duplicates, and validates the complete ledger before writing.
+rejects overlap/duplicates/backward epochs, and validates the complete ledger before writing.
 """
 from __future__ import annotations
 
@@ -50,6 +50,9 @@ def append_record(data: dict, record: dict) -> dict:
     records = data.setdefault("records", [])
     if any(r.get("record_id") == record["record_id"] for r in records):
         raise ValueError("duplicate record_id")
+    prior_epochs = [r.get("authority_epoch") for r in records if isinstance(r.get("authority_epoch"), int)]
+    if prior_epochs and record.get("authority_epoch", -1) < max(prior_epochs):
+        raise ValueError("authority_epoch would move evidence backward")
     start, end = ts(record["start_at"]), ts(record["end_at"])
     for existing in records:
         try:
