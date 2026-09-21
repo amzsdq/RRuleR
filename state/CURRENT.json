@@ -9,7 +9,7 @@
   "current_owner": "RUN-UTIL-20260921-204946",
   "authority_epoch": 68,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "WORKING",
+  "run_state": "CHECKPOINTED",
   "checkpoint": {
     "id": "CP-UTILIZATION-105",
     "state": "CONTINUE",
@@ -37,14 +37,14 @@
       ".github/workflows/event-wake-rescue-pulse.yml@641a66d68d51e6b26f3c8e05bf2ce77c798e2291",
       "planning/evidence/TURN-CLOSE-V4-RETEST.md@fc34b285ce7e22d57d7618050115394b25e13aa0"
     ],
-    "observation": "Detection and a guarded producer decision are implemented, but fast recovery is not active: no supported event consumer is provisioned or write-probed, and outstanding-generation atomic claim remains an activation blocker.",
-    "next_action": "Provision a supported GitHub PR event consumer only with operator/platform authorization, run EVENT-WORKER-WRITE-PROBE-001, then implement atomic outstanding-generation claim before activating the rescue ledger. Until then hourly same-canonical fallback remains actual recovery."
+    "observation": "Epoch 68 closed after 633 elapsed seconds with 556 strict accepted useful seconds. It implemented bootstrap-stage receipts, STARTUP_ACK_MISSING/REARM_VERIFICATION_MISSING diagnostics, guarded rescue evaluation, and the initial three-turn review. During close, fresh policy added a fixed Startup Watchdog; MAIN and Watchdog were synchronized to 21:01:19 and 21:04:19 KST.",
+    "next_action": "Next MAIN wake must write generation-matched BOOT_STARTED before provisional arm, then REARM_VERIFIED after verification. Validate the new fixed Watchdog with a live missing-ack canary without granting it substantive authority."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T21:02:29+09:00",
+    "next_due_at": "2026-09-21T21:01:19+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -68,10 +68,10 @@
       "normal_check_offset_seconds": 180,
       "recovery_recheck_seconds": 240,
       "main_recovery_due_offset_seconds": 60,
-      "next_watchdog_due_at": "2026-09-21T21:05:29+09:00",
+      "next_watchdog_due_at": "2026-09-21T21:04:19+09:00",
       "coverage": "PRE_BOOTSTRAP"
     },
-    "next_due_source": "LIVE_MAIN_AUTOMATION_RESYNC_2026-09-21T20:54:32+09:00"
+    "next_due_source": "EPOCH_68_ACTUAL_END_PLUS_60"
   },
   "safety": {
     "public_repo": true,
