@@ -60,25 +60,49 @@
       "predecessor_to_first_useful_seconds": 387,
       "validity": "VALID",
       "classification": "COMPLETION_RELATIVE_CLOSE_AND_REARM_DELAY_DOMINATES"
+    },
+    {
+      "sample_id": "STARTUP-004",
+      "predecessor_run_id": "RUN-UTIL-20260921-185559",
+      "predecessor_last_useful_at": "2026-09-21T19:02:56+09:00",
+      "predecessor_run_ended_at": "2026-09-21T19:04:23+09:00",
+      "scheduled_due_at": "2026-09-21T19:05:06+09:00",
+      "successor_observed_at": "2026-09-21T19:05:35.566381+09:00",
+      "authority_claim_at": null,
+      "first_durable_useful_at": null,
+      "required_fields": [
+        "predecessor_last_useful_at",
+        "scheduled_due_at",
+        "successor_observed_at",
+        "authority_claim_at",
+        "first_durable_useful_at"
+      ],
+      "rule": "Record only observed boundaries. This sample tests exact-second completion-relative +60s rearm from close reference 19:04:06; compare end-to-due and total gap against valid STARTUP-003.",
+      "due_to_observation_seconds": 30,
+      "validity": "INCOMPLETE",
+      "exclusion_reason": "MISSING_DURABLE_SUCCESSOR_PROGRESS",
+      "classification": "SUCCESSOR_INVOKED_WITHOUT_OBSERVED_AUTHORITY_OR_USEFUL_PROGRESS",
+      "audit_note": "Automation history proves invocation at 19:05:35.566381 KST, but no durable authority claim or first-useful boundary was recorded. Preserve the measured 30s delivery segment and leave the remaining boundaries unknown."
     }
   ],
   "next_sample": {
-    "sample_id": "STARTUP-004",
-    "predecessor_run_id": "RUN-UTIL-20260921-185559",
-    "predecessor_last_useful_at": "2026-09-21T19:02:56+09:00",
-    "predecessor_run_ended_at": "2026-09-21T19:04:23+09:00",
-    "scheduled_due_at": "2026-09-21T19:05:06+09:00",
-    "successor_observed_at": null,
-    "authority_claim_at": null,
+    "sample_id": "STARTUP-005",
+    "scheduled_due_at": "2026-09-21T19:37:36+09:00",
+    "successor_observed_at": "2026-09-21T19:38:45+09:00",
+    "authority_claim_at": "2026-09-21T19:39:57+09:00",
     "first_durable_useful_at": null,
+    "due_to_observation_seconds": 69,
+    "observation_to_claim_seconds": 72,
+    "validity": "DELIVERY_ONLY_PENDING_FIRST_USEFUL",
+    "exclusion_reason": "OPERATOR_RESCHEDULED_GENERATION_NO_COMPARABLE_PREDECESSOR",
+    "classification": "OPERATOR_RESCHEDULED_WAKE_DELIVERY_ONLY",
     "required_fields": [
-      "predecessor_last_useful_at",
       "scheduled_due_at",
       "successor_observed_at",
       "authority_claim_at",
       "first_durable_useful_at"
     ],
-    "rule": "Record only observed boundaries. This sample tests exact-second completion-relative +60s rearm from close reference 19:04:06; compare end-to-due and total gap against valid STARTUP-003."
+    "rule": "Use this sample for provider due-to-invocation and post-invocation startup only. Do not use it for END+60 local compliance because the schedule generation was operator-reset at 19:36:58 KST and has no comparable immediately preceding turn end."
   },
-  "decision_rule": "STARTUP-003 is the first valid complete sample after STARTUP-002 invalidation. The largest measured avoidable segment is predecessor end-to-due=134s (last-useful-to-due=203s), followed by observation-to-claim=71s and claim-to-first-useful=65s. Test exact-second completion-relative rearm from observed close before revisiting predictive prearm."
+  "decision_rule": "STARTUP-004 proves provider delivery of the 19:05:06 due at 19:05:35.566381 (about 30s) but lacks durable claim/useful progress. STARTUP-005 measures the operator-rescheduled generation separately. The next normal close must create a clean END+60 sample."
 }
