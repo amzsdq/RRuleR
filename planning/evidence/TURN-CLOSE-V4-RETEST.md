@@ -90,3 +90,5 @@ The normal MAIN v4 successor due at 00:02:08 KST was invoked at 00:05:12.368456 
 ## Epoch 76 exact one-shot category canary result
 
 The one-shot due at 00:25:53 KST was invoked at 00:27:31.651380, then platform completion left the same canonical without a preserved future DTSTART. No generation-matched BOOT_STARTED or REARM_VERIFIED was observed. The canary is therefore rejected, recorded as STARTUP-018, and excluded from normal RRULE, operator-rescheduled, and emergency-recovery comparisons. SAME MAIN recurring RRULE was restored and live-verified with provisional DTSTART 00:43:10; Watchdog remained unused. Audit and summary tools now expose a dedicated rejected-one-shot bucket, and exact remote-code checks passed.
+
+Validation after the classifier update used the exact remote source, not a reconstructed local copy: all 14 startup-audit tests and all 9 turn-close-summary tests passed (23 total). The live ledger audit also passed with 19 samples, zero unacknowledged boundary errors, four operator-rescheduled samples, one rejected one-shot canary sample, and one strict complete normal-comparison sample. No missing receipt was converted to zero.
