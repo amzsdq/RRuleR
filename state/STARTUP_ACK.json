@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
   "main_canonical_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "current_expected_due_at": "2026-09-21T22:47:28+09:00",
-  "generation_key": "DUE:2026-09-21T22:47:28+09:00",
+  "current_expected_due_at": "2026-09-21T23:10:59+09:00",
+  "generation_key": "DUE:2026-09-21T23:10:59+09:00",
   "boot_started_at": null,
   "boot_started_authority_epoch": null,
   "rearm_verified_at": null,
   "verified_provisional_due_at": null,
   "status": "AWAITING_BOOT_STARTED",
-  "last_updated_at": "2026-09-21T22:46:28+09:00",
-  "note": "Epoch 73 closed normally. Await a generation-matched BOOT_STARTED receipt for the verified same-canonical 22:47:28 continuation."
+  "last_updated_at": "2026-09-21T23:10:14+09:00",
+  "note": "Operator rearmed the SAME MAIN normal path to 23:10:59 after the prior fast invocation left no BOOT_STARTED receipt. Await generation-matched bootstrap evidence."
 }
