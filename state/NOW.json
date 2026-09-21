@@ -1,21 +1,5 @@
 {
-  "schema_version": "1.0",
-  "program_id": "RRULER-PROGRAM-001",
-  "program_ref": "planning/PROGRAM.md",
-  "project_id": "P001",
-  "project_ref": "planning/projects/P001-SUSTAINED-UTILIZATION.md",
-  "work_spec_id": "WS-P001-002",
-  "work_spec_ref": "planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md",
-  "execution_status": "ACTIVE",
-  "pause_reason": null,
-  "resume_target": {
-    "step": "Run the v5.5 durable-unit chat-trace canary on the authoritative SAME MAIN: verify the provisional schedule, emit the schedule trace, execute bounded substantive units, persist each unit timing/evidence before its completion trace, continue same-wake work through the normal 600s floor, then verify exact END+60 and emit the final due trace.",
-    "selection_rule": "Read fresh ACTIVE_CONTROLS each wake. Progress chat is observability only and never close authority. Before 600s, after each durably evidenced unit trace immediately select the next safe authorized unit. Preserve SAME MAIN recurring RRULE."
-  },
-  "turn_plan_role": "TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec and fresh ACTIVE_CONTROLS.",
-  "updated_at": "2026-09-22T02:02:10+09:00",
-  "resumed_by_operator_at": "2026-09-22T02:00:20+09:00",
-  "maintenance_repair_ref": "planning/evidence/MAIN-V5.2-POLICY-SYNC-ROLLBACK.md",
-  "active_runtime_revision": "MAIN_BOOTSTRAP_V5.5_DURABLE_UNIT_CHAT_TRACE_CANARY",
-  "operator_requested_next_due_at": "2026-09-22T02:04:10+09:00"
+  "schema_version":"1.0","program_id":"RRULER-PROGRAM-001","program_ref":"planning/PROGRAM.md","project_id":"P001","project_ref":"planning/projects/P001-SUSTAINED-UTILIZATION.md","work_spec_id":"WS-P001-002","work_spec_ref":"planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md","execution_status":"ACTIVE","pause_reason":null,
+  "resume_target":{"step":"Continue active v5.5 durable-unit chat-trace canary RUN-UTIL-20260922-020711 under epoch 81. Multiple bounded enforcement units are durably complete; continue safe work until the normal 600s floor, then finish the smallest safe in-flight unit, checkpoint, live-verify SAME MAIN exact END+60, project the identical due to CURRENT/ACTIVITY/HANDOFF, and emit the final due trace.","selection_rule":"Progress chat is observability only and never close authority. Before 600s, after each durably evidenced unit trace immediately select the next safe authorized unit. Preserve SAME MAIN recurring RRULE; provisional due currently 02:18:11 KST unless one guarded extension becomes necessary."},
+  "turn_plan_role":"TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec and fresh ACTIVE_CONTROLS.","updated_at":"2026-09-22T02:14:30+09:00","resumed_by_operator_at":"2026-09-22T02:00:20+09:00","maintenance_repair_ref":"planning/evidence/MAIN-V5.2-POLICY-SYNC-ROLLBACK.md","active_runtime_revision":"MAIN_BOOTSTRAP_V5.5_DURABLE_UNIT_CHAT_TRACE_CANARY","operator_requested_next_due_at":null,"active_run_id":"RUN-UTIL-20260922-020711","authority_epoch":81,"verified_provisional_due_at":"2026-09-22T02:18:11+09:00"
 }
