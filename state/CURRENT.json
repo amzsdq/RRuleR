@@ -11,35 +11,30 @@
   "canonical_automation_id": "6ab152b636748191a71873ba4d5ef551",
   "run_state": "HANDOFF_COMMITTED",
   "checkpoint": {
-    "id": "CP-UTILIZATION-117",
+    "id": "CP-UTILIZATION-118",
     "state": "CONTINUE",
     "completed": [
-      "Generation-matched BOOT_STARTED and REARM_VERIFIED were persisted for the clean MAIN wake.",
-      "Startup ACK audit now rejects BOOT_STARTED from a stale generation and regression coverage was added.",
-      "Intermediate broad rewrite regression was detected by commit diff review; full legacy audit output/CLI surface was restored before close.",
-      "CI custom-recurring validation undefined-variable defect was repaired.",
-      "Generation-bound startup receipt rule was aligned across ACTIVE_CONTROLS, runtime continuity, and scheduler-fence startup order.",
-      "Normal close live-verified SAME MAIN enabled=true with recurring RRULE and exact DTSTART 2026-09-22T01:07:52+09:00."
+      "Generation-matched BOOT_STARTED and REARM_VERIFIED were persisted for clean MAIN wake due 01:07:52.",
+      "Diagnosed durable drift: minimum_continue_work_seconds remained 480 despite operator/bootstrap 600-second minimum intent.",
+      "Run validator now rejects every normal CONTINUE close before 600 seconds unless an allowlisted EXCEPTION is explicitly recorded.",
+      "Validator now recognizes current same-canonical exact-one-shot/custom-recurring continuation end reasons instead of falsely failing historical current-era records.",
+      "Regression tests cover 599-second early handoff rejection, pre-600 budget-close rejection, documented exception acceptance, and current custom-recurring continuation acceptance."
     ],
     "evidence": [
-      "planning/evidence/CLEAN-MAIN-STARTUP-GENERATION-FENCE-2026-09-22.md",
-      "tools/audit_startup_boundaries.py@858d5cf",
-      "tests/test_audit_startup_boundaries.py@b13e7e6",
-      "control/ACTIVE_CONTROLS.json@8f448a8",
-      "control/runtime-continuity.v1.json@09ea6c9",
-      "control/scheduler-fence.v1.json@d859b01",
-      "live SAME MAIN metadata verified after close: enabled=true, RRULE:FREQ=HOURLY, DTSTART=20260922T010752 Asia/Seoul"
+      "tools/validate_run_records.py@399a950",
+      "tests/test_run_records.py@7a0459f",
+      "state/STARTUP_ACK.json@c1d3183"
     ],
-    "observation": "Latest integrated GitHub Actions validation remained an external pending item while rapid state/control pushes caused earlier concurrency cancellations. No CI PASS is claimed in this turn.",
-    "next_action": "On the next clean MAIN wake, read fresh CI result for latest source first; repair any concrete failure or, if PASS, record executable validation and continue WS-P001-002 rolling utilization evidence."
+    "observation": "Previous CI failure at epoch-78 close was not a substantive control-plane failure: validate_run_records rejected lines 19-20 because its valid end-reason allowlist lagged the exact-one-shot/custom-recurring lifecycle. The validator drift and the 480s minimum drift were repaired together.",
+    "next_action": "Observe integrated CI for the 600-second hard-gate patch. If PASS, continue WS-P001-002 prospective utilization evidence; normal CONTINUE must not close before 600 elapsed seconds except an explicit allowlisted exception."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_COMPLETION_RELATIVE_MAIN",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-22T01:07:52+09:00",
+    "next_due_at": "2026-09-22T01:23:00+09:00",
     "target_useful_work_seconds": 600,
-    "minimum_continue_work_seconds": 480,
+    "minimum_continue_work_seconds": 600,
     "provisional_safety_margin_seconds": 180,
     "provisional_due_offset_seconds": 780,
     "final_rearm_offset_seconds": 60,
@@ -62,7 +57,7 @@
       "enabled_verified": false,
       "policy_version": 8
     },
-    "next_due_source": "VERIFIED_ACTUAL_END_PLUS_EXACTLY_60_SECONDS",
+    "next_due_source": "VERIFIED_PROVISIONAL_CRASH_INSURANCE_PENDING_NORMAL_END_PLUS_60_CLOSE",
     "cold_fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE"
   },
   "safety": {
