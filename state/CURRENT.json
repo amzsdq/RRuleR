@@ -29,14 +29,14 @@
       "state/SUCCESSOR_STARTUP.json@0336564",
       "state/WORK_EVIDENCE.json@343dbff"
     ],
-    "observation": "Operator recovery after a receipt-less fast MAIN invocation. MAIN->MAIN is the normal path; provisional and Watchdog are emergency-only. Final CONTINUE close now requires live verified END+60 MAIN due.",
-    "next_action": "Await generation-matched BOOT_STARTED for DUE:2026-09-21T23:14:40+09:00. Normal continuation remains MAIN->MAIN; Watchdog is emergency-only."
+    "observation": "Operator switched runtime to self-reliant MAIN. Normal correctness no longer depends on Watchdog; SAME MAIN END+60 is fast path and SAME MAIN hourly RRULE is cold fallback.",
+    "next_action": "Await generation-matched BOOT_STARTED for DUE:2026-09-21T23:52:00+09:00 from compact MAIN v4.0 bootstrap."
   },
   "continuation": {
     "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE_WITH_GUARDED_TIMING_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
     "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-21T23:14:40+09:00",
+    "next_due_at": "2026-09-21T23:52:00+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -56,21 +56,14 @@
       "policy_ref": "control/startup-watchdog.v1.json",
       "state_ref": "state/WATCHDOG.json",
       "ack_ref": "state/STARTUP_ACK.json",
-      "mode": "ONE_SHOT_SELF_RELAY",
-      "normal_check_offset_seconds": 180,
-      "recovery_recheck_seconds": 240,
-      "main_recovery_due_offset_seconds": 60,
-      "next_watchdog_due_at": "2026-09-21T23:17:40+09:00",
-      "coverage": "ARMED_EMERGENCY_ONLY",
-      "last_classification": "HEALTHY_CONTINUATION_ARMED",
-      "last_recovery_at": "2026-09-21T22:33:20+09:00",
-      "enabled_verified": true,
-      "policy_version": 3,
-      "idle_distant_due_enabled": true,
-      "idle_distant_due_extra_slack_seconds": 120,
-      "idle_distant_due_recovery_offset_seconds": 60
+      "mode": "DISABLED_BREAK_GLASS_STANDBY",
+      "coverage": "NOT_REQUIRED_FOR_NORMAL_CONTINUITY",
+      "next_watchdog_due_at": null,
+      "enabled_verified": false,
+      "policy_version": 5
     },
-    "next_due_source": "OPERATOR_NORMAL_MAIN_RETRY_NOW_PLUS_60_SECONDS"
+    "next_due_source": "OPERATOR_SELF_RELIANT_MAIN_V4_RECOVERY",
+    "cold_fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE"
   },
   "safety": {
     "public_repo": true,
