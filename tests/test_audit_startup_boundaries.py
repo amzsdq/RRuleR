@@ -66,3 +66,22 @@ def test_matches_observation_prefix_to_predecessor_run_id():
     result = audit(startup, runs)["results"][0]
     assert result["predecessor_run_found"] is True
     assert result["errors"] == ["PREDECESSOR_LAST_USEFUL_AFTER_RECORDED_END"]
+
+
+def test_acknowledged_boundary_inconsistency_stays_flagged_but_does_not_fail_audit():
+    runs = ['{"observation_id":"OBS-RUN-UTIL-2","run_started_at":"2026-09-21T10:00:00+00:00","run_ended_at":"2026-09-21T10:10:00+00:00"}']
+    startup = {"samples":[{
+        "sample_id":"ACK",
+        "predecessor_run_id":"RUN-UTIL-2",
+        "predecessor_last_useful_at":"2026-09-21T10:10:01+00:00",
+        "scheduled_due_at":"2026-09-21T10:09:00+00:00",
+        "successor_observed_at":"2026-09-21T10:10:30+00:00",
+        "validity":"INVALID",
+        "exclusion_reason":"BOUNDARY_INCONSISTENCY",
+    }]}
+    out = audit(startup, runs)
+    assert out["valid"] is True
+    result = out["results"][0]
+    assert result["errors"] == ["PREDECESSOR_LAST_USEFUL_AFTER_RECORDED_END"]
+    assert result["acknowledged_invalid"] is True
+    assert result["scheduler_comparison_eligible"] is False
