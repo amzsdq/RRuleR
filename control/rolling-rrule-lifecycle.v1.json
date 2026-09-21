@@ -1,8 +1,8 @@
 {
   "policy_id": "RRULER_ROLLING_RRULE_LIFECYCLE",
-  "version": 20,
+  "version": 21,
   "status": "ACTIVE",
-  "purpose": "CLEAN MIGRATED MAIN: normal path is operator-created SAME MAIN recurring RRULE -> bounded work -> SAME MAIN exact END+60 shift. Both prior MAIN canonicals are retired. Watchdog is disabled break-glass only.",
+  "purpose": "CLEAN MIGRATED MAIN v5.5: SAME MAIN recurring RRULE -> verified provisional -> compact schedule trace -> bounded useful work with durable per-unit duration/evidence + chat trace -> SAME MAIN exact END+60 shift + final due trace. Prior MAIN canonicals remain retired; Watchdog is disabled break-glass only.",
   "canonical_invariant": "Never create a replacement canonical merely to continue this actor. Mutate only the verified canonical identified by fresh durable state.",
   "startup_order": [
     "READ_MINIMUM_FENCE_CURRENT_AND_CANONICAL_AUTHORITY",
@@ -49,7 +49,7 @@
     "retired_horizon_seconds": 780
   },
   "work": {
-    "rule": "Perform sustained useful authorized work by chaining bounded units. For a normal nonterminal CONTINUE turn, 600 observed elapsed seconds is the minimum voluntary duration. Before 600s, start the next clear low-risk checkpointable unit, independent fallback/residual unit, or smaller decomposed slice. CI pending, local packet completion, checkpoint completion, secured continuation, or no-obvious-next-task never authorize a voluntary pre-600s CONTINUE close. Earlier end must be STOP/PAUSE, durable terminal, genuine BLOCKED/fail-closed authority or safety state, or platform-enforced termination and must be reported as such. At >=600s, do not start a new large unit; close after the smallest safe in-flight boundary. Normal soft ceiling is ~720s.",
+    "rule": "Perform sustained useful authorized work by chaining bounded units. For a normal nonterminal CONTINUE turn, 600 observed elapsed seconds is the minimum voluntary duration. Before 600s, start the next clear low-risk checkpointable unit, independent fallback/residual unit, or smaller decomposed slice. CI pending, local packet completion, checkpoint completion, secured continuation, or no-obvious-next-task never authorize a voluntary pre-600s CONTINUE close. Earlier end must be STOP/PAUSE, durable terminal, genuine BLOCKED/fail-closed authority or safety state, or platform-enforced termination and must be reported as such. At >=600s, do not start a new large unit; close after the smallest safe in-flight boundary. Normal soft ceiling is ~720s. V5.5 TRACE CANARY: whenever a bounded substantive unit is actually complete and its observed START/END/DURATION plus artifact-backed work evidence are durably persisted, emit exactly one compact user-visible completion trace, then immediately continue same-wake work while the 600s floor is unmet. A trace is observability, never a close signal.",
     "checkpoint_rule": "Persist enough durable progress that a cold successor can resume without chat context.",
     "collision_rule": "Normally do not mutate the schedule mid-turn. If useful work or required close handling will plausibly cross the +660s provisional due, extend THIS SAME MAIN once before collision (prefer NOW+180s), live-verify, persist the newer due, then continue. Never allow stale queued wakes to gain substantive authority.",
     "unit_chaining_required_before_target": true,
@@ -197,5 +197,23 @@
       "6aaf8a993eb08191b8d0ab1d9662e4b2"
     ],
     "migration_basis": "EXPLICIT_OPERATOR_CLEAN_CONTEXT_MIGRATION"
+  },
+  "chat_trace": {
+    "mode": "DURABLE_UNIT_CHAT_TRACE_CANARY",
+    "enabled": true,
+    "first_schedule_trace": "After provisional SAME MAIN rearm is live-verified and persisted, emit `예약을 <N분 뒤>인 <HH:MM:SS KST>로 갱신했습니다.` before substantive work.",
+    "unit_completion_trace": "Only after one bounded substantive unit is actually completed AND observed unit START/END/DURATION plus artifact-backed work evidence are durably persisted, emit `완료: <what was done> (duration <measured>)`.",
+    "after_unit_trace": "Immediately select and execute the next safe authorized unit in the SAME wake while normal CONTINUE elapsed is below 600 seconds.",
+    "forbidden_trace_sources": [
+      "MERE_READ",
+      "PLAN_ONLY",
+      "WAIT",
+      "RETRY_WITHOUT_COMPLETION",
+      "UNPERSISTED_PARTIAL_WORK",
+      "SCHEDULER_MUTATION_ALONE"
+    ],
+    "trace_never_authorizes_close": true,
+    "batching_rule": "Do not batch independently persisted unit completions unless they are one atomic bounded unit.",
+    "final_due_trace": "After exact END+60 SAME MAIN live verification and durable close projection, emit `다음 예약을 <HH:MM:SS KST>로 갱신했습니다.`"
   }
 }
