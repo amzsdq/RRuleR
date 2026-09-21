@@ -5,27 +5,28 @@ Parent project: [P001 — Sustained Utilization & Continuous Execution](../proje
 
 ## Problem
 
-Continuation survival is high, but actual wake utilization is materially lower than the target. Recent work also showed the strict `WORK_EVIDENCE` ledger lagging far behind the current authority epoch, weakening visibility into whether the utilization objective is improving.
+Continuation survival is high, but useful-work occupancy must meet a SaaS-grade P0 target. Measurement freshness was previously broken, and after repairing it the active normal-continuation cadence was shown to have a theoretical utilization ceiling below the target.
 
 ## Outcome
 
-Make one bounded wake spend most of its available execution budget on substantive, authorized work, and keep measurement fresh enough to prove or falsify the improvement.
+Make bounded wakes spend most eligible wall-clock time on substantive authorized work, keep strict evidence current, and reduce normal cross-turn continuation loss enough that fixed 900-second P0 windows can actually pass.
 
 ## Scope
 
-- Establish a trustworthy baseline of real useful-work occupancy per wake.
-- Repair/replace stale evidence capture so current turns are measurable without manual historical backfill.
-- Identify the dominant causes of short turns / idle gaps.
-- Implement the highest-expected-effect corrections.
-- A/B or repeated-window test corrections where useful.
-- Keep correctness, fencing, idempotency, public-repo safety, and cold-rescue constraints intact.
+- trustworthy useful-work occupancy measurement;
+- prospective evidence capture without historical inference;
+- measured ranking of under-utilization causes;
+- highest-effect corrections and canaries;
+- repeated-turn/fixed-window retesting;
+- correctness, fencing, idempotency, public-repo safety, and cold-rescue preservation.
 
 ## Non-scope
 
-- Adding controls merely because a theoretical edge case exists.
-- Removing controls merely to reduce rule count.
-- Feature breadth unrelated to the active utilization bottleneck.
-- Treating scheduler survival as equivalent to useful-work utilization.
+- controls added only for theoretical completeness;
+- controls removed only to reduce rule count;
+- unrelated feature breadth;
+- treating scheduler survival as useful-work utilization;
+- weakening the P0 threshold to accommodate an inefficient continuation design.
 
 ## Acceptance
 
@@ -33,44 +34,42 @@ Make one bounded wake spend most of its available execution budget on substantiv
 - [x] Baseline wake utilization is computed from durable evidence with unknown time left unknown.
 - [x] Dominant causes of under-utilization are ranked by measured impact.
 - [x] At least one correction is implemented against the highest-impact cause.
-- [ ] The correction is retested across multiple valid windows/turns.
+- [ ] Corrections are retested across multiple valid turns/windows, including normal cross-turn continuation loss.
 - [ ] Results either meet P001 thresholds or produce a durable next experiment based on evidence.
 
 Acceptance progress: **4 / 6**
 
-## Evidence-pipeline diagnosis and repair (2026-09-21)
+## Evidence-pipeline repair
 
-`state/WORK_EVIDENCE.json` was a strict acceptance ledger, not an automatic activity feed. Its last accepted record was authority epoch 43 even though `state/CURRENT.json` advanced to epoch 58. No collector/generator existed under `tools/`; evidence insertion depended on the active worker explicitly persisting qualifying observed intervals. Later turns continued to create substantive artifacts without advancing this ledger. This was the direct cause of the multi-epoch freshness gap.
+The epoch-43 to epoch-58 measurement blackout was caused by missing explicit prospective capture responsibility, not by proof of idle time. Epoch 59 repaired this with guarded append tooling, focused tests, integrated CI, mandatory wake loading, and worker capture rules. Historical unknown time remains unknown.
 
-Repair applied:
-- added `tools/append_work_evidence.py`, which computes duration from caller-supplied observed boundaries and rejects duplicate IDs, overlaps, naive timestamps, and invalid resulting ledgers;
-- added focused regression tests and integrated them into control-plane CI;
-- added forward evidence capture to the worker bootstrap contract;
-- persisted `WE-20260921-E59-001` during the resumed turn, proving the ledger can advance with the active epoch without historical inference.
+## First resumed bounded-turn result
 
-This fixes the capture-path omission, but does not retroactively claim epochs 44-58 as useful time. Those intervals remain unknown unless independently observed evidence already proves them.
+Epoch 59: 626 wall seconds, 557 strict useful seconds (88.98% wall coverage; 92.83% of the 600-second useful target). This materially improves the historical tiny-packet pattern but is not itself a fixed 900-second P0 window.
 
-## Baseline and cause ranking
+## Current dominant cause: continuation-latency ceiling
 
-Canonical baseline: `planning/evidence/P001-UTILIZATION-BASELINE-2026-09-21.md`.
+P0 requires 840/900 = 93.33% useful coverage. With a 600-second bounded useful turn, average non-useful cross-turn loss must stay <=42.9 seconds. The current nominal 60-second post-close rearm offset already exceeds that budget before scheduler delivery latency and startup/checkpoint overhead. A prior production sample observed about 64 seconds of scheduler delivery delay after due.
 
-The pre-resume strict ledger proves 582 seconds of useful work across accepted epoch-34..43 records, then a 15-epoch measurement blackout through epoch 58. Epoch 59 prospectively restored current evidence with `WE-20260921-E59-001` (117 observed seconds through its first natural boundary). The baseline explicitly leaves unobserved time unknown.
+Therefore the active post-close continuation cadence cannot reliably pass P0 even with perfect in-turn execution.
 
-Ranked causes:
-1. evidence capture optional in practice — highest measured impact on provability;
-2. historically short local work packets — high execution-utilization risk;
-3. strategy drift toward nearby control work — medium/high opportunity cost;
-4. scheduler gaps — relevant but not currently proven dominant.
+## Active correction — UTIL-EXP-018
 
-The first correction therefore targeted evidence freshness and sustained-turn execution rather than another scheduler redesign.
+Guarded predictive same-canonical successor prearm:
+
+1. retain the 780-second provisional cold-rescue horizon;
+2. near bounded close, arm the same canonical successor for a due boundary before target close;
+3. predecessor continues useful work through close rather than yielding to the arm;
+4. if successor appears while predecessor is still fresh/conflicting, successor may fence/read/observe but cannot claim substantive authority or duplicate side effects;
+5. measure predecessor last useful boundary -> successor first useful boundary directly;
+6. rollback on unsafe overlap, duplicate side effect, schedule rollback, or missed successor.
+
+Promotion requires at least two safe canary handoffs with post-close gap <=42 seconds, then a valid fixed 900-second window.
 
 ## Exact resume step
 
-1. Verify integrated CI for the new append path.
-2. Continue sustained useful work to the bounded turn boundary while keeping evidence current.
-3. Retest the correction across subsequent turns/windows.
-4. If a turn underperforms, classify its largest observed gap and implement the highest-effect correction rather than repeating the same intervention blindly.
+Complete `PREARM-CANARY-001` for epoch 60. Record predictive due, successor observation, predecessor last useful boundary, successor first useful boundary, post-close gap, and overlap/fence result. If safe and <=42 seconds, repeat once before promotion. If not, classify the measured failure and choose the next highest-effect correction rather than repeating blindly.
 
 ## Decision rule
 
-Any rule/control/process change is valid if its net expected contribution to the P001 outcome is positive. More rules are acceptable when they materially improve the outcome; fewer rules are preferable only when protection/effect is preserved or improved.
+Any rule/control/process change is valid if its net expected contribution to P001 is positive. More rules are acceptable when they materially improve the outcome; fewer rules are preferable only when protection/effect is preserved or improved.
