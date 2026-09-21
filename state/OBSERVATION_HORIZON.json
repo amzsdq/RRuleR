@@ -1,13 +1,14 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "program_id": "RRULER-PROGRAM-001",
   "root_job_id": "RRULER-UTILIZATION-003",
   "trusted_observed_through": "2026-09-20T22:36:28+00:00",
   "provenance_kind": "GITHUB_ACTIONS_OBSERVED_TIMESTAMP",
   "provenance_ref": "35542168328",
   "provenance_attempt": 1,
+  "provenance_history": [],
   "boundary": "OBSERVED",
   "counts_as_useful_work": false,
   "monotonic_forward_only": true,
-  "note": "Monotonically advanced from the attempt-specific updated_at of independently durable successful GitHub Actions workflow run 35542168328 attempt 1. The attempt number is part of provenance identity so a later re-run of the same run id cannot retroactively mutate this trusted boundary. This boundary is not useful-work evidence and does not bridge gaps."
+  "note": "Current provenance is pinned to successful GitHub Actions run 35542168328 attempt 1. provenance_history is append-only: replacing provenance must retire the prior identity+timestamp into history, and retired identities cannot be reused. This prevents A->B->A repinning from bypassing immediate-predecessor checks."
 }
