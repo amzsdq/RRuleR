@@ -1,9 +1,19 @@
 {
-  "schema_version":"1.0",
-  "program_id":"RRULER-PROGRAM-001",
-  "candidate_policy":"control/event-wake-candidate.v1.json",
-  "status":"INACTIVE_CANDIDATE",
-  "processed_events":[],
-  "metrics":{"successful_cycles":0,"duplicate_deliveries":0,"duplicate_substantive_executions":0,"recursive_triggers":0,"authority_rollbacks":0,"event_to_first_work_seconds":[]},
-  "note":"No event-triggered wake is active yet. This ledger exists so a future bounded feasibility test starts with explicit dedupe and measurement semantics rather than retrofitting them after activation."
+  "schema_version": "1.0",
+  "program_id": "RRULER-PROGRAM-001",
+  "candidate_policy": "control/event-wake-candidate.v1.json",
+  "status": "INACTIVE_CANDIDATE",
+  "processed_events": [],
+  "metrics": {
+    "successful_cycles": 0,
+    "duplicate_deliveries": 0,
+    "duplicate_substantive_executions": 0,
+    "recursive_triggers": 0,
+    "authority_rollbacks": 0,
+    "event_to_first_work_seconds": []
+  },
+  "note": "No event-triggered wake is active. The guarded evaluator recognizes STARTUP_ACK_MISSING, but emission remains forbidden until a supported consumer is provisioned, its write probe passes, and the workflow atomically claims an outstanding generation.",
+  "consumer_status": "UNVERIFIED",
+  "outstanding_generation": null,
+  "last_emitted_generation": 0
 }
