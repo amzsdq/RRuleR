@@ -123,7 +123,7 @@
     "experiment_id": "UTIL-EXP-018",
     "status": "ROLLED_BACK_AFTER_FAILED_FIRST_CANARY",
     "result_ref": "state/PREDICTIVE_PREARM_CANARY.json",
-    "reentry_condition": "Do not treat short/early recurring wakes as the normal strategy. Prior +2m rolling reservation A/B evidence also showed overlap; use adaptive +11m provisional for ~10m envelopes unless new controlled evidence justifies another policy.",
+    "reentry_condition": "Do not treat short/early recurring wakes as the normal strategy. Prior 2-minute (120-second) rolling reservation A/B evidence also showed overlap; use adaptive 11-minute (660-second) provisional for 10-minute (600-second) envelopes unless new controlled evidence justifies another policy.",
     "historical_candidate_due": "target_bounded_close - 30 seconds",
     "safety_rule": "Any future retry still requires fresh authority fencing and no duplicate substantive side effects."
   },
@@ -150,10 +150,10 @@
     "newest_verified_future_continuation_wins": true
   },
   "evidence_basis": {
-    "test": "Independent RRULE ROLLING +2M TWO-WAKE TEST",
+    "test": "Independent RRULE ROLLING 2-MINUTE (120-SECOND) TWO-WAKE TEST",
     "canary_canonical": "6ab01dcefd64819190a756988c732f62",
     "result": "PASS",
-    "observed_sequence": "Stage 1 woke, mutated the same canonical hourly RRULE DTSTART to actual wake +2m, persisted Stage 2 prompt, then Stage 2 executed and the same canary was disabled."
+    "observed_sequence": "Stage 1 woke, mutated the same canonical hourly RRULE DTSTART to actual wake + exactly 2 minutes (120 seconds), persisted Stage 2 prompt, then Stage 2 executed and the same canary was disabled."
   },
   "rollback": "Preserve the canonical and completion-relative fallback whenever an experimental cadence produces unsafe overlap, missed continuation, rollback, or an out-of-budget useful-work handoff.",
   "startup_acknowledgement": {
@@ -227,10 +227,7 @@
       "3 minutes (180 seconds)"
     ],
     "forbidden_examples": [
-      "END+60",
-      "NOW+180",
-      "+660",
-      "600 floor"
+      "Any duration or schedule delta written as a bare number without seconds/minutes/hours"
     ],
     "machine_seconds_fields": "Numeric fields whose names end in _seconds are seconds by schema; explanatory prose must still state units.",
     "rrule_note": "FREQ=HOURLY is recurrence metadata and never converts explicit second offsets into minutes or hours."
