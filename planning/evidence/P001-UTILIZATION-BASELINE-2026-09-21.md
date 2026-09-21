@@ -5,72 +5,75 @@ Parent: `WS-P001-002 — Sustained Turn Utilization`
 
 ## Measurement discipline
 
-This baseline intentionally separates:
-
-- **observed useful work** — intervals with observed boundaries and materially new artifacts accepted by `state/WORK_EVIDENCE.json`;
-- **known non-useful work** — scheduler/heartbeat/wait/no-op evidence;
-- **unknown time** — anything without enough evidence to classify.
-
-Unknown time is not converted into useful time or idle time.
+This baseline separates observed useful work, known non-useful work, and unknown time. Unknown time is never converted into useful time or idle time.
 
 ## Strict ledger baseline before resumed epoch 59
 
-The accepted ledger contained 10 records covering authority epochs 34-43 with observed useful durations:
+The accepted ledger contained 10 records covering authority epochs 34-43 with 582 observed useful seconds. It then had no accepted records for epochs 44-58. This does not prove those epochs were idle; it proves the strict useful-work measurement pipeline could not classify them.
 
-`76 + 57 + 190 + 49 + 47 + 14 + 67 + 18 + 31 + 33 = 582 seconds`.
+## Resumed epoch 59 result
 
-The ledger then had no accepted records for epochs 44-58. This does **not** prove those epochs were idle. It proves the strict useful-work measurement pipeline could no longer classify their work time, so P0 could not be established from that interval.
+The resumed bounded turn ran from `15:49:58` to `16:00:24` KST (626 wall seconds). Five adjacent accepted intervals cover **557 strict useful seconds**, or **88.98% of turn wall time** and **92.83% of the 600-second useful-work target**.
 
-## Resumed epoch 59 baseline
+This is a material improvement over the historical tiny-packet pattern and proves prospective capture is functioning again. It is still not a completed fixed 900-second P0 window.
 
-The resumed turn began at the automation-observed boundary `2026-09-21T15:49:58+09:00`.
+## Epoch 60 fixed-window feasibility finding
 
-Prospective epoch-59 records now cover four adjacent observed substantive intervals through `15:57:58+09:00`: **117 + 164 + 100 + 99 = 480 observed useful seconds**. No time after that boundary is included in this figure.
+Epoch 60 was first observed at `17:01:46` KST inside the canonical fixed `17:00:00-17:15:00` window. The first 106 seconds are therefore unknown. Even if every second from observed start through window end were useful, the maximum possible accepted useful time is only **794 seconds**, below the **840-second** target. This window cannot become P0 acceptance evidence and must not be gamed or backfilled.
 
-This proves prospective capture is working again and that the resumed turn sustained materially more work than the historical tiny-packet pattern. It is still **not** a completed 900-second P0 window and must not be promoted as one.
+More importantly, the active execution cadence has a structural ceiling:
 
-## Ranked causes of under-utilization / unprovable utilization
+- P0 target: `840 / 900 = 93.33%` useful coverage.
+- Nominal bounded work target: 600 seconds.
+- Current normal completion-relative rearm offset: 60 seconds.
+- Idealized ceiling before any startup/checkpoint/scheduler jitter: `600 / (600 + 60) = 90.91%`.
+- A prior production sample (`UTIL-EXP-011`) observed about 64 seconds of scheduler delivery delay after the due boundary.
 
-### 1. Evidence capture was optional in practice — highest measured impact
+Therefore **the current post-close continuation design cannot reliably satisfy the current P0 target even with perfect in-turn execution**. This is now the highest-effect utilization bottleneck. Weakening the P0 target would hide the problem rather than make the runtime SaaS-grade.
 
-Impact: **15 authority epochs (44-58) became unclassifiable in the strict ledger.**
+## Ranked causes
 
-The repository had validators but no deterministic append helper/collector, and the worker bootstrap did not explicitly require qualifying work to advance the ledger. This caused a measurement blackout even while substantive commits continued.
+### 1. Normal continuation latency budget is structurally incompatible with P0 — highest current impact
 
-Correction applied in epoch 59:
-- `tools/append_work_evidence.py`;
-- `tests/test_append_work_evidence.py`;
-- integrated CI coverage;
-- explicit forward-capture bootstrap rule;
-- `state/WORK_EVIDENCE.json` added to mandatory wake state.
+A 600-second useful turn can tolerate at most about **42.9 seconds of average non-useful gap** and still reach 840/900. A 60-second post-close due already exceeds that budget before scheduler delivery latency and startup overhead are added.
 
-### 2. Turns historically ended after small local packets — high execution impact
+Correction direction: `UTIL-EXP-018` tests **predictive same-canonical successor prearm**. The successor due is moved before the predecessor's target close so scheduler latency can be absorbed while the predecessor is still doing useful work. This does not create dual substantive ownership: the successor must fence and may not claim substantive authority while the predecessor remains fresh/conflicting.
 
-The pre-resume strict ledger contains many very short accepted intervals (14s, 18s, 31s, 33s, 47s, 49s, 57s, 67s, 76s) and one 190s interval. These durations do not by themselves equal full-turn duration, but they are consistent with the previously observed pattern of committing one bounded change and then failing to establish sustained evidence across most of a 600-second useful-work target.
+The 780-second provisional cold-rescue horizon remains separate and unchanged.
 
-Epoch 59 is the first prospective retest under the new bounded-turn protocol and has already accumulated 480 adjacent observed useful seconds through 15:57:58 KST.
+### 2. Evidence capture was optional in practice — corrected, continue regression monitoring
 
-### 3. Strategy drift toward nearby control-plane work — medium/high opportunity cost
+Epochs 44-58 became unclassifiable because workers did not have an explicit forward-capture responsibility. Epoch 59 repaired this with guarded append tooling, tests, integrated CI, mandatory wake loading, and worker capture rules.
 
-Before the planning spine, the next packet remained continuation-policy workflow simplification even after utilization had become the stated P0. The work was technically valid but not clearly the highest-effect action against the active bottleneck.
+### 3. Historically short local work packets — materially improved, continue repeated-turn test
 
-Correction applied: `PROGRAM -> PROJECT -> WORK SPEC -> NOW -> TURN_PLAN`, with WS-P001-002 now authoritative.
+Epoch 59 sustained 557 strict useful seconds across a 626-second bounded turn. This is promising but one sample is insufficient. Epoch 60 remains the second repeated-turn retest.
 
-### 4. Bounded-turn close semantics contradicted the rolling lifecycle — corrected in epoch 59
+### 4. Strategy drift toward nearby control-plane work — structurally corrected
 
-The rolling lifecycle/hardcoded protocol requires a bounded turn to checkpoint, verify a future same-canonical continuation, and return. The previous continuation gate only allowed a nonterminal run to end after a successor had already been observed/committed, which conflicts with a clean 10-minute bounded-turn model and can force unnecessary overlap or indefinite ownership.
+The planning spine `PROGRAM -> PROJECT -> WORK SPEC -> NOW -> TURN_PLAN` now binds local work to P001 acceptance rather than nearby implementation context.
 
-Correction applied: gate v3 adds `VERIFIED_SAME_CANONICAL_CONTINUATION` as a **run-end-only** reason after explicit bounded-close requirements; it does not permit program completion. Dedicated continuation-policy CI and integrated control-plane CI both passed for the change.
+### 5. Bounded-turn close semantics contradiction — corrected
 
-### 5. Scheduler/continuation gaps — still relevant, but not currently proven dominant
+Gate v3 permits `VERIFIED_SAME_CANONICAL_CONTINUATION` as a run-end-only authority after bounded-close requirements while preserving program-level nonterminal semantics.
 
-Continuation survival is strong and the rolling same-canonical lifecycle already targets a completion-relative fast wake. Current evidence does not justify treating scheduler timing as the dominant remaining utilization loss ahead of execution occupancy/evidence freshness.
+## Current experiment
+
+`UTIL-EXP-018 — predictive successor prearm`
+
+Hypothesis: if the same-canonical successor is armed before target close, normal scheduler latency can overlap the predecessor's still-useful work. The predecessor continues useful work to its bounded close. An early successor may read/fence/observe but cannot take over substantive authority until a fresh re-read proves a safe close or transfer.
+
+Required canary evidence:
+
+1. predictive due timestamp;
+2. actual successor observation timestamp;
+3. predecessor last useful boundary;
+4. successor first useful boundary;
+5. post-close gap;
+6. whether any unsafe overlap, duplicate side effect, or schedule rollback occurred.
+
+Promotion requires at least two safe canary handoffs with post-close gap <=42 seconds, then a valid fixed 900-second utilization window.
 
 ## Baseline conclusion
 
-The first intervention remains **prospective evidence freshness + sustained-turn execution**, not another scheduler redesign. Subsequent valid turns should answer two questions with direct evidence:
-
-1. Does a resumed worker sustain useful work for most of its 600-second target rather than stopping after a small packet?
-2. Does every qualifying turn keep `WORK_EVIDENCE` current without fabricating unknown time?
-
-If both hold, move to repeated-window P0 testing. If not, classify the largest observed gap in the failed turn and correct that cause next.
+Evidence freshness and sustained in-turn execution have improved enough to reveal the next bottleneck: **normal continuation latency is now mathematically inconsistent with the P0 utilization target**. The next high-value work is not more generic control hardening. It is a measured predictive-prearm canary that tries to hide scheduler latency under useful predecessor work while retaining single substantive authority and cold-rescue safety.
