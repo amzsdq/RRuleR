@@ -9,29 +9,37 @@
   "current_owner": "RUN-UTIL-20260922-003010",
   "authority_epoch": 76,
   "canonical_automation_id": "6aaf8a993eb08191b8d0ab1d9662e4b2",
-  "run_state": "WORKING",
+  "run_state": "HANDOFF_COMMITTED",
   "checkpoint": {
     "id": "CP-UTILIZATION-114",
-    "state": "IN_PROGRESS",
+    "state": "COMPLETE",
     "completed": [
-      "Read fresh NOW and observed active program.",
-      "Classified one-shot canary as rejected after execution completed without preserving a future DTSTART.",
-      "Persisted BOOT_STARTED for operator-restored v4.2 generation due 00:30:39.",
-      "Live-verified SAME MAIN recurring RRULE provisional fallback at 00:43:10 and persisted REARM_VERIFIED.",
-      "Claimed authority epoch 76 without Watchdog."
+      "Bootstrapped epoch 76 and verified recurring provisional fallback without Watchdog.",
+      "Recorded STARTUP-018 rejected one-shot canary and STARTUP-019 operator-restored generation without inferred receipts.",
+      "Added dedicated rejected-one-shot audit/report classification and focused fixtures.",
+      "Passed all 23 exact-remote-source audit/summary tests and live-ledger audit with zero unacknowledged errors.",
+      "Recorded the rejected canary in P0 scorecard and experiment ledger.",
+      "Reconciled relay policy, scheduler fence, CI, and live automation to fresh custom recurring v4.3 category canary.",
+      "Detected enabled=false close race, then re-enabled and live-verified SAME MAIN custom recurring END+60 at 00:41:36."
     ],
     "evidence": [
-      "state/STARTUP_ACK.json@98cbf2d",
-      "live SAME MAIN metadata: enabled recurring DTSTART 2026-09-22T00:43:10+09:00"
+      "state/SUCCESSOR_STARTUP.json@9f66357",
+      "state/WORK_EVIDENCE.json@8013af6",
+      "state/P0_SCORECARD.json@5f32fd4",
+      "state/EXPERIMENTS.jsonl@6e1440a",
+      "tools/audit_startup_boundaries.py@b2ecaad",
+      "tools/summarize_turn_close.py@1493dfe",
+      "23 exact-remote-source tests PASS; live ledger audit PASS",
+      "live SAME MAIN: enabled, DTSTART 00:41:36, DAILY+24 BYHOUR, BYMINUTE=41, BYSECOND=36"
     ],
-    "observation": "The exact one-shot category canary executed at 00:27:31.651380 after due 00:25:53, then platform completion left no future DTSTART. RRULE primary is restored.",
-    "next_action": "Add explicit rejected one-shot canary evidence classification and fixtures so it cannot contaminate normal scheduler or recovery comparisons."
+    "observation": "Exact one-shot self-update is rejected. During custom-recurring reconciliation, prior one-shot completion processing briefly forced enabled=false; final close explicitly restored enabled=true and verified exact custom recurring END+60.",
+    "next_action": "Observe the 00:41:36 custom recurring wake and compare its delivery/bootstrap path with simple-hourly and rejected one-shot samples."
   },
   "continuation": {
-    "mechanism": "RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE",
+    "mechanism": "RRULE_CUSTOM_RECURRING_24H_SLOT_COMPLETION_RELATIVE_CANARY",
     "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
-    "rrule_frequency": "HOURLY",
-    "next_due_at": "2026-09-22T00:43:10+09:00",
+    "rrule_frequency": "DAILY",
+    "next_due_at": "2026-09-22T00:41:36+09:00",
     "target_useful_work_seconds": 600,
     "minimum_continue_work_seconds": 480,
     "provisional_safety_margin_seconds": 180,
@@ -57,8 +65,8 @@
       "enabled_verified": false,
       "policy_version": 6
     },
-    "next_due_source": "VERIFIED_IN_FLIGHT_PROVISIONAL_CRASH_INSURANCE",
-    "cold_fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE"
+    "next_due_source": "VERIFIED_NORMAL_END_PLUS_60_CUSTOM_RECURRING",
+    "cold_fallback": "SAME_MAIN_NATURAL_CUSTOM_RECURRING_OCCURRENCE"
   },
   "safety": {
     "public_repo": true,
