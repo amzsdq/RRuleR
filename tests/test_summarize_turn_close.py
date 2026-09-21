@@ -22,7 +22,7 @@ def test_old_no_safe_work_exception_is_not_excused_anymore():
     runs=['{"observation_id":"OLD-EX","run_started_at":"2026-09-21T17:00:00+00:00","run_ended_at":"2026-09-21T17:02:00+00:00","duration_seconds":120,"turn_outcome":"CONTINUE","productive_substantive_seconds":null,"short_turn_reason":"NO_SAFE_RUNNABLE_WORK_AFTER_EXPLICIT_SCAN","alternatives_checked":["primary","fallback"],"close_decision":"EXCEPTION"}']
     assert summarize(runs,{"samples":[]})["v4_unexcused_short_close_count"]==1
 
-def test_consecutive_p0_a_and_p0_b_require_observed_duration_and_explicit_due():
+def test_consecutive_p0_a_and_local_p0_b_require_observed_duration_and_explicit_due():
     runs=[
       '{"observation_id":"R1","run_started_at":"2026-09-21T17:00:00+00:00","run_ended_at":"2026-09-21T17:10:00+00:00","duration_seconds":600,"turn_outcome":"CONTINUE","end_reason":"VERIFIED_SAME_CANONICAL_CONTINUATION","verified_next_fast_due_at":"2026-09-21T17:11:00+00:00"}',
       '{"observation_id":"R2","run_started_at":"2026-09-21T17:20:00+00:00","run_ended_at":"2026-09-21T17:30:01+00:00","duration_seconds":601,"turn_outcome":"CONTINUE","end_reason":"VERIFIED_SAME_CANONICAL_CONTINUATION","verified_next_fast_due_at":"2026-09-21T17:31:01+00:00"}',
@@ -30,7 +30,8 @@ def test_consecutive_p0_a_and_p0_b_require_observed_duration_and_explicit_due():
     ]
     out=summarize(runs,{"samples":[]})
     assert out["p0_a_consecutive_normal_turns_gte_10_minutes_600_seconds"]==3
-    assert out["p0_b_consecutive_normal_closes_exactly_1_minute_60_seconds"]==3
+    assert out["p0_b_consecutive_local_closes_exactly_1_minute_60_seconds"]==3
+    assert out["p0_b_consecutive_normal_closes_exactly_1_minute_60_seconds_with_observed_fast_bootstrap"]==0
 
 def test_p0_b_does_not_infer_exact_close_from_end_reason_or_hourly_recurrence():
     runs=[
@@ -39,11 +40,27 @@ def test_p0_b_does_not_infer_exact_close_from_end_reason_or_hourly_recurrence():
     ]
     out=summarize(runs,{"samples":[]})
     assert out["p0_a_consecutive_normal_turns_gte_10_minutes_600_seconds"]==2
-    assert out["p0_b_consecutive_normal_closes_exactly_1_minute_60_seconds"]==0
+    assert out["p0_b_consecutive_local_closes_exactly_1_minute_60_seconds"]==0
 
 def test_sixty_minutes_is_not_accepted_as_one_minute():
     runs=['{"observation_id":"BAD-HOUR","run_started_at":"2026-09-21T17:00:00+00:00","run_ended_at":"2026-09-21T17:10:00+00:00","duration_seconds":600,"turn_outcome":"CONTINUE","end_reason":"VERIFIED_SAME_CANONICAL_CONTINUATION","verified_next_fast_due_at":"2026-09-21T18:10:00+00:00"}']
-    out=summarize(runs,{"samples":[]}); assert out["p0_b_consecutive_normal_closes_exactly_1_minute_60_seconds"]==0
+    out=summarize(runs,{"samples":[]}); assert out["p0_b_consecutive_local_closes_exactly_1_minute_60_seconds"]==0
+
+def test_p0_b_delivery_pass_requires_matching_normal_fast_bootstrap():
+    runs=['{"observation_id":"OBS-RUN-1","run_started_at":"2026-09-21T17:00:00+00:00","run_ended_at":"2026-09-21T17:10:00+00:00","duration_seconds":600,"turn_outcome":"CONTINUE","end_reason":"VERIFIED_SAME_CANONICAL_CONTINUATION","verified_next_fast_due_at":"2026-09-21T17:11:00+00:00"}']
+    normal={"sample_id":"FAST","predecessor_run_id":"RUN-1","scheduled_due_at":"2026-09-21T17:11:00+00:00","successor_observed_at":"2026-09-21T17:11:20+00:00","boot_started_at":"2026-09-21T17:11:25+00:00"}
+    out=summarize(runs,{"samples":[normal]})
+    assert out["p0_b_consecutive_local_closes_exactly_1_minute_60_seconds"]==1
+    assert out["p0_b_consecutive_normal_closes_exactly_1_minute_60_seconds_with_observed_fast_bootstrap"]==1
+
+
+def test_cold_fallback_does_not_satisfy_p0_b_delivered_fast_successor():
+    runs=['{"observation_id":"OBS-RUN-1","run_started_at":"2026-09-21T17:00:00+00:00","run_ended_at":"2026-09-21T17:10:00+00:00","duration_seconds":600,"turn_outcome":"CONTINUE","end_reason":"VERIFIED_SAME_CANONICAL_CONTINUATION","verified_next_fast_due_at":"2026-09-21T17:11:00+00:00"}']
+    cold={"sample_id":"COLD","predecessor_run_id":"RUN-1","scheduled_due_at":"2026-09-21T17:11:00+00:00","successor_observed_at":"2026-09-21T18:09:10+00:00","boot_started_at":"2026-09-21T18:09:10+00:00","generation_class":"SAME_MAIN_NATURAL_HOURLY_COLD_FALLBACK_AFTER_MISSED_FAST_SHIFT"}
+    out=summarize(runs,{"samples":[cold]})
+    assert out["p0_b_consecutive_local_closes_exactly_1_minute_60_seconds"]==1
+    assert out["p0_b_consecutive_normal_closes_exactly_1_minute_60_seconds_with_observed_fast_bootstrap"]==0
+    assert out["recovery_gap_samples"][0]["generation_kind"]=="HOURLY_FALLBACK_RECOVERY"
 
 def test_invalid_complete_sample_is_visible_but_not_comparison_eligible():
     startup={"samples":[{"sample_id":"INVALID","scheduled_due_at":"2026-09-21T10:00:00+00:00","successor_observed_at":"2026-09-21T10:01:00+00:00","authority_claim_at":"2026-09-21T10:01:10+00:00","first_durable_useful_at":"2026-09-21T10:01:10+00:00","predecessor_last_useful_at":"2026-09-21T10:00:30+00:00","validity":"INVALID","exclusion_reason":"BOUNDARY_INCONSISTENCY"}]}
