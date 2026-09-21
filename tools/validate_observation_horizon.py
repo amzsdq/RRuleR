@@ -36,7 +36,9 @@ def validate(horizon, policy, source, previous=None, previous_states=None):
         authoritative = source.get("updated_at")
     else:
         raise ValueError("accepted provenance kind has no verifier")
-    if not authoritative or trusted_instant != instant(authoritative): raise ValueError("trusted_observed_through does not match authoritative provenance timestamp")
+    if not authoritative: raise ValueError("authoritative provenance timestamp missing")
+    if trusted_instant != instant(authoritative):
+        raise ValueError("trusted_observed_through drifted from pinned authoritative provenance timestamp")
     return True
 
 def validate_actions_causality(source, compare_result, current_sha):
@@ -68,7 +70,7 @@ def main():
     kind=horizon.get("provenance_kind"); ref=str(horizon.get("provenance_ref", "")); repo=os.environ["REPO"]; token=os.environ["GH_TOKEN"]
     if kind != "GITHUB_ACTIONS_OBSERVED_TIMESTAMP": raise ValueError("accepted provenance kind has no verifier")
     attempt=horizon.get("provenance_attempt")
-    if not isinstance(attempt, int) or attempt < 1: raise ValueError("GitHub Actions provenance must bind an immutable run attempt")
+    if not isinstance(attempt, int) or attempt < 1: raise ValueError("GitHub Actions provenance must bind a specific run attempt")
     source=api(repo, token, f"actions/runs/{ref}/attempts/{attempt}")
     validate(horizon, policy, source, previous_states=previous_states)
     current_sha=os.environ.get("GITHUB_SHA")
