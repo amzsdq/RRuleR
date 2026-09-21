@@ -6,6 +6,7 @@
 - `HANDOFF.json` — explicit predecessor/successor coordination state for the current handoff.
 - `ACTIVITY.json` — durable operator-facing liveness heartbeat: armed/working/handoff/terminal state, active run identity, last progress, current unit, and next wake.
 - `WORK_EVIDENCE.json` — strict forward-only accepted useful-work intervals; unknown time is never inferred.
+- `PREDICTIVE_PREARM_CANARY.json` — active UTIL-EXP-018 canary state and measured cross-turn latency samples.
 - `RELAY_VALIDATION.json` — machine-readable acceptance ledger for the reproduced RRULE self-relay.
 - `EVENTS.jsonl` — append-oriented public-safe relay event ledger.
 - `RUNS.jsonl` — run/handoff/utilization observation ledger.
@@ -14,95 +15,55 @@ Detailed history also remains available in Git commits, experiment records, task
 
 ## CURRENT.json requirements
 
-It must remain:
-
-- public-safe;
-- sufficient for cold-start reconstruction;
-- explicit about program status separately from root status;
-- explicit about owner/authority epoch;
-- explicit about latest checkpoint;
-- explicit about exact next action;
-- explicit about continuation mode;
-- explicit that root completion is not automatically program completion;
-- explicit that voluntary idle before successor observation is forbidden for this relay;
-- free of secrets and private source material.
-
-Chat output may summarize this state but cannot override it.
+It must remain public-safe; sufficient for cold-start reconstruction; explicit about program status, owner/authority epoch, checkpoint, exact next action, continuation mode, and program-vs-root completion; and free of secrets/private source material.
 
 ## ACTIVITY.json
 
-This is the durable corroborating signal for whether the program is merely armed or an execution is actually doing work.
-
-Rules:
-
-- `WORKING` requires an `active_run_id`;
-- refresh after meaningful work units when practical;
-- `ARMED` means continuation exists but no active executor is claimed;
-- the ChatGPT composer UI is advisory only;
-- idle UI plus stale `ACTIVITY.json` and no successor evidence is a utilization gap, not healthy activity;
-- never claim hidden/background work from schedule existence alone.
+`WORKING` requires an `active_run_id`. Refresh after meaningful work units when practical. `ARMED` means continuation exists but no active executor is claimed. Schedule existence alone never proves useful work.
 
 Schema: `schemas/activity.schema.json`.
 
 ## WORK_EVIDENCE.json
 
-This is the strict useful-work acceptance ledger used for P0 measurement. It is not an activity log and does not automatically infer work from commits, schedule existence, or heartbeats.
+This is the strict useful-work acceptance ledger used for P0 measurement. It does not infer work from commits, schedules, or heartbeats.
 
 Prospective capture rules:
 
-- both interval boundaries must be actually observed and timezone-aware;
-- a materially new substantive artifact must support the interval;
-- intervals may not overlap and record IDs must be unique;
-- evidence authority epochs may not move backward;
+- both interval boundaries are actually observed and timezone-aware;
+- a materially new substantive artifact supports the interval;
+- intervals do not overlap and record IDs are unique;
+- evidence authority epochs do not move backward;
 - scheduler-only, heartbeat-only, waiting, timestamp-only, and evidence-bookkeeping-only activity is not useful work;
-- missing historical time remains unknown rather than being backfilled for a better utilization score.
+- missing historical time remains unknown.
 
-`tools/append_work_evidence.py` provides deterministic guarded append semantics. `tools/validate_work_evidence.py` audits the strict ledger and promotion windows. `tools/summarize_work_evidence.py` reports evidence freshness and observed totals without converting unknown time into useful or idle time.
+`tools/append_work_evidence.py` provides guarded append semantics. `tools/validate_work_evidence.py` audits the ledger/promotion windows. `tools/summarize_work_evidence.py` reports freshness/totals without converting unknown time.
+
+When the available connector surface cannot safely append the monolithic one-line ledger without rewriting unrelated history, an observed candidate may be persisted under `state/evidence-pending/`. Pending evidence is **not** P0-accepted evidence and must be ignored by promotion until validated and canonically appended. This preserves observed boundaries without falsely claiming acceptance.
+
+## PREDICTIVE_PREARM_CANARY.json
+
+This is the durable measurement surface for `UTIL-EXP-018`.
+
+Purpose: determine whether arming the same canonical successor before predecessor close can hide scheduler delivery latency under still-useful predecessor work while preserving one substantive authority owner.
+
+Required sample evidence includes predictive due, actual successor observation, predecessor last useful boundary, successor first useful boundary, derived post-close gap, overlap/fence result, duplicate-side-effect result, and schedule-rollback result.
+
+An early successor may fence/read/observe but cannot claim conflicting substantive authority while the predecessor is fresh. Promotion requires the documented safe-sample threshold and then a valid fixed 900-second utilization window. Schema: `schemas/predictive-prearm-canary.schema.json`.
 
 ## RELAY_VALIDATION.json
 
-This is the machine-readable acceptance surface for the live relay experiment. It separates proven criteria from pending observations so a fresh session does not have to infer PASS from prose.
-
-Rules:
-
-- preserve the canonical automation ID;
-- mark each criterion `PASS`, `PASS_WITH_SCOPE`, `PENDING`, or `FAIL`;
-- never infer overlap/serialization or timing values from missing evidence;
-- link concrete run/commit/schedule evidence in the criterion or current checkpoint;
-- only promote overall `status` to `PASS` when the documented pass rule is satisfied.
+Machine-readable acceptance surface for the live relay experiment. Preserve canonical identity, never infer timing/overlap from missing evidence, and promote only when the documented pass rule is satisfied.
 
 Schema: `schemas/relay-validation.schema.json`.
 
 ## EVENTS.jsonl
 
-Each non-empty line is one JSON object following `schemas/relay-event.schema.json`.
-
-Use stable unique `event_id` values. Relevant event classes include wake update, work start, checkpoint, successor observation, handoff, degraded continuation, completion, and external block.
-
-Do not rewrite history merely to improve presentation. Correct later with a new event when necessary.
+Each non-empty line follows `schemas/relay-event.schema.json`. Do not rewrite history merely to improve presentation; correct later with a new event when necessary.
 
 ## RUNS.jsonl
 
-Each non-empty line is a run observation following `schemas/run-observation.schema.json`.
+Each non-empty line follows `schemas/run-observation.schema.json`.
 
-Every new bounded execution turn should durably record, when write authority is available:
+Every bounded execution turn should durably record actual `run_started_at`, actual `run_ended_at`, derived `duration_seconds`, and `turn_outcome: CONTINUE | COMPLETE | BLOCKED | PAUSED`, plus detailed classification/evidence fields as applicable.
 
-- actual `run_started_at`;
-- actual `run_ended_at`;
-- derived `duration_seconds`;
-- simple `turn_outcome`: `CONTINUE | COMPLETE | BLOCKED | PAUSED`;
-- the existing detailed classification/end-reason/evidence fields that apply.
-
-`turn_outcome` is an operator-readable turn result, not permission to collapse program semantics. If useful work remains after a local success, use `CONTINUE`; reserve `COMPLETE` for durable program terminal state.
-
-Use it to measure:
-
-- run start/end;
-- successor observation;
-- productive work;
-- checkpoint/handoff overhead;
-- relay-caused idle gap;
-- successor wait;
-- classification.
-
-Do not invent timing values that were not observed. Null is preferable to fabricated precision.
+`COMPLETE` is reserved for durable program terminal state. Missing timing values remain null rather than fabricated.
