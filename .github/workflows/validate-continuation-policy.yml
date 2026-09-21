@@ -5,6 +5,8 @@ on:
     branches: ["main"]
     paths:
       - 'control/run-continuation-gate.v1.json'
+      - 'control/rolling-rrule-lifecycle.v1.json'
+      - 'control/ACTIVE_CONTROLS.json'
       - 'control/relay-policy.v1.json'
       - 'state/CURRENT.json'
       - 'state/UTILIZATION.json'
@@ -12,6 +14,8 @@ on:
   pull_request:
     paths:
       - 'control/run-continuation-gate.v1.json'
+      - 'control/rolling-rrule-lifecycle.v1.json'
+      - 'control/ACTIVE_CONTROLS.json'
       - 'control/relay-policy.v1.json'
       - 'state/CURRENT.json'
       - 'state/UTILIZATION.json'
@@ -35,12 +39,14 @@ jobs:
           set -euo pipefail
           fetch() { curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" "https://api.github.com/repos/$REPO/contents/$1?ref=$SHA" -o "$2"; }
           fetch control/run-continuation-gate.v1.json /tmp/gate.json
+          fetch control/rolling-rrule-lifecycle.v1.json /tmp/lifecycle.json
+          fetch control/ACTIVE_CONTROLS.json /tmp/controls.json
           fetch control/relay-policy.v1.json /tmp/policy.json
           fetch state/CURRENT.json /tmp/current.json
           fetch state/UTILIZATION.json /tmp/utilization.json
           python - <<'PY'
           import json
-          gate=json.load(open('/tmp/gate.json')); policy=json.load(open('/tmp/policy.json')); current=json.load(open('/tmp/current.json')); utilization=json.load(open('/tmp/utilization.json'))
+          gate=json.load(open('/tmp/gate.json')); policy=json.load(open('/tmp/policy.json')); current=json.load(open('/tmp/current.json')); utilization=json.load(open('/tmp/utilization.json')); lifecycle=json.load(open('/tmp/lifecycle.json')); controls=json.load(open('/tmp/controls.json'))
           assert gate['status']=='ACTIVE'
           assert set(gate['program_nonterminal_states'])=={'CONTINUE','DEGRADED_CONTINUATION'}
           assert gate['default_for_nonterminal_owner']=='MUST_CONTINUE_USEFUL_WORK'
@@ -57,6 +63,13 @@ jobs:
           assert decision['normal_continue_minimum_elapsed_seconds']==600
           assert decision['pre_600_voluntary_continue_close_forbidden'] is True
           assert decision['normal_soft_ceiling_seconds']==720
+          assert 'USER_VISIBLE_PROGRESS_TRACE_EMITTED' in set(gate['never_end_because'])
+          assert gate['enforcement']['progress_trace_never_authorizes_close'] is True
+          assert gate['enforcement']['unit_completion_trace_requires_durable_duration_and_work_evidence'] is True
+          assert 'DURABLY_PERSISTED_BOUNDED_UNIT_COMPLETION_EMITS_USER_VISIBLE_TRACE_WITHOUT_END_AUTHORITY' in set(controls['hard_invariants'])
+          trace=lifecycle['chat_trace']
+          assert trace['enabled'] is True and trace['mode']=='DURABLE_UNIT_CHAT_TRACE_CANARY'
+          assert trace['trace_never_authorizes_close'] is True
           util=policy['utilization']
           assert util['voluntary_idle_while_useful_work_exists_forbidden'] is True
           assert util['checkpoint_is_yield_condition'] is False
@@ -68,7 +81,10 @@ jobs:
           assert current['continuation']['minimum_continue_work_seconds']==600
           assert utilization['execution_envelope']['minimum_continue_turn_seconds']==600
           assert utilization['execution_envelope']['normal_continue_pre600_voluntary_close_forbidden'] is True
+          assert utilization['execution_envelope']['durable_unit_chat_trace_enabled'] is True
+          assert utilization['execution_envelope']['unit_trace_requires_persisted_observed_duration_and_work_evidence'] is True
+          assert utilization['execution_envelope']['progress_trace_is_never_close_authority'] is True
           if current['program_status'] in gate['program_nonterminal_states']:
               assert current['continuation']['program_terminal_disabled_required'] is True
-          print('continuation authority + 600s hard-floor validation passed')
+          print('continuation authority + 600s hard-floor + v5.5 durable chat-trace validation passed')
           PY
