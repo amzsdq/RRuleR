@@ -139,3 +139,27 @@ def test_legacy_operator_reset_marker_uses_operator_bucket():
     assert len(out["operator_rescheduled_gap_samples"]) == 1
     assert out["normal_scheduler_gap_samples"] == []
     assert out["recovery_gap_samples"] == []
+
+
+def test_rejected_one_shot_canary_has_own_bucket_and_unknown_receipts():
+    startup = {"samples": [{
+        "sample_id": "ONE-SHOT",
+        "schedule_mode": "EXACT_ONE_SHOT_SELF_UPDATE_CANARY",
+        "scheduled_due_at": "2026-09-22T00:25:53+09:00",
+        "successor_observed_at": "2026-09-22T00:27:31.651380+09:00",
+        "boot_started_at": None,
+        "rearm_verified_at": None,
+        "authority_claim_at": None,
+        "first_durable_useful_at": None,
+        "validity": "EXCLUDED_SCHEDULE_CATEGORY_CANARY",
+        "exclusion_reason": "SCHEDULE_CATEGORY_CANARY_REJECTED",
+    }]}
+    out = summarize([], startup)
+    gap = out["rejected_one_shot_canary_gap_samples"][0]
+    assert gap["generation_kind"] == "REJECTED_ONE_SHOT_CANARY"
+    assert gap["due_to_observation_seconds"] == 98
+    assert gap["observation_to_boot_seconds"] is None
+    assert gap["comparison_eligible"] is False
+    assert out["normal_scheduler_gap_samples"] == []
+    assert out["operator_rescheduled_gap_samples"] == []
+    assert out["recovery_gap_samples"] == []
