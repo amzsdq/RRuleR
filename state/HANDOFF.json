@@ -4,14 +4,14 @@
   "root_job_id": "RRULER-UTILIZATION-003",
   "handoff_state": "COMMITTED",
   "handoff_mode": "SAME_MAIN_END_PLUS_60",
-  "predecessor_run_id": "RUN-UTIL-20260922-005431",
-  "predecessor_authority_epoch": 77,
+  "predecessor_run_id": "RUN-UTIL-20260922-010103",
+  "predecessor_authority_epoch": 78,
   "successor_run_id": null,
-  "successor_expected_at": "2026-09-22T00:58:13+09:00",
+  "successor_expected_at": "2026-09-22T01:07:52+09:00",
   "successor_observed_at": null,
-  "predecessor_last_progress_at": "2026-09-22T00:57:13+09:00",
+  "predecessor_last_progress_at": "2026-09-22T01:06:52+09:00",
   "recovery_basis": "NORMAL_SAME_MAIN_RECURRING_CONTINUATION",
-  "active_unit": "Continue WS-P001-002; validate startup-receipt lifecycle hardening and rolling utilization evidence.",
-  "checkpoint_id": "CP-UTILIZATION-115",
-  "next_action": "Same clean MAIN continues from fresh GitHub at verified exact END+60 due. Retired predecessors remain disabled; Watchdog remains standby."
+  "active_unit": "Observe latest integrated CI for generation-bound startup receipt patch, then continue WS-P001-002.",
+  "checkpoint_id": "CP-UTILIZATION-117",
+  "next_action": "Same clean MAIN continues from fresh GitHub at verified exact END+60 due. Treat CI as pending until a latest-source completed result exists; do not infer PASS from cancelled predecessor runs."
 }
