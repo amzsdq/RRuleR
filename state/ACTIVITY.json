@@ -1,18 +1,3 @@
 {
-  "schema_version":"1.1",
-  "program_id":"RRULER-PROGRAM-001",
-  "root_job_id":"RRULER-UTILIZATION-003",
-  "canonical_automation_id":"6ab152b636748191a71873ba4d5ef551",
-  "status":"ACTIVE",
-  "active_run_id":"RUN-UTIL-20260922-105419",
-  "authority_epoch":89,
-  "substantive_work_started_at":"2026-09-22T10:54:19+09:00",
-  "last_progress_at":"2026-09-22T10:55:20+09:00",
-  "last_progress_kind":"EPOCH89_BOOTSTRAP_PROJECTION_NORMALIZATION",
-  "current_unit":"Validate final-writer canary and user-visible trace path while keeping live scheduler state authoritative for due time.",
-  "provisional_next_wake_due_at":"2026-09-22T11:05:19+09:00",
-  "next_wake_due_at":null,
-  "successor_observed":false,
-  "handoff_ready":false,
-  "operator_ui_note":"Epoch 89 is active under v5.6.5. Provisional 11:05:19 KST is crash insurance only. Final nonterminal close must replace it with observed close + exactly 1 minute (60 seconds) using SAME MAIN full VEVENT RRULE, enabled=true; durable projections then copy that verified due."
+  "schema_version":"1.1","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","canonical_automation_id":"6ab152b636748191a71873ba4d5ef551","status":"CHECKPOINTED","active_run_id":"RUN-UTIL-20260922-105419","authority_epoch":89,"substantive_work_started_at":"2026-09-22T10:54:19+09:00","last_progress_at":"2026-09-22T10:56:20+09:00","last_progress_kind":"FINAL_WRITER_RRULE_AND_TRACE_CANARY_CHECKPOINT","current_unit":"Epoch 89 checkpoint complete; successor must verify final due survived return.","provisional_next_wake_due_at":"2026-09-22T11:05:19+09:00","next_wake_due_at":"2026-09-22T10:57:13+09:00","successor_observed":false,"handoff_ready":true,"operator_ui_note":"Final live SAME MAIN full-VEVENT RRULE due 10:57:13 KST is authoritative. No scheduler mutation follows it in epoch 89; durable projections mirror it."
 }
