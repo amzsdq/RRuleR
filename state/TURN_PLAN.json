@@ -2,36 +2,39 @@
   "schema_version":"1.4",
   "program_id":"RRULER-PROGRAM-001",
   "root_job_id":"RRULER-UTILIZATION-003",
-  "authority_epoch":88,
-  "run_id":"RUN-UTIL-20260922-104040",
+  "authority_epoch":89,
+  "run_id":"RUN-UTIL-20260922-105419",
   "status":"ACTIVE",
-  "phase":"P0_FINAL_WRITER_RRULE_CANARY",
+  "phase":"P0_FINAL_WRITER_RRULE_AND_TRACE_CANARY",
   "objective_id":"WS-P001-002-P0-RUNTIME-FOCUS",
-  "objective":"Validate the proven minimal SAME-MAIN self-update pattern in production control: full recurring VEVENT, enabled=true, provisional crash insurance before work, and exactly one authoritative final close write to observed close + 1 minute (60 seconds).",
+  "objective":"Validate minimal SAME-MAIN full recurring VEVENT self-update, final-writer close semantics, and user-visible bounded-unit trace observability as separate evidence surfaces.",
   "expected_useful_seconds":600,
   "acceptance_criteria":[
     "Every scheduler mutation uses the SAME MAIN canonical with full VEVENT DTSTART plus RRULE:FREQ=HOURLY and enabled=true.",
     "The provisional 11-minute (660-second) write is crash insurance only and is superseded on every nonterminal close.",
     "The final close-time RRULE update is the last scheduler mutation of the wake and survives live metadata reread.",
     "CURRENT/ACTIVITY/HANDOFF follow the verified live final due; none may push an older provisional/stale due back to the scheduler.",
+    "Durably completed bounded units produce the required compact user-visible completion trace; missing trace is classified as observability failure rather than execution failure.",
     "No new automation, one-shot conversion, dtstart_offset_json, or retired-canonical reactivation occurs."
   ],
   "checkpointable_substeps":[
-    "Record and verify the provisional full-VEVENT RRULE arm.",
-    "Advance stale active projections to the current authority epoch without using them to drive the scheduler.",
-    "Audit remaining control/state surfaces for stale schedule-writer semantics and remove or demote them where safe.",
-    "At nonterminal close, perform the final SAME MAIN full-VEVENT RRULE write to observed close + exactly 1 minute (60 seconds), live-verify, then copy that due to durable projections without any later schedule mutation."
+    "Record and verify provisional full-VEVENT RRULE arm.",
+    "Advance stale active projections to current authority epoch without using them to drive scheduler.",
+    "Record provider delivery offset separately from local schedule mutation correctness.",
+    "Validate user-visible trace path against durable bounded-unit evidence.",
+    "At nonterminal close, perform final SAME MAIN full-VEVENT RRULE write to observed close + exactly 1 minute (60 seconds), live-verify, then copy due to durable projections without later schedule mutation."
   ],
-  "current_substep":3,
-  "early_finish_fallback":"Continue removing stale projection semantics and redundant schedule-control assumptions while preserving the minimal live RRULE path.",
+  "current_substep":4,
+  "early_finish_fallback":"Continue removing stale projection semantics and redundant schedule-control assumptions while preserving minimal live RRULE path and trace evidence.",
   "handoff_boundary":"FINAL_LIVE_RRULE_WRITE_MUST_BE_LAST_SCHEDULE_MUTATION_OF_WAKE",
   "created_for_next_wake":false,
-  "expected_wake_at":"2026-09-22T10:40:40+09:00",
+  "expected_wake_at":"2026-09-22T10:54:19+09:00",
   "progress_evidence":[
-    "state/STARTUP_ACK.json@e0dbc3eb805499f26a852eb3f90b9b1c6fbc1649",
-    "state/NOW.json@4a1554fe70a5ad08086419b19fb9df8a33f0ec90",
-    "state/CURRENT.json@13d3f1eb8f2c95780284807962cd3aa3160216ca",
-    "state/ACTIVITY.json@e43f5994698ee51f223ef20e3ff82f8523aca3d2",
-    "state/HANDOFF.json@3376689b66d710554a3e165250ca73f8f7d221ca"
+    "state/STARTUP_ACK.json@8e61af54b6ece6c87308686c22d9d059a81bf211",
+    "state/CURRENT.json@3c51eae755eee5d78078ade04b6dae5f6e3cd781",
+    "state/ACTIVITY.json@9c3c3af1ac79c218189cb88048d9002e690af9c6",
+    "state/HANDOFF.json@46b4494a51d2a510070b71a2d58ab5f92b0c2476",
+    "state/SCHEDULER_OBSERVATIONS.json@d9c5018cea8b24a3a4b79726791ddb4dcf8855ab",
+    "state/NOW.json@4c6b9c782b4d8cac1bf47553f01a96f365b18440"
   ]
 }
