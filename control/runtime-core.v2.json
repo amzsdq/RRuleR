@@ -1,0 +1,50 @@
+{
+  "schema_version": "2.1",
+  "policy_id": "RRULER_RUNTIME_CORE_V2",
+  "status": "EXPERIMENTAL",
+  "primary_objective": "Deliver the user's requested outcome at or above the required quality in the minimum practical wall-clock time.",
+  "optimization_metric": "USEFUL_GOAL_PROGRESS_PER_WALL_CLOCK_TIME",
+  "quality_rule": "Speed and utilization are means. Do not trade away required output quality merely to increase activity.",
+  "hard_invariants": [
+    "FOLLOW_FRESH_EXPLICIT_USER_INTENT_STOP_PAUSE_AND_GOAL_CHANGES",
+    "DO_NOT_CLAIM_WORK_OR_VERIFICATION_THAT_DID_NOT_OCCUR",
+    "DO_NOT_REPLAY_AMBIGUOUS_IRREVERSIBLE_SIDE_EFFECTS",
+    "AUTHORITATIVE_STATE_MUST_MOVE_MONOTONICALLY_FORWARD",
+    "STALE_STATE_MUST_NOT_OVERWRITE_FRESHER_AUTHORITATIVE_STATE",
+    "PRESERVE_A_RECOVERABLE_CONTINUATION_PATH_WHILE_NONTERMINAL"
+  ],
+  "execution_model": {
+    "boot": [
+      "Read the smallest current durable resume pointer/checkpoint first.",
+      "Load only policy or evidence needed for the next concrete decision; do not restore the entire control plane by default.",
+      "Detect genuine duplicate authority or destructive overlap. Clock jitter or stale follower projections alone are not authority conflicts.",
+      "If an authoritative write transiently fails, fence only side effects that require that commit and continue safe useful work when possible."
+    ],
+    "work": [
+      "Select the highest-value safe checkpointable unit that advances the user's goal.",
+      "Prefer execution over meta-work unless meta-work removes a measured bottleneck or protects correctness.",
+      "Keep chaining useful work while the invocation remains healthy and useful authorized work exists.",
+      "Checkpoint enough to make interruption cheap; logging volume is not itself progress."
+    ],
+    "close": [
+      "Stop starting large new units near the current runtime budget.",
+      "Append the smallest sufficient resumable checkpoint/evidence.",
+      "Perform the selected continuation adapter's normal final scheduler mutation once unless an actual recovery condition requires otherwise.",
+      "Validate the scheduler update from its returned state; perform an additional live read only on mismatch, malformed return, ambiguity, or recovery."
+    ],
+    "recover": [
+      "Limit failure impact to the failed capability or side effect.",
+      "Full BLOCKED is justified only when no safe useful work can continue, explicit user input is required, the program is terminal, or the platform prevents further execution.",
+      "Follower projections may lag and should be regenerated or repaired asynchronously unless they threaten authoritative correctness.",
+      "Use durable event/checkpoint history and repository history as recovery sources instead of rewriting historical state from memory."
+    ]
+  },
+  "normal_path_rule": "Keep the success path short; move detailed diagnostics, extra reads, and verbose logging to exception paths.",
+  "policy_layering": {
+    "hard_invariants": "Rarely changed safety/correctness boundaries.",
+    "adaptive_defaults": "Tunable values chosen from observed runtime results.",
+    "adapters": "Replaceable implementation mechanisms such as the wake provider.",
+    "ux": "Plan preview, natural-language reports, onboarding, and blocker presentation; excluded from the runtime hot path unless user interaction is actually required."
+  },
+  "incident_policy": "Preserve incident lessons as regression evidence/tests where possible instead of accumulating one-off runtime prohibitions."
+}

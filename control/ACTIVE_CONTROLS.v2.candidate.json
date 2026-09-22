@@ -1,0 +1,63 @@
+{
+  "schema_version": "3.1-candidate",
+  "status": "CANDIDATE_NOT_ACTIVE",
+  "purpose": "Goal-first minimal hot-path control registry for the v5.8 refactor.",
+  "primary_runtime": "control/runtime-core.v2.json",
+  "adaptive_defaults": "control/runtime-defaults.v1.json",
+  "selected_wake_adapter": "control/wake-adapter.rrule.v1.json",
+  "mandatory_on_wake": [
+    "state/NOW.json",
+    "control/runtime-core.v2.json",
+    "control/runtime-defaults.v1.json",
+    "control/wake-adapter.rrule.v1.json"
+  ],
+  "normal_path": [
+    "Read minimal resume pointer/checkpoint.",
+    "Resolve only genuine authority/destructive-overlap conflicts.",
+    "Perform useful work.",
+    "Append minimal durable checkpoint/evidence.",
+    "At close, write the SAME automation once using the selected RRULE adapter and current experimental lead.",
+    "Inspect update return object and end on clean match."
+  ],
+  "lazy_load_groups": {
+    "planning_and_goal_context": [
+      "state/PROGRAM_GOALS.json",
+      "state/CURRENT.json",
+      "state/TURN_PLAN.json"
+    ],
+    "telemetry_and_experiments": [
+      "state/P0_SCORECARD.json",
+      "state/UTILIZATION.json",
+      "state/WORK_EVIDENCE.json",
+      "state/TURN_TRACES.json",
+      "state/SCHEDULER_OBSERVATIONS.json",
+      "state/STARTUP_BUDGET.json"
+    ],
+    "recovery_and_liveness": [
+      "state/STARTUP_ACK.json",
+      "state/WATCHDOG.json",
+      "control/handoff-recovery.v1.json",
+      "control/startup-watchdog.v1.json"
+    ],
+    "ci_and_regression": [
+      ".github/workflows/validate-control-plane.yml",
+      ".github/workflows/validate-continuation-policy.yml",
+      "control/incident-regression-registry.v1.json"
+    ]
+  },
+  "exception_only_detail": [
+    "extra scheduler read-back",
+    "multiple scheduler mutations",
+    "full historical/control-plane restore",
+    "verbose positive-state logging",
+    "rollback/recovery diagnostics"
+  ],
+  "promotion_gate": [
+    "Recovery snapshot exists.",
+    "Selected wake adapter remains functional.",
+    "No stale rollback or duplicate irreversible side effect is introduced.",
+    "Long-running soak and fault-injection evidence does not show a regression in recovery.",
+    "A/B evidence shows equal or better useful progress per wall-clock time without reducing required quality or recoverability."
+  ],
+  "product_ux_note": "Plan preview, onboarding, natural-language turn reports, blocker UX, Personal/GitHub profiles, and recursive-development presentation are valuable product conveniences but are not mandatory runtime hot-path work unless the current user interaction requires them."
+}

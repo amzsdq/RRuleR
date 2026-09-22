@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "status": "EXPERIMENTAL",
+  "purpose": "Keep incident lessons as regression cases instead of turning every historical failure into an always-loaded runtime prohibition.",
+  "cases": [
+    {"id":"REG-001","incident":"RRULE self-update accidentally became one-shot","expected_property":"Selected RRULE adapter preserves recurring VEVENT and enabled state."},
+    {"id":"REG-002","incident":"A stale due overwrote a newer verified due","expected_property":"Authoritative scheduler/durable state moves monotonically forward; stale follower data cannot overwrite it."},
+    {"id":"REG-003","incident":"Clock jitter caused a wake to idle instead of work","expected_property":"Early/late dispatch alone does not fence safe work."},
+    {"id":"REG-004","incident":"A local control-plane write failure stopped all work","expected_property":"Failure scope is localized; safe independent work remains admissible."},
+    {"id":"REG-005","incident":"Follower projections lagged authority and were treated as global failure","expected_property":"Projection lag is repairable and non-blocking unless it threatens authoritative correctness."},
+    {"id":"REG-006","incident":"Rules accumulated until control-plane work dominated useful work","expected_property":"Hot-path load remains minimal and decision-driven."}
+  ]
+}
