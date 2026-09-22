@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.22",
+  "schema_version": "2.23",
   "program_id": "RRULER-PROGRAM-001",
   "status": "ACTIVE",
   "purpose": "Single machine-readable registry of control artifacts that every fresh worker must load before substantive work.",
@@ -56,7 +56,6 @@
     "NORMAL_NONTERMINAL_CONTINUE_VOLUNTARY_CLOSE_BEFORE_600S_FORBIDDEN",
     "AUTHORITY_EPOCH_MONOTONIC",
     "MINIMUM_FENCE_THEN_PROVISIONAL_REARM_AND_VERIFY_BEFORE_FULL_RESTORE_OR_SUBSTANTIVE_WORK",
-    "FINAL_CHECKPOINT_THEN_SAME_MAIN_EXACT_END_PLUS_1_MINUTE_60_SECONDS_REARM_AND_VERIFY_BEFORE_NORMAL_RETURN",
     "PREDICTIVE_PREARM_MUST_NOT_CREATE_DUAL_SUBSTANTIVE_AUTHORITY",
     "STALE_WAKE_MUST_NOT_ROLL_DSTART_OR_AUTHORITY_BACKWARD",
     "NONTERMINAL_PROGRAM_MUST_RETAIN_VERIFIED_CONTINUATION",
@@ -75,7 +74,9 @@
     "SAME_MAIN_PROVISIONAL_MATCHES_BOUNDED_ENVELOPE_AND_AVOIDS_SHORT_ROLLING_COLLISION",
     "DURABLY_PERSISTED_BOUNDED_UNIT_COMPLETION_EMITS_USER_VISIBLE_TRACE_WITHOUT_END_AUTHORITY",
     "ALL_HUMAN_READABLE_TIME_OFFSETS_MUST_INCLUDE_EXPLICIT_UNITS",
-    "SCHEDULER_JITTER_MUST_NOT_CAUSE_VOLUNTARY_IDLE_WHEN_SINGLE_AUTHORITY_CAN_BE_SAFELY_CLAIMED"
+    "SCHEDULER_JITTER_MUST_NOT_CAUSE_VOLUNTARY_IDLE_WHEN_SINGLE_AUTHORITY_CAN_BE_SAFELY_CLAIMED",
+    "EVERY_NONTERMINAL_EXIT_MUST_END_WITH_SAME_MAIN_FULL_VEVENT_RRULE_FINAL_REARM_TO_CLOSE_PLUS_1_MINUTE_60_SECONDS_UNLESS_EXPLICIT_STOP_PAUSE_TERMINAL_OR_REARM_FORBIDDEN_AUTHORITY_CONFLICT",
+    "FINAL_LIVE_RRULE_WRITE_IS_LAST_SCHEDULE_MUTATION_OF_WAKE_AND_DURABLE_PROJECTIONS_MUST_FOLLOW_IT_NOT_OVERWRITE_IT"
   ],
-  "conflict_rule": "Every wake reloads fresh ACTIVE_CONTROLS and mandatory artifacts. P0 is useful-work duty cycle: the 10-minute (600-second) normal work floor remains, and ACTUAL END + 1 minute (60 seconds) remains an aggressive next-wake target, but exact provider dispatch time is not itself a correctness goal. Early or late scheduler jitter is accepted when monotonic durable state and single substantive authority can be preserved. Fence only genuine duplicate/stale/destructive overlap. Investigate timing jitter only when it materially increases idle time or violates authority safety. Never reactivate retired MAIN canonicals; Watchdog remains disabled standby."
+  "conflict_rule": "Every wake reloads fresh ACTIVE_CONTROLS and mandatory artifacts. P0 is useful-work duty cycle. Scheduler updates use the SAME MAIN automation and a full VEVENT containing DTSTART plus RRULE:FREQ=HOURLY with enabled=true. Pre-work provisional arming is crash insurance only. The LAST schedule write of every nonterminal wake is close + 1 minute (60 seconds); once live-verified, no later same-wake reconciliation may mutate schedule. Durable CURRENT/ACTIVITY/HANDOFF copy that verified live due and may never push an older/provisional due back into the scheduler. Provider jitter is tolerated. Never reactivate retired MAIN canonicals; Watchdog remains disabled standby."
 }
