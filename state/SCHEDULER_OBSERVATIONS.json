@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.0",
+  "schema_version": "2.1",
   "program_id": "RRULER-PROGRAM-001",
   "purpose": "Keep scheduler/provider delivery jitter separate from reasoning-worker utilization and from the local normal-close offset so P0 diagnosis does not blame the wrong layer.",
   "observations": [
@@ -14,17 +14,18 @@
     {"authority_epoch":91,"expected_due_at":"2026-09-22T11:10:23+09:00","observed_at":"2026-09-22T11:12:49+09:00","delivery_offset_seconds":146,"human_offset":"2 minutes 26 seconds (146 seconds) late","generation_class":"FINAL_WRITER_2M_SHIFTED_RRULE_DELIVERED_LATE_BUT_ELIGIBLE","normal_fast_delivery_sample":true,"authority_allowed":true,"local_final_rearm_offset_seconds":120},
     {"authority_epoch":92,"expected_due_at":"2026-09-22T11:39:00+09:00","observed_at":"2026-09-22T11:36:59+09:00","delivery_offset_seconds":-121,"human_offset":"2 minutes 1 second (121 seconds) early","generation_class":"FINAL_WRITER_2M_SHIFTED_RRULE_DELIVERED_EARLY_BUT_ELIGIBLE","normal_fast_delivery_sample":true,"authority_allowed":true,"local_final_rearm_offset_seconds":120},
     {"authority_epoch":93,"expected_due_at":"2026-09-22T11:51:57+09:00","observed_at":"2026-09-22T11:52:43+09:00","delivery_offset_seconds":46,"human_offset":"46 seconds late","generation_class":"FINAL_WRITER_2M_SHIFTED_RRULE_DELIVERED_LATE_BUT_ELIGIBLE","normal_fast_delivery_sample":true,"authority_allowed":true,"local_final_rearm_offset_seconds":120},
-    {"authority_epoch":94,"expected_due_at":"2026-09-22T12:05:25+09:00","observed_at":"2026-09-22T12:02:58+09:00","delivery_offset_seconds":-147,"human_offset":"2 minutes 27 seconds (147 seconds) early","generation_class":"FINAL_WRITER_2M_SHIFTED_RRULE_DELIVERED_EARLY_BUT_ELIGIBLE","source":"automation turn 8 run context","normal_fast_delivery_sample":true,"authority_allowed":true,"local_final_rearm_offset_seconds":120,"interpretation":"Fourth direct +120-second successor sample. Early timing alone was not fenced; fresh monotonic authority remained safe."}
+    {"authority_epoch":94,"expected_due_at":"2026-09-22T12:05:25+09:00","observed_at":"2026-09-22T12:02:58+09:00","delivery_offset_seconds":-147,"human_offset":"2 minutes 27 seconds (147 seconds) early","generation_class":"FINAL_WRITER_2M_SHIFTED_RRULE_DELIVERED_EARLY_BUT_ELIGIBLE","source":"automation turn 8 run context","normal_fast_delivery_sample":true,"authority_allowed":true,"local_final_rearm_offset_seconds":120,"interpretation":"Fourth direct +120-second successor sample. Early timing alone was not fenced; fresh monotonic authority remained safe."},
+    {"authority_epoch":95,"expected_due_at":"2026-09-22T12:50:19+09:00","observed_at":"2026-09-22T12:52:02+09:00","delivery_offset_seconds":103,"human_offset":"1 minute 43 seconds (103 seconds) late","generation_class":"FINAL_WRITER_2M_SHIFTED_RRULE_DELIVERED_LATE_BUT_ELIGIBLE","source":"automation turn 11 run context","normal_fast_delivery_sample":true,"authority_allowed":true,"local_final_rearm_offset_seconds":120,"interpretation":"Fifth direct +120-second successor sample. Late timing alone was not fenced; same MAIN remained enabled recurring and no duplicate authority was observed."}
   ],
   "derived": {
-    "sample_count": 12,
-    "normal_fast_comparable_sample_count": 6,
+    "sample_count": 13,
+    "normal_fast_comparable_sample_count": 7,
     "latest_60s_final_rearm_delivery_offset_seconds": 59,
-    "latest_120s_final_rearm_delivery_offsets_seconds": [146,-121,46,-147],
-    "latest_120s_mean_signed_offset_seconds": -19.0,
-    "latest_120s_mean_absolute_offset_seconds": 115.0,
+    "latest_120s_final_rearm_delivery_offsets_seconds": [146,-121,46,-147,103],
+    "latest_120s_mean_signed_offset_seconds": 5.4,
+    "latest_120s_mean_absolute_offset_seconds": 112.6,
     "latest_120s_observed_authority_conflict_count": 0
   },
-  "interpretation": "Four direct +120-second successor samples now exist: +146, -121, +46, -147 seconds. All remained eligible without observed duplicate authority. +120 has not demonstrated timing-accuracy superiority; its current value is continuity-safety testing only.",
-  "next_action": "Continue useful-work turns and compare successor continuity and total non-useful gap. Do not promote +120 merely from schedule-offset accuracy."
+  "interpretation": "Five direct +120-second successor samples now exist: +146, -121, +46, -147, +103 seconds. All remained eligible without observed duplicate authority. +120 has not demonstrated timing-accuracy superiority; its current value remains continuity-safety testing only.",
+  "next_action": "Continue useful-work turns and compare successor continuity and total non-useful gap. Do not promote +120 merely from schedule-offset accuracy; absent measurable safety benefit, prefer the lower-idle +60 comparator."
 }
