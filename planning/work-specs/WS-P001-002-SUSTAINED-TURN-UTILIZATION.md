@@ -9,7 +9,7 @@ Continuation survival is high, but useful-work occupancy must meet a SaaS-grade 
 
 ## Outcome
 
-Make bounded wakes spend most eligible wall-clock time on substantive authorized work and make normal cross-turn continuation exact. The active operator-locked P0 is two-part: **P0-A** sustain at least 10 minutes (600 observed elapsed seconds) on a normal nonterminal `CONTINUE` turn unless a truthful early-exit exception applies; **P0-B** rearm the SAME enabled recurring MAIN at ACTUAL END + exactly 1 minute (60 seconds), live-verify the exact `DTSTART`, and measure provider delivery/startup delay separately.
+Make bounded wakes spend most eligible wall-clock time on substantive authorized work and make normal cross-turn continuation exact. The active operator-locked P0 is two-part: **P0-A** sustain at least 10 minutes (600 observed elapsed seconds) on a normal nonterminal `CONTINUE` turn unless a truthful early-exit exception applies; **P0-B** currently canaries rearming the SAME enabled recurring MAIN at ACTUAL END + exactly 2 minutes (120 seconds), live-verifying the exact `DTSTART`, and measuring provider delivery/startup delay separately. Historical +1 minute (60 seconds) samples remain evidence and are not rewritten.
 
 ## Scope
 
@@ -49,7 +49,7 @@ Epoch 59: 626 wall seconds, 557 strict useful seconds (88.98% wall coverage; 92.
 
 ## Continuation-latency ceiling
 
-P0 requires 840/900 = 93.33% useful coverage. With a 600-second bounded useful turn, average non-useful cross-turn loss must stay <=42.9 seconds. A 1-minute (60-second) post-close rearm offset already exceeds that budget before scheduler delivery latency and startup/checkpoint overhead. This is an optimization tension to measure, not permission to reinterpret the 1-minute (60-second) local offset as an hour or to leave the natural hourly occurrence as the normal successor.
+P0 requires 840/900 = 93.33% useful coverage. With a 600-second bounded useful turn, average non-useful cross-turn loss must stay <=42.9 seconds. Both the historical 1-minute (60-second) and current 2-minute (120-second) post-close offsets exceed that budget before scheduler delivery latency and startup/checkpoint overhead. The 2-minute value is therefore a stability canary, not a claim that it can satisfy the final utilization target by itself.
 
 ## UTIL-EXP-018 result — predictive prearm failed first canary
 
@@ -86,7 +86,7 @@ The first attempted correction, routine `NOW + 2 minutes (120 seconds)` short ro
 - arm the SAME MAIN once at observed wake/arm reference + exactly 11 minutes (660 seconds) (10-minute / 600-second target + 1-minute / 60-second safety);
 - normally perform no mid-turn schedule mutation;
 - only if useful work or required close handling clearly threatens the provisional due, extend SAME MAIN once before collision, preferably to `NOW + exactly 3 minutes (180 seconds)`, and verify it;
-- normal close still replaces the provisional due with exact observed `ACTUAL END + exactly 1 minute (60 seconds)` on the SAME recurring MAIN;
+- the current normal-close canary replaces the provisional due with exact observed `ACTUAL END + exactly 2 minutes (120 seconds)` on the SAME recurring MAIN;
 - natural hourly recurrence remains cold fallback if a shifted occurrence fails before durable bootstrap;
 - Watchdog remains disabled break-glass standby.
 
@@ -101,11 +101,15 @@ Epochs 89-90 established two separate facts that must not be conflated:
 
 Selected correction: retain the minimal SAME MAIN full-VEVENT RRULE mechanism and change trace observability to **durable capture first, immediate delivery when supported, ordered final-response flush otherwise**. A missing intermediate UI message is no longer classified as execution failure when durable unit evidence exists. Conversely, a visible message never proves work unless the corresponding durable evidence exists.
 
-This correction is deliberately narrow. It does not relax the 600-second P0-A floor. Recent short CONTINUE turns remain failures of sustained utilization even when their scheduler mutation and durable bookkeeping are correct. Epoch 90 therefore prioritizes substantive P001 work over further scheduler churn and requires a >=600-second normal CONTINUE sample before P0-A can advance.
+This correction is deliberately narrow. It does not relax the 600-second P0-A floor. Recent short CONTINUE turns remain failures of sustained utilization even when their scheduler mutation and durable bookkeeping are correct.
+
+## v5.7.1 +2-minute stability canary
+
+The operator changed the final completion-relative offset from +1 minute (60 seconds) to +2 minutes (120 seconds) to test whether the larger gap improves actual wake stability. This is a controlled timing canary, not a new utilization target. Every eligible wake must still begin useful work even if provider invocation is early or late; clock mismatch alone is not a fence. Compare +120 against historical +60 using successful shifted-wake rate, actual provider offset, overlap/conflict rate, inter-turn idle gap, and useful-work duty cycle. Keep historical +60 observations intact for comparison.
 
 ## Exact resume step
 
-Continue `UTIL-EXP-019` with five observed boundaries: invocation, `BOOT_STARTED`, provisional `REARM_VERIFIED`, authority claim, and first durable useful work. Preserve missing boundaries as unknown. Keep the v5.6.5 final-writer rule: provisional scheduling is crash insurance only; every normal nonterminal close must make the SAME MAIN full recurring VEVENT at observed ACTUAL END + exactly 1 minute (60 seconds) the final scheduler mutation. Capture bounded-unit traces durably and flush them in the user-visible completion response if reliable intermediate delivery is unavailable.
+Continue `UTIL-EXP-019` with five observed boundaries: invocation, `BOOT_STARTED`, provisional `REARM_VERIFIED`, authority claim, and first durable useful work. Preserve missing boundaries as unknown. Keep the v5.7.1 final-writer rule: provisional scheduling is crash insurance only; every normal nonterminal close must make the SAME MAIN full recurring VEVENT at observed ACTUAL END + exactly 2 minutes (120 seconds) the final scheduler mutation. Capture bounded-unit traces durably and flush them in the user-visible completion response if reliable intermediate delivery is unavailable.
 
 ## Decision rule
 
