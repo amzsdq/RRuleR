@@ -1,3 +1,20 @@
 {
-  "schema_version":"1.3","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","handoff_state":"COMMITTED","handoff_mode":"SAME_MAIN_FINAL_WRITER_RRULE","predecessor_run_id":"RUN-UTIL-20260922-113659","predecessor_authority_epoch":92,"active_run_id":null,"active_authority_epoch":92,"successor_run_id":null,"successor_authority_epoch":null,"successor_expected_at":"2026-09-22T11:40:23+09:00","successor_observed_at":null,"provisional_due_at":"2026-09-22T11:50:00+09:00","recovery_basis":"LIVE_V571_FINAL_WRITER_VERIFIED_END_PLUS_2_MINUTES_120_SECONDS","active_unit":"P0_2M_STABILITY_CANARY_AND_SUSTAINED_UTILIZATION","checkpoint_id":"CP-UTILIZATION-144","next_action":"On successor wake, accept harmless timing jitter if single authority is safe, record offset from 11:40:23 KST, continue P001 substantive work, and collect at least one more +120-second successor sample before judging stability."
+  "schema_version":"1.4",
+  "program_id":"RRULER-PROGRAM-001",
+  "root_job_id":"RRULER-UTILIZATION-003",
+  "handoff_state":"COMMITTED",
+  "handoff_mode":"SAME_MAIN_FINAL_WRITER_RRULE",
+  "predecessor_run_id":"RUN-UTIL-20260922-115243",
+  "predecessor_authority_epoch":93,
+  "active_run_id":null,
+  "active_authority_epoch":93,
+  "successor_run_id":null,
+  "successor_authority_epoch":null,
+  "successor_expected_at":"2026-09-22T12:05:25+09:00",
+  "successor_observed_at":null,
+  "provisional_due_at":"2026-09-22T12:03:43+09:00",
+  "recovery_basis":"LIVE_V571_FINAL_WRITER_VERIFIED_END_PLUS_2_MINUTES_120_SECONDS",
+  "active_unit":"P0_2M_STABILITY_CANARY_AND_SUSTAINED_UTILIZATION",
+  "checkpoint_id":"CP-UTILIZATION-145",
+  "next_action":"On successor wake, accept harmless timing jitter if single authority is safe, record offset from 12:05:25 KST, continue P001 substantive work, and judge +120 by continuation safety plus total non-useful gap versus +60 rather than timing error alone."
 }
