@@ -1,13 +1,13 @@
 {
   "schema_version":"1.3",
   "main_canonical_id":"6ab152b636748191a71873ba4d5ef551",
-  "generation_key":"FINAL-WRITER-RRULE:2026-09-22T11:12:49+09:00",
-  "boot_started_at":"2026-09-22T11:12:49+09:00",
-  "boot_started_authority_epoch":91,
-  "rearm_verified_at":"2026-09-22T11:12:57+09:00",
-  "verified_provisional_due_at":"2026-09-22T11:23:49+09:00",
+  "generation_key":"FINAL-WRITER-RRULE:2026-09-22T11:36:59+09:00",
+  "boot_started_at":"2026-09-22T11:36:59+09:00",
+  "boot_started_authority_epoch":92,
+  "rearm_verified_at":"2026-09-22T11:37:25+09:00",
+  "verified_provisional_due_at":"2026-09-22T11:50:00+09:00",
   "status":"REARM_VERIFIED",
-  "last_updated_at":"2026-09-22T11:12:57+09:00",
-  "provisional_extension_count":0,
-  "note":"v5.7.1 epoch 91. SAME MAIN automation_id=6ab152b636748191a71873ba4d5ef551 live-verified is_enabled=true, exact_schedule, full recurring VEVENT with DTSTART 20260922T112349 and RRULE:FREQ=HOURLY. Crash insurance only; normal close must supersede it with observed close + exactly 2 minutes (120 seconds)."
+  "last_updated_at":"2026-09-22T11:37:25+09:00",
+  "provisional_extension_count":1,
+  "note":"v5.7.1 epoch 92. Invocation timing mismatch is not a work fence. SAME MAIN automation_id=6ab152b636748191a71873ba4d5ef551 live-verified is_enabled=true, exact_schedule, full recurring VEVENT with DTSTART 20260922T115000 and RRULE:FREQ=HOURLY. Provisional crash insurance only; normal close must supersede it with observed close + exactly 2 minutes (120 seconds)."
 }
