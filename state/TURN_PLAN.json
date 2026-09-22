@@ -2,8 +2,8 @@
   "schema_version":"1.4",
   "program_id":"RRULER-PROGRAM-001",
   "root_job_id":"RRULER-UTILIZATION-003",
-  "authority_epoch":87,
-  "run_id":"RUN-UTIL-20260922-101524",
+  "authority_epoch":88,
+  "run_id":"RUN-UTIL-20260922-104040",
   "status":"ACTIVE",
   "phase":"P0_FINAL_WRITER_RRULE_CANARY",
   "objective_id":"WS-P001-002-P0-RUNTIME-FOCUS",
@@ -18,18 +18,20 @@
   ],
   "checkpointable_substeps":[
     "Record and verify the provisional full-VEVENT RRULE arm.",
-    "Audit stale durable projections that can conflict with the final-writer rule.",
-    "Normalize the stale projections to the current authority epoch without using them to drive the live scheduler.",
+    "Advance stale active projections to the current authority epoch without using them to drive the scheduler.",
+    "Audit remaining control/state surfaces for stale schedule-writer semantics and remove or demote them where safe.",
     "At nonterminal close, perform the final SAME MAIN full-VEVENT RRULE write to observed close + exactly 1 minute (60 seconds), live-verify, then copy that due to durable projections without any later schedule mutation."
   ],
-  "current_substep":2,
+  "current_substep":3,
   "early_finish_fallback":"Continue removing stale projection semantics and redundant schedule-control assumptions while preserving the minimal live RRULE path.",
   "handoff_boundary":"FINAL_LIVE_RRULE_WRITE_MUST_BE_LAST_SCHEDULE_MUTATION_OF_WAKE",
   "created_for_next_wake":false,
-  "expected_wake_at":"2026-09-22T10:15:24+09:00",
+  "expected_wake_at":"2026-09-22T10:40:40+09:00",
   "progress_evidence":[
-    "control/ACTIVE_CONTROLS.json@b5a9ff165dea96bf8ddb075f43ae0a1a8054f267",
-    "control/relay-policy.v1.json@d3958c54da233a23744c04153e1c5b021ce44ae8",
-    "state/STARTUP_ACK.json@011883baec2d285e5341de84dc48a453433a9048"
+    "state/STARTUP_ACK.json@e0dbc3eb805499f26a852eb3f90b9b1c6fbc1649",
+    "state/NOW.json@4a1554fe70a5ad08086419b19fb9df8a33f0ec90",
+    "state/CURRENT.json@13d3f1eb8f2c95780284807962cd3aa3160216ca",
+    "state/ACTIVITY.json@e43f5994698ee51f223ef20e3ff82f8523aca3d2",
+    "state/HANDOFF.json@3376689b66d710554a3e165250ca73f8f7d221ca"
   ]
 }
