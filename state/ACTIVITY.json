@@ -4,15 +4,15 @@
   "root_job_id":"RRULER-UTILIZATION-003",
   "canonical_automation_id":"6ab152b636748191a71873ba4d5ef551",
   "status":"ACTIVE",
-  "active_run_id":"RUN-UTIL-20260922-104040",
-  "authority_epoch":88,
-  "substantive_work_started_at":"2026-09-22T10:40:40+09:00",
-  "last_progress_at":"2026-09-22T10:41:25+09:00",
-  "last_progress_kind":"EPOCH88_BOOTSTRAP_AND_STALE_PROJECTION_ADVANCE",
-  "current_unit":"Normalize remaining epoch-87 active projections and strengthen final-writer canary observability without allowing durable state to drive scheduler writes.",
-  "provisional_next_wake_due_at":"2026-09-22T10:51:40+09:00",
+  "active_run_id":"RUN-UTIL-20260922-105419",
+  "authority_epoch":89,
+  "substantive_work_started_at":"2026-09-22T10:54:19+09:00",
+  "last_progress_at":"2026-09-22T10:55:20+09:00",
+  "last_progress_kind":"EPOCH89_BOOTSTRAP_PROJECTION_NORMALIZATION",
+  "current_unit":"Validate final-writer canary and user-visible trace path while keeping live scheduler state authoritative for due time.",
+  "provisional_next_wake_due_at":"2026-09-22T11:05:19+09:00",
   "next_wake_due_at":null,
   "successor_observed":false,
   "handoff_ready":false,
-  "operator_ui_note":"Epoch 88 is active under v5.6.5. Provisional 10:51:40 KST is crash insurance only. Final nonterminal close must replace it with observed close + exactly 1 minute (60 seconds) using SAME MAIN full VEVENT RRULE, enabled=true; durable projections then copy that verified due and never drive a later schedule mutation."
+  "operator_ui_note":"Epoch 89 is active under v5.6.5. Provisional 11:05:19 KST is crash insurance only. Final nonterminal close must replace it with observed close + exactly 1 minute (60 seconds) using SAME MAIN full VEVENT RRULE, enabled=true; durable projections then copy that verified due."
 }
