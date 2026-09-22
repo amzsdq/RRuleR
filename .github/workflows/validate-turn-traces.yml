@@ -8,8 +8,10 @@ on:
       - "schemas/turn-traces.schema.json"
       - "tools/validate_turn_traces.py"
       - "tools/append_turn_trace.py"
+      - "tools/render_turn_trace_flush.py"
       - "tests/test_validate_turn_traces.py"
       - "tests/test_append_turn_trace.py"
+      - "tests/test_render_turn_trace_flush.py"
       - ".github/workflows/validate-turn-traces.yml"
   pull_request:
     paths:
@@ -17,8 +19,10 @@ on:
       - "schemas/turn-traces.schema.json"
       - "tools/validate_turn_traces.py"
       - "tools/append_turn_trace.py"
+      - "tools/render_turn_trace_flush.py"
       - "tests/test_validate_turn_traces.py"
       - "tests/test_append_turn_trace.py"
+      - "tests/test_render_turn_trace_flush.py"
       - ".github/workflows/validate-turn-traces.yml"
   workflow_dispatch:
 
@@ -33,4 +37,4 @@ jobs:
       - name: Validate current trace ledger
         run: python tools/validate_turn_traces.py state/TURN_TRACES.json
       - name: Run focused trace tests
-        run: python -m unittest tests.test_validate_turn_traces tests.test_append_turn_trace -v
+        run: python -m unittest tests.test_validate_turn_traces tests.test_append_turn_trace tests.test_render_turn_trace_flush -v
