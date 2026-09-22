@@ -47,7 +47,7 @@ When progress changes, update the work-spec acceptance/evidence first, then proj
 
 ## Active rolling continuation
 
-The scheduler mechanism is `RRULE_HOURLY_ROLLING_COMPLETION_RELATIVE` unless fresh active controls explicitly replace it.
+The scheduler mechanism is `SAME_MAIN_RRULE_FAST_SHIFT_PLUS_NATURAL_HOURLY_COLD_FALLBACK` unless fresh active controls explicitly replace it.
 
 - Startup: fence -> preserve newest verified continuation -> persist BOOT_STARTED -> arm the same canonical once at observed wake + exactly 11 minutes (660 seconds) for the normal 10-minute (600-second) envelope -> verify -> work. Do not restore the retired 13-minute (780-second) horizon, and do not use repeated 2-minute (120-second) rolling refresh as the normal strategy.
 - Normal `CONTINUE` close: checkpoint -> set THIS SAME canonical's next due to the **ACTUAL END + exactly 1 minute (60 seconds)** (preserve seconds; no minute rounding) -> verify -> persist observed due. **Do not arm or synchronize Watchdog during normal close.** The same MAIN's recurring RRULE is its built-in cold fallback if a shifted wake is lost before bootstrap. A different MAIN delay requires fresh durable evidence/constraint plus an explicit exception reason; scheduler delivery jitter is measured separately.
@@ -156,16 +156,17 @@ Run ongoing authorized work with no fixed turn/sample-count limit. Three eligibl
 
 The startup Watchdog is disabled-by-default break-glass standby governed by `control/startup-watchdog.v1.json`. Normal continuity MUST work without it. MAIN writes BOOT_STARTED and REARM_VERIFIED for observability, but normal close does not arm or synchronize Watchdog. Nominal continuation is SAME MAIN at ACTUAL END + exactly 1 minute (60 seconds), meaning sixty seconds after observed END and never 60 minutes. Never reactivate retired MAIN canonicals.
 
-## V5.5 durable unit chat trace
+## Durable unit chat trace
 
-During the v5.5 canary, operator-visible progress messages are mandatory observability events, not turn boundaries.
+Operator-visible progress is mandatory observability, but scheduled invocations do not assume that intermediate assistant messages are independently delivered by the host UI.
 
-- After provisional SAME MAIN rearm is live-verified and durably recorded, emit one compact schedule message naming the verified due.
-- For each bounded substantive unit, record observed unit START, END, derived DURATION, and artifact-backed work evidence first. Only then emit one compact `완료: ... (duration ...)` message.
-- Do not emit a completion message for a mere read, plan, wait, retry without completion, scheduler mutation alone, or unpersisted partial work.
-- After emitting a unit trace, immediately continue same-wake work selection while normal nonterminal CONTINUE elapsed is below 600 seconds. The message does not authorize final response or voluntary close.
-- After SAME MAIN ACTUAL END + exactly 1 minute (60 seconds) live verification and consistent durable close projection, emit one final compact next-due message, then the normal TURN STATUS footer.
-
+- After provisional SAME MAIN rearm is live-verified and durably recorded, append a pending schedule trace to durable turn evidence.
+- For each bounded substantive unit, record observed unit START, END, derived DURATION, artifact-backed work evidence, and a compact pending `완료: ... (duration ...)` trace before selecting the next unit.
+- If the runtime supports reliable intermediate user-visible delivery, emit the trace immediately. Otherwise do **not** classify the missing intermediate UI message as execution failure: preserve the trace durably and flush all pending traces in order in the turn's user-visible completion response.
+- Do not create a completion trace for a mere read, plan, wait, scheduler mutation alone, or unpersisted partial work.
+- Trace creation or delivery never authorizes close. Before 600 observed elapsed seconds, immediately continue same-wake work selection.
+- After SAME MAIN ACTUAL END + exactly 1 minute (60 seconds) live verification and consistent durable close projection, append the final next-due trace and flush any pending trace backlog before the TURN STATUS footer.
+- Distinguish `TRACE_DURABLY_RECORDED`, `TRACE_INTERMEDIATE_DELIVERED`, and `TRACE_FINAL_FLUSH_DELIVERED`; never infer one from another.
 
 ## Time-unit safety
 
