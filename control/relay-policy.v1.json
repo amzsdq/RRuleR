@@ -1,7 +1,7 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
-  "policy_revision": 19,
+  "policy_revision": 20,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
@@ -23,7 +23,7 @@
     "final_checkpoint_before_close": true,
     "verify_every_mutation": true,
     "fixed_quarter_cycle_active": false,
-    "note": "For the normal 10-minute (600-second) envelope, arm SAME MAIN recurring due once at observed wake + exactly 11 minutes (660 seconds), normally leave it untouched during work, and replace it at normal close with ACTUAL END + exactly 1 minute (60 seconds). This means sixty seconds after observed END, never 60 minutes or the next natural hourly RRULE occurrence. Extend once before collision only if work/close handling will cross the provisional due. Prior 2-minute (120-second) SHORT_ROLLING live A/B evidence produced overlap; prior 11-minute (660-second) LONG_PROVISIONAL passed. Former 13-minute (780-second) horizon is retired as unnecessarily long.",
+    "note": "Primary objective is high useful-work duty cycle, not perfect wall-clock dispatch. Schedule ACTUAL END + 1 minute (60 seconds) as an aggressive next-wake target and keep the 11-minute (660-second) provisional/cold fallback for resilience. Provider early/late jitter is acceptable when single substantive authority and monotonic durable state are preserved. Do not spend P0 effort chasing harmless scheduler seconds.",
     "long_provisional_780_seconds_retired": true,
     "provisional_extension_guard_seconds": 90,
     "provisional_extension_offset_seconds": 180,
@@ -45,7 +45,9 @@
     "after_each_work_unit": "BEFORE_10_MINUTES_600_SECONDS_SELECT_NEXT_SAFE_USEFUL_UNIT_OR_DECOMPOSE; AT_OR_AFTER_10_MINUTES_600_SECONDS_FINISH_SMALLEST_SAFE_IN_FLIGHT_UNIT_AND_CLOSE",
     "measurement_rule": "Optimize evidenced wall-clock useful coverage across worker boundaries. Do not substitute the 10-minute (600-second) bounded-turn target for the 14-minute (840-second) useful-work target inside the 15-minute (900-second) P0 acceptance window.",
     "minimum_normal_continue_elapsed_seconds": 600,
-    "pre_600_voluntary_normal_continue_close_forbidden": true
+    "pre_600_voluntary_normal_continue_close_forbidden": true,
+    "primary_kpi": "USEFUL_WORK_DUTY_CYCLE",
+    "scheduler_jitter_policy": "TOLERATE_EARLY_OR_LATE_PROVIDER_JITTER_UNLESS_IT_CAUSES_MATERIAL_IDLE_OR_AUTHORITY_CONFLICT"
   },
   "program_continuity": {
     "enabled": true,
