@@ -1,0 +1,15 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://rruler.local/schemas/turn-traces.schema.json",
+  "type":"object",
+  "required":["schema_version","program_id","rules","delivery_states","active_run_id","authority_epoch","traces"],
+  "properties":{
+    "schema_version":{"const":"1.0"},
+    "program_id":{"type":"string","minLength":1},
+    "active_run_id":{"type":"string","minLength":1},
+    "authority_epoch":{"type":"integer","minimum":0},
+    "rules":{"type":"object","required":["durable_before_delivery","trace_is_never_close_authority","unit_trace_requires_artifact_backed_work_evidence","final_flush_required_for_undelivered_traces","delivery_must_not_be_inferred"]},
+    "delivery_states":{"type":"array","uniqueItems":true,"items":{"enum":["TRACE_DURABLY_RECORDED","TRACE_INTERMEDIATE_DELIVERED","TRACE_FINAL_FLUSH_DELIVERED"]}},
+    "traces":{"type":"array","items":{"type":"object","required":["trace_id","kind","created_at","message","delivery_state","evidence"],"properties":{"trace_id":{"type":"string","minLength":1},"kind":{"type":"string","minLength":1},"created_at":{"type":"string","format":"date-time"},"message":{"type":"string","minLength":1},"delivery_state":{"enum":["TRACE_DURABLY_RECORDED","TRACE_INTERMEDIATE_DELIVERED","TRACE_FINAL_FLUSH_DELIVERED"]},"evidence":{"type":"array","minItems":1,"items":{"type":"string","minLength":1}}}}}
+  }
+}
