@@ -1,0 +1,32 @@
+name: Audit latest closed run record
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "state/CURRENT.json"
+      - "state/RUNS.jsonl"
+      - "tools/audit_latest_run_record.py"
+      - "tools/validate_run_records.py"
+      - "tests/test_audit_latest_run_record.py"
+      - "tests/test_run_records.py"
+      - ".github/workflows/audit-latest-run-record.yml"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate all closed run records
+        run: python tools/validate_run_records.py state/RUNS.jsonl
+      - name: Ensure closed CURRENT owner has a closed RUNS record
+        run: python tools/audit_latest_run_record.py state/CURRENT.json state/RUNS.jsonl
+      - name: Run focused run-record tests
+        env:
+          PYTHONPATH: tools
+        run: python -m unittest tests.test_run_records tests.test_audit_latest_run_record -v
