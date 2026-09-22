@@ -5,12 +5,12 @@
   "generation_key":"DUE:2026-09-22T08:29:51+09:00",
   "boot_started_at":"2026-09-22T09:29:53+09:00",
   "boot_started_authority_epoch":"DUE:2026-09-22T08:29:51+09:00",
-  "rearm_verified_at":null,
-  "verified_provisional_due_at":null,
-  "status":"BOOT_STARTED",
-  "last_updated_at":"2026-09-22T09:29:53+09:00",
+  "rearm_verified_at":"2026-09-22T09:30:18+09:00",
+  "verified_provisional_due_at":"2026-09-22T10:40:53+09:00",
+  "status":"REARM_VERIFIED",
+  "last_updated_at":"2026-09-22T09:30:18+09:00",
   "provider_delivery_delay_seconds":3602,
-  "provider_delivery_delay_human":"Observed eligible bootstrap began 1 hour 0 minutes 2 seconds (3602 seconds) after the still-pending verified 08:29:51 KST fast due. This is natural-hourly cold-fallback recovery after the shifted fast occurrence failed to produce a durable eligible bootstrap; it is not a P0-B fast-successor pass.",
+  "provider_delivery_delay_human":"Observed eligible bootstrap began 1 hour 0 minutes 2 seconds (3602 seconds) after the verified 08:29:51 KST fast due. This is natural-hourly cold-fallback recovery after the shifted fast occurrence failed to produce an eligible bootstrap; it is not a P0-B fast-successor pass.",
   "provisional_extension_count":0,
-  "note":"PREMATURE_INVOCATION at 08:28:42 KST was fenced. The next eligible invocation arrived at 09:29:53 KST, 3602 seconds after the intended fast due, proving the fast shifted occurrence still did not deliver an eligible work wake."
+  "note":"Eligible wake fenced against the stale fast generation, then SAME MAIN recurring provisional was live-verified at observed arm reference 09:29:53 KST + exactly 11 minutes (660 seconds) = 09:40:53 KST. The RRULE retains hourly recurrence; the explicit DTSTART offset remains 11 minutes (660 seconds)."
 }
