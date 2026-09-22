@@ -1,6 +1,48 @@
 {
-  "schema_version":"1.2","repository":"amzsdq/RRuleR","program_id":"RRULER-PROGRAM-001","program_status":"CONTINUE","root_job_id":"RRULER-UTILIZATION-003","root_goal":"P0: maximize artifact-backed useful-work duty cycle while preserving safe SAME MAIN continuation","status":"CONTINUE","current_owner":"RUN-UTIL-20260922-113659","authority_epoch":92,"canonical_automation_id":"6ab152b636748191a71873ba4d5ef551","run_state":"HANDOFF_COMMITTED",
-  "checkpoint":{"id":"CP-UTILIZATION-144","state":"CONTINUE","completed":["Epoch 92 accepted a 121-second early provider invocation as timing jitter because monotonic single authority could be claimed safely.","Second direct +120-second canary successor sample recorded: first +146s late, second -121s early; stability judgment remains inconclusive.","premature-wake fence upgraded from clock-threshold semantics to explicit duplicate-authority/stale-rollback/destructive-overlap decision test.","Platform turn ended before the 600-second normal floor; no padding or inferred useful time was recorded.","Live SAME MAIN verified enabled recurring full VEVENT at 11:40:23 KST; no scheduler mutation follows."],"evidence":["state/STARTUP_ACK.json@9119dd0e8bed01dc5935646ecbaa31e5604266f1","state/SCHEDULER_OBSERVATIONS.json@eee9fbc8fb622493ce37e042162e699a41ce4e03","state/UTILIZATION.json@83212171db463a5c9815d3dcb28709ba3f6ce27a","control/premature-wake-fence.v1.json@d579562c07ea79de54e6cf921b7dc7954f969f06","state/ACTIVITY.json@4c35ed4e6b714d991e7851971147675bc8d4a6ab","state/HANDOFF.json@d3bddaf1f35dc086146a2a49a2c432c123db27d8"],"next_action":"On successor wake, record provider offset from verified 11:40:23 KST due, work immediately if single authority is safe, and collect at least one more +120-second sample before deciding whether +2m is more stable than +1m."},
-  "continuation":{"mechanism":"SAME_MAIN_FINAL_WRITER_RRULE","rrule_frequency":"HOURLY","provisional_due_at":"2026-09-22T11:50:00+09:00","next_due_at":"2026-09-22T11:40:23+09:00","target_useful_work_seconds":600,"minimum_continue_work_seconds":600,"provisional_due_offset_seconds":660,"final_rearm_offset_seconds":120,"cold_fallback":"SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE","scheduler_jitter_policy":"ACCEPT_IF_SINGLE_AUTHORITY_SAFE","primary_kpi":"USEFUL_WORK_DUTY_CYCLE","final_live_write_is_authoritative":true,"durable_projection_drives_scheduler":false},
+  "schema_version":"1.3",
+  "repository":"amzsdq/RRuleR",
+  "program_id":"RRULER-PROGRAM-001",
+  "program_status":"CONTINUE",
+  "root_job_id":"RRULER-UTILIZATION-003",
+  "root_goal":"P0: maximize artifact-backed useful-work duty cycle while preserving safe SAME MAIN continuation",
+  "status":"CONTINUE",
+  "current_owner":"RUN-UTIL-20260922-115243",
+  "authority_epoch":93,
+  "canonical_automation_id":"6ab152b636748191a71873ba4d5ef551",
+  "run_state":"HANDOFF_COMMITTED",
+  "checkpoint":{
+    "id":"CP-UTILIZATION-145",
+    "state":"CONTINUE",
+    "completed":[
+      "Epoch 93 recorded the third direct +120-second successor sample: 46 seconds late; no observed authority conflict.",
+      "PROGRAM_GOALS stale +60-second active P0-B semantics were repaired to active +120-second canary with +60 retained only as historical comparator.",
+      "P0_SCORECARD advanced to epoch 93 with three +120 successor samples (+146,-121,+46 seconds) and explicit nominal-idle cost in the decision rule.",
+      "Mandatory validate-p0-scorecard CI was repaired from stale +60 enforcement to active +120 canary plus historical +60 comparator.",
+      "Final SAME MAIN full recurring VEVENT live update succeeded for 12:05:25 KST with is_enabled=true and RRULE:FREQ=HOURLY."
+    ],
+    "evidence":[
+      "state/STARTUP_ACK.json@16ce1d5811e8704a36d25dee6ffa9d8a64763841",
+      "state/SCHEDULER_OBSERVATIONS.json@b0babd69afeb5922fd9f924055a3b78a4ba7cfce",
+      "state/PROGRAM_GOALS.json@8b2ffdbe8c01d5f4ffe82f5326322a5f4cf3c6ff",
+      "state/P0_SCORECARD.json@909df749ea20d1b95b884952f44b0085f578516c",
+      ".github/workflows/validate-p0-scorecard.yml@746df2fbd6e4dbd375238c37cc42ab4de64b0c7d"
+    ],
+    "next_action":"On successor wake, record provider offset from verified 12:05:25 KST due, continue useful work regardless of harmless timing jitter, and compare +120 continuation safety plus total non-useful gap against the +60 comparator."
+  },
+  "continuation":{
+    "mechanism":"SAME_MAIN_FINAL_WRITER_RRULE",
+    "rrule_frequency":"HOURLY",
+    "provisional_due_at":"2026-09-22T12:03:43+09:00",
+    "next_due_at":"2026-09-22T12:05:25+09:00",
+    "target_useful_work_seconds":600,
+    "minimum_continue_work_seconds":600,
+    "provisional_due_offset_seconds":660,
+    "final_rearm_offset_seconds":120,
+    "cold_fallback":"SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE",
+    "scheduler_jitter_policy":"ACCEPT_IF_SINGLE_AUTHORITY_SAFE",
+    "primary_kpi":"USEFUL_WORK_DUTY_CYCLE",
+    "final_live_write_is_authoritative":true,
+    "durable_projection_drives_scheduler":false
+  },
   "safety":{"public_repo":true,"secrets_allowed":false,"reference_repo_amzsdq_R":"READ_ONLY"}
 }
