@@ -1,107 +1,12 @@
 {
-  "policy_id": "RRULER_RUNTIME_CONTINUITY",
-  "version": 7,
-  "status": "ACTIVE",
-  "principle": "DURABLE_WORKFLOW_DISPOSABLE_REASONING_WORKER",
-  "components": {
-    "wake_source": {
-      "responsibility": "Start a fresh reasoning invocation at the next supported opportunity.",
-      "current_adapter": "SAME_MAIN_RRULE_FAST_SHIFT_PLUS_NATURAL_HOURLY_COLD_FALLBACK",
-      "lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
-      "must_not_be_treated_as": "proof that predecessor stayed alive or permission for dual substantive authority"
-    },
-    "reasoning_worker": {
-      "responsibility": "Perform useful checkpointable work while invocation exists.",
-      "mortality": "EXPECTED",
-      "must_not_be_treated_as": "durable process"
-    },
-    "durable_continuation": {
-      "responsibility": "Persist exact resumable state and side-effect evidence after meaningful units.",
-      "current_adapter": "GITHUB_DURABLE_STATE"
-    },
-    "supervisor_measurement": {
-      "responsibility": "Detect stale workers, recover/transfer ownership, and measure useful coverage/dead gaps without inference.",
-      "current_adapter": "NEXT_WAKE_OBSERVATION_PLUS_DURABLE_STATE"
-    }
-  },
-  "required_metrics": [
-    "invocation_useful_span_seconds",
-    "continuation_gap_seconds",
-    "window_useful_coverage_seconds",
-    "scheduler_delivery_delay_seconds",
-    "rearm_overhead_seconds",
-    "predictive_due_to_successor_observation_seconds",
-    "predecessor_last_useful_to_successor_first_useful_seconds"
-  ],
-  "scheduler_budget": {
-    "evaluation_window_seconds": 900,
-    "target_useful_seconds": 840,
-    "active_scheduler": "ROLLING_SAME_CANONICAL_SELF_RELIANT",
-    "normal_target_work_seconds": 600,
-    "normal_continue_minimum_elapsed_seconds": 600,
-    "p0_max_average_non_useful_gap_seconds_for_600s_turn": 42.9,
-    "verified_fallback_final_rearm_offset_seconds": 60,
-    "provisional_rescue_offset_seconds": 660,
-    "provisional_extension_guard_seconds": 90,
-    "provisional_extension_offset_seconds": 180,
-    "routine_short_rolling_refresh_forbidden": true,
-    "retired_provisional_rescue_offset_seconds": 780,
-    "rule": "For a normal 10 minutes (600 seconds) nonterminal CONTINUE turn, arm SAME MAIN once at observed wake/arm reference + exactly 11 minutes (660 seconds) and normally do not mutate it mid-turn. Extend once before collision only if useful authorized work or close handling clearly threatens that due. Normal close shifts SAME MAIN to ACTUAL END + exactly 1 minute (60 seconds). If that occurrence is lost before bootstrap, the SAME MAIN recurring RRULE supplies the natural hourly cold fallback. Watchdog is not required."
-  },
-  "startup_receipt_generation_fence": {
-    "required": true,
-    "receipt": "BOOT_STARTED",
-    "generation_field": "generation_key",
-    "receipt_generation_field": "boot_started_authority_epoch",
-    "rule": "A BOOT_STARTED receipt is valid only for the scheduler generation whose generation_key exactly matches boot_started_authority_epoch. A stale receipt from an earlier occurrence cannot satisfy current startup acknowledgement.",
-    "failure_class": "STARTUP_ACK_BOOT_EPOCH_GENERATION_MISMATCH"
-  },
-  "predictive_prearm": {
-    "experiment_id": "UTIL-EXP-018",
-    "purpose": "Hide scheduler delivery latency under predecessor useful work.",
-    "single_substantive_authority_required": true,
-    "fresh_predecessor_blocks_successor_substantive_takeover": true,
-    "provisional_cold_rescue_horizon_unchanged": false,
-    "current_provisional_rescue_horizon_seconds": 660,
-    "rollback_on": [
-      "UNSAFE_SUBSTANTIVE_OVERLAP",
-      "DUPLICATE_SUBSTANTIVE_SIDE_EFFECT",
-      "SCHEDULE_ROLLBACK",
-      "MISSED_SUCCESSOR"
-    ],
-    "status": "ROLLED_BACK",
-    "normal_path_dependency": false
-  },
-  "early_runtime_end": {
-    "classification": "RUNTIME_INVOCATION_ENDED_EARLY",
-    "conditions": [
-      "plan was ACTIVE and valid",
-      "useful admissible work remained or fallback continuation was required",
-      "no terminal or safe continuation/transfer evidence exists",
-      "later wake observes predecessor stale"
-    ],
-    "response": [
-      "do not infer useful work across the gap",
-      "recover at next available verified wake",
-      "preserve exact checkpoint",
-      "compare invocation span across experiments",
-      "if repeated, target wake/runtime adapter rather than adding policy prose"
-    ]
-  },
-  "rolling_recovery": {
-    "startup": "minimum fence, persist generation-matched BOOT_STARTED, arm and verify SAME MAIN + exactly 11 minutes (660 seconds) provisional, then classify normal vs predictive vs recovery before substantive authority",
-    "normal_close": "checkpoint then live-verify SAME MAIN ACTUAL END + exactly 1 minute (60 seconds); do not arm Watchdog",
-    "mutation_failure": "retry once when safe; if older verified future continuation survives, classify DEGRADED_CONTINUATION within its safety envelope; otherwise fail closed before conflicting substantive side effects",
-    "stale_occurrence": "classify a natural SAME MAIN recurrence after missing bootstrap as MAIN_COLD_FALLBACK_RECOVERY; recover forward without replacing the canonical"
-  },
-  "progress_evidence": {
-    "timestamp_only_heartbeat_counts_as_useful_work": false,
-    "meaningful_unit_or_material_advancement_required": true,
-    "maximum_unexplained_gap_seconds_for_acceptance": 120
-  },
-  "design_reference": "docs/RUNTIME_CONTINUITY_ARCHITECTURE.md",
-  "time_unit_safety": {
-    "required": true,
-    "rule": "Human-readable timing must include explicit units; critical relay timings include both the human unit and exact seconds. Bare numeric timing arithmetic without a seconds/minutes/hours unit is forbidden."
-  }
+  "policy_id":"RRULER_RUNTIME_CONTINUITY","version":8,"status":"ACTIVE","principle":"DURABLE_WORKFLOW_DISPOSABLE_REASONING_WORKER",
+  "components":{"wake_source":{"responsibility":"Start a fresh reasoning invocation at the next supported opportunity.","current_adapter":"SAME_MAIN_RRULE_FAST_SHIFT_PLUS_NATURAL_HOURLY_COLD_FALLBACK","lifecycle_policy":"control/rolling-rrule-lifecycle.v1.json","must_not_be_treated_as":"proof that predecessor stayed alive or permission for dual substantive authority"},"reasoning_worker":{"responsibility":"Perform useful checkpointable work while invocation exists.","mortality":"EXPECTED","must_not_be_treated_as":"durable process"},"durable_continuation":{"responsibility":"Persist exact resumable state and side-effect evidence after meaningful units.","current_adapter":"GITHUB_DURABLE_STATE"},"supervisor_measurement":{"responsibility":"Measure useful coverage and scheduler/startup gaps without inference.","current_adapter":"NEXT_WAKE_OBSERVATION_PLUS_DURABLE_STATE"}},
+  "required_metrics":["invocation_useful_span_seconds","continuation_gap_seconds","window_useful_coverage_seconds","scheduler_delivery_delay_seconds","rearm_overhead_seconds","predecessor_last_useful_to_successor_first_useful_seconds"],
+  "scheduler_budget":{"evaluation_window_seconds":900,"target_useful_seconds":840,"active_scheduler":"ROLLING_SAME_CANONICAL_SELF_RELIANT","normal_target_work_seconds":600,"normal_continue_minimum_elapsed_seconds":600,"p0_max_average_non_useful_gap_seconds_for_600s_turn":42.9,"active_final_rearm_offset_seconds":120,"active_final_rearm_offset_human":"2 minutes (120 seconds)","provisional_rescue_offset_seconds":660,"provisional_extension_guard_seconds":90,"provisional_extension_offset_seconds":180,"routine_short_rolling_refresh_forbidden":true,"retired_provisional_rescue_offset_seconds":780,"rule":"For a normal 10 minutes (600 seconds) nonterminal CONTINUE turn, arm SAME MAIN once at observed wake/arm reference + exactly 11 minutes (660 seconds). Early/late provider timing alone never suppresses safe work. Normal close currently canaries SAME MAIN ACTUAL END + exactly 2 minutes (120 seconds), preserving full recurring RRULE and enabled=true. Historical +60-second samples remain comparison evidence."},
+  "startup_receipt_generation_fence":{"required":true,"receipt":"BOOT_STARTED","generation_field":"generation_key","receipt_generation_field":"boot_started_authority_epoch","rule":"A stale receipt from an earlier occurrence cannot satisfy current startup acknowledgement.","failure_class":"STARTUP_ACK_BOOT_EPOCH_GENERATION_MISMATCH"},
+  "predictive_prearm":{"experiment_id":"UTIL-EXP-018","single_substantive_authority_required":true,"status":"ROLLED_BACK","normal_path_dependency":false},
+  "early_runtime_end":{"classification":"RUNTIME_INVOCATION_ENDED_EARLY","response":["do not infer useful work across the gap","recover at next available verified wake","preserve exact checkpoint","compare invocation span across experiments"]},
+  "rolling_recovery":{"startup":"minimum fence, persist generation-matched BOOT_STARTED, arm and verify SAME MAIN + exactly 11 minutes (660 seconds) provisional, then claim authority if safe","normal_close":"checkpoint then live-verify SAME MAIN full recurring VEVENT at ACTUAL END + exactly 2 minutes (120 seconds); do not arm Watchdog","mutation_failure":"retry same full RRULE update once when safe; preserve older verified recurring fallback rather than create replacement","stale_occurrence":"recover forward without replacing canonical; timing mismatch alone is not a fence"},
+  "progress_evidence":{"timestamp_only_heartbeat_counts_as_useful_work":false,"meaningful_unit_or_material_advancement_required":true,"maximum_unexplained_gap_seconds_for_acceptance":120},
+  "design_reference":"docs/RUNTIME_CONTINUITY_ARCHITECTURE.md","time_unit_safety":{"required":true,"rule":"Human-readable timing must include explicit units and exact seconds for critical relay timings."}
 }
