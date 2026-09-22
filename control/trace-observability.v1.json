@@ -1,0 +1,11 @@
+{
+  "policy_id":"RRULER_TRACE_OBSERVABILITY",
+  "version":1,
+  "status":"ACTIVE",
+  "ledger":"state/TURN_TRACES.json",
+  "principle":"DURABLE_EXECUTION_EVIDENCE_AND_UI_DELIVERY_ARE_SEPARATE",
+  "unit_completion":{"requires_observed_duration":true,"requires_artifact_evidence":true,"durable_before_delivery":true,"trace_never_authorizes_close":true},
+  "delivery":{"intermediate_delivery_best_effort":true,"missing_intermediate_delivery_is_not_execution_failure":true,"pending_trace_final_flush_required":true,"delivery_state_must_not_be_inferred":true,"states":["TRACE_DURABLY_RECORDED","TRACE_INTERMEDIATE_DELIVERED","TRACE_FINAL_FLUSH_DELIVERED"]},
+  "compatibility":{"legacy_emit_requirement":"Satisfied by immediate delivery when supported or guaranteed ordered final flush from a durable trace ledger; execution success never depends on an unverified intermediate UI message."},
+  "validation":{"validator":"tools/validate_turn_traces.py","append_helper":"tools/append_turn_trace.py","final_flush_renderer":"tools/render_turn_trace_flush.py","workflow":".github/workflows/validate-turn-traces.yml"}
+}
