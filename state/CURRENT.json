@@ -6,29 +6,29 @@
   "root_job_id":"RRULER-UTILIZATION-003",
   "root_goal":"P0: maximize artifact-backed useful-work duty cycle while preserving safe SAME MAIN continuation",
   "status":"CONTINUE",
-  "current_owner":"RUN-UTIL-20260922-104040",
-  "authority_epoch":88,
+  "current_owner":"RUN-UTIL-20260922-105419",
+  "authority_epoch":89,
   "canonical_automation_id":"6ab152b636748191a71873ba4d5ef551",
   "run_state":"ACTIVE",
   "checkpoint":{
-    "id":"CP-UTILIZATION-137",
+    "id":"CP-UTILIZATION-138",
     "state":"CONTINUE",
     "completed":[
-      "Epoch 88 BOOT_STARTED is durable.",
-      "SAME MAIN provisional schedule is live-verified as a full recurring VEVENT with RRULE:FREQ=HOURLY and enabled=true for 10:51:40 KST.",
-      "Epoch 87 stale active projections are being advanced before further substantive work."
+      "Epoch 89 BOOT_STARTED and provisional REARM_VERIFIED are durable.",
+      "SAME MAIN provisional schedule was live-verified as full recurring VEVENT with RRULE:FREQ=HOURLY and enabled=true for 11:05:19 KST.",
+      "ACTIVITY stale epoch-88 ownership was advanced to epoch 89 before further work.",
+      "User-visible trace-path validation is now an explicit current unit rather than being inferred from durable scheduler state."
     ],
     "evidence":[
-      "state/STARTUP_ACK.json@e0dbc3eb805499f26a852eb3f90b9b1c6fbc1649",
-      "state/NOW.json@4a1554fe70a5ad08086419b19fb9df8a33f0ec90",
-      "control/ACTIVE_CONTROLS.json@b5a9ff165dea96bf8ddb075f43ae0a1a8054f267"
+      "state/STARTUP_ACK.json@8e61af54b6ece6c87308686c22d9d059a81bf211",
+      "state/ACTIVITY.json@9c3c3af1ac79c218189cb88048d9002e690af9c6"
     ],
-    "next_action":"Continue the final-writer canary and remove remaining stale active-run projection semantics; at nonterminal close the final scheduler mutation must be SAME MAIN full VEVENT RRULE to observed close + exactly 1 minute (60 seconds), then durable projections copy that verified due."
+    "next_action":"Continue final-writer and trace-path canary; at nonterminal close perform the last scheduler mutation as SAME MAIN full VEVENT RRULE to observed close + exactly 1 minute (60 seconds), live-verify, then copy that due into durable projections."
   },
   "continuation":{
     "mechanism":"SAME_MAIN_FINAL_WRITER_RRULE",
     "rrule_frequency":"HOURLY",
-    "provisional_due_at":"2026-09-22T10:51:40+09:00",
+    "provisional_due_at":"2026-09-22T11:05:19+09:00",
     "next_due_at":null,
     "target_useful_work_seconds":600,
     "minimum_continue_work_seconds":600,
