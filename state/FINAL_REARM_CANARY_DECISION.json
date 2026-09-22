@@ -1,0 +1,17 @@
+{
+  "schema_version":"1.0",
+  "program_id":"RRULER-PROGRAM-001",
+  "authority_epoch":98,
+  "observed_at":"2026-09-22T15:23:00+09:00",
+  "status":"EVIDENCE_FAVORS_ROLLBACK_BUT_OPERATOR_RUNTIME_LOCK_PREVENTS_AUTONOMOUS_POLICY_CHANGE",
+  "active_canary_offset_seconds":120,
+  "historical_comparator_offset_seconds":60,
+  "p0_max_average_non_useful_gap_seconds_for_600s_turn":42.9,
+  "canary_samples":7,
+  "canary_mean_absolute_delivery_offset_seconds":101.0,
+  "canary_observed_authority_conflicts":0,
+  "finding":"The +120-second final-rearm canary has not demonstrated continuation or authority-safety benefit over the +60-second comparator. Its nominal idle cost is 60 seconds higher than +60 and 77.1 seconds above the P0 42.9-second average non-useful-gap budget before startup/provider costs. Timing accuracy is not a promotion argument because observed delivery jitter is bidirectional and mean absolute offset is 101 seconds.",
+  "decision":"Do not promote +120 as the long-term utilization policy. The current bootstrap explicitly locks +120 for this run, so preserve it during this wake. On the next operator-authorized policy revision, prefer rollback to +60 unless new evidence demonstrates a measurable continuation or authority-safety benefit that offsets the extra nominal idle minute.",
+  "evidence_refs":["state/P0_SCORECARD.json","state/STARTUP_BUDGET.json","control/ACTIVE_CONTROLS.json"],
+  "next_measurement":"Measure total cross-turn non-useful gap from prior useful-work END to successor useful-work START, not scheduler delivery offset alone."
+}
