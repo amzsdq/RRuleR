@@ -1,9 +1,9 @@
 {
-  "schema_version": "3.4",
+  "schema_version": "3.5",
   "program_id": "RRULER-PROGRAM-001",
   "goal": "Operator-locked P0: maximize artifact-backed useful-work duty cycle. Normal nonterminal turns target at least 10 minutes (600 observed elapsed seconds); ACTUAL END + 2 minutes (120 seconds) is the active continuation canary, not a requirement for exact provider dispatch.",
   "status": "P0_UTILIZATION_ACTIVE_2M_FINAL_REARM_CANARY",
-  "current_epoch": 95,
+  "current_epoch": 96,
   "metrics": {
     "evaluation_window_seconds": 900,
     "target_useful_seconds": 840,
@@ -18,27 +18,28 @@
     "p0_max_average_non_useful_gap_seconds_for_600s_turn": 42.9,
     "active_canary_final_rearm_offset_seconds": 120,
     "historical_comparator_final_rearm_offset_seconds": 60,
-    "canary_120s_successor_offsets_seconds": [146, -121, 46, -147, 103],
-    "canary_120s_successor_count": 5,
+    "canary_120s_successor_offsets_seconds": [146, -121, 46, -147, 103, 72],
+    "canary_120s_successor_count": 6,
     "canary_120s_observed_authority_conflict_count": 0,
-    "canary_120s_mean_signed_delivery_offset_seconds": 5.4,
-    "canary_120s_mean_absolute_delivery_offset_seconds": 112.6,
+    "canary_120s_mean_signed_delivery_offset_seconds": 16.5,
+    "canary_120s_mean_absolute_delivery_offset_seconds": 105.8333333333,
     "latest_60s_final_rearm_delivery_offset_seconds": 59,
     "active_run_id": null,
-    "active_authority_epoch": 95
+    "active_authority_epoch": 96
   },
   "active_interventions": [
     {"id":"P0_A_10_MINUTE_600_SECOND_HARD_FLOOR","state":"ACTIVE","expected_effect":"Prevent voluntary normal CONTINUE close before 10 minutes (600 observed elapsed seconds)."},
-    {"id":"P0_B_2M_FINAL_REARM_CANARY","state":"ACTIVE_FIVE_SUCCESSOR_SAMPLES","expected_effect":"Determine whether +120 seconds improves continuation/authority safety enough to justify one extra nominal idle minute versus +60 seconds."},
+    {"id":"P0_B_2M_FINAL_REARM_CANARY","state":"ACTIVE_SIX_SUCCESSOR_SAMPLES","expected_effect":"Determine whether +120 seconds improves continuation/authority safety enough to justify one extra nominal idle minute versus +60 seconds."},
     {"id":"UTILIZATION_SAFE_WAKE_ACCEPTANCE","state":"ACTIVE","expected_effect":"Accept harmless early/late scheduler jitter immediately when single authority can be preserved; fence only real overlap/stale-authority hazards."},
     {"id":"USER_VISIBLE_UNIT_TRACE","state":"DURABLE_CAPTURE_PLUS_FINAL_FLUSH","expected_effect":"Separate execution evidence from host UI delivery; never infer work from trace visibility or trace delivery from work evidence."}
   ],
   "latest_runtime_interpretation": {
-    "epoch_91": "First active +120-second canary successor sample arrived 146 seconds late and remained eligible.",
-    "epoch_92": "Second +120-second successor sample arrived 121 seconds early; timing mismatch alone was not fenced and no authority conflict was observed.",
-    "epoch_93": "Third +120-second successor sample arrived 46 seconds late and remained eligible.",
-    "epoch_94": "Fourth +120-second successor sample arrived 147 seconds early; early timing alone was not fenced and no authority conflict was observed.",
-    "epoch_95": "Fifth +120-second successor sample arrived 103 seconds late. Across five samples mean signed offset is +5.4 seconds and mean absolute offset is 112.6 seconds; timing-accuracy superiority remains unproven and observed authority conflicts remain zero."
+    "epoch_91":"First active +120-second canary successor sample arrived 146 seconds late and remained eligible.",
+    "epoch_92":"Second +120-second successor sample arrived 121 seconds early; timing mismatch alone was not fenced and no authority conflict was observed.",
+    "epoch_93":"Third +120-second successor sample arrived 46 seconds late and remained eligible.",
+    "epoch_94":"Fourth +120-second successor sample arrived 147 seconds early; early timing alone was not fenced and no authority conflict was observed.",
+    "epoch_95":"Fifth +120-second successor sample arrived 103 seconds late.",
+    "epoch_96":"Sixth +120-second successor sample arrived 72 seconds late. Across six samples mean signed offset is +16.5 seconds and mean absolute offset is about 105.83 seconds; timing-accuracy superiority remains unproven and observed authority conflicts remain zero."
   },
   "dominant_risks": [
     "No three-consecutive P0-A sustained-turn gate exists yet.",
@@ -46,5 +47,5 @@
     "Provider execution jitter remains bidirectional and distinct from local schedule mutation correctness.",
     "Host UI may not surface intermediate progress messages; durable trace capture plus final flush remains required."
   ],
-  "next_decision": "Do not promote +120 from timing accuracy: five samples show no authority conflicts but high bidirectional jitter. Continue >=600-second substantive turns and compare total non-useful gap and continuation reliability against the +60 comparator; absent measurable safety benefit, roll back toward +60 because it has lower nominal idle cost."
+  "next_decision": "Do not promote +120 from timing accuracy: six samples show no authority conflicts but high bidirectional jitter. Continue >=600-second substantive turns and compare total non-useful gap and continuation reliability against the +60 comparator; absent measurable safety benefit, roll back toward +60 because it has lower nominal idle cost."
 }
