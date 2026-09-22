@@ -1,20 +1,35 @@
 {
-  "schema_version":"1.3",
+  "schema_version":"1.4",
   "program_id":"RRULER-PROGRAM-001",
   "root_job_id":"RRULER-UTILIZATION-003",
-  "authority_epoch":84,
-  "run_id":"RUN-UTIL-20260922-081839",
+  "authority_epoch":87,
+  "run_id":"RUN-UTIL-20260922-101524",
   "status":"ACTIVE",
-  "phase":"P0_WORK_TIME_AND_RESERVATION_RENEWAL",
+  "phase":"P0_FINAL_WRITER_RRULE_CANARY",
   "objective_id":"WS-P001-002-P0-RUNTIME-FOCUS",
-  "objective":"Sustain a full normal work turn while diagnosing why epoch 83's live-verified SAME MAIN ACTUAL END + exactly 1 minute (60 seconds) fast due did not durably bootstrap until the natural hourly cold fallback.",
+  "objective":"Validate the proven minimal SAME-MAIN self-update pattern in production control: full recurring VEVENT, enabled=true, provisional crash insurance before work, and exactly one authoritative final close write to observed close + 1 minute (60 seconds).",
   "expected_useful_seconds":600,
-  "acceptance_criteria":["Normal nonterminal CONTINUE wake sustains at least 10 minutes (600 observed elapsed seconds) unless a truthful non-CONTINUE exception applies.","SAME MAIN provisional schedule is live-verified at wake + exactly 11 minutes (660 seconds) and normal close is live-verified at ACTUAL END + exactly 1 minute (60 seconds).","A live-verified local rearm is not counted as successful fast delivery until a generation-matched successor bootstrap is observed.","Missed fast shift / cold fallback, ordinary provider jitter, and post-observation startup remain separate measured segments.","No broader productization displaces P0-A/P0-B."],
-  "checkpointable_substeps":["Persist epoch 84 cold-fallback classification and split local rearm correctness from provider execution.","Harden the smallest deterministic evidence/validator surface so a live local rearm cannot be promoted as a delivered fast successor without observed generation-matched bootstrap.","Audit current runtime state for stale wording/metrics that still conflate fast due with successful successor delivery.","At or after 10 minutes (600 seconds), finish the smallest safe in-flight unit, checkpoint, live-verify SAME MAIN ACTUAL END + exactly 1 minute (60 seconds), project the due consistently, and close."],
+  "acceptance_criteria":[
+    "Every scheduler mutation uses the SAME MAIN canonical with full VEVENT DTSTART plus RRULE:FREQ=HOURLY and enabled=true.",
+    "The provisional 11-minute (660-second) write is crash insurance only and is superseded on every nonterminal close.",
+    "The final close-time RRULE update is the last scheduler mutation of the wake and survives live metadata reread.",
+    "CURRENT/ACTIVITY/HANDOFF follow the verified live final due; none may push an older provisional/stale due back to the scheduler.",
+    "No new automation, one-shot conversion, dtstart_offset_json, or retired-canonical reactivation occurs."
+  ],
+  "checkpointable_substeps":[
+    "Record and verify the provisional full-VEVENT RRULE arm.",
+    "Audit stale durable projections that can conflict with the final-writer rule.",
+    "Normalize the stale projections to the current authority epoch without using them to drive the live scheduler.",
+    "At nonterminal close, perform the final SAME MAIN full-VEVENT RRULE write to observed close + exactly 1 minute (60 seconds), live-verify, then copy that due to durable projections without any later schedule mutation."
+  ],
   "current_substep":2,
-  "early_finish_fallback":"Audit schedule/startup evidence and validators for any path that treats verified DTSTART as proof of successor execution; preserve missing successor bootstrap as unknown/missed rather than inferred success.",
-  "handoff_boundary":"ONLY_AFTER_10_MINUTES_600_SECONDS_NORMAL_FLOOR_AND_EXACT_END_PLUS_1_MINUTE_60_SECONDS_LIVE_VERIFICATION",
+  "early_finish_fallback":"Continue removing stale projection semantics and redundant schedule-control assumptions while preserving the minimal live RRULE path.",
+  "handoff_boundary":"FINAL_LIVE_RRULE_WRITE_MUST_BE_LAST_SCHEDULE_MUTATION_OF_WAKE",
   "created_for_next_wake":false,
-  "expected_wake_at":"2026-09-22T08:18:39+09:00",
-  "progress_evidence":["state/STARTUP_ACK.json@0f60467aa97d426a33c271f53e212db29f9911eb","planning/evidence/P0-RUNTIME-FOCUS-E84-20260922.md@0a5e72cb4bb35fb365f16045de3203995d4bacd9","state/P0_SCORECARD.json@1040f095e3c3322afbaec7d72cf2f9d97d60dbe3","state/SCHEDULER_OBSERVATIONS.json@9466ad2030470f8748d3a7750a4f9fe76f0823a0","state/STARTUP_BUDGET.json@20fbcf7e286f0bc3a8e11da20454848056d3ee81"]
+  "expected_wake_at":"2026-09-22T10:15:24+09:00",
+  "progress_evidence":[
+    "control/ACTIVE_CONTROLS.json@b5a9ff165dea96bf8ddb075f43ae0a1a8054f267",
+    "control/relay-policy.v1.json@d3958c54da233a23744c04153e1c5b021ce44ae8",
+    "state/STARTUP_ACK.json@011883baec2d285e5341de84dc48a453433a9048"
+  ]
 }
