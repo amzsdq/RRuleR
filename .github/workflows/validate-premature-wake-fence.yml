@@ -1,0 +1,44 @@
+name: Validate premature wake fence
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'control/premature-wake-fence.v1.json'
+      - 'control/ACTIVE_CONTROLS.json'
+      - '.github/workflows/validate-premature-wake-fence.yml'
+  pull_request:
+    paths:
+      - 'control/premature-wake-fence.v1.json'
+      - 'control/ACTIVE_CONTROLS.json'
+      - '.github/workflows/validate-premature-wake-fence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate fence registry and semantics
+        run: |
+          python - <<'PY'
+          import json
+          controls=json.load(open('control/ACTIVE_CONTROLS.json'))
+          fence=json.load(open('control/premature-wake-fence.v1.json'))
+          assert controls['status']=='ACTIVE'
+          assert 'control/premature-wake-fence.v1.json' in controls['mandatory_on_wake']
+          assert 'PREMATURE_INVOCATION_MUST_NOT_ADVANCE_AUTHORITY_OR_OVERWRITE_PENDING_FAST_DUE' in controls['hard_invariants']
+          assert fence['status']=='ACTIVE'
+          assert fence['timing_semantics']['premature_tolerance_seconds']==0
+          forbidden=set(fence['forbidden'])
+          assert 'PREMATURE_INVOCATION_OVERWRITES_PENDING_FAST_DUE' in forbidden
+          assert 'PREMATURE_INVOCATION_COUNTS_AS_P0_B_PASS' in forbidden
+          assert 'PREMATURE_INVOCATION_ADVANCES_SUBSTANTIVE_AUTHORITY' in forbidden
+          assert '11-minute (660-second)' not in fence['rule'], 'use explicit canonical human form instead'
+          assert '11 minutes (660 seconds)' in fence['rule']
+          assert '1 minute (60 seconds)' in fence['timing_semantics']['normal_final_rearm']
+          print('premature wake fence validation passed')
+          PY
