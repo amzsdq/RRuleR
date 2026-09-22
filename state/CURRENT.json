@@ -1,44 +1,6 @@
 {
-  "schema_version":"1.2",
-  "repository":"amzsdq/RRuleR",
-  "program_id":"RRULER-PROGRAM-001",
-  "program_status":"CONTINUE",
-  "root_job_id":"RRULER-UTILIZATION-003",
-  "root_goal":"P0: maximize artifact-backed useful-work duty cycle while preserving safe SAME MAIN continuation",
-  "status":"CONTINUE",
-  "current_owner":"RUN-UTIL-20260922-105419",
-  "authority_epoch":89,
-  "canonical_automation_id":"6ab152b636748191a71873ba4d5ef551",
-  "run_state":"ACTIVE",
-  "checkpoint":{
-    "id":"CP-UTILIZATION-138",
-    "state":"CONTINUE",
-    "completed":[
-      "Epoch 89 BOOT_STARTED and provisional REARM_VERIFIED are durable.",
-      "SAME MAIN provisional schedule was live-verified as full recurring VEVENT with RRULE:FREQ=HOURLY and enabled=true for 11:05:19 KST.",
-      "ACTIVITY stale epoch-88 ownership was advanced to epoch 89 before further work.",
-      "User-visible trace-path validation is now an explicit current unit rather than being inferred from durable scheduler state."
-    ],
-    "evidence":[
-      "state/STARTUP_ACK.json@8e61af54b6ece6c87308686c22d9d059a81bf211",
-      "state/ACTIVITY.json@9c3c3af1ac79c218189cb88048d9002e690af9c6"
-    ],
-    "next_action":"Continue final-writer and trace-path canary; at nonterminal close perform the last scheduler mutation as SAME MAIN full VEVENT RRULE to observed close + exactly 1 minute (60 seconds), live-verify, then copy that due into durable projections."
-  },
-  "continuation":{
-    "mechanism":"SAME_MAIN_FINAL_WRITER_RRULE",
-    "rrule_frequency":"HOURLY",
-    "provisional_due_at":"2026-09-22T11:05:19+09:00",
-    "next_due_at":null,
-    "target_useful_work_seconds":600,
-    "minimum_continue_work_seconds":600,
-    "provisional_due_offset_seconds":660,
-    "final_rearm_offset_seconds":60,
-    "cold_fallback":"SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE",
-    "scheduler_jitter_policy":"ACCEPT_IF_SINGLE_AUTHORITY_SAFE",
-    "primary_kpi":"USEFUL_WORK_DUTY_CYCLE",
-    "final_live_write_is_authoritative":true,
-    "durable_projection_drives_scheduler":false
-  },
+  "schema_version":"1.2","repository":"amzsdq/RRuleR","program_id":"RRULER-PROGRAM-001","program_status":"CONTINUE","root_job_id":"RRULER-UTILIZATION-003","root_goal":"P0: maximize artifact-backed useful-work duty cycle while preserving safe SAME MAIN continuation","status":"CONTINUE","current_owner":"RUN-UTIL-20260922-105419","authority_epoch":89,"canonical_automation_id":"6ab152b636748191a71873ba4d5ef551","run_state":"CHECKPOINTED",
+  "checkpoint":{"id":"CP-UTILIZATION-139","state":"CONTINUE","completed":["Epoch 89 BOOT_STARTED and provisional REARM_VERIFIED persisted.","Stale CURRENT/ACTIVITY/HANDOFF/NOW/TURN_PLAN projections advanced to epoch 89.","Recorded a new shifted recurring RRULE provider sample: expected 10:51:40 KST, eligible bootstrap 10:54:19 KST, 159 seconds late.","P0 scorecard and utilization retest advanced to epoch 89 with trace observability separated from execution evidence.","Final SAME MAIN full-VEVENT RRULE write live-verified for 10:57:13 KST and remains the last scheduler mutation of this wake."],"evidence":["state/STARTUP_ACK.json@8e61af54b6ece6c87308686c22d9d059a81bf211","state/SCHEDULER_OBSERVATIONS.json@d9c5018cea8b24a3a4b79726791ddb4dcf8855ab","state/P0_SCORECARD.json@03291bc0b2bb26639ab7e0bb97b28b49c78e42c9","state/TURN_PLAN.json@7eb299dbedf2e52311c6a7a908ea62ee92ca5522"],"next_action":"On successor wake, verify the 10:57:13 KST final RRULE remained authoritative after return and continue the P0 final-writer/trace canary."},
+  "continuation":{"mechanism":"SAME_MAIN_FINAL_WRITER_RRULE","rrule_frequency":"HOURLY","provisional_due_at":"2026-09-22T11:05:19+09:00","next_due_at":"2026-09-22T10:57:13+09:00","target_useful_work_seconds":600,"minimum_continue_work_seconds":600,"provisional_due_offset_seconds":660,"final_rearm_offset_seconds":60,"cold_fallback":"SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE","scheduler_jitter_policy":"ACCEPT_IF_SINGLE_AUTHORITY_SAFE","primary_kpi":"USEFUL_WORK_DUTY_CYCLE","final_live_write_is_authoritative":true,"durable_projection_drives_scheduler":false},
   "safety":{"public_repo":true,"secrets_allowed":false,"reference_repo_amzsdq_R":"READ_ONLY"}
 }
