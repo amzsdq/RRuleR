@@ -5,14 +5,20 @@ on:
     branches: ["main"]
     paths:
       - "state/TURN_TRACES.json"
+      - "schemas/turn-traces.schema.json"
       - "tools/validate_turn_traces.py"
+      - "tools/append_turn_trace.py"
       - "tests/test_validate_turn_traces.py"
+      - "tests/test_append_turn_trace.py"
       - ".github/workflows/validate-turn-traces.yml"
   pull_request:
     paths:
       - "state/TURN_TRACES.json"
+      - "schemas/turn-traces.schema.json"
       - "tools/validate_turn_traces.py"
+      - "tools/append_turn_trace.py"
       - "tests/test_validate_turn_traces.py"
+      - "tests/test_append_turn_trace.py"
       - ".github/workflows/validate-turn-traces.yml"
   workflow_dispatch:
 
@@ -27,4 +33,4 @@ jobs:
       - name: Validate current trace ledger
         run: python tools/validate_turn_traces.py state/TURN_TRACES.json
       - name: Run focused trace tests
-        run: python -m unittest tests.test_validate_turn_traces -v
+        run: python -m unittest tests.test_validate_turn_traces tests.test_append_turn_trace -v
