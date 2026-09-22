@@ -92,9 +92,20 @@ The first attempted correction, routine `NOW + 2 minutes (120 seconds)` short ro
 
 The 01:38 generation is the first live v5.4 verification turn. It durably wrote generation-matched `BOOT_STARTED`, live-verified SAME MAIN enabled recurring at 01:48:17 KST, and persisted `REARM_VERIFIED`. Fresh-policy audit then found two stale 780-second authorities outside the primary lifecycle: the integrated CI assertion and `control/runtime-continuity.v1.json`. Both were repaired forward; integrated control-plane validation subsequently passed after working-owner/handoff projection was reconciled. This demonstrates why fresh policy synchronization must include validators and secondary mandatory controls, not only the headline lifecycle artifact.
 
+## v5.6.5 final-writer + observability correction
+
+Epochs 89-90 established two separate facts that must not be conflated:
+
+1. A shifted SAME MAIN recurring `DTSTART` can produce a same-hour eligible successor. Epoch 89 arrived 159 seconds after its shifted target; epoch 90 arrived 59 seconds after the epoch-89 final target. Provider delivery remains variable, but shifted RRULE execution is not categorically ignored.
+2. Intermediate progress text from a scheduled invocation is not a reliable execution receipt. Durable work/state can advance even when no intermediate chat trace is visible. Therefore execution evidence and UI-delivery evidence are separate domains.
+
+Selected correction: retain the minimal SAME MAIN full-VEVENT RRULE mechanism and change trace observability to **durable capture first, immediate delivery when supported, ordered final-response flush otherwise**. A missing intermediate UI message is no longer classified as execution failure when durable unit evidence exists. Conversely, a visible message never proves work unless the corresponding durable evidence exists.
+
+This correction is deliberately narrow. It does not relax the 600-second P0-A floor. Recent short CONTINUE turns remain failures of sustained utilization even when their scheduler mutation and durable bookkeeping are correct. Epoch 90 therefore prioritizes substantive P001 work over further scheduler churn and requires a >=600-second normal CONTINUE sample before P0-A can advance.
+
 ## Exact resume step
 
-Continue `UTIL-EXP-019` with five observed boundaries: invocation, `BOOT_STARTED`, provisional `REARM_VERIFIED`, authority claim, and first durable useful work. Treat the 01:38 v5.4 generation as a prospective provisional-horizon sample, but do not promote it until the turn closes normally at at least 10 minutes (600 seconds) and the SAME MAIN exact `ACTUAL END + 1 minute (60 seconds)` due is live-verified and projected consistently to CURRENT/ACTIVITY/HANDOFF. Preserve missing boundaries as unknown; do not infer scheduler or useful-work success from invocation metadata alone.
+Continue `UTIL-EXP-019` with five observed boundaries: invocation, `BOOT_STARTED`, provisional `REARM_VERIFIED`, authority claim, and first durable useful work. Preserve missing boundaries as unknown. Keep the v5.6.5 final-writer rule: provisional scheduling is crash insurance only; every normal nonterminal close must make the SAME MAIN full recurring VEVENT at observed ACTUAL END + exactly 1 minute (60 seconds) the final scheduler mutation. Capture bounded-unit traces durably and flush them in the user-visible completion response if reliable intermediate delivery is unavailable.
 
 ## Decision rule
 
@@ -129,4 +140,4 @@ Broader productization remains deferred unless it directly advances one of these
 
 ## Distribution reporting note
 
-The current evidence-bound chat trace is a debugging/canary surface. The intended distribution version will preserve exact structured telemetry internally but render each turn to the user in concise natural language covering observed work period, what was completed, current status, and what happens next. Do not replace internal machine evidence with prose.
+The current evidence-bound chat trace is a debugging/canary surface. The intended distribution version preserves exact structured telemetry internally but renders each turn to the user in concise natural language covering observed work period, what was completed, current status, and what happens next. Scheduled runtimes must not depend on intermediate-message delivery for correctness: persist traces first, then deliver immediately if supported or flush them in order at final completion. Do not replace internal machine evidence with prose.
