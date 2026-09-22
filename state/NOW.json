@@ -8,18 +8,16 @@
   "work_spec_ref":"planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md",
   "execution_status":"ACTIVE",
   "pause_reason":null,
-  "resume_target":{
-    "step":"Continue P001 after epoch 98. Prioritize measured non-useful-gap decomposition and startup-loss reduction while preserving the active +120-second final-rearm canary until evidence supports promotion or rollback.",
-    "selection_rule":"Prefer substantive work-spec advancement over scheduler bookkeeping. Preserve SAME MAIN full-VEVENT RRULE final-writer semantics, 600-second normal CONTINUE floor, and active +120 canary until evidence supports promotion or rollback."
-  },
+  "resume_target":{"step":"Continue P001 after epoch 98. Prioritize measured non-useful-gap decomposition and startup-loss reduction while preserving the active +120-second final-rearm canary until evidence supports promotion or rollback.","selection_rule":"Prefer substantive work-spec advancement over scheduler bookkeeping. Preserve SAME MAIN full-VEVENT RRULE final-writer semantics, 600-second normal CONTINUE floor, and active +120 canary until evidence supports promotion or rollback."},
   "turn_plan_role":"TURN_PLAN is one-turn execution detail subordinate to fresh ACTIVE_CONTROLS and this active work spec.",
-  "updated_at":"2026-09-22T15:21:33+09:00",
+  "updated_at":"2026-09-22T15:22:09+09:00",
   "active_runtime_revision":"MAIN_BOOTSTRAP_V5.7.1_STRICT_ORDERED_RRULE_SELF_UPDATE_2M_FINAL_REARM",
   "operator_requested_next_due_at":null,
   "active_run_id":"MAIN-E98-20260922T152133+0900",
   "authority_epoch":98,
   "boot_started_at":"2026-09-22T15:21:33+09:00",
-  "boot_status":"BOOT_STARTED",
-  "verified_provisional_due_at":null,
+  "boot_status":"REARM_VERIFIED",
+  "rearm_verified_at":"2026-09-22T15:22:09+09:00",
+  "verified_provisional_due_at":"2026-09-22T15:32:33+09:00",
   "verified_next_fast_due_at":"2026-09-22T14:19:30+09:00"
 }
