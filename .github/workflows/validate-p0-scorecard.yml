@@ -52,27 +52,30 @@ jobs:
           metrics = score.get('metrics', {})
           if metrics.get('minimum_continue_turn_seconds') != 600:
               raise SystemExit('P0 scorecard drift: normal CONTINUE floor must be 10 minutes (600 seconds)')
-          if metrics.get('verified_fallback_final_rearm_offset_seconds') != 60:
-              raise SystemExit('P0 scorecard drift: normal close must be 1 minute (60 seconds)')
+          if metrics.get('active_canary_final_rearm_offset_seconds') != 120:
+              raise SystemExit('P0 scorecard drift: active canary close must be 2 minutes (120 seconds)')
+          if metrics.get('historical_comparator_final_rearm_offset_seconds') != 60:
+              raise SystemExit('P0 scorecard drift: historical comparator must remain 1 minute (60 seconds)')
           if '10 minutes (600 seconds)' not in metrics.get('normal_continue_minimum_human', ''):
               raise SystemExit('P0 scorecard lacks explicit 10-minute (600-second) human semantics')
-          if '1 minute (60 seconds)' not in metrics.get('verified_fallback_final_rearm_human', ''):
-              raise SystemExit('P0 scorecard lacks explicit 1-minute (60-second) human semantics')
 
           decision = gate.get('turn_decision', {})
           if decision.get('normal_continue_minimum_elapsed_seconds') != 600:
               raise SystemExit('continuation gate drift from 10 minutes (600 seconds)')
           timing = lifecycle.get('timing', {})
-          if timing.get('final_rearm_offset_seconds') != 60:
-              raise SystemExit('lifecycle drift from 1 minute (60 seconds) final rearm')
+          if timing.get('final_rearm_offset_seconds') != 120:
+              raise SystemExit('lifecycle drift from active 2-minute (120-second) final-rearm canary')
 
           goalmap = {g.get('goal_id'): g for g in goals.get('goals', [])}
           p0a = goalmap.get('GOAL-TURN-WORKTIME-P0A')
           p0b = goalmap.get('GOAL-SCHEDULE-REARM-P0B')
           if not p0a or p0a.get('acceptance', {}).get('normal_continue_minimum_elapsed_seconds') != 600:
               raise SystemExit('operator-locked P0-A 10-minute (600-second) goal missing/drifted')
-          if not p0b or p0b.get('acceptance', {}).get('final_rearm_offset_seconds') != 60:
-              raise SystemExit('operator-locked P0-B 1-minute (60-second) goal missing/drifted')
+          p0b_accept = (p0b or {}).get('acceptance', {})
+          if p0b_accept.get('active_canary_final_rearm_offset_seconds') != 120:
+              raise SystemExit('operator-locked P0-B active 2-minute (120-second) canary missing/drifted')
+          if p0b_accept.get('historical_comparator_offset_seconds') != 60:
+              raise SystemExit('operator-locked P0-B historical 1-minute (60-second) comparator missing/drifted')
 
-          print('P0 scorecard timing projection is aligned: 10 minutes (600 seconds) work floor; 1 minute (60 seconds) final rearm.')
+          print('P0 timing projection aligned: 10 minutes (600 seconds) work floor; active 2 minutes (120 seconds) final-rearm canary; historical 1 minute (60 seconds) comparator preserved.')
           PY
