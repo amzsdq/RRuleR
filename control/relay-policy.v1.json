@@ -1,7 +1,7 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
-  "policy_revision": 20,
+  "policy_revision": 21,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
@@ -23,12 +23,23 @@
     "final_checkpoint_before_close": true,
     "verify_every_mutation": true,
     "fixed_quarter_cycle_active": false,
-    "note": "Primary objective is high useful-work duty cycle, not perfect wall-clock dispatch. Schedule ACTUAL END + 1 minute (60 seconds) as an aggressive next-wake target and keep the 11-minute (660-second) provisional/cold fallback for resilience. Provider early/late jitter is acceptable when single substantive authority and monotonic durable state are preserved. Do not spend P0 effort chasing harmless scheduler seconds.",
+    "note": "Use the proven minimal self-update semantics: mutate the SAME automation with a full VEVENT containing DTSTART plus RRULE:FREQ=HOURLY, keep enabled=true, and treat the last successful close-time RRULE update as the authoritative next wake. Provisional arming exists only as pre-work crash insurance. On every nonterminal close, including early BLOCKED/DEGRADED exits unless an explicit exception applies, the final live RRULE write to close + 1 minute (60 seconds) MUST occur after all other schedule writes. After that write, no same-wake control/state reconciliation may mutate schedule again; durable projections copy the live verified due rather than drive it.",
     "long_provisional_780_seconds_retired": true,
     "provisional_extension_guard_seconds": 90,
     "provisional_extension_offset_seconds": 180,
     "short_rolling_120_seconds_retired_as_default": true,
-    "normal_midturn_schedule_mutation": false
+    "normal_midturn_schedule_mutation": false,
+    "final_schedule_writer": "LIVE_SAME_MAIN_RRULE_UPDATE_AT_NONTERMINAL_CLOSE",
+    "final_write_wins": true,
+    "post_final_schedule_mutation_forbidden_same_wake": true,
+    "durable_projection_may_not_overwrite_live_final_due": true,
+    "nonterminal_close_rearm_required": true,
+    "nonterminal_close_rearm_exceptions": [
+      "EXPLICIT_OPERATOR_STOP",
+      "EXPLICIT_OPERATOR_PAUSE",
+      "VERIFIED_PROGRAM_COMPLETE",
+      "UNSAFE_AUTHORITY_CONFLICT_WHERE_REARM_ITSELF_IS_FORBIDDEN"
+    ]
   },
   "utilization": {
     "first_class_objective": true,
@@ -67,7 +78,7 @@
   },
   "fallback": {
     "predictive_prearm_failure": "RESTORE_VERIFIED_COMPLETION_RELATIVE_REARM_WITHOUT_REPLACING_CANONICAL",
-    "self_update_failure_with_old_verified_rrule_intact": "DEGRADED_CONTINUATION",
+    "self_update_failure_with_old_verified_rrule_intact": "DEGRADED_CONTINUATION_KEEP_OLD_RRULE_AND_REPORT",
     "retry_mutation_once_when_safe": true,
     "old_verified_future_rrule_may_act_as_recovery_opportunity": true,
     "disabled_deleted_missing_automation_self_rescued": false,
