@@ -6,34 +6,30 @@
   "root_job_id":"RRULER-UTILIZATION-003",
   "root_goal":"P0: maximize artifact-backed useful-work duty cycle while preserving safe SAME MAIN continuation",
   "status":"CONTINUE",
-  "current_owner":"RUN-UTIL-20260922-115243",
-  "authority_epoch":93,
+  "current_owner":"RUN-UTIL-20260922-135148",
+  "authority_epoch":97,
   "canonical_automation_id":"6ab152b636748191a71873ba4d5ef551",
   "run_state":"HANDOFF_COMMITTED",
   "checkpoint":{
-    "id":"CP-UTILIZATION-145",
+    "id":"CP-UTILIZATION-149",
     "state":"CONTINUE",
     "completed":[
-      "Epoch 93 recorded the third direct +120-second successor sample: 46 seconds late; no observed authority conflict.",
-      "PROGRAM_GOALS stale +60-second active P0-B semantics were repaired to active +120-second canary with +60 retained only as historical comparator.",
-      "P0_SCORECARD advanced to epoch 93 with three +120 successor samples (+146,-121,+46 seconds) and explicit nominal-idle cost in the decision rule.",
-      "Mandatory validate-p0-scorecard CI was repaired from stale +60 enforcement to active +120 canary plus historical +60 comparator.",
-      "Final SAME MAIN full recurring VEVENT live update succeeded for 12:05:25 KST with is_enabled=true and RRULE:FREQ=HOURLY."
+      "Epoch 97 recorded the seventh direct +120-second successor sample: 72 seconds early; no observed authority conflict.",
+      "P0_SCORECARD advanced to epoch 97 with seven +120 successor samples and mean absolute delivery offset 101.0 seconds.",
+      "SAME MAIN provisional recurring VEVENT was live-verified at 14:02:48 KST.",
+      "Final SAME MAIN full recurring VEVENT write succeeded for 13:54:27 KST with is_enabled=true, exact_schedule, and RRULE:FREQ=HOURLY."
     ],
     "evidence":[
-      "state/STARTUP_ACK.json@16ce1d5811e8704a36d25dee6ffa9d8a64763841",
-      "state/SCHEDULER_OBSERVATIONS.json@b0babd69afeb5922fd9f924055a3b78a4ba7cfce",
-      "state/PROGRAM_GOALS.json@8b2ffdbe8c01d5f4ffe82f5326322a5f4cf3c6ff",
-      "state/P0_SCORECARD.json@909df749ea20d1b95b884952f44b0085f578516c",
-      ".github/workflows/validate-p0-scorecard.yml@746df2fbd6e4dbd375238c37cc42ab4de64b0c7d"
+      "state/STARTUP_ACK.json@ee4feb684dffe04da7acc46c583a080ebc6cfa40",
+      "state/P0_SCORECARD.json@5a7b77f359628035cdca45a4eab73ee087403352"
     ],
-    "next_action":"On successor wake, record provider offset from verified 12:05:25 KST due, continue useful work regardless of harmless timing jitter, and compare +120 continuation safety plus total non-useful gap against the +60 comparator."
+    "next_action":"On successor wake, record provider offset from verified 13:54:27 KST due and continue the +120 versus +60 comparison using total non-useful gap and continuation/authority safety, not timing accuracy alone."
   },
   "continuation":{
     "mechanism":"SAME_MAIN_FINAL_WRITER_RRULE",
     "rrule_frequency":"HOURLY",
-    "provisional_due_at":"2026-09-22T12:03:43+09:00",
-    "next_due_at":"2026-09-22T12:05:25+09:00",
+    "provisional_due_at":"2026-09-22T14:02:48+09:00",
+    "next_due_at":"2026-09-22T13:54:27+09:00",
     "target_useful_work_seconds":600,
     "minimum_continue_work_seconds":600,
     "provisional_due_offset_seconds":660,
