@@ -9,15 +9,15 @@
   "execution_status":"ACTIVE",
   "pause_reason":null,
   "resume_target":{
-    "step":"Continue P001 after epoch 96. Six +120-second successor samples now exist; compare continuation/authority-safety benefit and total non-useful gap against the lower-idle +60 comparator while preserving safe authority acceptance under scheduler jitter.",
+    "step":"Continue P001 after epoch 97. The active +120-second final-rearm canary still lacks evidence of continuation/authority-safety benefit sufficient to offset its higher nominal idle cost versus the +60-second comparator; prioritize measured non-useful-gap decomposition and startup-loss reduction.",
     "selection_rule":"Prefer substantive work-spec advancement over scheduler bookkeeping. Preserve SAME MAIN full-VEVENT RRULE final-writer semantics, 600-second normal CONTINUE floor, and active +120 canary until evidence supports promotion or rollback."
   },
   "turn_plan_role":"TURN_PLAN is one-turn execution detail subordinate to fresh ACTIVE_CONTROLS and this active work spec.",
-  "updated_at":"2026-09-22T13:07:13+09:00",
+  "updated_at":"2026-09-22T13:57:25+09:00",
   "active_runtime_revision":"MAIN_BOOTSTRAP_V5.7.1_STRICT_ORDERED_RRULE_SELF_UPDATE_2M_FINAL_REARM",
   "operator_requested_next_due_at":null,
   "active_run_id":null,
-  "authority_epoch":96,
-  "verified_provisional_due_at":"2026-09-22T13:17:12+09:00",
-  "verified_next_fast_due_at":"2026-09-22T13:09:09+09:00"
+  "authority_epoch":97,
+  "verified_provisional_due_at":"2026-09-22T14:08:18+09:00",
+  "verified_next_fast_due_at":"2026-09-22T13:59:25+09:00"
 }
