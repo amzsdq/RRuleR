@@ -1,3 +1,18 @@
 {
-  "schema_version":"1.0","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","canonical_automation_id":"6ab152b636748191a71873ba4d5ef551","status":"HANDOFF_READY","active_run_id":"RUN-UTIL-20260922-081839","authority_epoch":84,"substantive_work_started_at":"2026-09-22T08:19:02+09:00","last_progress_at":"2026-09-22T08:28:51+09:00","last_progress_kind":"NORMAL_CLOSE_EXACT_1_MINUTE_60_SECONDS_VERIFIED","current_unit":"Await generation-matched successor bootstrap for the exact shifted fast due; do not infer delivery from local verification.","next_wake_due_at":"2026-09-22T08:29:51+09:00","successor_observed":false,"handoff_ready":true,"operator_ui_note":"Epoch 84 ACTUAL END=08:28:51 KST; SAME MAIN recurring final due=08:29:51 KST, exactly 1 minute (60 seconds) later and live-verified. Next P0-B evidence is actual generation-matched successor bootstrap, not schedule metadata alone."
+  "schema_version":"1.1",
+  "program_id":"RRULER-PROGRAM-001",
+  "root_job_id":"RRULER-UTILIZATION-003",
+  "canonical_automation_id":"6ab152b636748191a71873ba4d5ef551",
+  "status":"ACTIVE",
+  "active_run_id":"RUN-UTIL-20260922-101524",
+  "authority_epoch":87,
+  "substantive_work_started_at":"2026-09-22T10:15:24+09:00",
+  "last_progress_at":"2026-09-22T10:16:46+09:00",
+  "last_progress_kind":"FINAL_WRITER_RRULE_CANARY_STATE_NORMALIZATION",
+  "current_unit":"Validate that the final close-time full recurring VEVENT is the last scheduler mutation and survives after return.",
+  "provisional_next_wake_due_at":"2026-09-22T10:26:24+09:00",
+  "next_wake_due_at":null,
+  "successor_observed":false,
+  "handoff_ready":false,
+  "operator_ui_note":"Epoch 87 is active under v5.6.5. Provisional 10:26:24 KST is crash insurance only. Final nonterminal close must replace it with observed close + exactly 1 minute (60 seconds) using SAME MAIN full VEVENT RRULE, enabled=true; durable projections then copy that verified due and never drive a later schedule mutation."
 }
