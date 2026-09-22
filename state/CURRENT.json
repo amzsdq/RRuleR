@@ -1,16 +1,46 @@
 {
-  "schema_version":"1.1",
+  "schema_version":"1.2",
   "repository":"amzsdq/RRuleR",
   "program_id":"RRULER-PROGRAM-001",
   "program_status":"CONTINUE",
   "root_job_id":"RRULER-UTILIZATION-003",
   "root_goal":"P0: maximize artifact-backed useful-work duty cycle while preserving safe SAME MAIN continuation",
   "status":"CONTINUE",
-  "current_owner":"RUN-UTIL-20260922-094058",
-  "authority_epoch":85,
+  "current_owner":"RUN-UTIL-20260922-101524",
+  "authority_epoch":87,
   "canonical_automation_id":"6ab152b636748191a71873ba4d5ef551",
   "run_state":"ACTIVE",
-  "checkpoint":{"id":"CP-UTILIZATION-135","state":"CONTINUE","completed":["Utilization-first policy is active.","Observed invocation at 09:40:58.959 KST followed the 09:40:53 KST target by about 5.96 seconds, demonstrating a successful low-idle wake.","Wake architecture was simplified to judge provider jitter by duty-cycle impact rather than second-perfect dispatch."],"evidence":["state/STARTUP_ACK.json@872a8ad1e82740f8126ca7321abc94054af82b74","state/WAKE_ARCHITECTURE.json@d73153a69cb8a271a2148f004cd1303ccb37b47e"],"next_action":"Continue measuring useful-work duration and inter-turn idle gap; prefer the minimal working self-update pattern and add guards only for observed authority conflicts."},
-  "continuation":{"mechanism":"SAME_MAIN_UTILIZATION_FIRST_RRULE","rrule_frequency":"HOURLY","next_due_at":"2026-09-22T09:53:00+09:00","target_useful_work_seconds":600,"minimum_continue_work_seconds":600,"provisional_due_offset_seconds":660,"final_rearm_offset_seconds":60,"cold_fallback":"SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE","scheduler_jitter_policy":"ACCEPT_IF_SINGLE_AUTHORITY_SAFE","primary_kpi":"USEFUL_WORK_DUTY_CYCLE"},
+  "checkpoint":{
+    "id":"CP-UTILIZATION-136",
+    "state":"CONTINUE",
+    "completed":[
+      "v5.6.5 FINAL-WRITER policy is active.",
+      "SAME MAIN provisional schedule was live-verified as a full recurring VEVENT with RRULE:FREQ=HOURLY and enabled=true.",
+      "Stale NOW/TURN_PLAN projections were advanced to epoch 87 so they cannot masquerade as current scheduler authority."
+    ],
+    "evidence":[
+      "control/ACTIVE_CONTROLS.json@b5a9ff165dea96bf8ddb075f43ae0a1a8054f267",
+      "control/relay-policy.v1.json@d3958c54da233a23744c04153e1c5b021ce44ae8",
+      "state/STARTUP_ACK.json@011883baec2d285e5341de84dc48a453433a9048",
+      "state/NOW.json@efafa2ea5b71f595908b7bc591f2aef7f420cc52",
+      "state/TURN_PLAN.json@0be6b6caed248c1e736be56cab7ccc9626c4131d"
+    ],
+    "next_action":"Continue the final-writer canary; at nonterminal close the last scheduler mutation must be SAME MAIN full VEVENT RRULE to observed close + exactly 1 minute (60 seconds), then durable projections copy that verified due."
+  },
+  "continuation":{
+    "mechanism":"SAME_MAIN_FINAL_WRITER_RRULE",
+    "rrule_frequency":"HOURLY",
+    "provisional_due_at":"2026-09-22T10:26:24+09:00",
+    "next_due_at":null,
+    "target_useful_work_seconds":600,
+    "minimum_continue_work_seconds":600,
+    "provisional_due_offset_seconds":660,
+    "final_rearm_offset_seconds":60,
+    "cold_fallback":"SAME_MAIN_NATURAL_HOURLY_RRULE_OCCURRENCE",
+    "scheduler_jitter_policy":"ACCEPT_IF_SINGLE_AUTHORITY_SAFE",
+    "primary_kpi":"USEFUL_WORK_DUTY_CYCLE",
+    "final_live_write_is_authoritative":true,
+    "durable_projection_drives_scheduler":false
+  },
   "safety":{"public_repo":true,"secrets_allowed":false,"reference_repo_amzsdq_R":"READ_ONLY"}
 }
