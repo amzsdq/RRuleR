@@ -1,5 +1,23 @@
 {
-  "schema_version":"1.1","program_id":"RRULER-PROGRAM-001","program_ref":"planning/PROGRAM.md","project_id":"P001","project_ref":"planning/projects/P001-SUSTAINED-UTILIZATION.md","work_spec_id":"WS-P001-002","work_spec_ref":"planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md","execution_status":"ACTIVE","pause_reason":null,
-  "resume_target":{"step":"Continue epoch 90 substantive P001 utilization work. The epoch-89 final RRULE due survived return and epoch 90 arrived 59 seconds late. Live MAIN metadata now carries bootstrap v5.7.0 STRICT ORDERED RRULE SELF-UPDATE; preserve that prompt and do not roll it back. Trace execution evidence remains durable-first while v5.7.0 requests immediate separate user-visible messages when the host exposes them. Normal CONTINUE still requires >=600 observed elapsed seconds before voluntary close.","selection_rule":"Prefer substantive work-spec advancement over scheduler/trace bookkeeping. Preserve SAME MAIN full-VEVENT RRULE final-writer semantics, preserve the fresher v5.7.0 live prompt, and never infer trace delivery from execution evidence."},
-  "turn_plan_role":"TURN_PLAN is one-turn execution detail subordinate to fresh ACTIVE_CONTROLS and this active work spec.","updated_at":"2026-09-22T11:06:49+09:00","active_runtime_revision":"MAIN_BOOTSTRAP_V5.7.0_STRICT_ORDERED_RRULE_SELF_UPDATE","operator_requested_next_due_at":null,"active_run_id":"RUN-UTIL-20260922-105812","authority_epoch":90,"verified_provisional_due_at":"2026-09-22T11:09:12+09:00","verified_next_fast_due_at":null
+  "schema_version":"1.2",
+  "program_id":"RRULER-PROGRAM-001",
+  "program_ref":"planning/PROGRAM.md",
+  "project_id":"P001",
+  "project_ref":"planning/projects/P001-SUSTAINED-UTILIZATION.md",
+  "work_spec_id":"WS-P001-002",
+  "work_spec_ref":"planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md",
+  "execution_status":"ACTIVE",
+  "pause_reason":null,
+  "resume_target":{
+    "step":"Continue P001 after epoch 93. Record successor offset from verified 12:05:25 KST due, accept harmless early/late jitter when single authority is safe, and keep +120 seconds as a canary until its continuation/authority-safety benefit outweighs the extra nominal idle minute versus +60.",
+    "selection_rule":"Prefer substantive work-spec advancement over scheduler bookkeeping. Preserve SAME MAIN full-VEVENT RRULE final-writer semantics, 600-second normal CONTINUE floor, and active +120 canary with +60 only as historical comparator."
+  },
+  "turn_plan_role":"TURN_PLAN is one-turn execution detail subordinate to fresh ACTIVE_CONTROLS and this active work spec.",
+  "updated_at":"2026-09-22T12:03:25+09:00",
+  "active_runtime_revision":"MAIN_BOOTSTRAP_V5.7.1_STRICT_ORDERED_RRULE_SELF_UPDATE_2M_FINAL_REARM",
+  "operator_requested_next_due_at":null,
+  "active_run_id":null,
+  "authority_epoch":93,
+  "verified_provisional_due_at":"2026-09-22T12:03:43+09:00",
+  "verified_next_fast_due_at":"2026-09-22T12:05:25+09:00"
 }
