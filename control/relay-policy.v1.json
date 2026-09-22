@@ -1,7 +1,7 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
-  "policy_revision": 21,
+  "policy_revision": 22,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
@@ -23,7 +23,7 @@
     "final_checkpoint_before_close": true,
     "verify_every_mutation": true,
     "fixed_quarter_cycle_active": false,
-    "note": "Use the proven minimal self-update semantics: mutate the SAME automation with a full VEVENT containing DTSTART plus RRULE:FREQ=HOURLY, keep enabled=true, and treat the last successful close-time RRULE update as the authoritative next wake. Provisional arming exists only as pre-work crash insurance. On every nonterminal close, including early BLOCKED/DEGRADED exits unless an explicit exception applies, the final live RRULE write to close + 1 minute (60 seconds) MUST occur after all other schedule writes. After that write, no same-wake control/state reconciliation may mutate schedule again; durable projections copy the live verified due rather than drive it.",
+    "note": "Production MAIN now mirrors the proven RRULE test pattern at the scheduler boundary: same automation ID, full VEVENT, RRULE:FREQ=HOURLY, enabled=true, explicit live verification, and a final write that wins. The production MAIN does NOT perform five dummy T1..T5 rewrites; those were a test harness. It adopts the test's strict mutation semantics and numbered sequencing without unnecessary schedule churn.",
     "long_provisional_780_seconds_retired": true,
     "provisional_extension_guard_seconds": 90,
     "provisional_extension_offset_seconds": 180,
@@ -39,6 +39,34 @@
       "EXPLICIT_OPERATOR_PAUSE",
       "VERIFIED_PROGRAM_COMPLETE",
       "UNSAFE_AUTHORITY_CONFLICT_WHERE_REARM_ITSELF_IS_FORBIDDEN"
+    ],
+    "strict_ordered_self_update": true,
+    "automation_id": "6ab152b636748191a71873ba4d5ef551",
+    "required_is_enabled": true,
+    "required_timing_mode": "exact_schedule",
+    "required_schedule_shape": "BEGIN:VEVENT\\nDTSTART;TZID=Asia/Seoul:<YYYYMMDDTHHMMSS>\\nRRULE:FREQ=HOURLY\\nEND:VEVENT",
+    "forbidden_update_modes": [
+      "DTSTART_ONLY_ONE_SHOT",
+      "dtstart_offset_json",
+      "NEW_AUTOMATION",
+      "DISABLE_MAIN",
+      "RRULE_REMOVAL"
+    ],
+    "execution_order": [
+      "1 FRESH_STATE",
+      "2 AUTHORITY",
+      "3 PROVISIONAL_RRULE_ARM",
+      "4 PROVISIONAL_LIVE_VERIFY",
+      "5 PROVISIONAL_CHAT_TRACE",
+      "6 SUBSTANTIVE_WORK",
+      "7 UNIT_PERSIST_AND_CHAT",
+      "8 CLOSE_PREP",
+      "9 FINAL_RRULE_WRITE",
+      "10 FINAL_LIVE_VERIFY",
+      "11 DURABLE_FOLLOWER_SYNC",
+      "12 FINAL_CHAT_TRACE",
+      "13 TELEMETRY",
+      "14 TURN_FOOTER"
     ]
   },
   "utilization": {
