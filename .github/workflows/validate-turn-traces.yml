@@ -1,0 +1,30 @@
+name: Validate durable turn traces
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "state/TURN_TRACES.json"
+      - "tools/validate_turn_traces.py"
+      - "tests/test_validate_turn_traces.py"
+      - ".github/workflows/validate-turn-traces.yml"
+  pull_request:
+    paths:
+      - "state/TURN_TRACES.json"
+      - "tools/validate_turn_traces.py"
+      - "tests/test_validate_turn_traces.py"
+      - ".github/workflows/validate-turn-traces.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate current trace ledger
+        run: python tools/validate_turn_traces.py state/TURN_TRACES.json
+      - name: Run focused trace tests
+        run: python -m unittest tests.test_validate_turn_traces -v
