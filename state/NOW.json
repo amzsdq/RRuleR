@@ -9,15 +9,15 @@
   "execution_status":"ACTIVE",
   "pause_reason":null,
   "resume_target":{
-    "step":"Continue P001 after epoch 93. Record successor offset from verified 12:05:25 KST due, accept harmless early/late jitter when single authority is safe, and keep +120 seconds as a canary until its continuation/authority-safety benefit outweighs the extra nominal idle minute versus +60.",
-    "selection_rule":"Prefer substantive work-spec advancement over scheduler bookkeeping. Preserve SAME MAIN full-VEVENT RRULE final-writer semantics, 600-second normal CONTINUE floor, and active +120 canary with +60 only as historical comparator."
+    "step":"Continue P001 after epoch 96. Six +120-second successor samples now exist; compare continuation/authority-safety benefit and total non-useful gap against the lower-idle +60 comparator while preserving safe authority acceptance under scheduler jitter.",
+    "selection_rule":"Prefer substantive work-spec advancement over scheduler bookkeeping. Preserve SAME MAIN full-VEVENT RRULE final-writer semantics, 600-second normal CONTINUE floor, and active +120 canary until evidence supports promotion or rollback."
   },
   "turn_plan_role":"TURN_PLAN is one-turn execution detail subordinate to fresh ACTIVE_CONTROLS and this active work spec.",
-  "updated_at":"2026-09-22T12:03:25+09:00",
+  "updated_at":"2026-09-22T13:07:13+09:00",
   "active_runtime_revision":"MAIN_BOOTSTRAP_V5.7.1_STRICT_ORDERED_RRULE_SELF_UPDATE_2M_FINAL_REARM",
   "operator_requested_next_due_at":null,
   "active_run_id":null,
-  "authority_epoch":93,
-  "verified_provisional_due_at":"2026-09-22T12:03:43+09:00",
-  "verified_next_fast_due_at":"2026-09-22T12:05:25+09:00"
+  "authority_epoch":96,
+  "verified_provisional_due_at":"2026-09-22T13:17:12+09:00",
+  "verified_next_fast_due_at":"2026-09-22T13:09:09+09:00"
 }
