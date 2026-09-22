@@ -1,3 +1,18 @@
 {
-  "schema_version":"1.1","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","canonical_automation_id":"6ab152b636748191a71873ba4d5ef551","status":"HANDOFF_READY","active_run_id":null,"authority_epoch":92,"substantive_work_started_at":"2026-09-22T11:37:25+09:00","last_progress_at":"2026-09-22T11:38:23+09:00","last_progress_kind":"EPOCH_92_FINAL_WRITER_CLOSE_V571_2M_CANARY","current_unit":"Recorded second direct +120-second successor sample (-121s early), advanced utilization diagnosis, and hardened jitter-safe authority decision test. Platform turn ended before the 600-second normal floor; no padding or fabricated work time.","provisional_next_wake_due_at":"2026-09-22T11:50:00+09:00","next_wake_due_at":"2026-09-22T11:40:23+09:00","successor_observed":false,"handoff_ready":true,"operator_ui_note":"Epoch 92 accepted early timing as harmless after monotonic authority claim, performed artifact-backed work, and live-verified SAME MAIN recurring final due 11:40:23 KST."
+  "schema_version":"1.2",
+  "program_id":"RRULER-PROGRAM-001",
+  "root_job_id":"RRULER-UTILIZATION-003",
+  "canonical_automation_id":"6ab152b636748191a71873ba4d5ef551",
+  "status":"HANDOFF_READY",
+  "active_run_id":null,
+  "authority_epoch":93,
+  "substantive_work_started_at":"2026-09-22T11:52:51+09:00",
+  "last_progress_at":"2026-09-22T12:03:25+09:00",
+  "last_progress_kind":"EPOCH_93_FINAL_WRITER_CLOSE_V571_2M_CANARY",
+  "current_unit":"Recorded third +120-second successor sample, repaired stale +60 P0-B goal and CI enforcement, advanced scorecard, and preserved jitter-safe authority semantics.",
+  "provisional_next_wake_due_at":"2026-09-22T12:03:43+09:00",
+  "next_wake_due_at":"2026-09-22T12:05:25+09:00",
+  "successor_observed":false,
+  "handoff_ready":true,
+  "operator_ui_note":"Epoch 93 completed a >600-second eligible turn. Final SAME MAIN recurring due is 12:05:25 KST; +120 canary now has three direct successor samples and no observed authority conflict, but no proven timing-accuracy advantage over +60."
 }
