@@ -1,16 +1,13 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
-  "current_expected_due_at": "2026-09-22T09:40:53+09:00",
-  "generation_key": "UTILIZATION-FIRST:2026-09-22T09:40:58.959194+09:00",
-  "boot_started_at": "2026-09-22T09:40:58.959194+09:00",
-  "boot_started_authority_epoch": 85,
-  "rearm_verified_at": "2026-09-22T09:50:15.680701+09:00",
-  "verified_provisional_due_at": "2026-09-22T10:05:00+09:00",
+  "generation_key": "UTILIZATION-FIRST:2026-09-22T09:54:38.999785+09:00",
+  "boot_started_at": "2026-09-22T09:54:38.999785+09:00",
+  "boot_started_authority_epoch": 86,
+  "rearm_verified_at": "2026-09-22T10:03:40.072543+09:00",
+  "verified_provisional_due_at": "2026-09-22T10:24:25+09:00",
   "status": "REARM_VERIFIED",
-  "last_updated_at": "2026-09-22T09:50:15.680701+09:00",
-  "provider_delivery_delay_seconds": 5.959194,
-  "provider_delivery_delay_human": "Observed invocation began about 5.96 seconds after the prior 09:40:53 KST target. Under utilization-first policy this harmless scheduler jitter is accepted rather than treated as failure.",
+  "last_updated_at": "2026-09-22T10:03:40.072543+09:00",
   "provisional_extension_count": 0,
-  "note": "SAME MAIN remains enabled and recurring. Provisional crash-insurance is live at 10:05:00 KST. This wake prioritizes useful-work duty cycle over second-perfect dispatch."
+  "note": "SAME MAIN is enabled and recurring. Live metadata verified canonical identity, enabled state, RRULE:FREQ=HOURLY, and DTSTART 10:24:25 KST. Exact scheduler seconds are not a P0 goal; useful-work duty cycle is."
 }
