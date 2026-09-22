@@ -1,12 +1,72 @@
 {
-  "schema_version":"2.0","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","status":"P0_WORK_TIME_AND_EXACT_REARM_ACTIVE",
-  "target":{"acceptance_window_seconds":900,"required_useful_seconds":840,"minimum_valid_completed_windows":3,"pass_rule":"THREE_CONSECUTIVE_VALID_ACCEPTED_FIXED_WINDOWS_WITH_SELECTED_ROLLING_MEAN_GTE_840","maximum_unexplained_internal_progress_gap_seconds_for_acceptance":120,"operator_locked_immediate_priorities":["P0-A: normal nonterminal turn worktime at least 10 minutes (600 observed elapsed seconds)","P0-B: SAME MAIN normal close at ACTUAL END + exactly 1 minute (60 seconds)"]},
-  "execution_envelope":{"bounded_turn_target_useful_seconds":600,"minimum_continue_turn_seconds":600,"verified_fallback_final_rearm_offset_seconds":60,"verified_fallback_final_rearm_human":"1 minute (60 seconds)","p0_max_average_non_useful_gap_seconds_for_600s_turn":42.9,"distinction":"The 10-minute (600-second) bounded execution turn is not the 15-minute (900-second) P0 acceptance window.","normal_continue_pre600_voluntary_close_forbidden":true,"long_provisional_780_seconds_retired":true,"provisional_offset_seconds":660,"provisional_offset_human":"11 minutes (660 seconds)","provisional_extension_guard_seconds":90,"provisional_extension_offset_seconds":180,"provisional_extension_offset_human":"3 minutes (180 seconds)","short_rolling_120_seconds_retired_as_default":true,"normal_midturn_schedule_mutation":false,"durable_unit_chat_trace_enabled":true,"unit_trace_requires_persisted_observed_duration_and_work_evidence":true,"progress_trace_is_never_close_authority":true},
-  "measurement":{"continuous_progress_evidence_required":true,"missing_boundary_policy":"MARK_UNKNOWN_DO_NOT_INFER","scheduler_and_startup_separate":true,"fixed_window_policy_ref":"control/rolling-window-promotion.v1.json","pending_evidence_is_not_accepted":true,"trusted_observation_horizon_ref":"state/OBSERVATION_HORIZON.json","normal_close_local_offset_must_be_measured_separately_from_provider_delivery":true},
-  "latest_completed_bounded_turn":{"run_id":"RUN-UTIL-20260922-020711","authority_epoch":81,"wall_seconds":678,"normal_floor_seconds":600,"normal_floor_passed":true,"verified_next_due_offset_seconds":60,"verified_next_due_offset_human":"1 minute (60 seconds)","classification":"P0_A_SINGLE_TURN_PASS_AND_P0_B_SINGLE_CLOSE_PASS_NOT_YET_CONSECUTIVE_GATE"},
-  "startup_measurement":{"ledger":"state/SUCCESSOR_STARTUP.json","rule":"Preserve raw historical samples; classify current generations prospectively only from observed boundaries. Invocation metadata alone is not BOOT_STARTED or first useful work."},
-  "active_retest":{"experiment_id":"UTIL-EXP-021-P0-WORKTIME-EXACT-REARM","run_id":"RUN-UTIL-20260922-030015","purpose":"Prospectively verify the operator-locked two-part P0 without broad product expansion.","success_signal":"At least 10 minutes (600 seconds) observed elapsed on a normal CONTINUE turn with chained real work, followed by SAME MAIN live-verified at ACTUAL END + exactly 1 minute (60 seconds); provider delivery/startup measured separately.","failure_signal":"Voluntary normal close before 10 minutes (600 seconds), provisional/natural-hourly due left as normal successor, any interpretation of 60 as 60 minutes, inconsistent durable due projection, or fabricated useful time.","observed_provider_delivery_delay_seconds":152,"verified_provisional_due_at":"2026-09-22T03:11:15+09:00","durable_units_completed_so_far":1},
-  "valid_completed_windows_rolling":[],"rolling_mean_observed_useful_seconds":null,"goal_reached":false,
-  "latest_diagnosis":{"cause_class":"TWO_PART_RUNTIME_P0","evidence":"Epoch 81 proved one 678-second normal turn and one exact 1-minute (60-second) SAME MAIN close. Operator identified ambiguous unitless timing as a plausible schedule interpretation defect and reprioritized sustained worktime plus reservation renewal above product breadth.","implication":"Require consecutive live evidence for both P0-A and P0-B; keep all critical human-readable time units explicit and provider delay separate."},
-  "next_corrective_experiment":{"experiment_id":"UTIL-EXP-021-P0-WORKTIME-EXACT-REARM","hypothesis":"Explicit-unit schedule semantics plus a hard 10-minute (600-second) work floor can make normal continuation behavior reproducible without adding product breadth.","success_signal":"Consecutive normal turns reproduce both sustained worktime and exact SAME MAIN ACTUAL END + 1 minute (60 seconds) close."}
+  "schema_version":"2.1",
+  "program_id":"RRULER-PROGRAM-001",
+  "root_job_id":"RRULER-UTILIZATION-003",
+  "status":"P0_FINAL_WRITER_RRULE_CANARY_ACTIVE",
+  "target":{
+    "acceptance_window_seconds":900,
+    "required_useful_seconds":840,
+    "minimum_valid_completed_windows":3,
+    "pass_rule":"THREE_CONSECUTIVE_VALID_ACCEPTED_FIXED_WINDOWS_WITH_SELECTED_ROLLING_MEAN_GTE_840",
+    "maximum_unexplained_internal_progress_gap_seconds_for_acceptance":120,
+    "operator_locked_immediate_priorities":[
+      "P0-A: normal nonterminal turn worktime at least 10 minutes (600 observed elapsed seconds)",
+      "P0-B: SAME MAIN final scheduler write uses full recurring VEVENT and targets observed close + exactly 1 minute (60 seconds)"
+    ]
+  },
+  "execution_envelope":{
+    "bounded_turn_target_useful_seconds":600,
+    "minimum_continue_turn_seconds":600,
+    "verified_fallback_final_rearm_offset_seconds":60,
+    "verified_fallback_final_rearm_human":"1 minute (60 seconds)",
+    "provisional_offset_seconds":660,
+    "provisional_offset_human":"11 minutes (660 seconds)",
+    "provisional_is_crash_insurance_only":true,
+    "final_scheduler_write_is_last_write":true,
+    "final_scheduler_write_shape":"FULL_VEVENT_WITH_DTSTART_AND_RRULE_FREQ_HOURLY",
+    "one_shot_forbidden":true,
+    "dtstart_offset_json_forbidden":true,
+    "durable_projection_drives_scheduler":false,
+    "durable_projection_follows_verified_live_due":true
+  },
+  "measurement":{
+    "continuous_progress_evidence_required":true,
+    "missing_boundary_policy":"MARK_UNKNOWN_DO_NOT_INFER",
+    "scheduler_and_startup_separate":true,
+    "fixed_window_policy_ref":"control/rolling-window-promotion.v1.json",
+    "pending_evidence_is_not_accepted":true,
+    "trusted_observation_horizon_ref":"state/OBSERVATION_HORIZON.json",
+    "normal_close_local_offset_must_be_measured_separately_from_provider_delivery":true,
+    "primary_kpi":"USEFUL_WORK_DUTY_CYCLE"
+  },
+  "latest_completed_bounded_turn":{
+    "run_id":"RUN-UTIL-20260922-020711",
+    "authority_epoch":81,
+    "wall_seconds":678,
+    "normal_floor_seconds":600,
+    "normal_floor_passed":true,
+    "verified_next_due_offset_seconds":60,
+    "verified_next_due_offset_human":"1 minute (60 seconds)",
+    "classification":"P0_A_SINGLE_TURN_PASS_AND_P0_B_SINGLE_CLOSE_PASS_NOT_YET_CONSECUTIVE_GATE"
+  },
+  "active_retest":{
+    "experiment_id":"UTIL-EXP-022-FINAL-WRITER-RRULE",
+    "run_id":"RUN-UTIL-20260922-101524",
+    "purpose":"Test whether the minimal proven same-automation full-RRULE update pattern eliminates post-close overwrite of the desired low-idle due.",
+    "success_signal":"After a nonterminal close, live metadata retains SAME MAIN enabled=true with RRULE:FREQ=HOURLY and DTSTART equal to observed close + exactly 1 minute (60 seconds), with no later same-wake schedule mutation.",
+    "failure_signal":"The 11-minute (660-second) provisional or another stale/derived due remains after close, RRULE disappears, automation is disabled/replaced, or a post-final reconciliation mutates schedule again.",
+    "verified_provisional_due_at":"2026-09-22T10:26:24+09:00"
+  },
+  "valid_completed_windows_rolling":[],
+  "rolling_mean_observed_useful_seconds":null,
+  "goal_reached":false,
+  "latest_diagnosis":{
+    "cause_class":"SCHEDULE_LAST_WRITER_CONTROL_PLANE_INTERFERENCE_CANARY",
+    "evidence":"A separate RRULE self-update test repeatedly preserves the same automation, enabled state, and recurring RRULE while moving DTSTART. MAIN used the same schedule shape but durable/control reconciliation could leave a later provisional due as final state.",
+    "implication":"Make the live close-time full-RRULE update authoritative and last; make durable state follow it rather than drive another scheduler mutation."
+  },
+  "next_corrective_experiment":{
+    "experiment_id":"UTIL-EXP-022-FINAL-WRITER-RRULE",
+    "hypothesis":"Minimal same-automation full recurring VEVENT updates plus last-writer-wins close semantics will preserve the close + 1 minute (60 seconds) due and reduce idle without new scheduler machinery."
+  }
 }
