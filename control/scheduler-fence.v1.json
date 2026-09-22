@@ -1,19 +1,19 @@
 {
   "policy_id": "RRULER_SCHEDULER_FENCE",
-  "version": 10,
+  "version": 11,
   "status": "ACTIVE",
-  "purpose": "Prevent stale schedule/canonical rollback after clean operator migration while supporting SAME MAIN completion-relative continuation.",
-  "authoritative_expected_due_path": "state/CURRENT.json#/continuation/next_due_at",
+  "purpose": "Prevent stale schedule/canonical rollback while preserving SAME MAIN completion-relative continuation and final-live-write authority.",
+  "authoritative_expected_due_path": "LIVE_SAME_MAIN_VERIFIED_SCHEDULE_FIRST; state/CURRENT.json#/continuation/next_due_at is a follower projection after final close verification",
   "active_lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
   "startup_order": [
     "READ_FRESH_CURRENT_AND_LIVE_CANONICAL",
-    "COMPARE_ACTUAL_WAKE_AND_EXPECTED_DUE",
+    "COMPARE_ACTUAL_WAKE_AND_NEWEST_VERIFIED_LIVE_DUE",
     "IF_VALID_OR_RECOVERABLE_PRESERVE_NEWEST_VERIFIED_LIVE_CONTINUATION",
     "PERSIST_GENERATION_MATCHED_BOOT_STARTED",
     "PROVISIONAL_ARM_SAME_MAIN_AND_VERIFY_BEFORE_BROAD_RESTORE_OR_SUBSTANTIVE_WORK",
     "PERSIST_GENERATION_MATCHED_REARM_VERIFIED",
     "CLASSIFY_PREDICTIVE_PREARM_IF_DECLARED",
-    "RECONCILE_CURRENT_ACTIVITY_HANDOFF_FORWARD",
+    "RECONCILE_CURRENT_ACTIVITY_HANDOFF_FORWARD_WITHOUT_SCHEDULER_WRITE",
     "CLAIM_FRESH_AUTHORITY_ONLY_IF_NONCONFLICTING",
     "CONTINUE_WORK_PROTOCOL"
   ],
@@ -25,6 +25,13 @@
   "queued_old_occurrence_must_not_restore_old_prompt_or_title": true,
   "queued_old_occurrence_must_not_roll_dstart_backward": true,
   "scheduler_mechanism": "RRULE_HOURLY_COMPLETION_RELATIVE_MAIN",
+  "final_writer": {
+    "rule": "On every nonterminal close, the last scheduler mutation of the wake is the SAME MAIN full VEVENT recurring RRULE write to observed close + exactly 1 minute (60 seconds).",
+    "post_final_scheduler_mutation_same_wake_forbidden": true,
+    "durable_projection_role": "FOLLOWER_ONLY",
+    "durable_projection_must_copy_verified_live_due": true,
+    "durable_projection_must_not_drive_post_final_scheduler_write": true
+  },
   "predictive_prearm": {
     "experiment_id": "UTIL-EXP-018",
     "declared_by": "state/PREDICTIVE_PREARM_CANARY.json",
@@ -58,13 +65,10 @@
     "local_extra_delay_without_evidence_forbidden": true,
     "scheduler_delivery_latency_measured_separately": true
   },
-  "compatibility_note": "Prior custom-recurring/exact-one-shot/predictive-prearm experiments and both earlier MAIN canonicals are historical. Current clean MAIN uses recurring hourly RRULE, arms one +660s provisional for the normal ~600s envelope, and self-shifts DTSTART to exact END+60 on normal close. Retired canonical and retired +780s horizon rollback are forbidden.",
+  "compatibility_note": "Prior custom-recurring/exact-one-shot/predictive-prearm experiments and both earlier MAIN canonicals are historical. Current clean MAIN uses recurring hourly RRULE, arms one +660s provisional for the normal ~600s envelope, and self-shifts DTSTART to exact END+60 on nonterminal close. The final live RRULE write wins; CURRENT/ACTIVITY/HANDOFF only mirror it. Retired canonical and retired +780s horizon rollback are forbidden.",
   "canonical_migration": {
     "current_main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
-    "retired_main_canonical_ids": [
-      "6ab14f7951848191b65e4b5d4bc979d8",
-      "6aaf8a993eb08191b8d0ab1d9662e4b2"
-    ],
+    "retired_main_canonical_ids": ["6ab14f7951848191b65e4b5d4bc979d8","6aaf8a993eb08191b8d0ab1d9662e4b2"],
     "retired_reactivation_forbidden": true,
     "newest_current_wins": true
   }
