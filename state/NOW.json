@@ -1,5 +1,23 @@
 {
-  "schema_version":"1.0","program_id":"RRULER-PROGRAM-001","program_ref":"planning/PROGRAM.md","project_id":"P001","project_ref":"planning/projects/P001-SUSTAINED-UTILIZATION.md","work_spec_id":"WS-P001-002","work_spec_ref":"planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md","execution_status":"ACTIVE","pause_reason":null,
-  "resume_target":{"step":"Epoch 84 closed at ACTUAL END 08:28:51 KST after exceeding the 10-minute (600-second) normal floor. SAME MAIN was live-verified at 08:29:51 KST, exactly 1 minute (60 seconds) later. The next wake must prove actual fast delivery with generation-matched BOOT_STARTED; local schedule verification alone is not a delivered-successor pass.","selection_rule":"P0-A and P0-B remain the only immediate goals. Preserve unknown time as unknown. If DUE:2026-09-22T08:29:51+09:00 bootstraps, record provider delay separately and continue. If only the natural hourly recurrence appears, classify SAME_MAIN_NATURAL_HOURLY_COLD_FALLBACK_AFTER_MISSED_FAST_SHIFT and keep the local 1-minute (60-second) close rule unchanged."},
-  "turn_plan_role":"TURN_PLAN is one-turn execution detail only and must remain subordinate to this active work spec and fresh ACTIVE_CONTROLS.","updated_at":"2026-09-22T08:28:51+09:00","active_runtime_revision":"MAIN_BOOTSTRAP_V5.6.2_P0_RUNTIME_FOCUS","operator_requested_next_due_at":null,"active_run_id":"RUN-UTIL-20260922-081839","authority_epoch":84,"verified_provisional_due_at":null,"verified_next_fast_due_at":"2026-09-22T08:29:51+09:00"
+  "schema_version":"1.1",
+  "program_id":"RRULER-PROGRAM-001",
+  "program_ref":"planning/PROGRAM.md",
+  "project_id":"P001",
+  "project_ref":"planning/projects/P001-SUSTAINED-UTILIZATION.md",
+  "work_spec_id":"WS-P001-002",
+  "work_spec_ref":"planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md",
+  "execution_status":"ACTIVE",
+  "pause_reason":null,
+  "resume_target":{
+    "step":"Run the v5.6.5 FINAL-WRITER RRULE canary. SAME MAIN is provisionally armed with a full recurring VEVENT. Continue safe useful P0 work, then on every nonterminal close make the final scheduler write observed close + exactly 1 minute (60 seconds), verify it live, and only then copy that verified due into durable projections.",
+    "selection_rule":"Prefer the proven minimal self-update path. Provisional scheduling is crash insurance only. The final successful full-VEVENT RRULE update wins; no same-wake durable reconciliation may mutate schedule afterward."
+  },
+  "turn_plan_role":"TURN_PLAN is one-turn execution detail subordinate to fresh ACTIVE_CONTROLS and this active work spec.",
+  "updated_at":"2026-09-22T10:15:24+09:00",
+  "active_runtime_revision":"MAIN_BOOTSTRAP_V5.6.5_FINAL_WRITER_RRULE",
+  "operator_requested_next_due_at":null,
+  "active_run_id":"RUN-UTIL-20260922-101524",
+  "authority_epoch":87,
+  "verified_provisional_due_at":"2026-09-22T10:26:24+09:00",
+  "verified_next_fast_due_at":null
 }
