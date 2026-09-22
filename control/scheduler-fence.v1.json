@@ -1,75 +1,10 @@
 {
-  "policy_id": "RRULER_SCHEDULER_FENCE",
-  "version": 11,
-  "status": "ACTIVE",
-  "purpose": "Prevent stale schedule/canonical rollback while preserving SAME MAIN completion-relative continuation and final-live-write authority.",
-  "authoritative_expected_due_path": "LIVE_SAME_MAIN_VERIFIED_SCHEDULE_FIRST; state/CURRENT.json#/continuation/next_due_at is a follower projection after final close verification",
-  "active_lifecycle_policy": "control/rolling-rrule-lifecycle.v1.json",
-  "startup_order": [
-    "READ_FRESH_CURRENT_AND_LIVE_CANONICAL",
-    "COMPARE_ACTUAL_WAKE_AND_NEWEST_VERIFIED_LIVE_DUE",
-    "IF_VALID_OR_RECOVERABLE_PRESERVE_NEWEST_VERIFIED_LIVE_CONTINUATION",
-    "PERSIST_GENERATION_MATCHED_BOOT_STARTED",
-    "PROVISIONAL_ARM_SAME_MAIN_AND_VERIFY_BEFORE_BROAD_RESTORE_OR_SUBSTANTIVE_WORK",
-    "PERSIST_GENERATION_MATCHED_REARM_VERIFIED",
-    "CLASSIFY_PREDICTIVE_PREARM_IF_DECLARED",
-    "RECONCILE_CURRENT_ACTIVITY_HANDOFF_FORWARD_WITHOUT_SCHEDULER_WRITE",
-    "CLAIM_FRESH_AUTHORITY_ONLY_IF_NONCONFLICTING",
-    "CONTINUE_WORK_PROTOCOL"
-  ],
-  "startup_receipt_generation_rule": "BOOT_STARTED and REARM_VERIFIED must belong to the current generation; a stale receipt cannot satisfy the current wake.",
-  "stale_wake_definition": "A wake whose occurrence belongs to an older schedule generation and conflicts with the newest verified durable/live continuation.",
-  "stale_wake_action": "RECOVER_FORWARD_NO_ROLLBACK",
-  "expected_due_tolerance_seconds": 240,
-  "queued_old_occurrence_must_not_disable_canonical": true,
-  "queued_old_occurrence_must_not_restore_old_prompt_or_title": true,
-  "queued_old_occurrence_must_not_roll_dstart_backward": true,
-  "scheduler_mechanism": "RRULE_HOURLY_COMPLETION_RELATIVE_MAIN",
-  "final_writer": {
-    "rule": "On every nonterminal close, the last scheduler mutation of the wake is the SAME MAIN full VEVENT recurring RRULE write to observed close + exactly 1 minute (60 seconds).",
-    "post_final_scheduler_mutation_same_wake_forbidden": true,
-    "durable_projection_role": "FOLLOWER_ONLY",
-    "durable_projection_must_copy_verified_live_due": true,
-    "durable_projection_must_not_drive_post_final_scheduler_write": true
-  },
-  "predictive_prearm": {
-    "experiment_id": "UTIL-EXP-018",
-    "declared_by": "state/PREDICTIVE_PREARM_CANARY.json",
-    "status": "ROLLED_BACK",
-    "rule": "Historical predictive-overlap samples remain evidence only. Predictive prearm is not an active normal-path scheduler mechanism unless a fresh experiment explicitly re-authorizes it.",
-    "fresh_predecessor_action": "DO_NOT_CLAIM_CONFLICTING_SUBSTANTIVE_AUTHORITY",
-    "takeover_rule": "Advance authority only after a fresh durable re-read proves committed close, explicit nonconflicting transfer, or applicable stale-owner recovery."
-  },
-  "expected_wake_action": "VALIDATE_FENCE_PERSIST_BOOT_REARM_THEN_CLASSIFY_NORMAL_VS_RECOVERY_BEFORE_SUBSTANTIVE_AUTHORITY",
-  "timing_defaults": {
-    "target_useful_work_seconds": 600,
-    "minimum_normal_continue_elapsed_seconds": 600,
-    "provisional_safety_margin_seconds": 60,
-    "provisional_due_offset_seconds": 660,
-    "provisional_extension_guard_seconds": 90,
-    "provisional_extension_offset_seconds": 180,
-    "routine_short_rolling_refresh": false,
-    "retired_provisional_due_offset_seconds": 780,
-    "final_rearm_offset_seconds": 60,
-    "normal_continue_due_rule": "ACTUAL_OBSERVED_TURN_END_PLUS_EXACTLY_60_SECONDS",
-    "exception_requires_durable_reason": true
-  },
-  "recovery_policy": {
-    "nonterminal_mismatch_is_blocking": false,
-    "no_op_due_to_stale_timing_forbidden": true,
-    "preserve_newest_verified_live_schedule": true,
-    "rollback_schedule_generation_forbidden": true,
-    "rollback_authority_epoch_forbidden": true,
-    "reconcile_to_newest_verified_future_wake": true,
-    "actual_platform_or_security_blockers_still_apply": true,
-    "local_extra_delay_without_evidence_forbidden": true,
-    "scheduler_delivery_latency_measured_separately": true
-  },
-  "compatibility_note": "Prior custom-recurring/exact-one-shot/predictive-prearm experiments and both earlier MAIN canonicals are historical. Current clean MAIN uses recurring hourly RRULE, arms one +660s provisional for the normal ~600s envelope, and self-shifts DTSTART to exact END+60 on nonterminal close. The final live RRULE write wins; CURRENT/ACTIVITY/HANDOFF only mirror it. Retired canonical and retired +780s horizon rollback are forbidden.",
-  "canonical_migration": {
-    "current_main_canonical_id": "6ab152b636748191a71873ba4d5ef551",
-    "retired_main_canonical_ids": ["6ab14f7951848191b65e4b5d4bc979d8","6aaf8a993eb08191b8d0ab1d9662e4b2"],
-    "retired_reactivation_forbidden": true,
-    "newest_current_wins": true
-  }
+  "policy_id":"RRULER_SCHEDULER_FENCE","version":12,"status":"ACTIVE","purpose":"Prevent stale schedule/canonical rollback while preserving SAME MAIN completion-relative continuation and final-live-write authority.",
+  "authoritative_expected_due_path":"LIVE_SAME_MAIN_VERIFIED_SCHEDULE_FIRST; durable CURRENT/ACTIVITY/HANDOFF are follower projections after final close verification","active_lifecycle_policy":"control/rolling-rrule-lifecycle.v1.json",
+  "startup_order":["READ_FRESH_CURRENT_AND_LIVE_CANONICAL","ACCEPT_EARLY_OR_LATE_JITTER_IF_SINGLE_AUTHORITY_SAFE","PERSIST_GENERATION_MATCHED_BOOT_STARTED","PROVISIONAL_ARM_SAME_MAIN_FULL_RRULE_AND_VERIFY","PERSIST_REARM_VERIFIED","RECONCILE_DURABLE_FOLLOWERS_FORWARD_WITHOUT_SCHEDULER_WRITE","CLAIM_FRESH_AUTHORITY_ONLY_IF_NONCONFLICTING","CONTINUE_WORK_PROTOCOL"],
+  "stale_wake_definition":"A wake whose schedule generation conflicts with a newer verified live continuation or whose acceptance would create duplicate substantive authority; timing offset alone is not stale authority.","stale_wake_action":"RECOVER_FORWARD_NO_ROLLBACK","expected_due_tolerance_seconds":240,"scheduler_mechanism":"RRULE_HOURLY_COMPLETION_RELATIVE_MAIN",
+  "final_writer":{"rule":"On every eligible nonterminal close, the last scheduler mutation is automation_id=6ab152b636748191a71873ba4d5ef551 with is_enabled=true, exact_schedule, and a complete VEVENT containing DTSTART=observed close+2 minutes (120 seconds) plus RRULE:FREQ=HOURLY.","post_final_scheduler_mutation_same_wake_forbidden":true,"durable_projection_role":"FOLLOWER_ONLY","durable_projection_must_copy_verified_live_due":true},
+  "timing_defaults":{"target_useful_work_seconds":600,"minimum_normal_continue_elapsed_seconds":600,"provisional_safety_margin_seconds":60,"provisional_due_offset_seconds":660,"provisional_extension_guard_seconds":90,"provisional_extension_offset_seconds":180,"routine_short_rolling_refresh":false,"final_rearm_offset_seconds":120,"normal_continue_due_rule":"ACTUAL_OBSERVED_TURN_END_PLUS_EXACTLY_120_SECONDS","exception_requires_durable_reason":true},
+  "recovery_policy":{"nonterminal_mismatch_is_blocking":false,"no_op_due_to_stale_timing_forbidden":true,"preserve_newest_verified_live_schedule":true,"rollback_schedule_generation_forbidden":true,"rollback_authority_epoch_forbidden":true,"reconcile_to_newest_verified_future_wake":true,"scheduler_delivery_latency_measured_separately":true,"jitter_only_idle_forbidden":true},
+  "canonical":{"automation_id":"6ab152b636748191a71873ba4d5ef551","is_enabled_required":true,"timing_mode_required":"exact_schedule","rrule_required":"FREQ=HOURLY","replacement_forbidden":true}
 }
