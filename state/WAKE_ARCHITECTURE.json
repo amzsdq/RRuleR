@@ -1,20 +1,54 @@
 {
-  "schema_version": "2.4",
+  "schema_version": "2.5",
   "program_id": "RRULER-PROGRAM-001",
   "status": "SAME_MAIN_SELF_RELIANT_UTILIZATION_FIRST",
   "goal": "Maximize useful-work duty cycle without paid API or always-on user PC while preserving single substantive authority and durable monotonic state.",
   "layers": [
-    {"priority":1,"id":"SAME_MAIN_FAST_SHIFT","role":"NORMAL_PRIMARY_LOW_IDLE_TARGET","target_latency":"predecessor ACTUAL END + exactly 1 minute (60 seconds) target plus provider jitter","mechanism":"Mutate SAME MAIN recurring DTSTART aggressively; judge success by useful-work duty cycle and actual wake latency, not second-perfect dispatch.","active":true,"delivery_status":"VARIABLE_PROVIDER_DELIVERY_OBSERVED","fallback":"SAME_MAIN_NATURAL_HOURLY_RRULE"},
-    {"priority":2,"id":"SAME_MAIN_NATURAL_HOURLY_RRULE","role":"BUILT_IN_COLD_FALLBACK","active":true,"watchdog_required":false},
-    {"priority":3,"id":"UTILIZATION_SAFE_AUTHORITY_GUARD","role":"ACCEPT_HARMLESS_JITTER_FENCE_REAL_OVERLAP","active":true},
-    {"priority":4,"id":"EMERGENCY_WATCHDOG","role":"DISABLED_BREAK_GLASS_STANDBY","active":false}
+    {
+      "priority": 1,
+      "id": "SAME_MAIN_FAST_SHIFT",
+      "role": "NORMAL_PRIMARY_LOW_IDLE_TARGET",
+      "target_latency": "predecessor ACTUAL END + exactly 1 minute (60 seconds) target plus provider jitter",
+      "mechanism": "At nonterminal close, perform the LAST scheduler mutation of the wake on the SAME MAIN using full VEVENT DTSTART + RRULE:FREQ=HOURLY, enabled=true. Then freeze schedule writes for the remainder of that wake; durable projections follow the verified live due.",
+      "active": true,
+      "delivery_status": "VARIABLE_PROVIDER_DELIVERY_OBSERVED",
+      "fallback": "SAME_MAIN_NATURAL_HOURLY_RRULE",
+      "final_write_wins": true
+    },
+    {
+      "priority": 2,
+      "id": "SAME_MAIN_NATURAL_HOURLY_RRULE",
+      "role": "BUILT_IN_COLD_FALLBACK",
+      "active": true,
+      "watchdog_required": false
+    },
+    {
+      "priority": 3,
+      "id": "UTILIZATION_SAFE_AUTHORITY_GUARD",
+      "role": "ACCEPT_HARMLESS_JITTER_FENCE_REAL_OVERLAP",
+      "active": true
+    },
+    {
+      "priority": 4,
+      "id": "EMERGENCY_WATCHDOG",
+      "role": "DISABLED_BREAK_GLASS_STANDBY",
+      "active": false
+    }
   ],
-  "nonnegotiable_invariants": ["GitHub main is durable source of truth","reasoning workers are disposable","authority epoch monotonic","duplicate substantive side effects forbidden","same MAIN canonical remains enabled until terminal or explicit operator stop","same MAIN recurring RRULE is cold fallback","Watchdog is disabled standby"],
+  "nonnegotiable_invariants": [
+    "GitHub main is durable source of truth",
+    "reasoning workers are disposable",
+    "authority epoch monotonic",
+    "duplicate substantive side effects forbidden",
+    "same MAIN canonical remains enabled until terminal or explicit operator stop",
+    "same MAIN recurring RRULE is cold fallback",
+    "Watchdog is disabled standby"
+  ],
   "capability_evidence": {
-    "prior_failures":"Earlier shifted wakes sometimes fell through to natural-hourly fallback; preserve as evidence but do not treat second-level dispatch as the goal.",
-    "utilization_first_wake_20260922_094058":"Observed MAIN invocation at 09:40:58.959 KST against a 09:40:53 KST target: about 5.96 seconds late. This is a successful low-idle wake for utilization purposes and directly contradicts treating all dynamic shifted occurrences as provider failures.",
-    "interpretation":"Provider behavior is variable rather than categorically incapable. Continue measuring actual idle gap/duty cycle and keep the mechanism simple when it works."
+    "prior_failures": "Earlier shifted wakes sometimes fell through to natural-hourly fallback; preserve as evidence but do not treat second-level dispatch as the goal.",
+    "utilization_first_wake_20260922_094058": "Observed MAIN invocation at 09:40:58.959 KST against a 09:40:53 KST target: about 5.96 seconds late. This is a successful low-idle wake for utilization purposes and directly contradicts treating all dynamic shifted occurrences as provider failures.",
+    "interpretation": "Provider behavior is variable rather than categorically incapable. Continue measuring actual idle gap/duty cycle and keep the mechanism simple when it works."
   },
-  "current_blocker": "Reduce inter-turn idle time while avoiding control-plane complexity that suppresses otherwise useful self-updates.",
-  "next_test": "Use the working minimal self-update pattern as baseline: same automation, aggressive next target, compact durable checkpoint, immediate useful work. Add guards only when observed duplicate/stale side effects require them."
+  "current_blocker": "Control-plane schedule writes can outlive or overwrite the desired low-idle close target.",
+  "next_test": "Mirror the proven RRULE self-update test: same automation, full VEVENT with RRULE:FREQ=HOURLY, enabled=true, and exactly one authoritative final close write. Verify that no later provisional or durable-state reconciliation overwrites that final live due."
 }
