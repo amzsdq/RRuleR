@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "adapter_id": "CHATGPT_SAME_MAIN_RRULE_SELF_UPDATE",
   "status": "SELECTED_DEFAULT",
   "replaceable": true,
@@ -11,8 +11,29 @@
     "timing_mode": "exact_schedule",
     "complete_vevent_required": true,
     "rrule": "FREQ=HOURLY",
-    "schedule_shape": "BEGIN:VEVENT\nDTSTART;TZID=Asia/Seoul:<YYYYMMDDTHHMMSS>\nRRULE:FREQ=HOURLY\nEND:VEVENT",
-    "live_verify_after_mutation": true
+    "schedule_shape": "BEGIN:VEVENT\nDTSTART;TZID=Asia/Seoul:<YYYYMMDDTHHMMSS>\nRRULE:FREQ=HOURLY\nEND:VEVENT"
+  },
+  "normal_clean_turn": {
+    "scheduler_mutations": 1,
+    "mutation_position": "AFTER_USEFUL_WORK_AND_CHECKPOINT_AT_CLOSE",
+    "lead_source": "control/runtime-defaults.v1.json",
+    "verification": "INSPECT_UPDATE_RETURN_OBJECT",
+    "required_return_state": [
+      "same automation id",
+      "expected DTSTART",
+      "RRULE:FREQ=HOURLY present",
+      "is_enabled=true"
+    ],
+    "extra_live_read": "NOT_REQUIRED_ON_CLEAN_MATCH"
+  },
+  "exception_path": {
+    "extra_live_read_when": [
+      "update return is malformed",
+      "returned state mismatches intended schedule",
+      "scheduler state is ambiguous",
+      "recovery or rollback is in progress"
+    ],
+    "additional_scheduler_mutation": "ONLY_WHEN_REQUIRED_TO_RECOVER_A_CONFIRMED_MISMATCH_OR_FAILURE"
   },
   "forbidden_while_selected": [
     "CREATE_REPLACEMENT_MAIN",
@@ -22,8 +43,7 @@
     "USE_dtstart_offset_json_FOR_NORMAL_CONTINUATION"
   ],
   "semantics": {
-    "provisional_arm": "Crash insurance only. Use the current adaptive default offset and do not treat it as the desired normal next turn.",
-    "final_rearm": "After the last useful checkpoint, set DTSTART from observed close plus the current adaptive default final offset. The final successful scheduler write wins for that invocation.",
+    "rrule_fallback": "Recurring RRULE remains present so a failed near wake does not necessarily erase the continuation path.",
     "jitter": "Scheduled timestamps are aggressive wake targets. Early or late provider dispatch alone is not a reason to idle or abandon safe work."
   },
   "replacement_rule": "This adapter is a default, not a product objective. A better supported wake mechanism may replace it after evidence-backed evaluation and rollback preparation."
