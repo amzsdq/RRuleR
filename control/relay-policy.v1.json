@@ -1,7 +1,7 @@
 {
   "policy_id": "RRULER_RELAY_POLICY",
   "version": 1,
-  "policy_revision": 22,
+  "policy_revision": 23,
   "status": "ACTIVE",
   "source_of_truth": "GITHUB_DURABLE_STATE",
   "scheduler": {
@@ -23,7 +23,7 @@
     "final_checkpoint_before_close": true,
     "verify_every_mutation": true,
     "fixed_quarter_cycle_active": false,
-    "note": "Production MAIN now mirrors the proven RRULE test pattern at the scheduler boundary: same automation ID, full VEVENT, RRULE:FREQ=HOURLY, enabled=true, explicit live verification, and a final write that wins. The production MAIN does NOT perform five dummy T1..T5 rewrites; those were a test harness. It adopts the test's strict mutation semantics and numbered sequencing without unnecessary schedule churn.",
+    "note": "Use the proven minimal self-update semantics. Early/late provider jitter alone is never a reason to idle or return without work. On every eligible nonterminal close, the final live SAME-MAIN full recurring VEVENT write targets observed close + exactly 2 minutes (120 seconds), then live-verify and let durable projections follow.",
     "long_provisional_780_seconds_retired": true,
     "provisional_extension_guard_seconds": 90,
     "provisional_extension_offset_seconds": 180,
@@ -67,7 +67,10 @@
       "12 FINAL_CHAT_TRACE",
       "13 TELEMETRY",
       "14 TURN_FOOTER"
-    ]
+    ],
+    "final_rearm_offset_seconds": 120,
+    "final_rearm_offset_human": "2 minutes (120 seconds)",
+    "scheduler_jitter_policy": "START_WORK_ON_EARLY_OR_LATE_WAKE_UNLESS_GENUINE_DUPLICATE_AUTHORITY_STALE_ROLLBACK_OR_DESTRUCTIVE_OVERLAP"
   },
   "utilization": {
     "first_class_objective": true,
