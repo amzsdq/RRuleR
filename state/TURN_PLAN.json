@@ -1,40 +1,6 @@
 {
-  "schema_version":"1.4",
-  "program_id":"RRULER-PROGRAM-001",
-  "root_job_id":"RRULER-UTILIZATION-003",
-  "authority_epoch":89,
-  "run_id":"RUN-UTIL-20260922-105419",
-  "status":"ACTIVE",
-  "phase":"P0_FINAL_WRITER_RRULE_AND_TRACE_CANARY",
-  "objective_id":"WS-P001-002-P0-RUNTIME-FOCUS",
-  "objective":"Validate minimal SAME-MAIN full recurring VEVENT self-update, final-writer close semantics, and user-visible bounded-unit trace observability as separate evidence surfaces.",
-  "expected_useful_seconds":600,
-  "acceptance_criteria":[
-    "Every scheduler mutation uses the SAME MAIN canonical with full VEVENT DTSTART plus RRULE:FREQ=HOURLY and enabled=true.",
-    "The provisional 11-minute (660-second) write is crash insurance only and is superseded on every nonterminal close.",
-    "The final close-time RRULE update is the last scheduler mutation of the wake and survives live metadata reread.",
-    "CURRENT/ACTIVITY/HANDOFF follow the verified live final due; none may push an older provisional/stale due back to the scheduler.",
-    "Durably completed bounded units produce the required compact user-visible completion trace; missing trace is classified as observability failure rather than execution failure.",
-    "No new automation, one-shot conversion, dtstart_offset_json, or retired-canonical reactivation occurs."
-  ],
-  "checkpointable_substeps":[
-    "Record and verify provisional full-VEVENT RRULE arm.",
-    "Advance stale active projections to current authority epoch without using them to drive scheduler.",
-    "Record provider delivery offset separately from local schedule mutation correctness.",
-    "Validate user-visible trace path against durable bounded-unit evidence.",
-    "At nonterminal close, perform final SAME MAIN full-VEVENT RRULE write to observed close + exactly 1 minute (60 seconds), live-verify, then copy due to durable projections without later schedule mutation."
-  ],
-  "current_substep":4,
-  "early_finish_fallback":"Continue removing stale projection semantics and redundant schedule-control assumptions while preserving minimal live RRULE path and trace evidence.",
-  "handoff_boundary":"FINAL_LIVE_RRULE_WRITE_MUST_BE_LAST_SCHEDULE_MUTATION_OF_WAKE",
-  "created_for_next_wake":false,
-  "expected_wake_at":"2026-09-22T10:54:19+09:00",
-  "progress_evidence":[
-    "state/STARTUP_ACK.json@8e61af54b6ece6c87308686c22d9d059a81bf211",
-    "state/CURRENT.json@3c51eae755eee5d78078ade04b6dae5f6e3cd781",
-    "state/ACTIVITY.json@9c3c3af1ac79c218189cb88048d9002e690af9c6",
-    "state/HANDOFF.json@46b4494a51d2a510070b71a2d58ab5f92b0c2476",
-    "state/SCHEDULER_OBSERVATIONS.json@d9c5018cea8b24a3a4b79726791ddb4dcf8855ab",
-    "state/NOW.json@4c6b9c782b4d8cac1bf47553f01a96f365b18440"
-  ]
+  "schema_version":"1.4","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","authority_epoch":90,"run_id":"RUN-UTIL-20260922-105812","status":"ACTIVE","phase":"P0_SUBSTANTIVE_UTILIZATION_AND_TRACE_OBSERVABILITY","objective_id":"WS-P001-002-P0-RUNTIME-FOCUS","objective":"Stop conflating scheduler/UI observability with work execution: preserve the proven final-writer RRULE path, harden durable trace evidence, and spend the remaining bounded turn on substantive P001 utilization corrections rather than scheduler churn.","expected_useful_seconds":600,
+  "acceptance_criteria":["Every scheduler mutation uses SAME MAIN full VEVENT DTSTART + RRULE:FREQ=HOURLY with enabled=true.","Epoch-89 final due survival is recorded separately from provider jitter.","Qualifying bounded-unit traces are durably captured before any delivery claim and undelivered traces are final-flush eligible.","Normal CONTINUE does not voluntarily close before 600 observed elapsed seconds.","No scheduler-only or trace-bookkeeping interval is promoted as useful work."],
+  "checkpointable_substeps":["Record epoch-90 startup and provisional rearm.","Correct trace observability contract and add durable trace ledger.","Record final-writer successor delivery sample without changing scheduler mechanism.","Continue substantive P001 correction/evidence work until the 600-second floor or a truthful exception.","At close, make SAME MAIN ACTUAL END + exactly 1 minute (60 seconds) the final scheduler mutation, then mirror it durably."],
+  "current_substep":4,"early_finish_fallback":"Audit and remove stale semantics that cause scheduler/trace bookkeeping to masquerade as useful work, without weakening safety or the 600-second floor.","handoff_boundary":"FINAL_LIVE_RRULE_WRITE_MUST_BE_LAST_SCHEDULE_MUTATION_OF_WAKE","created_for_next_wake":false,"expected_wake_at":"2026-09-22T10:58:12+09:00","progress_evidence":["state/STARTUP_ACK.json@01cab4359a2728efbefce79263239540b584ed14","AGENTS.md@f2f8cbb2db13e4617a8b21ad82afecb2547beaee","state/P0_SCORECARD.json@7641c18f504dbed54566e177d5915e71a0a18da8","planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md@29c3e94b20f90a7f0a52872bbf58a83e991f844c","state/TURN_TRACES.json@856ba6bb3868b46a054014d880093eddb5911630","state/SCHEDULER_OBSERVATIONS.json@af3934f673ec6b413f604b148aed76ee131dcdcf"]
 }
