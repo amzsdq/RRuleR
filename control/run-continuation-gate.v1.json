@@ -1,142 +1,15 @@
 {
-  "policy_id": "RRULER_RUN_CONTINUATION_GATE",
-  "version": 14,
-  "status": "ACTIVE",
-  "purpose": "Allow normal CONTINUE close only after the current operator-created SAME MAIN recurring schedule is live-verified at ACTUAL END + exactly 1 minute (60 seconds). Watchdog is not normal continuity.",
-  "program_nonterminal_states": [
-    "CONTINUE",
-    "DEGRADED_CONTINUATION"
-  ],
-  "default_for_nonterminal_owner": "MUST_CONTINUE_USEFUL_WORK",
-  "run_end_allowed_only_for": [
-    "VERIFIED_SAME_CANONICAL_CONTINUATION",
-    "COMMITTED_SUCCESSOR_HANDOFF",
-    "EXPLICIT_OPERATOR_STOP",
-    "PLATFORM_ENFORCED_TERMINATION"
-  ],
-  "program_end_allowed_only_for": [
-    "PROGRAM_COMPLETE",
-    "BLOCKED_EXTERNAL",
-    "EXPLICIT_OPERATOR_STOP"
-  ],
-  "never_end_because": [
-    "WORK_PACKET_COMPLETE",
-    "PRIMARY_OBJECTIVE_COMPLETE",
-    "CHECKPOINT_COMPLETE",
-    "DOCUMENT_COMPLETE",
-    "CI_PASS",
-    "MILESTONE_COMPLETE",
-    "ROOT_COMPLETE",
-    "PLAN_COMPLETE",
-    "NO_OBVIOUS_NEXT_TASK",
-    "WAITING_FOR_NEXT_WAKE",
-    "SCHEDULE_BOUNDARY",
-    "USER_VISIBLE_PROGRESS_TRACE_EMITTED"
-  ],
-  "bounded_turn_close_rule": {
-    "required_before_verified_continuation_end": [
-      "NORMAL_CONTINUE_MINIMUM_600S_REACHED_OR_NONCONTINUE_STOP_PAUSE_TERMINAL_BLOCKED_OR_PLATFORM_TERMINATION",
-      "LATEST_CHECKPOINT_PERSISTED",
-      "ACTUAL_END_OBSERVED",
-      "SAME_MAIN_MUTATED_TO_ACTUAL_END_PLUS_EXACTLY_1_MINUTE_60_SECONDS",
-      "LIVE_MAIN_REREAD_PROVES_SAME_CANONICAL_ENABLED_RECURRING_EXACT_DSTART",
-      "DURABLE_EXPECTED_FAST_DUE_PERSISTED",
-      "NON_WORKING_CURRENT_ACTIVITY_HANDOFF_PROJECTION_VALIDATED",
-      "TURN_STATUS_AND_RUN_EVIDENCE_PERSISTED"
-    ],
-    "local_success_alone_never_satisfies_rule": true,
-    "future_wake_without_same_canonical_verification_never_satisfies_rule": true,
-    "provisional_continuation_never_satisfies_normal_close": true,
-    "watchdog_coverage_never_satisfies_normal_close": true
-  },
-  "nonterminal_no_handoff_rule": {
-    "final_response": "FORBIDDEN",
-    "run_end": "FORBIDDEN",
-    "required_action": "SELECT_AND_EXECUTE_NEXT_USEFUL_ADMISSIBLE_UNIT"
-  },
-  "nonterminal_verified_continuation_rule": {
-    "final_response": "ALLOWED_AFTER_BOUNDED_TURN_CLOSE_ONLY",
-    "run_end": "ALLOWED_AFTER_BOUNDED_TURN_CLOSE_ONLY",
-    "required_action": "RETURN_WITH_CONTINUE_STATUS_AND_PRESERVE_CANONICAL"
-  },
-  "nonterminal_committed_handoff_rule": {
-    "final_response": "ALLOWED_FOR_PREDECESSOR_ONLY",
-    "run_end": "ALLOWED_FOR_PREDECESSOR_ONLY",
-    "required_action": "RELINQUISH_OLD_AUTHORITY"
-  },
-  "enforcement": {
-    "durable_end_record_requires_end_reason": true,
-    "nonterminal_end_without_allowlisted_reason_is_incident": "EARLY_VOLUNTARY_RUN_END",
-    "normal_completion_prose_is_not_authority_to_end": true,
-    "platform_forced_run_end_recovers_on_next_wake": true,
-    "canonical_disable_requires_program_terminal_or_explicit_operator_stop": true,
-    "final_without_fresh_pre_final_authorization_is_incident": "EARLY_VOLUNTARY_FINAL_RESPONSE",
-    "waiting_for_cold_rescue_is_not_valid_end_reason": true,
-    "future_wake_exists_does_not_authorize_current_owner_to_end": true,
-    "verified_same_canonical_continuation_authorizes_only_bounded_turn_end_not_program_end": true,
-    "normal_continue_final_requires_exact_fast_main": true,
-    "provisional_due_left_after_close_is_incident": "NORMAL_CLOSE_LEFT_PROVISIONAL_DUE",
-    "watchdog_as_expected_successor_is_incident": "NORMAL_PATH_DEPENDED_ON_WATCHDOG",
-    "normal_path_depends_on_watchdog_forbidden": true,
-    "retired_predecessor_reactivation_forbidden": true,
-    "progress_trace_never_authorizes_close": true,
-    "unit_completion_trace_requires_durable_duration_and_work_evidence": true
-  },
-  "final_response_is_authoritative_side_effect": true,
-  "pre_final_authorization": {
-    "required": true,
-    "source_of_truth": [
-      "state/CURRENT.json",
-      "state/HANDOFF.json",
-      "control/run-continuation-gate.v1.json",
-      "state/NOW.json"
-    ],
-    "check_immediately_before_user_visible_final": true,
-    "authorization_rule": "Honor operator pause and terminal states first. For normal CONTINUE, final is authorized only after the fresh CURRENT MAIN canonical is live-verified enabled with recurrence at ACTUAL END + exactly 1 minute (60 seconds) and the non-WORKING close projection is consistent. This means sixty seconds after observed END, never 60 minutes or the next hourly RRULE occurrence. A retired predecessor canonical can never satisfy the gate.",
-    "if_denied": "DO_NOT_EMIT_FINAL_CONTINUE_USEFUL_WORK",
-    "stale_prior_check_forbidden": true,
-    "normal_status_report_does_not_authorize_final": true
-  },
-  "turn_decision": {
-    "target_elapsed_seconds": 600,
-    "short_turn_threshold_seconds": 600,
-    "clock": "Observed authorized work start through close; elapsed is NOT useful-work duration. Capture wake time separately; startup must not reset the platform safety budget.",
-    "order": [
-      "Honor operator pause/STOP before work and scheduler mutation.",
-      "After each completed bounded unit, choose the next primary, independent fallback, then smallest authorized runnable unit.",
-      "After each bounded substantive unit completes, persist its observed START/END/DURATION and artifact-backed work evidence, emit exactly one compact completion trace, then continue same-wake selection; the trace never authorizes close.",
-      "If elapsed <10 minutes (600 seconds) and a clear low-risk checkpointable unit fits the remaining platform safety budget, execute it in the same turn.",
-      "If elapsed <10 minutes (600 seconds) and the obvious next unit is too large, decompose it and execute a smaller safe slice when possible.",
-      "A normal nonterminal STATUS=CONTINUE voluntary close before 10 minutes (600 seconds) is forbidden. CI pending, local packet/substep/checkpoint completion, secured continuation, or no-obvious-next-task are not close reasons.",
-      "If an earlier end is unavoidable, it must be explicit operator STOP/PAUSE, durable program terminal, genuine BLOCKED/fail-closed authority or safety state with no safe authorized work, or platform-enforced termination; record the corresponding status/reason instead of normal CONTINUE.",
-      "At elapsed >=10 minutes (600 seconds), do not start a new large unit; finish only the smallest safe in-flight unit.",
-      "Aim to close by about 12 minutes (720 seconds); exceeding that soft ceiling requires an actual in-flight safety/atomicity reason.",
-      "Checkpoint, observe actual END, live-verify the fresh CURRENT SAME MAIN recurring schedule at ACTUAL END + exactly 1 minute (60 seconds) with enabled=true and exact DTSTART, persist the exact fast due and non-WORKING handoff projection, then report."
-    ],
-    "close_reserve_rule": "Use measured close cost only to avoid overrunning the platform safety budget after the 10-minute (600-second) minimum. Close reserve never authorizes a voluntary normal CONTINUE close before 10 minutes (600 seconds). Never pad.",
-    "normal_close_evidence": [
-      "close_decision",
-      "proof that normal CONTINUE elapsed reached at least 600 seconds",
-      "corresponding STOP/PAUSE/terminal/BLOCKED/platform evidence for any earlier non-normal end",
-      "soft_ceiling_exception_reason when closing above 720 seconds"
-    ],
-    "pause_rule": "state/NOW.json execution_status=PAUSED forbids new work and self-rearm; checkpoint only and report PAUSED.",
-    "normal_soft_ceiling_seconds": 720,
-    "work_unit_chaining": {
-      "before_target": "Before 10 minutes (600 elapsed seconds), continue authorized work by selecting the next clear low-risk checkpointable unit, independent fallback, residual unit, or smaller decomposed slice. Voluntary normal CONTINUE close is forbidden.",
-      "decompose_if_needed": "If the obvious next unit is too large or risky, select a smaller safe slice with an explicit checkpoint.",
-      "after_target": "At or after 10 minutes (600 elapsed seconds), do not start a new large unit; finish only the smallest safe in-flight unit, checkpoint, verify continuation, and close.",
-      "soft_ceiling": "Normal operation should close by about 12 minutes (720 elapsed seconds). Exceed only for a genuine in-flight atomicity/safety reason.",
-      "chat_trace": "A completed bounded unit gets one user-visible trace only after durable duration/work evidence exists; then same-wake work selection continues. Progress chat is not a task boundary or close signal."
-    },
-    "normal_continue_minimum_elapsed_seconds": 600,
-    "pre_600_voluntary_continue_close_forbidden": true
-  },
-  "time_unit_safety": {
-    "required": true,
-    "normal_close_offset": "1 minute (60 seconds)",
-    "minimum_continue": "10 minutes (600 seconds)",
-    "soft_ceiling": "12 minutes (720 seconds)",
-    "rule": "Bare numeric timing arithmetic without an explicit seconds/minutes/hours unit is forbidden in human-readable policy text."
-  }
+  "policy_id":"RRULER_RUN_CONTINUATION_GATE","version":15,"status":"ACTIVE","purpose":"Allow normal CONTINUE close only after the SAME MAIN recurring schedule is live-verified at ACTUAL END + exactly 2 minutes (120 seconds). Timing jitter alone never suppresses safe work.",
+  "program_nonterminal_states":["CONTINUE","DEGRADED_CONTINUATION"],"default_for_nonterminal_owner":"MUST_CONTINUE_USEFUL_WORK",
+  "run_end_allowed_only_for":["VERIFIED_SAME_CANONICAL_CONTINUATION","COMMITTED_SUCCESSOR_HANDOFF","EXPLICIT_OPERATOR_STOP","PLATFORM_ENFORCED_TERMINATION"],
+  "program_end_allowed_only_for":["PROGRAM_COMPLETE","BLOCKED_EXTERNAL","EXPLICIT_OPERATOR_STOP"],
+  "never_end_because":["WORK_PACKET_COMPLETE","CHECKPOINT_COMPLETE","CI_PASS","MILESTONE_COMPLETE","ROOT_COMPLETE","NO_OBVIOUS_NEXT_TASK","WAITING_FOR_NEXT_WAKE","SCHEDULE_BOUNDARY","USER_VISIBLE_PROGRESS_TRACE_EMITTED","EARLY_OR_LATE_SCHEDULER_TIMING_ALONE"],
+  "bounded_turn_close_rule":{"required_before_verified_continuation_end":["NORMAL_CONTINUE_MINIMUM_600S_REACHED_OR_NONCONTINUE_EXCEPTION","LATEST_CHECKPOINT_PERSISTED","ACTUAL_END_OBSERVED","SAME_MAIN_MUTATED_WITH_COMPLETE_VEVENT_TO_ACTUAL_END_PLUS_EXACTLY_2_MINUTES_120_SECONDS","LIVE_MAIN_REREAD_PROVES_AUTOMATION_ID_6ab152b636748191a71873ba4d5ef551_ENABLED_TRUE_EXACT_SCHEDULE_RRULE_FREQ_HOURLY_EXACT_DSTART","DURABLE_EXPECTED_FAST_DUE_PERSISTED","NON_WORKING_CURRENT_ACTIVITY_HANDOFF_PROJECTION_VALIDATED"],"provisional_continuation_never_satisfies_normal_close":true,"watchdog_coverage_never_satisfies_normal_close":true},
+  "nonterminal_no_handoff_rule":{"final_response":"FORBIDDEN","run_end":"FORBIDDEN","required_action":"SELECT_AND_EXECUTE_NEXT_USEFUL_ADMISSIBLE_UNIT"},
+  "nonterminal_verified_continuation_rule":{"final_response":"ALLOWED_AFTER_BOUNDED_TURN_CLOSE_ONLY","run_end":"ALLOWED_AFTER_BOUNDED_TURN_CLOSE_ONLY","required_action":"RETURN_WITH_CONTINUE_STATUS_AND_PRESERVE_CANONICAL"},
+  "enforcement":{"canonical_disable_requires_program_terminal_or_explicit_operator_stop":true,"verified_same_canonical_continuation_authorizes_only_bounded_turn_end_not_program_end":true,"normal_continue_final_requires_exact_fast_main":true,"provisional_due_left_after_close_is_incident":"NORMAL_CLOSE_LEFT_PROVISIONAL_DUE","normal_path_depends_on_watchdog_forbidden":true,"progress_trace_never_authorizes_close":true,"scheduler_jitter_alone_never_authorizes_idle_or_close":true},
+  "final_response_is_authoritative_side_effect":true,
+  "pre_final_authorization":{"required":true,"source_of_truth":["state/CURRENT.json","state/HANDOFF.json","control/run-continuation-gate.v1.json","state/NOW.json"],"check_immediately_before_user_visible_final":true,"authorization_rule":"For normal CONTINUE, final is authorized only after automation_id=6ab152b636748191a71873ba4d5ef551 is live-verified is_enabled=true, timing_mode=exact_schedule, full VEVENT recurrence contains RRULE:FREQ=HOURLY, and DTSTART equals ACTUAL END + exactly 2 minutes (120 seconds).","if_denied":"DO_NOT_EMIT_FINAL_CONTINUE_USEFUL_WORK"},
+  "turn_decision":{"target_elapsed_seconds":600,"short_turn_threshold_seconds":600,"normal_soft_ceiling_seconds":720,"normal_continue_minimum_elapsed_seconds":600,"pre_600_voluntary_continue_close_forbidden":true,"jitter_rule":"If invocation is early or late but single authority is safe, start/continue useful work immediately. Clock mismatch is not a BLOCKED condition.","order":["Honor explicit STOP/PAUSE/terminal first.","Claim single authority monotonically.","Before 600 observed elapsed seconds, chain safe useful checkpointable work; decompose oversized units.","At or after 600 seconds, finish only the smallest safe in-flight unit.","Checkpoint, observe ACTUAL END, write SAME MAIN full recurring VEVENT to END+120 seconds, live-verify exact identity/enabled/RRULE/DTSTART, sync durable followers, then report."]},
+  "time_unit_safety":{"required":true,"normal_close_offset":"2 minutes (120 seconds)","minimum_continue":"10 minutes (600 seconds)","soft_ceiling":"12 minutes (720 seconds)"}
 }
