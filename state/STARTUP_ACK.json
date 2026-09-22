@@ -3,14 +3,14 @@
   "main_canonical_id":"6ab152b636748191a71873ba4d5ef551",
   "current_expected_due_at":"2026-09-22T08:29:51+09:00",
   "generation_key":"DUE:2026-09-22T08:29:51+09:00",
-  "boot_started_at":"2026-09-22T08:28:42+09:00",
+  "boot_started_at":"2026-09-22T09:29:53+09:00",
   "boot_started_authority_epoch":"DUE:2026-09-22T08:29:51+09:00",
-  "rearm_verified_at":"2026-09-22T08:28:44+09:00",
-  "verified_provisional_due_at":"2026-09-22T08:39:42+09:00",
-  "status":"REARM_VERIFIED",
-  "last_updated_at":"2026-09-22T08:28:44+09:00",
-  "provider_delivery_delay_seconds":null,
-  "provider_delivery_delay_human":"Invocation began 1 minute 9 seconds (69 seconds) BEFORE the previously verified 08:29:51 KST fast due, so this invocation is not valid evidence that the 1-minute (60-second) fast successor was delivered. Treat delivery result as UNKNOWN/PREMATURE_INVOCATION and do not count it as P0-B PASS.",
+  "rearm_verified_at":null,
+  "verified_provisional_due_at":null,
+  "status":"BOOT_STARTED",
+  "last_updated_at":"2026-09-22T09:29:53+09:00",
+  "provider_delivery_delay_seconds":3602,
+  "provider_delivery_delay_human":"Observed eligible bootstrap began 1 hour 0 minutes 2 seconds (3602 seconds) after the still-pending verified 08:29:51 KST fast due. This is natural-hourly cold-fallback recovery after the shifted fast occurrence failed to produce a durable eligible bootstrap; it is not a P0-B fast-successor pass.",
   "provisional_extension_count":0,
-  "note":"SAME MAIN recurring provisional live-verified at observed wake/arm reference + exactly 11 minutes (660 seconds). This run started before the expected fast due; local schedule verification and provider delivery remain separate evidence domains."
+  "note":"PREMATURE_INVOCATION at 08:28:42 KST was fenced. The next eligible invocation arrived at 09:29:53 KST, 3602 seconds after the intended fast due, proving the fast shifted occurrence still did not deliver an eligible work wake."
 }
