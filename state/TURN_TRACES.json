@@ -1,0 +1,34 @@
+{
+  "schema_version":"1.0",
+  "program_id":"RRULER-PROGRAM-001",
+  "purpose":"Durable ordered ledger for operator-visible schedule and bounded-unit traces. Execution evidence and host UI delivery are separate states.",
+  "rules":{
+    "durable_before_delivery":true,
+    "trace_is_never_close_authority":true,
+    "unit_trace_requires_artifact_backed_work_evidence":true,
+    "intermediate_delivery_may_be_unavailable":true,
+    "final_flush_required_for_undelivered_traces":true,
+    "delivery_must_not_be_inferred":true
+  },
+  "delivery_states":["TRACE_DURABLY_RECORDED","TRACE_INTERMEDIATE_DELIVERED","TRACE_FINAL_FLUSH_DELIVERED"],
+  "active_run_id":"RUN-UTIL-20260922-105812",
+  "authority_epoch":90,
+  "traces":[
+    {
+      "trace_id":"TRACE-E90-SCHEDULE-001",
+      "kind":"PROVISIONAL_REARM",
+      "created_at":"2026-09-22T10:58:20+09:00",
+      "message":"예약을 11분 뒤인 11:09:12 KST로 갱신했습니다.",
+      "delivery_state":"TRACE_DURABLY_RECORDED",
+      "evidence":["state/STARTUP_ACK.json@01cab4359a2728efbefce79263239540b584ed14"]
+    },
+    {
+      "trace_id":"TRACE-E90-UNIT-001",
+      "kind":"BOUNDED_SUBSTANTIVE_UNIT",
+      "created_at":"2026-09-22T10:59:45+09:00",
+      "message":"완료: scheduled-runtime trace observability를 durable-first + final-flush 방식으로 교정하고 AGENTS/work-spec/P0 scorecard를 동기화했습니다.",
+      "delivery_state":"TRACE_DURABLY_RECORDED",
+      "evidence":["AGENTS.md@f2f8cbb2db13e4617a8b21ad82afecb2547beaee","planning/work-specs/WS-P001-002-SUSTAINED-TURN-UTILIZATION.md@29c3e94b20f90a7f0a52872bbf58a83e991f844c","state/P0_SCORECARD.json@7641c18f504dbed54566e177d5915e71a0a18da8"]
+    }
+  ]
+}
