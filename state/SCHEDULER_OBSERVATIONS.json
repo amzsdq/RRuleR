@@ -1,8 +1,8 @@
 {
-  "schema_version":"1.8",
-  "program_id":"RRULER-PROGRAM-001",
-  "purpose":"Keep scheduler/provider delivery jitter separate from reasoning-worker utilization and from the local normal-close offset so P0 diagnosis does not blame the wrong layer.",
-  "observations":[
+  "schema_version": "1.9",
+  "program_id": "RRULER-PROGRAM-001",
+  "purpose": "Keep scheduler/provider delivery jitter separate from reasoning-worker utilization and from the local normal-close offset so P0 diagnosis does not blame the wrong layer.",
+  "observations": [
     {"expected_due_at":"2026-09-21T00:45:00+09:00","observed_at":"2026-09-21T00:46:08+09:00","delivery_offset_seconds":68,"source":"durable handoff successor_observed_at"},
     {"expected_due_at":"2026-09-21T01:00:00+09:00","observed_at":"2026-09-21T00:59:19+09:00","delivery_offset_seconds":-41,"source":"automation run context and durable successor observation"},
     {"authority_epoch":83,"expected_due_at":"2026-09-22T07:07:30+09:00","observed_at":"2026-09-22T07:09:13+09:00","delivery_offset_seconds":103,"human_offset":"1 minute 43 seconds (103 seconds) late","source":"automation run context plus generation-matched BOOT_STARTED"},
@@ -12,9 +12,25 @@
     {"authority_epoch":89,"expected_due_at":"2026-09-22T10:51:40+09:00","observed_at":"2026-09-22T10:54:19+09:00","delivery_offset_seconds":159,"human_offset":"2 minutes 39 seconds (159 seconds) late","generation_class":"SHIFTED_RECURRING_RRULE_DELIVERED_LATE_BUT_ELIGIBLE","normal_fast_delivery_sample":false,"authority_allowed":true},
     {"authority_epoch":90,"expected_due_at":"2026-09-22T10:57:13+09:00","observed_at":"2026-09-22T10:58:12+09:00","delivery_offset_seconds":59,"human_offset":"59 seconds late","generation_class":"FINAL_WRITER_SHIFTED_RRULE_DELIVERED_LATE_BUT_ELIGIBLE","normal_fast_delivery_sample":true,"authority_allowed":true,"local_final_rearm_offset_seconds":60},
     {"authority_epoch":91,"expected_due_at":"2026-09-22T11:10:23+09:00","observed_at":"2026-09-22T11:12:49+09:00","delivery_offset_seconds":146,"human_offset":"2 minutes 26 seconds (146 seconds) late","generation_class":"FINAL_WRITER_2M_SHIFTED_RRULE_DELIVERED_LATE_BUT_ELIGIBLE","normal_fast_delivery_sample":true,"authority_allowed":true,"local_final_rearm_offset_seconds":120},
-    {"authority_epoch":92,"expected_due_at":"2026-09-22T11:39:00+09:00","observed_at":"2026-09-22T11:36:59+09:00","delivery_offset_seconds":-121,"human_offset":"2 minutes 1 second (121 seconds) early","generation_class":"FINAL_WRITER_2M_SHIFTED_RRULE_DELIVERED_EARLY_BUT_ELIGIBLE","source":"epoch 91 successor close plus automation turn 5 observed invocation","normal_fast_delivery_sample":true,"authority_allowed":true,"local_final_rearm_offset_seconds":120,"interpretation":"Second direct +120-second canary successor sample. Unlike historical epoch 85 behavior, timing mismatch alone is not fenced; epoch 92 claimed fresh monotonic authority and continued useful work."}
+    {"authority_epoch":92,"expected_due_at":"2026-09-22T11:39:00+09:00","observed_at":"2026-09-22T11:36:59+09:00","delivery_offset_seconds":-121,"human_offset":"2 minutes 1 second (121 seconds) early","generation_class":"FINAL_WRITER_2M_SHIFTED_RRULE_DELIVERED_EARLY_BUT_ELIGIBLE","source":"epoch 91 successor close plus automation turn 5 observed invocation","normal_fast_delivery_sample":true,"authority_allowed":true,"local_final_rearm_offset_seconds":120,"interpretation":"Timing mismatch alone was not fenced; epoch 92 claimed fresh monotonic authority and continued useful work."},
+    {"authority_epoch":93,"expected_due_at":"2026-09-22T11:51:57+09:00","observed_at":"2026-09-22T11:52:43+09:00","delivery_offset_seconds":46,"human_offset":"46 seconds late","generation_class":"FINAL_WRITER_2M_SHIFTED_RRULE_DELIVERED_LATE_BUT_ELIGIBLE","source":"automation turn 7 run context plus generation-matched BOOT_STARTED","normal_fast_delivery_sample":true,"authority_allowed":true,"local_final_rearm_offset_seconds":120,"interpretation":"Third direct +120-second successor sample. SAME MAIN continuation delivered without authority conflict; timing jitter did not suppress work."}
   ],
-  "derived":{"sample_count":10,"normal_fast_comparable_sample_count":4,"cold_fallback_sample_count":2,"premature_invocation_sample_count":1,"shifted_rrule_eligible_late_sample_count":3,"shifted_rrule_eligible_early_sample_count":1,"min_offset_seconds":-121,"max_offset_seconds":3602,"range_seconds":3723,"absolute_offset_max_seconds":3602,"latest_60s_final_rearm_delivery_offset_seconds":59,"latest_120s_final_rearm_delivery_offsets_seconds":[146,-121]},
-  "interpretation":"Provider timing remains variable in both directions. The first two direct +120-second samples are +146 seconds late and -121 seconds early. Both can remain eligible when single authority is safe; timing mismatch alone must not suppress useful work. Two samples are insufficient to claim +120 seconds is more stable than +60 seconds.",
-  "next_action":"Continue >=600-second substantive turns and collect at least one more +120 successor sample before a stability judgment. Compare wake success and authority-conflict rate as well as absolute timing error and added nominal idle cost."
+  "derived": {
+    "sample_count": 11,
+    "normal_fast_comparable_sample_count": 5,
+    "cold_fallback_sample_count": 2,
+    "premature_invocation_sample_count": 1,
+    "shifted_rrule_eligible_late_sample_count": 4,
+    "shifted_rrule_eligible_early_sample_count": 1,
+    "min_offset_seconds": -121,
+    "max_offset_seconds": 3602,
+    "range_seconds": 3723,
+    "absolute_offset_max_seconds": 3602,
+    "latest_60s_final_rearm_delivery_offset_seconds": 59,
+    "latest_120s_final_rearm_delivery_offsets_seconds": [146, -121, 46],
+    "latest_120s_mean_signed_offset_seconds": 23.67,
+    "latest_120s_mean_absolute_offset_seconds": 104.33
+  },
+  "interpretation": "Three direct +120-second successor samples now exist: +146 seconds late, -121 seconds early, +46 seconds late. All three were eligible without observed duplicate authority. This supports continuity safety, but does not establish that +120 seconds is more timing-accurate than +60 seconds; provider jitter remains bidirectional and the +120 nominal offset itself adds one minute of planned idle versus +60.",
+  "next_action": "Treat +120 seconds as a continuation-safety canary rather than a timing-accuracy improvement. Continue >=600-second substantive turns and compare successful successor delivery/authority-conflict rate and total non-useful gap against +60 before promotion."
 }
