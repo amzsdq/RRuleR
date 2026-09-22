@@ -1,21 +1,8 @@
 {
-  "policy_id": "RRULER_PREMATURE_WAKE_FENCE",
-  "version": 3,
-  "status": "UTILIZATION_GUARD",
-  "purpose": "Prevent duplicate/stale substantive authority without rejecting harmless scheduler jitter that can increase utilization.",
-  "rule": "Treat schedule timestamps as target wake times, not exact-dispatch correctness goals. An early invocation is not automatically fenced. If no conflicting live authority/lease exists and durable state can be claimed monotonically, accept the wake and continue useful work immediately. Fence only when accepting it would create duplicate substantive authority, stale-state rollback, or destructive overlap. Never classify harmless early/late jitter itself as a failure.",
-  "timing_semantics": {
-    "normal_final_rearm": "ACTUAL END + exactly 1 minute (60 seconds)",
-    "normal_provisional": "eligible wake reference + exactly 11 minutes (660 seconds)",
-    "premature_tolerance_seconds": null,
-    "premature_tolerance_human": "No fixed early-jitter rejection threshold; safety/authority conflict determines fencing."
-  },
-  "forbidden": [
-    "DUPLICATE_SUBSTANTIVE_AUTHORITY",
-    "STALE_WAKE_ROLLBACK",
-    "JITTER_ONLY_IDLE_FENCING",
-    "SCHEDULER_EXACTNESS_AS_PRIMARY_KPI"
-  ],
-  "evidence_basis": "Epoch 85 invocation was observed at 08:28:42 KST while the predecessor's live-verified fast due remained 08:29:51 KST, 1 minute 9 seconds (69 seconds) later. Blind provisional rearm would have canceled the still-pending P0-B test, so the pending due was restored before it elapsed.",
-  "rollback": "Restore strict pre-due fencing only if measured overlap/duplicate side effects exceed the utilization benefit."
+  "policy_id":"RRULER_PREMATURE_WAKE_FENCE","version":4,"status":"UTILIZATION_GUARD","purpose":"Prevent duplicate/stale substantive authority without rejecting harmless scheduler jitter that can increase utilization.",
+  "rule":"Treat schedule timestamps as target wake times, not exact-dispatch correctness goals. Early or late invocation is not automatically fenced. If no conflicting live authority exists and durable state can be claimed monotonically, accept the wake and continue useful work immediately. Fence only duplicate substantive authority, stale rollback, or destructive overlap. Timing mismatch alone is never a BLOCKED or idle reason.",
+  "timing_semantics":{"normal_final_rearm":"ACTUAL END + exactly 2 minutes (120 seconds) during the active stability canary","normal_provisional":"eligible wake reference + exactly 11 minutes (660 seconds)","premature_tolerance_seconds":null,"premature_tolerance_human":"No fixed early/late jitter rejection threshold; safety/authority conflict determines fencing."},
+  "forbidden":["DUPLICATE_SUBSTANTIVE_AUTHORITY","STALE_WAKE_ROLLBACK","JITTER_ONLY_IDLE_FENCING","SCHEDULER_EXACTNESS_AS_PRIMARY_KPI"],
+  "evidence_basis":"Epoch 85 showed an early invocation could collide with a still-pending shifted due; epochs 89-91 showed shifted RRULE wakes can also arrive late and remain eligible. Therefore clock offset is evidence to measure, not sufficient authority evidence to fence.",
+  "rollback":"Restore stricter timing fencing only if measured overlap/duplicate side effects exceed the utilization benefit."
 }
