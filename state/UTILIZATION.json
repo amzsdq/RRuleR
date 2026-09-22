@@ -1,5 +1,5 @@
 {
-  "schema_version":"2.1",
+  "schema_version":"2.2",
   "program_id":"RRULER-PROGRAM-001",
   "root_job_id":"RRULER-UTILIZATION-003",
   "status":"P0_FINAL_WRITER_RRULE_CANARY_ACTIVE",
@@ -9,10 +9,7 @@
     "minimum_valid_completed_windows":3,
     "pass_rule":"THREE_CONSECUTIVE_VALID_ACCEPTED_FIXED_WINDOWS_WITH_SELECTED_ROLLING_MEAN_GTE_840",
     "maximum_unexplained_internal_progress_gap_seconds_for_acceptance":120,
-    "operator_locked_immediate_priorities":[
-      "P0-A: normal nonterminal turn worktime at least 10 minutes (600 observed elapsed seconds)",
-      "P0-B: SAME MAIN final scheduler write uses full recurring VEVENT and targets observed close + exactly 1 minute (60 seconds)"
-    ]
+    "operator_locked_immediate_priorities":["P0-A: normal nonterminal turn worktime at least 10 minutes (600 observed elapsed seconds)","P0-B: SAME MAIN final scheduler write uses full recurring VEVENT and targets observed close + exactly 1 minute (60 seconds)"]
   },
   "execution_envelope":{
     "bounded_turn_target_useful_seconds":600,
@@ -27,7 +24,11 @@
     "one_shot_forbidden":true,
     "dtstart_offset_json_forbidden":true,
     "durable_projection_drives_scheduler":false,
-    "durable_projection_follows_verified_live_due":true
+    "durable_projection_follows_verified_live_due":true,
+    "short_rolling_120_seconds_retired_as_default":true,
+    "durable_unit_chat_trace_enabled":true,
+    "unit_trace_requires_persisted_observed_duration_and_work_evidence":true,
+    "progress_trace_is_never_close_authority":true
   },
   "measurement":{
     "continuous_progress_evidence_required":true,
@@ -40,33 +41,25 @@
     "primary_kpi":"USEFUL_WORK_DUTY_CYCLE"
   },
   "latest_completed_bounded_turn":{
-    "run_id":"RUN-UTIL-20260922-020711",
-    "authority_epoch":81,
-    "wall_seconds":678,
-    "normal_floor_seconds":600,
-    "normal_floor_passed":true,
-    "verified_next_due_offset_seconds":60,
-    "verified_next_due_offset_human":"1 minute (60 seconds)",
-    "classification":"P0_A_SINGLE_TURN_PASS_AND_P0_B_SINGLE_CLOSE_PASS_NOT_YET_CONSECUTIVE_GATE"
+    "run_id":"RUN-UTIL-20260922-020711","authority_epoch":81,"wall_seconds":678,"normal_floor_seconds":600,"normal_floor_passed":true,"verified_next_due_offset_seconds":60,"verified_next_due_offset_human":"1 minute (60 seconds)","classification":"P0_A_SINGLE_TURN_PASS_AND_P0_B_SINGLE_CLOSE_PASS_NOT_YET_CONSECUTIVE_GATE"
   },
   "active_retest":{
     "experiment_id":"UTIL-EXP-022-FINAL-WRITER-RRULE",
-    "run_id":"RUN-UTIL-20260922-101524",
+    "run_id":"RUN-UTIL-20260922-104040",
+    "authority_epoch":88,
     "purpose":"Test whether the minimal proven same-automation full-RRULE update pattern eliminates post-close overwrite of the desired low-idle due.",
     "success_signal":"After a nonterminal close, live metadata retains SAME MAIN enabled=true with RRULE:FREQ=HOURLY and DTSTART equal to observed close + exactly 1 minute (60 seconds), with no later same-wake schedule mutation.",
     "failure_signal":"The 11-minute (660-second) provisional or another stale/derived due remains after close, RRULE disappears, automation is disabled/replaced, or a post-final reconciliation mutates schedule again.",
-    "verified_provisional_due_at":"2026-09-22T10:26:24+09:00"
+    "verified_provisional_due_at":"2026-09-22T10:51:40+09:00",
+    "policy_hardening_evidence":"control/scheduler-fence.v1.json@7793d250023434992bd8c49dae2e05f2921f73ef"
   },
   "valid_completed_windows_rolling":[],
   "rolling_mean_observed_useful_seconds":null,
   "goal_reached":false,
   "latest_diagnosis":{
     "cause_class":"SCHEDULE_LAST_WRITER_CONTROL_PLANE_INTERFERENCE_CANARY",
-    "evidence":"A separate RRULE self-update test repeatedly preserves the same automation, enabled state, and recurring RRULE while moving DTSTART. MAIN used the same schedule shape but durable/control reconciliation could leave a later provisional due as final state.",
+    "evidence":"The separate RRULE self-update test preserves same automation + enabled recurring RRULE while moving DTSTART. Epoch 88 additionally demoted CURRENT.next_due_at from scheduler authority to follower projection in scheduler-fence v11.",
     "implication":"Make the live close-time full-RRULE update authoritative and last; make durable state follow it rather than drive another scheduler mutation."
   },
-  "next_corrective_experiment":{
-    "experiment_id":"UTIL-EXP-022-FINAL-WRITER-RRULE",
-    "hypothesis":"Minimal same-automation full recurring VEVENT updates plus last-writer-wins close semantics will preserve the close + 1 minute (60 seconds) due and reduce idle without new scheduler machinery."
-  }
+  "next_corrective_experiment":{"experiment_id":"UTIL-EXP-022-FINAL-WRITER-RRULE","hypothesis":"Minimal same-automation full recurring VEVENT updates plus last-writer-wins close semantics will preserve the close + 1 minute (60 seconds) due and reduce idle without new scheduler machinery."}
 }
