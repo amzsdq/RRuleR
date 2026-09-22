@@ -1,18 +1,3 @@
 {
-  "schema_version":"1.1",
-  "program_id":"RRULER-PROGRAM-001",
-  "root_job_id":"RRULER-UTILIZATION-003",
-  "canonical_automation_id":"6ab152b636748191a71873ba4d5ef551",
-  "status":"ACTIVE",
-  "active_run_id":"RUN-UTIL-20260922-113659",
-  "authority_epoch":92,
-  "substantive_work_started_at":"2026-09-22T11:37:25+09:00",
-  "last_progress_at":"2026-09-22T11:37:25+09:00",
-  "last_progress_kind":"EPOCH_92_BOOTSTRAP_REARM_VERIFIED",
-  "current_unit":"Continue P001 utilization work; collect second +120-second stability sample and harden evidence consistency without treating scheduler timing mismatch as a fence.",
-  "provisional_next_wake_due_at":"2026-09-22T11:50:00+09:00",
-  "next_wake_due_at":null,
-  "successor_observed":false,
-  "handoff_ready":false,
-  "operator_ui_note":"Epoch 92 authority claimed; provisional recurring RRULE verified. Timing mismatch alone did not suppress work."
+  "schema_version":"1.1","program_id":"RRULER-PROGRAM-001","root_job_id":"RRULER-UTILIZATION-003","canonical_automation_id":"6ab152b636748191a71873ba4d5ef551","status":"HANDOFF_READY","active_run_id":null,"authority_epoch":92,"substantive_work_started_at":"2026-09-22T11:37:25+09:00","last_progress_at":"2026-09-22T11:38:23+09:00","last_progress_kind":"EPOCH_92_FINAL_WRITER_CLOSE_V571_2M_CANARY","current_unit":"Recorded second direct +120-second successor sample (-121s early), advanced utilization diagnosis, and hardened jitter-safe authority decision test. Platform turn ended before the 600-second normal floor; no padding or fabricated work time.","provisional_next_wake_due_at":"2026-09-22T11:50:00+09:00","next_wake_due_at":"2026-09-22T11:40:23+09:00","successor_observed":false,"handoff_ready":true,"operator_ui_note":"Epoch 92 accepted early timing as harmless after monotonic authority claim, performed artifact-backed work, and live-verified SAME MAIN recurring final due 11:40:23 KST."
 }
