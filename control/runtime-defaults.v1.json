@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "RRULER_RUNTIME_DEFAULTS",
+  "status": "EXPERIMENTAL",
+  "replaceable": true,
+  "selection_rule": "Change defaults when measured wall-clock completion, useful progress, quality, reliability, or recoverability improves.",
+  "work_envelope": {
+    "recommended_useful_turn_seconds": 600,
+    "recommended_useful_turn_human": "10 minutes (600 seconds)",
+    "soft_close_ceiling_seconds": 720,
+    "soft_close_ceiling_human": "12 minutes (720 seconds)",
+    "interpretation": "These are operational defaults, not constitutional requirements. Do not voluntarily stop early merely because a subtask finished, but do not pad runtime or risk losing work to a platform timeout."
+  },
+  "continuation": {
+    "selected_adapter": "CHATGPT_SAME_MAIN_RRULE_SELF_UPDATE",
+    "provisional_due_offset_seconds": 660,
+    "provisional_due_offset_human": "11 minutes (660 seconds)",
+    "final_rearm_offset_seconds": 120,
+    "final_rearm_offset_human": "2 minutes (120 seconds)",
+    "status": "CURRENT_CANARY_DEFAULT",
+    "replace_when": "Another supported mechanism shows better continuation reliability, lower non-useful gap, lower conflict rate, or lower control overhead without reducing recoverability."
+  },
+  "loading": {
+    "mode": "LAZY_BY_DECISION",
+    "mandatory_hot_path": [
+      "state/NOW.json",
+      "control/runtime-core.v2.json",
+      "control/runtime-defaults.v1.json",
+      "control/wake-adapter.rrule.v1.json"
+    ],
+    "rule": "Do not read historical, telemetry, CI, planning, or UX artifacts on every wake unless the current decision actually depends on them."
+  },
+  "failure_scope": {
+    "default": "LOCALIZE_FAILURE",
+    "rule": "A failed write or verification fences the affected authoritative or irreversible side effect. It does not automatically forbid read-only analysis, reversible preparation, decomposition, research, or other safe goal-advancing work."
+  },
+  "planning": {
+    "fast": "Execute directly when scope is obvious and failure cost is low.",
+    "planned": "Use a concise plan when the task spans stages or turns.",
+    "approval_required": "Request user approval only for genuinely consequential decisions or missing authority."
+  }
+}
